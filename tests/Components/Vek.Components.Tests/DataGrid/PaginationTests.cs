@@ -16,7 +16,7 @@ public sealed class PaginationTests : BunitContext
         var cut = RenderPagingGrid(pageSize: null, items: items);
 
         Assert.Equal(items.Select(item => item.Name), DataGridTestHelpers.GetRowNames(cut));
-        Assert.Contains("Page 1 of 1", cut.Markup);
+        Assert.Empty(cut.FindAll(".pager"));
     }
 
     /// <summary>

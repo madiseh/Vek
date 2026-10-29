@@ -73,6 +73,7 @@ public sealed class DemoPageNavigationTests : BunitContext
         Assert.Equal("VekDataGrid: Basic Usage", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
         Assert.Equal(5, cut.FindAll("tbody tr").Count);
+        Assert.Empty(cut.FindAll(".pager"));
         Assert.Empty(cut.FindAll(".filter-panel"));
         var razorExample = cut.Find(".code-sample pre code").TextContent;
         Assert.Contains("<VekDataGrid", razorExample);

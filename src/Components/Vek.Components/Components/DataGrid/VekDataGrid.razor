@@ -257,7 +257,7 @@
         </table>
     </div>
 
-    @if (!VirtualizeRows && PagerContent is null)
+    @if (!VirtualizeRows && PagerContent is null && (PageSize > 0 || ServerData is not null))
     {
         <nav class="pager" aria-label="Table pagination">
             <label>Rows per page
@@ -273,7 +273,7 @@
             <button type="button" aria-label="Next page" @onclick="() => SetCurrentPageAsync(_currentPage + 1)" disabled="@(_currentPage >= totalPages)">Next</button>
         </nav>
     }
-    else if (!VirtualizeRows)
+    else if (!VirtualizeRows && PagerContent is not null)
     {
         @PagerContent?.Invoke(pagerContext)
     }
