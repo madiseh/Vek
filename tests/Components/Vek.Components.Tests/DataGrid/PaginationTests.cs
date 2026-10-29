@@ -6,6 +6,19 @@ namespace Vek.Components.Tests.DataGrid;
 
 public sealed class PaginationTests : BunitContext
 {
+    /// <summary>Verifies the grid displays every supplied item when no page size is specified.</summary>
+    [Fact]
+    public void DefaultPageSizeDisplaysAllItems()
+    {
+        var items = Enumerable.Range(1, 12)
+            .Select(index => new TestProduct($"Product {index}"))
+            .ToArray();
+        var cut = RenderPagingGrid(pageSize: null, items: items);
+
+        Assert.Equal(items.Select(item => item.Name), DataGridTestHelpers.GetRowNames(cut));
+        Assert.Contains("Page 1 of 1", cut.Markup);
+    }
+
     /// <summary>
     /// Verifies that the pager navigates forward and backward between result pages.
     /// </summary>
@@ -95,19 +108,26 @@ public sealed class PaginationTests : BunitContext
     }
 
     private IRenderedComponent<VekDataGrid<TestProduct>> RenderPagingGrid(
-        int pageSize = 2,
+        int? pageSize = 2,
         TestProduct[]? items = null,
         RenderFragment<VekDataGridPagerContext<TestProduct>>? pagerContent = null,
-        Action<int>? currentPageChanged = null) => Render<VekDataGrid<TestProduct>>(parameters => parameters
-            .Add(grid => grid.Items, items ?? DataGridTestHelpers.Products)
-            .Add(grid => grid.PageSize, pageSize)
-            .Add(grid => grid.PageSizeOptions, new[] { 1, 2, 3 })
-            .Add(grid => grid.PagerContent, pagerContent)
-            .Add(grid => grid.CurrentPageChanged, EventCallback.Factory.Create(this, currentPageChanged ?? (_ => { })))
-            .AddChildContent(builder =>
+        Action<int>? currentPageChanged = null) => Render<VekDataGrid<TestProduct>>(parameters =>
+        {
+            parameters.Add(grid => grid.Items, items ?? DataGridTestHelpers.Products);
+            if (pageSize.HasValue)
+            {
+                parameters.Add(grid => grid.PageSize, pageSize.Value);
+            }
+
+            parameters
+                .Add(grid => grid.PageSizeOptions, new[] { 1, 2, 3 })
+                .Add(grid => grid.PagerContent, pagerContent)
+                .Add(grid => grid.CurrentPageChanged, EventCallback.Factory.Create(this, currentPageChanged ?? (_ => { })))
+                .AddChildContent(builder =>
             {
                 builder.OpenComponent<PropertyColumn<TestProduct, string>>(0);
                 builder.AddAttribute(1, nameof(PropertyColumn<TestProduct, string>.Property), (System.Linq.Expressions.Expression<Func<TestProduct, string>>)(product => product.Name));
                 builder.CloseComponent();
-            }));
+            });
+        });
 }

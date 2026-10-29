@@ -528,10 +528,11 @@ public partial class VekDataGrid<TItem> : IDisposable
     }
 
     /// <summary>
-    /// Gets or sets the maximum number of rows displayed on each page. Defaults to 10.
+    /// Gets or sets the maximum number of rows displayed on each page. Defaults to all client items;
+    /// when using server data, the default request size is 10.
     /// </summary>
     [Parameter]
-    public int PageSize { get; set; } = 10;
+    public int PageSize { get; set; }
 
     /// <summary>Gets or sets the current one-based page for two-way binding.</summary>
     [Parameter]
@@ -1360,7 +1361,11 @@ public partial class VekDataGrid<TItem> : IDisposable
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
-    private int EffectivePageSize => Math.Max(PageSize, 1);
+    private int EffectivePageSize => PageSize > 0
+        ? PageSize
+        : ServerData is not null
+            ? 10
+            : Math.Max(TotalItems, 1);
 
     /// <summary>Clamps the current page when incoming data or parameters reduce the page count.</summary>
     protected override async Task OnParametersSetAsync()

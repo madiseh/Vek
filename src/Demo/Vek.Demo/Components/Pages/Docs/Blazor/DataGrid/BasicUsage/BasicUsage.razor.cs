@@ -5,7 +5,7 @@ namespace Vek.Demo.Components.Pages.Docs.Blazor.DataGrid.BasicUsage;
 public partial class BasicUsage
 {
     private const string RazorExample = """
-        <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="10">
+        <VekDataGrid TItem="DemoProduct" Items="_products">
             <PropertyColumn Property="product => product.Name" Title="Name" />
             <PropertyColumn Property="product => product.Category" Title="Category" />
             <PropertyColumn Property="product => product.Price" Title="Price" Format="C2" />
@@ -45,7 +45,7 @@ public partial class BasicUsage
 
     protected override async Task OnInitializedAsync()
     {
-        _products = await ProductProvider.GetProductsAsync();
+        _products = (await ProductProvider.GetProductsAsync()).Take(5).ToArray();
     }
 
     private void ShowRazor() => _showCodeBehind = false;

@@ -59,7 +59,11 @@ public sealed class DemoPageNavigationTests : BunitContext
         Services.AddSingleton<IDemoProductProvider>(new TestProductProvider(
         [
             new DemoProduct(1, "Desk Lamp", "Lighting", 49.99m),
-            new DemoProduct(2, "Task Chair", "Furniture", 199.00m)
+            new DemoProduct(2, "Task Chair", "Furniture", 199.00m),
+            new DemoProduct(3, "Notebook Set", "Stationery", 12.90m),
+            new DemoProduct(4, "Desk Organizer", "Accessories", 18.50m),
+            new DemoProduct(5, "Reading Lamp", "Lighting", 38.00m),
+            new DemoProduct(6, "Standing Desk", "Furniture", 429.00m)
         ]));
         Services.GetRequiredService<NavigationManager>()
             .NavigateTo("/docs/components/vekdatagrid/basic-usage");
@@ -68,9 +72,11 @@ public sealed class DemoPageNavigationTests : BunitContext
 
         Assert.Equal("VekDataGrid: Basic Usage", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
+        Assert.Equal(5, cut.FindAll("tbody tr").Count);
         Assert.Empty(cut.FindAll(".filter-panel"));
         var razorExample = cut.Find(".code-sample pre code").TextContent;
         Assert.Contains("<VekDataGrid", razorExample);
+        Assert.DoesNotContain("PageSize", razorExample);
         Assert.Contains("<TemplateColumn", razorExample);
         Assert.DoesNotContain("GetProductsAsync", razorExample);
         Assert.Equal(

@@ -7,14 +7,12 @@
     <article class="docs-article">
         <h1>VekDataGrid: Basic Usage</h1>
         <p class="docs-intro">
-            Display a collection of items in a sortable table with built-in pagination.
+            Display every supplied item in a sortable table, and opt into pagination with <code>PageSize</code>.
         </p>
 
         <section id="live-example" class="docs-section-content" aria-labelledby="live-example-heading">
             <h2 id="live-example-heading">Live example</h2>
-            <p>
-                Click a column heading to sort the products. Use the pager to move between result pages.
-            </p>
+            <p>Click a column heading to sort the five sample products.</p>
             @if (_products is null)
             {
                 <p class="docs-loading" role="status">Loading sample products...</p>
@@ -22,7 +20,7 @@
             else
             {
                 <div class="docs-example-frame">
-                    <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="10" Class="docs-data-grid">
+                    <VekDataGrid TItem="DemoProduct" Items="_products" Class="docs-data-grid">
                         <PropertyColumn Property="product => product.Name" Title="Name" />
                         <PropertyColumn Property="product => product.Category" Title="Category" />
                         <PropertyColumn Property="product => product.Price" Title="Price" Format="C2" />
@@ -64,8 +62,8 @@
         <section id="sorting-and-pagination" class="docs-section-content" aria-labelledby="features-heading">
             <h2 id="features-heading">Sorting and pagination</h2>
             <p>
-                Each property column can be sorted by selecting its heading. Set <code>PageSize</code>
-                to choose how many rows appear on each page; it defaults to 10.
+                Each property column can be sorted by selecting its heading. When <code>PageSize</code>
+                is omitted, all supplied items are displayed. Set it to opt into pagination.
             </p>
             <p>
                 Column filters are opt-in: <code>Filterable</code> defaults to false. Set it to true on columns that need filtering and choose a filter layout on the grid. See <a href="/docs/components/vekdatagrid/filtering">Filtering</a> for the available options.
