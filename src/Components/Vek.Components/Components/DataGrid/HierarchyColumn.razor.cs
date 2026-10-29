@@ -21,6 +21,22 @@ public partial class HierarchyColumn<TItem> : IDisposable, IVekDataGridColumn<TI
     [Parameter]
     public EventCallback<bool> VisibleChanged { get; set; }
 
+    /// <summary>Gets or sets the initial or current width of the column in pixels.</summary>
+    [Parameter]
+    public int? Width { get; set; }
+
+    /// <summary>Gets or sets the minimum resizable width in pixels.</summary>
+    [Parameter]
+    public int MinWidth { get; set; } = 80;
+
+    /// <summary>Gets or sets the maximum resizable width in pixels.</summary>
+    [Parameter]
+    public int MaxWidth { get; set; } = 600;
+
+    /// <summary>Gets or sets the callback invoked when this column's width changes.</summary>
+    [Parameter]
+    public EventCallback<int?> WidthChanged { get; set; }
+
     /// <summary>Registers the hierarchy column with its parent grid.</summary>
     protected override void OnParametersSet()
     {
@@ -37,6 +53,14 @@ public partial class HierarchyColumn<TItem> : IDisposable, IVekDataGridColumn<TI
     {
         Visible = visible;
         await VisibleChanged.InvokeAsync(visible);
+    }
+    int? IVekDataGridColumn<TItem>.Width { get => Width; set => Width = value; }
+    int IVekDataGridColumn<TItem>.MinWidth => MinWidth;
+    int IVekDataGridColumn<TItem>.MaxWidth => MaxWidth;
+    async Task IVekDataGridColumn<TItem>.SetWidthAsync(int width)
+    {
+        Width = width;
+        await WidthChanged.InvokeAsync(width);
     }
     bool IVekDataGridColumn<TItem>.Sortable => false;
     bool IVekDataGridColumn<TItem>.Filterable => false;

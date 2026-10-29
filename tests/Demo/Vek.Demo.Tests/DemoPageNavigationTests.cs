@@ -326,6 +326,23 @@ public sealed class DemoPageNavigationTests : BunitContext
     }
 
     /// <summary>
+    /// Verifies the column layout guide demonstrates sizing, fixed headers, and responsive styling.
+    /// </summary>
+    [Fact]
+    public void DataGridColumnLayoutRouteShowsSizingAndStyleOptions()
+    {
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo("/docs/components/vekdatagrid/column-layout");
+
+        var cut = Render<Routes>();
+
+        Assert.Equal("VekDataGrid: Column Layout", cut.Find("main h1").TextContent.Trim());
+        Assert.Contains("ColumnResizeMode", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("FixedHeader=\"true\"", cut.Find(".code-sample pre code").TextContent);
+        Assert.Equal("/docs/components/vekdatagrid/column-layout", cut.Find(".docs-sidebar a.active").GetAttribute("href"));
+    }
+
+    /// <summary>
     /// Verifies that the code sample switches from Razor markup to its C# code-behind.
     /// </summary>
     [Fact]

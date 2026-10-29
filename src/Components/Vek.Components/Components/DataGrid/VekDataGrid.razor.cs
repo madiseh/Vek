@@ -30,6 +30,7 @@ public partial class VekDataGrid<TItem>
     private long _serverRequestVersion;
     private bool _serverInitialized;
     private IReadOnlyList<TItem> _virtualServerItems = Array.Empty<TItem>();
+    private int _virtualServerStartIndex;
     private Virtualize<TItem>? _virtualizer;
     private bool _columnPanelOpen;
     private string _columnSearch = string.Empty;
@@ -44,6 +45,7 @@ public partial class VekDataGrid<TItem>
         IReadOnlyList<TItem> Items,
         int Level,
         string Path);
+    private sealed record ColumnGroupSegment(string? Title, int Span);
 
     /// <summary>
     /// Gets or sets the complete collection of items displayed by the grid.
@@ -87,6 +89,70 @@ public partial class VekDataGrid<TItem>
     [Parameter]
     public EventCallback<IReadOnlyList<string>> ColumnReordered { get; set; }
 
+    /// <summary>Gets or sets the visible column groups shown above the table headings.</summary>
+    [Parameter]
+    public IReadOnlyList<VekDataGridColumnGroup> ColumnGroups { get; set; } = Array.Empty<VekDataGridColumnGroup>();
+
+    /// <summary>Gets or sets the resizing surface enabled for the grid.</summary>
+    [Parameter]
+    public VekDataGridColumnResizeMode ColumnResizeMode { get; set; }
+
+    /// <summary>Gets or sets the row density.</summary>
+    [Parameter]
+    public VekDataGridDensity Density { get; set; } = VekDataGridDensity.Comfortable;
+
+    /// <summary>Gets or sets whether the grid draws cell borders.</summary>
+    [Parameter]
+    public bool Bordered { get; set; }
+
+    /// <summary>Gets or sets whether alternating rows receive a contrasting background.</summary>
+    [Parameter]
+    public bool Striped { get; set; }
+
+    /// <summary>Gets or sets whether the table header remains visible while its container scrolls.</summary>
+    [Parameter]
+    public bool FixedHeader { get; set; }
+
+    /// <summary>Gets or sets whether the grid applies narrow-screen overflow constraints.</summary>
+    [Parameter]
+    public bool Responsive { get; set; }
+
+    /// <summary>Gets or sets the initial width of a resizable grid container in pixels.</summary>
+    [Parameter]
+    public int? ContainerWidth { get; set; }
+
+    /// <summary>Gets or sets a function that supplies a CSS class for a row.</summary>
+    [Parameter]
+    public Func<TItem, int, string?>? RowClass { get; set; }
+
+    /// <summary>Gets or sets a function that supplies inline CSS for a row.</summary>
+    [Parameter]
+    public Func<TItem, int, string?>? RowStyle { get; set; }
+
+    /// <summary>Gets or sets a function that supplies a CSS class for a cell.</summary>
+    [Parameter]
+    public Func<TItem, string, int, string?>? CellClass { get; set; }
+
+    /// <summary>Gets or sets a function that supplies inline CSS for a cell.</summary>
+    [Parameter]
+    public Func<TItem, string, int, string?>? CellStyle { get; set; }
+
+    /// <summary>Gets or sets a function that supplies a CSS class for a column heading.</summary>
+    [Parameter]
+    public Func<string, string?>? HeaderClass { get; set; }
+
+    /// <summary>Gets or sets a function that supplies inline CSS for a column heading.</summary>
+    [Parameter]
+    public Func<string, string?>? HeaderStyle { get; set; }
+
+    /// <summary>Gets or sets a function that supplies a CSS class for the aggregate footer.</summary>
+    [Parameter]
+    public Func<string?>? FooterClass { get; set; }
+
+    /// <summary>Gets or sets a function that supplies inline CSS for the aggregate footer.</summary>
+    [Parameter]
+    public Func<string?>? FooterStyle { get; set; }
+
     /// <summary>Gets or sets whether rows are rendered through the framework virtualizer.</summary>
     [Parameter]
     public bool VirtualizeRows { get; set; }
@@ -120,6 +186,8 @@ public partial class VekDataGrid<TItem>
     private int VisibleColumnCount => Math.Max(VisibleColumns.Count, 1);
     private bool CanReorderInPanel => ColumnReorderMode is VekDataGridColumnReorderMode.Panel or VekDataGridColumnReorderMode.Both;
     private bool CanReorderInHeader => ColumnReorderMode is VekDataGridColumnReorderMode.Header or VekDataGridColumnReorderMode.Both;
+    private int? CurrentContainerWidth => _containerWidth ?? ContainerWidth;
+    private int? _containerWidth;
 
     /// <summary>Changes a column's visibility by its stable key.</summary>
     public async Task SetColumnVisibilityAsync(string columnKey, bool visible)
@@ -149,6 +217,98 @@ public partial class VekDataGrid<TItem>
         await ColumnReordered.InvokeAsync(_columns.Select(candidate => candidate.Key).ToArray());
         await InvokeAsync(StateHasChanged);
     }
+
+    /// <summary>Changes a column's width by its stable key, clamped to that column's size limits.</summary>
+    public async Task ResizeColumnAsync(string columnKey, int width)
+    {
+        if (ColumnResizeMode != VekDataGridColumnResizeMode.Column)
+            throw new InvalidOperationException("Column resizing must be enabled with ColumnResizeMode.Column.");
+        var column = _columns.FirstOrDefault(candidate => candidate.Key == columnKey)
+            ?? throw new ArgumentException($"No column with key '{columnKey}' is registered.", nameof(columnKey));
+        var minimum = Math.Max(column.MinWidth, 32);
+        var maximum = Math.Max(column.MaxWidth, minimum);
+        await column.SetWidthAsync(Math.Clamp(width, minimum, maximum));
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private Task ResizeContainerAsync(ChangeEventArgs args)
+    {
+        if (int.TryParse(args.Value?.ToString(), out var width))
+            _containerWidth = Math.Clamp(width, 320, 1440);
+        return InvokeAsync(StateHasChanged);
+    }
+
+    private Task ResizeColumnFromInputAsync(string columnKey, ChangeEventArgs args)
+        => int.TryParse(args.Value?.ToString(), out var width)
+            ? ResizeColumnAsync(columnKey, width)
+            : Task.CompletedTask;
+
+    private int GetColumnWidthValue(IVekDataGridColumn<TItem> column) => column.Width ?? 160;
+
+    private string? GetColumnWidthStyle(IVekDataGridColumn<TItem> column)
+    {
+        var widthStyle = column.Width is int width ? $"width: {width}px;" : null;
+        var minWidthStyle = column.MinWidth > 0 ? $"min-width: {column.MinWidth}px;" : null;
+        return string.Concat(widthStyle, minWidthStyle);
+    }
+
+    private string? GetGridStyle() => CurrentContainerWidth is int width
+        ? $"width: {width}px; max-width: 100%;"
+        : null;
+
+    private string GetGridClass() => string.Join(' ', new[]
+    {
+        Class,
+        Responsive ? "is-responsive" : null,
+        Density == VekDataGridDensity.Compact ? "is-compact" : null,
+        Bordered ? "is-bordered" : null,
+        Striped ? "is-striped" : null
+    }.Where(value => !string.IsNullOrWhiteSpace(value)));
+
+    private string? GetHeaderClass(string key)
+        => string.Join(' ', new[] { GetColumnDragClass(key), HeaderClass?.Invoke(key) }
+            .Where(value => !string.IsNullOrWhiteSpace(value)));
+
+    private string? GetCellStyle(TItem item, IVekDataGridColumn<TItem> column, int index)
+        => string.Concat(GetColumnWidthStyle(column), CellStyle?.Invoke(item, column.Key, index));
+
+    private int GetRowIndex(TItem item)
+    {
+        var source = ServerVirtualData is not null
+            ? _virtualServerItems.ToList()
+            : ServerData is not null ? _serverItems.ToList() : GetSortedItems();
+        var itemIndex = source.FindIndex(candidate => EqualityComparer<TItem>.Default.Equals(candidate, item));
+        if (itemIndex < 0) itemIndex = 0;
+        return ServerVirtualData is not null
+            ? _virtualServerStartIndex + itemIndex
+            : ServerData is not null ? ((_currentPage - 1) * EffectivePageSize) + itemIndex : itemIndex;
+    }
+
+    private IReadOnlyList<ColumnGroupSegment> GetColumnGroupSegments()
+    {
+        var columns = VisibleColumns;
+        var segments = new List<ColumnGroupSegment>();
+        for (var index = 0; index < columns.Count;)
+        {
+            var group = ColumnGroups.FirstOrDefault(candidate => candidate.ColumnKeys.Contains(columns[index].Key));
+            var span = 1;
+            while (index + span < columns.Count)
+            {
+                var nextGroup = ColumnGroups.FirstOrDefault(candidate => candidate.ColumnKeys.Contains(columns[index + span].Key));
+                if (!ReferenceEquals(group, nextGroup)) break;
+                span++;
+            }
+
+            segments.Add(new ColumnGroupSegment(group?.Title, span));
+            index += span;
+        }
+
+        return segments;
+    }
+
+    private string? GetRowClass(TItem item, int index)
+        => string.Join(' ', new[] { IsItemSelected(item) ? "is-selected" : null, RowClass?.Invoke(item, index) }
+            .Where(value => !string.IsNullOrWhiteSpace(value)));
 
     private void ToggleColumnPanel() => _columnPanelOpen = !_columnPanelOpen;
 
@@ -671,6 +831,7 @@ public partial class VekDataGrid<TItem>
         var availableItems = Math.Max(0, totalItems - request.StartIndex);
         var requestedItems = Math.Min(request.Count, availableItems);
         var items = result.Items.Take(requestedItems).ToArray();
+        _virtualServerStartIndex = request.StartIndex;
         _virtualServerItems = items;
         return new ItemsProviderResult<TItem>(items, totalItems);
     }
@@ -694,16 +855,19 @@ public partial class VekDataGrid<TItem>
             throw new InvalidOperationException("Virtualization cannot be combined with hierarchical row details because expanded rows have variable heights.");
 
         var sequence = 0;
-        var selected = IsItemSelected(item);
+        var rowIndex = GetRowIndex(item);
         builder.OpenElement(sequence++, "tr");
         builder.SetKey(item);
-        builder.AddAttribute(sequence++, "class", selected ? "is-selected" : null);
-        builder.AddAttribute(sequence++, "aria-selected", selected);
+        builder.AddAttribute(sequence++, "class", GetRowClass(item, rowIndex));
+        builder.AddAttribute(sequence++, "style", RowStyle?.Invoke(item, rowIndex));
+        builder.AddAttribute(sequence++, "aria-selected", IsItemSelected(item));
         builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => SelectRowAsync(item)));
 
         foreach (var column in VisibleColumns)
         {
             builder.OpenElement(sequence++, "td");
+            builder.AddAttribute(sequence++, "class", CellClass?.Invoke(item, column.Key, rowIndex));
+            builder.AddAttribute(sequence++, "style", GetCellStyle(item, column, rowIndex));
             if (IsEditing(item, column) && column.EditTemplate is not null)
             {
                 builder.OpenComponent<CascadingValue<EditContext>>(sequence++);
@@ -911,13 +1075,17 @@ public partial class VekDataGrid<TItem>
         var sequence = 0;
         foreach (var item in items)
         {
+            var rowIndex = GetRowIndex(item);
             builder.OpenElement(sequence++, "tr");
-            builder.AddAttribute(sequence++, "class", IsItemSelected(item) ? "is-selected" : null);
+            builder.AddAttribute(sequence++, "class", GetRowClass(item, rowIndex));
+            builder.AddAttribute(sequence++, "style", RowStyle?.Invoke(item, rowIndex));
             builder.AddAttribute(sequence++, "aria-selected", IsItemSelected(item));
             builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => SelectRowAsync(item)));
             foreach (var column in VisibleColumns)
             {
                 builder.OpenElement(sequence++, "td");
+                builder.AddAttribute(sequence++, "class", CellClass?.Invoke(item, column.Key, rowIndex));
+                builder.AddAttribute(sequence++, "style", GetCellStyle(item, column, rowIndex));
                 var editContext = GetEditContext(item, column);
                 if (editContext is not null && column.EditTemplate is not null)
                 {

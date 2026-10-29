@@ -1,0 +1,66 @@
+@page "/docs/components/vekdatagrid/column-layout"
+@layout DocumentationLayout
+
+<PageTitle>VekDataGrid Column Layout | Vek Components</PageTitle>
+
+<div class="docs-page-layout">
+    <article class="docs-article">
+        <h1>VekDataGrid: Column Layout</h1>
+        <p class="docs-intro">Arrange related columns, set useful widths, and tune the table for dense or narrow layouts.</p>
+
+        <section id="live-example" class="docs-section-content" aria-labelledby="live-example-heading">
+            <h2 id="live-example-heading">Live example</h2>
+            <p>Resize columns from their heading controls. The header stays visible inside its scroll area, and the grid keeps wide content inside its own horizontal scroller.</p>
+            @if (_products is null)
+            {
+                <p class="docs-loading" role="status">Loading sample products...</p>
+            }
+            else
+            {
+                <div class="docs-example-frame">
+                    <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="5"
+                                 ColumnGroups="_columnGroups" ColumnResizeMode="VekDataGridColumnResizeMode.Column"
+                                 Density="VekDataGridDensity.Compact" Bordered="true" Striped="true"
+                                 FixedHeader="true" Responsive="true"
+                                 RowClass="GetRowClass" CellClass="GetCellClass">
+                        <ChildContent>
+                            <PropertyColumn Property="product => product.Name" Title="Name" Key="Name" Width="210" />
+                            <PropertyColumn Property="product => product.Category" Title="Category" Key="Category" Width="160" />
+                            <PropertyColumn Property="product => product.Price" Title="Price" Key="Price" Format="C2" Width="140" />
+                        </ChildContent>
+                    </VekDataGrid>
+                </div>
+            }
+        </section>
+
+        <section id="code" class="docs-section-content" aria-labelledby="code-heading">
+            <h2 id="code-heading">Code</h2>
+            <div class="code-sample">
+                <div class="code-tabs" role="group" aria-label="Code sample files">
+                    <button type="button" class="code-tab @(!_showCodeBehind ? "is-active" : null)" data-sample="razor" aria-pressed="@(!_showCodeBehind)" @onclick="ShowRazor">Sample.razor</button>
+                    <button type="button" class="code-tab @(_showCodeBehind ? "is-active" : null)" data-sample="code-behind" aria-pressed="@_showCodeBehind" @onclick="ShowCodeBehind">Sample.razor.cs</button>
+                </div>
+                <pre><code>@SelectedCode</code></pre>
+            </div>
+        </section>
+
+        <section id="sizing" class="docs-section-content" aria-labelledby="sizing-heading">
+            <h2 id="sizing-heading">Sizing and grouped headings</h2>
+            <p>Give each column a stable <code>Key</code> before adding its key to <code>ColumnGroups</code>. Set <code>Width</code>, <code>MinWidth</code>, and <code>MaxWidth</code> to define its sizing range.</p>
+            <p><code>ColumnResizeMode.Column</code> exposes column controls; <code>Container</code> exposes the grid width control. Fixed headers scroll within the grid, while responsive mode contains wide columns in a horizontal scroller.</p>
+        </section>
+
+        <section id="appearance" class="docs-section-content" aria-labelledby="appearance-heading">
+            <h2 id="appearance-heading">Density and row styling</h2>
+            <p>Use <code>Density</code>, <code>Bordered</code>, and <code>Striped</code> to set common table treatments. Row, cell, header, and footer callbacks can add data-dependent classes or inline styles.</p>
+        </section>
+    </article>
+
+    <nav class="docs-toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <a href="/docs/components/vekdatagrid/column-layout#live-example">Live example</a>
+        <a href="/docs/components/vekdatagrid/column-layout#code">Code</a>
+        <a href="/docs/components/vekdatagrid/column-layout#sizing">Sizing and grouped headings</a>
+        <a href="/docs/components/vekdatagrid/column-layout#appearance">Density and row styling</a>
+    </nav>
+</div>

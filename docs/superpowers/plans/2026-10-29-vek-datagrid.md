@@ -224,11 +224,11 @@ Task 1 defines these Vek-owned contracts, then later tasks extend them only when
 
 **Interfaces:** Produces column groups/initial sizing, column/container resize modes, breakpoint behavior, density, borders, striping, fixed header, and per-row/cell/header/footer class/style functions.
 
-- [ ] Add tests `ColumnGroupSpansConfiguredColumns`, `ColumnResizeUpdatesConfiguredWidth`, `RowStyleFunctionReceivesItemAndIndex`, `FixedHeaderKeepsHeaderVisible`, and `NarrowGridAvoidsPageOverflow`.
-- [ ] Run focused layout tests and confirm failures.
-- [ ] Implement sizing/resize/layout behavior with visible keyboard focus and pointer/touch affordances; preserve sensible horizontal overflow for genuinely wide data.
-- [ ] Run focused tests and component suite.
-- [ ] Add the live Column Layout page and verify navigation.
+- [x] Add tests `ColumnGroupSpansConfiguredColumns`, `ColumnResizeUpdatesConfiguredWidth`, `RowStyleFunctionReceivesItemAndIndex`, `FixedHeaderKeepsHeaderVisible`, and `NarrowGridAvoidsPageOverflow`.
+- [x] Run focused layout tests and confirm failures.
+- [x] Implement sizing/resize/layout behavior with visible keyboard focus and pointer/touch affordances; preserve sensible horizontal overflow for genuinely wide data.
+- [x] Run focused tests and component suite.
+- [x] Add the live Column Layout page and verify navigation.
 - [ ] Commit as `feat: add data grid column layout controls`.
 
 ### Task 14: Templates, presentation, culture, and accessibility

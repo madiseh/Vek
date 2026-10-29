@@ -12,6 +12,10 @@ internal interface IVekDataGridColumn<TItem>
     string Key { get; }
     bool Visible { get; set; }
     Task SetVisibleAsync(bool visible);
+    int? Width { get; set; }
+    int MinWidth { get; }
+    int MaxWidth { get; }
+    Task SetWidthAsync(int width);
 
     /// <summary>
     /// Gets whether this column can be sorted.

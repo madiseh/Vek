@@ -128,6 +128,31 @@ public enum VekDataGridColumnReorderMode
     Both
 }
 
+/// <summary>Determines whether columns or the overall grid can be resized.</summary>
+public enum VekDataGridColumnResizeMode
+{
+    /// <summary>Resizing controls are hidden.</summary>
+    None,
+    /// <summary>Each column can be resized independently.</summary>
+    Column,
+    /// <summary>The overall grid width can be adjusted.</summary>
+    Container
+}
+
+/// <summary>Controls the vertical spacing used for grid rows and cells.</summary>
+public enum VekDataGridDensity
+{
+    /// <summary>Uses standard row spacing.</summary>
+    Comfortable,
+    /// <summary>Uses reduced row spacing.</summary>
+    Compact
+}
+
+/// <summary>Groups a set of column keys under one table header.</summary>
+/// <param name="Title">The group heading shown above its columns.</param>
+/// <param name="ColumnKeys">The ordered stable keys of the grouped columns.</param>
+public sealed record VekDataGridColumnGroup(string Title, IReadOnlyList<string> ColumnKeys);
+
 /// <summary>Chooses the calculation performed for an aggregate definition.</summary>
 public enum VekDataGridAggregateType
 {

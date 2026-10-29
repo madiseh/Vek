@@ -15,8 +15,15 @@
     @ChildContent
 </CascadingValue>
 
-<div class="vek-data-grid @Class">
+<div class="vek-data-grid @GetGridClass()" style="@GetGridStyle()">
     @{ var pagerContext = CreatePagerContext(totalItemCount, totalPages); }
+    @if (ColumnResizeMode == VekDataGridColumnResizeMode.Container)
+    {
+        <label class="container-resize-control">Grid width
+            <input type="range" aria-label="Resize grid" min="320" max="1440" step="16"
+                   value="@(CurrentContainerWidth ?? 900)" @oninput="ResizeContainerAsync" />
+        </label>
+    }
     @if (ShowColumnPanel)
     {
         <div class="column-toolbar">
@@ -67,15 +74,26 @@
             <button type="button" @onclick="() => ClearFilterAsync()">Clear filters</button>
         </div>
     }
-    <div class="table-scroll-container">
+    <div class="table-scroll-container @(Responsive ? "is-responsive" : null) @(FixedHeader ? "has-fixed-header" : null)"
+         data-responsive="@(Responsive ? "true" : "false")">
         <table>
-            <thead>
+            <thead class="@(FixedHeader ? "is-sticky" : null) @(ColumnGroups.Count > 0 ? "has-column-groups" : null)">
+                @if (ColumnGroups.Count > 0)
+                {
+                    <tr class="column-group-row">
+                        @foreach (var segment in GetColumnGroupSegments())
+                        {
+                            <th scope="@(segment.Title is null ? "col" : "colgroup")" colspan="@segment.Span">@segment.Title</th>
+                        }
+                    </tr>
+                }
                 <tr>
                     @foreach (var column in VisibleColumns)
                     {
                         var sortPriority = GetSortPriority(column);
                         <th scope="col" data-column-key="@column.Key" draggable="@(CanReorderInHeader ? "true" : "false")"
-                            class="@GetColumnDragClass(column.Key)" aria-sort="@GetAriaSort(column)"
+                            class="@GetHeaderClass(column.Key)" aria-sort="@GetAriaSort(column)"
+                            style="@GetColumnWidthStyle(column) @HeaderStyle?.Invoke(column.Key)"
                             tabindex="@(CanReorderInHeader ? 0 : null)"
                             aria-description="@(CanReorderInHeader ? "Use the left and right arrow keys to move this column." : null)"
                             @ondragstart="() => BeginColumnDrag(column.Key)"
@@ -116,6 +134,13 @@
                             @if (FilterMode == VekDataGridFilterMode.ColumnMenu && column.Filterable)
                             {
                                 @RenderFilterControl(column)
+                            }
+                            @if (ColumnResizeMode == VekDataGridColumnResizeMode.Column)
+                            {
+                                <input type="range" class="column-width-control" aria-label="Resize @column.Title column"
+                                       min="@Math.Max(column.MinWidth, 32)" max="@Math.Max(column.MaxWidth, Math.Max(column.MinWidth, 32))"
+                                       step="8" value="@GetColumnWidthValue(column)"
+                                       @oninput="args => ResizeColumnFromInputAsync(column.Key, args)" />
                             }
                         </th>
                     }
@@ -198,7 +223,7 @@
             {
                 var footerContext = CreateFooterContext();
                 <tfoot>
-                    <tr class="aggregate-footer">
+                    <tr class="aggregate-footer @FooterClass?.Invoke()" style="@FooterStyle?.Invoke()">
                         <td colspan="@VisibleColumnCount">
                             @if (FooterTemplate is not null)
                             {
