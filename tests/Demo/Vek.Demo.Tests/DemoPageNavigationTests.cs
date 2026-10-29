@@ -68,6 +68,7 @@ public sealed class DemoPageNavigationTests : BunitContext
 
         Assert.Equal("VekDataGrid: Basic Usage", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
+        Assert.Empty(cut.FindAll(".filter-panel"));
         var razorExample = cut.Find(".code-sample pre code").TextContent;
         Assert.Contains("<VekDataGrid", razorExample);
         Assert.Contains("<TemplateColumn", razorExample);
@@ -123,6 +124,8 @@ public sealed class DemoPageNavigationTests : BunitContext
         Assert.Equal("VekDataGrid: Filtering", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
         Assert.Contains("FilterMode=\"VekDataGridFilterMode.ColumnRow\"", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("Filterable", cut.Find("#filter-options").TextContent);
+        Assert.Contains("FilterBy", cut.Find("#filter-options").TextContent);
         var filterModeButtons = cut.FindAll(".filter-mode-picker button");
         Assert.Equal("true", filterModeButtons[0].GetAttribute("aria-pressed"));
         Assert.Equal("false", filterModeButtons[1].GetAttribute("aria-pressed"));

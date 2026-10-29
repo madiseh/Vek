@@ -103,8 +103,9 @@ public sealed class FilteringTests : BunitContext
                 builder.OpenComponent<PropertyColumn<TestProduct, string>>(0);
                 builder.AddAttribute(1, nameof(PropertyColumn<TestProduct, string>.Property), (System.Linq.Expressions.Expression<Func<TestProduct, string>>)(product => product.Name));
                 builder.AddAttribute(2, nameof(PropertyColumn<TestProduct, string>.Key), "Name");
+                builder.AddAttribute(3, nameof(PropertyColumn<TestProduct, string>.Filterable), true);
                 if (filterTemplate is not null)
-                    builder.AddAttribute(3, nameof(PropertyColumn<TestProduct, string>.FilterTemplate), filterTemplate);
+                    builder.AddAttribute(4, nameof(PropertyColumn<TestProduct, string>.FilterTemplate), filterTemplate);
                 builder.CloseComponent();
             }));
 }

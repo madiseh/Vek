@@ -82,19 +82,31 @@ public partial class PropertyColumn<TItem, TValue>
     [Parameter]
     public IComparer<object?>? SortComparer { get; set; }
 
-    /// <summary>Gets or sets whether the column can be filtered.</summary>
+    /// <summary>
+    /// Gets or sets whether this column participates in filtering. Defaults to false; set to true to show its filter
+    /// control when the grid's <see cref="VekDataGrid{TItem}.FilterMode"/> enables a filter surface.
+    /// </summary>
     [Parameter]
-    public bool Filterable { get; set; } = true;
+    public bool Filterable { get; set; }
 
-    /// <summary>Gets or sets an optional value selector for filtering.</summary>
+    /// <summary>
+    /// Gets or sets the value selector used to compare this column during filtering. When unset, the value from
+    /// <see cref="Property"/> is used. This selector is only used when <see cref="Filterable"/> is true.
+    /// </summary>
     [Parameter]
     public Func<TItem, object?>? FilterBy { get; set; }
 
-    /// <summary>Gets or sets the default comparison used by the column filter.</summary>
+    /// <summary>
+    /// Gets or sets the default comparison used by this column's filter control. Defaults to
+    /// <see cref="VekDataGridFilterOperator.Contains"/>.
+    /// </summary>
     [Parameter]
     public VekDataGridFilterOperator FilterOperator { get; set; } = VekDataGridFilterOperator.Contains;
 
-    /// <summary>Gets or sets a custom filter control template.</summary>
+    /// <summary>
+    /// Gets or sets custom content for this column's filter control. The template receives filter actions for this
+    /// column and is rendered only when <see cref="Filterable"/> is true.
+    /// </summary>
     [Parameter]
     public RenderFragment<VekDataGridFilterContext>? FilterTemplate { get; set; }
 

@@ -24,9 +24,9 @@
             {
                 <div class="docs-example-frame">
                     <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="10" FilterMode="_filterMode">
-                        <PropertyColumn Property="product => product.Name" Title="Name" FilterOperator="VekDataGridFilterOperator.Contains" />
-                        <PropertyColumn Property="product => product.Category" Title="Category" FilterOperator="VekDataGridFilterOperator.Contains" />
-                        <PropertyColumn Property="product => product.Price" Title="Price" Format="C2" FilterOperator="VekDataGridFilterOperator.GreaterThanOrEqual" />
+                        <PropertyColumn Property="product => product.Name" Title="Name" Filterable="true" FilterOperator="VekDataGridFilterOperator.Contains" />
+                        <PropertyColumn Property="product => product.Category" Title="Category" Filterable="true" FilterOperator="VekDataGridFilterOperator.Contains" />
+                        <PropertyColumn Property="product => product.Price" Title="Price" Format="C2" Filterable="true" FilterOperator="VekDataGridFilterOperator.GreaterThanOrEqual" />
                     </VekDataGrid>
                 </div>
             }
@@ -49,6 +49,52 @@
             <p><code>Simple</code> places controls above the grid, <code>ColumnMenu</code> groups each control in a menu, and <code>ColumnRow</code> places controls below the headings. Use <code>FilterBy</code> for a custom selector, <code>FilterTemplate</code> for a custom editor, and <code>FilterCaseSensitive</code> to set string matching behavior.</p>
             <p>Available operators include equality, text matching, numeric comparisons, and null or empty checks. Filter changes reset the page and are exposed through <code>CurrentState</code> and <code>FilterChanged</code>.</p>
         </section>
+
+        <section id="filter-options" class="docs-section-content" aria-labelledby="filter-options-heading">
+            <h2 id="filter-options-heading">Filter properties</h2>
+            <p>Filtering is opt-in per column. Set <code>Filterable="true"</code> on the columns users can filter, then choose where their controls appear with <code>FilterMode</code>.</p>
+            <dl class="filter-property-list">
+                <div>
+                    <dt><code>Filterable</code> <span>bool</span></dt>
+                    <dd>Enables filtering for this column and includes it in the chosen filter surface.</dd>
+                    <dd class="property-default">Default: <code>false</code></dd>
+                </div>
+                <div>
+                    <dt><code>FilterBy</code> <span>Func&lt;TItem, object?&gt;?</span></dt>
+                    <dd>Selects the value compared by filters. If omitted, filtering uses the value selected by <code>Property</code>.</dd>
+                    <dd class="property-default">Default: <code>null</code></dd>
+                </div>
+                <div>
+                    <dt><code>FilterOperator</code> <span>VekDataGridFilterOperator</span></dt>
+                    <dd>Sets the comparison used by the built-in editor, such as <code>Contains</code> or <code>GreaterThanOrEqual</code>.</dd>
+                    <dd class="property-default">Default: <code>Contains</code></dd>
+                </div>
+                <div>
+                    <dt><code>FilterTemplate</code> <span>RenderFragment&lt;VekDataGridFilterContext&gt;?</span></dt>
+                    <dd>Replaces the built-in editor with custom controls that can apply or clear this column's filter.</dd>
+                    <dd class="property-default">Default: built-in editor</dd>
+                </div>
+                <div>
+                    <dt><code>FilterMode</code> <span>VekDataGridFilterMode</span></dt>
+                    <dd>Chooses the filter surface: <code>Simple</code>, <code>ColumnMenu</code>, or <code>ColumnRow</code>.</dd>
+                    <dd class="property-default">Default: <code>Simple</code></dd>
+                </div>
+                <div>
+                    <dt><code>FilterCaseSensitive</code> <span>bool</span></dt>
+                    <dd>Controls whether string comparisons distinguish uppercase and lowercase letters.</dd>
+                    <dd class="property-default">Default: <code>false</code></dd>
+                </div>
+                <div>
+                    <dt><code>QuickFilter</code> <span>Func&lt;TItem, bool&gt;?</span></dt>
+                    <dd>Applies an item-level predicate before the per-column filters.</dd>
+                    <dd class="property-default">Default: <code>null</code></dd>
+                </div>
+                <div>
+                    <dt><code>FilterChanged</code> <span>EventCallback&lt;IReadOnlyList&lt;VekDataGridFilter&gt;&gt;</span></dt>
+                    <dd>Notifies the parent when column filters are applied or cleared.</dd>
+                </div>
+            </dl>
+        </section>
     </article>
 
     <nav class="docs-toc" aria-label="On this page">
@@ -56,5 +102,6 @@
         <a href="/docs/components/vekdatagrid/filtering#live-example">Live example</a>
         <a href="/docs/components/vekdatagrid/filtering#code">Code</a>
         <a href="/docs/components/vekdatagrid/filtering#filter-modes">Filter modes</a>
+        <a href="/docs/components/vekdatagrid/filtering#filter-options">Filter properties</a>
     </nav>
 </div>
