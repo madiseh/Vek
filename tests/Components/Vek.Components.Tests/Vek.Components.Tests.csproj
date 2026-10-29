@@ -18,5 +18,6 @@
   <ItemGroup>
     <Using Include="Xunit" />
     <ProjectReference Include="../../../src/Components/Vek.Components/Vek.Components.csproj" />
+    <EmbeddedResource Include="../../../src/Components/Vek.Components/Components/CodeView/VekCodeViewMulti.razor.css" Link="CodeView/VekCodeViewMulti.razor.css" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,43 @@
+@if (ActiveTab is not null)
+{
+    <div class="vek-code-view-multi">
+        <div class="code-tabs" role="tablist" aria-label="Code samples">
+            @for (var index = 0; index < Tabs.Count; index++)
+            {
+                var tabIndex = index;
+                var tab = Tabs[tabIndex];
+
+                <button @ref="_tabElements[tabIndex]"
+                        id="@GetTabId(tabIndex)"
+                        class="code-tab"
+                        type="button"
+                        role="tab"
+                        aria-controls="@GetPanelId(tabIndex)"
+                        aria-selected="@(_selectedIndex == tabIndex ? "true" : "false")"
+                        tabindex="@(_selectedIndex == tabIndex ? "0" : "-1")"
+                        @onclick="() => SelectTab(tabIndex)"
+                        @onkeydown="args => HandleTabKeyDownAsync(args, tabIndex)">
+                    @tab.Title
+                </button>
+            }
+        </div>
+
+        @for (var index = 0; index < Tabs.Count; index++)
+        {
+            var tabIndex = index;
+            var tab = Tabs[tabIndex];
+
+            <div id="@GetPanelId(tabIndex)"
+                 class="code-tab-panel"
+                 role="tabpanel"
+                 aria-labelledby="@GetTabId(tabIndex)"
+                 tabindex="0"
+                 hidden="@(_selectedIndex != tabIndex)">
+                @if (_selectedIndex == tabIndex)
+                {
+                    <VekCodeView Code="@tab.Code" Language="@tab.Language" />
+                }
+            </div>
+        }
+    </div>
+}

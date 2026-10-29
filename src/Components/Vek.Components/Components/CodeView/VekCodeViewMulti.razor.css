@@ -1,0 +1,42 @@
+.vek-code-view-multi {
+    min-width: 0;
+}
+
+.code-tabs {
+    display: flex;
+    gap: 0.25rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-bottom: 1px solid #45465a;
+}
+
+.code-tab {
+    flex: 0 0 auto;
+    padding: 0.65rem 0.9rem;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    background: transparent;
+    color: #c8c9d7;
+    cursor: pointer;
+    font: inherit;
+}
+
+.code-tab[aria-selected="true"] {
+    border-bottom-color: #b6a6ff;
+    color: #fff;
+}
+
+.code-tab:hover {
+    color: #fff;
+}
+
+.code-tab:focus-visible,
+.code-tab-panel:focus-visible {
+    outline: 3px solid #b6a6ff;
+    outline-offset: 2px;
+}
+
+.code-tab-panel {
+    min-width: 0;
+}

@@ -38,25 +38,7 @@
                 Keep the component markup in <code>Sample.razor</code> and its data loading
                 logic in <code>Sample.razor.cs</code>.
             </p>
-            <div class="code-sample">
-                <div class="code-tabs" role="group" aria-label="Code sample files">
-                    <button type="button"
-                            class="code-tab @(!_showCodeBehind ? "is-active" : null)"
-                            data-sample="razor"
-                            aria-pressed="@(!_showCodeBehind)"
-                            @onclick="ShowRazor">
-                        Sample.razor
-                    </button>
-                    <button type="button"
-                            class="code-tab @(_showCodeBehind ? "is-active" : null)"
-                            data-sample="code-behind"
-                            aria-pressed="@_showCodeBehind"
-                            @onclick="ShowCodeBehind">
-                        Sample.razor.cs
-                    </button>
-                </div>
-                <pre><code>@SelectedCode</code></pre>
-            </div>
+            <VekCodeViewMulti Tabs="_codeSamples" />
         </section>
 
         <section id="sorting-and-pagination" class="docs-section-content" aria-labelledby="features-heading">

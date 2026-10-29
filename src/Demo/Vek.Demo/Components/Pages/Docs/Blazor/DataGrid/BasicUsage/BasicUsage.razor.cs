@@ -39,16 +39,15 @@ public partial class BasicUsage
     private IDemoProductProvider ProductProvider { get; set; } = default!;
 
     private IReadOnlyList<DemoProduct>? _products;
-    private bool _showCodeBehind;
-
-    private string SelectedCode => _showCodeBehind ? CodeBehindExample : RazorExample;
+    private readonly IReadOnlyList<VekCodeViewTab> _codeSamples =
+    [
+        new("Sample.razor", VekCodeLanguage.Html, RazorExample),
+        new("Sample.razor.cs", VekCodeLanguage.CSharp, CodeBehindExample)
+    ];
 
     protected override async Task OnInitializedAsync()
     {
         _products = (await ProductProvider.GetProductsAsync()).Take(5).ToArray();
     }
 
-    private void ShowRazor() => _showCodeBehind = false;
-
-    private void ShowCodeBehind() => _showCodeBehind = true;
 }

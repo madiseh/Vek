@@ -57,6 +57,27 @@ public sealed class DemoPageNavigationTests : BunitContext
         Assert.Contains("SELECT name, created_at", cut.FindAll(".vek-code-view")[3].TextContent);
     }
 
+    /// <summary>Verifies the Multi-Sample guide links to the multi-viewer and switches its active code sample.</summary>
+    [Fact]
+    public void CodeViewMultiSampleRouteRendersSelectableTabs()
+    {
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo("/docs/components/vekcodeview/multi-sample");
+
+        var cut = Render<Routes>();
+
+        Assert.Equal("VekCodeView: Multi-Sample", cut.Find("main h1").TextContent.Trim());
+        Assert.Equal(
+            "Multi-Sample",
+            cut.Find(".docs-sidebar a[href='/docs/components/vekcodeview/multi-sample']").TextContent.Trim());
+        Assert.Equal(3, cut.FindAll("[role='tab']").Count);
+        Assert.Contains("<article", cut.Find(".vek-code-view pre code").TextContent);
+
+        cut.FindAll("[role='tab']")[1].Click();
+
+        Assert.Contains("public static class Greeting", cut.Find(".vek-code-view pre code").TextContent);
+    }
+
     /// <summary>
     /// Verifies that the Components navigation group starts collapsed until the user opens it.
     /// </summary>
@@ -96,7 +117,7 @@ public sealed class DemoPageNavigationTests : BunitContext
         Assert.Equal(5, cut.FindAll("tbody tr").Count);
         Assert.Empty(cut.FindAll(".pager"));
         Assert.Empty(cut.FindAll(".filter-panel"));
-        var razorExample = cut.Find(".code-sample pre code").TextContent;
+        var razorExample = cut.Find(".vek-code-view pre code").TextContent;
         Assert.Contains("<VekDataGrid", razorExample);
         Assert.DoesNotContain("PageSize", razorExample);
         Assert.Contains("<TemplateColumn", razorExample);
@@ -446,7 +467,7 @@ public sealed class DemoPageNavigationTests : BunitContext
     }
 
     /// <summary>
-    /// Verifies that the code sample switches from Razor markup to its C# code-behind.
+    /// Verifies that the VekCodeViewMulti switches between the Basic Usage Razor and code-behind samples.
     /// </summary>
     [Fact]
     public void CodeSampleSwitchesBetweenRazorAndCodeBehind()
@@ -456,12 +477,15 @@ public sealed class DemoPageNavigationTests : BunitContext
 
         var cut = Render<Routes>();
 
-        Assert.Equal("Sample.razor", cut.Find("button[data-sample='razor']").TextContent.Trim());
-        Assert.Equal("Sample.razor.cs", cut.Find("button[data-sample='code-behind']").TextContent.Trim());
+        var tabs = cut.FindAll("[role='tab']");
+        Assert.Equal(2, tabs.Count);
+        Assert.Equal("Sample.razor", tabs[0].TextContent.Trim());
+        Assert.Equal("Sample.razor.cs", tabs[1].TextContent.Trim());
 
-        cut.Find("button[data-sample='code-behind']").Click();
+        Assert.Contains("<VekDataGrid", cut.Find(".vek-code-view pre code").TextContent);
+        tabs[1].Click();
 
-        var codeBehindExample = cut.Find(".code-sample pre code").TextContent;
+        var codeBehindExample = cut.Find(".vek-code-view pre code").TextContent;
         Assert.Contains("IDemoProductProvider", codeBehindExample);
         Assert.Contains("GetProductsAsync", codeBehindExample);
         Assert.DoesNotContain("<VekDataGrid", codeBehindExample);
