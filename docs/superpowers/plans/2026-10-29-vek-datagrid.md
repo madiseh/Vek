@@ -133,12 +133,12 @@ Task 1 defines these Vek-owned contracts, then later tasks extend them only when
 
 **Interfaces:** Produces read-only/editable state, cell/inline-row/form edit modes, edit templates, clone strategy, validation, commit/cancel actions, and before/after/cancel lifecycle callbacks.
 
-- [ ] Add tests `CellEditCommitsValue`, `InlineEditAllowsOnlyOneRow`, `FormEditCanKeepOpenAfterRejectedCommit`, `CancelRestoresOriginalItem`, and `ValidationFailurePreventsCommit`.
-- [ ] Run focused editing tests and confirm expected failures.
-- [ ] Implement copied edit state, editable-column controls, validation, commit/cancel, and callbacks. Do not mutate the source item before a successful commit.
-- [ ] Rerun focused editing tests and component suite.
-- [ ] Add the live Editing page with a `DemoProduct` example and tested route.
-- [ ] Commit as `feat: add data grid editing and validation`.
+- [x] Add tests `CellEditCommitsValue`, `InlineEditAllowsOnlyOneRow`, `FormEditCanKeepOpenAfterRejectedCommit`, `CancelRestoresOriginalItem`, and `ValidationFailurePreventsCommit`.
+- [x] Run focused editing tests and confirm expected failures.
+- [x] Implement copied edit state, editable-column controls, validation, commit/cancel, and callbacks. Do not mutate the source item before a successful commit.
+- [x] Rerun focused editing tests and component suite.
+- [x] Add the live Editing page with a `DemoProduct` example and tested route.
+- [x] Commit as `feat: add data grid editing and validation`.
 
 ### Task 7: Grouping
 

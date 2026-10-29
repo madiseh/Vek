@@ -91,7 +91,29 @@
                             @onclick="() => SelectRowAsync(item)">
                             @foreach (var column in _columns)
                             {
-                                <td>@column.CellTemplate(item)</td>
+                                <td>
+                                    @if (IsEditing(item, column) && column.EditTemplate is not null)
+                                    {
+                                        <CascadingValue Value="_editContext">
+                                            @column.EditTemplate(GetEditContext(item, column)!)
+                                        </CascadingValue>
+                                    }
+                                    else
+                                    {
+                                        @column.CellTemplate(item)
+                                        @if (EditMode == VekDataGridEditMode.Cell && column.Editable && column.EditTemplate is not null)
+                                        {
+                                            <button type="button" class="edit-cell-button" aria-label="Edit @column.Title"
+                                                    @onclick:stopPropagation="true" @onclick="() => StartEditAsync(item, column)">Edit</button>
+                                        }
+                                        @if ((EditMode is VekDataGridEditMode.Row or VekDataGridEditMode.Form)
+                                            && CanEditRow && ReferenceEquals(column, _columns.FirstOrDefault()))
+                                        {
+                                            <button type="button" class="edit-row-button" aria-label="Edit row @GetEditLabel(item)"
+                                                    @onclick:stopPropagation="true" @onclick="() => StartEditAsync(item)">Edit</button>
+                                        }
+                                    }
+                                </td>
                             }
                         </tr>
                     }

@@ -1,0 +1,69 @@
+@page "/docs/components/vekdatagrid/editing"
+@layout DocumentationLayout
+
+<PageTitle>VekDataGrid Editing | Vek Components</PageTitle>
+
+<div class="docs-page-layout">
+    <article class="docs-article">
+        <h1>VekDataGrid: Editing and Validation</h1>
+        <p class="docs-intro">Edit a cell or row through an isolated draft, validate it, then commit or cancel the change.</p>
+
+        <section id="live-example" class="docs-section-content" aria-labelledby="live-example-heading">
+            <h2 id="live-example-heading">Live example</h2>
+            <p>Start editing a product name. An empty name is rejected and leaves the draft open.</p>
+            @if (_products is null)
+            {
+                <p class="docs-loading" role="status">Loading sample products...</p>
+            }
+            else
+            {
+                <div class="docs-example-frame">
+                    <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="10"
+                                 EditMode="VekDataGridEditMode.Row" CloneItem="CloneProduct"
+                                 CommitEdit="ValidateProduct" ItemCommitted="SaveProduct">
+                        <PropertyColumn Property="product => product.Name" Title="Name" Editable="true">
+                            <EditTemplate Context="edit">
+                                <label>Name
+                                    <input aria-label="Edit product name" value="@edit.Item.Name"
+                                           @onchange="args => edit.UpdateItem(edit.Item with { Name = args.Value?.ToString() ?? string.Empty })" />
+                                </label>
+                                <button type="button" @onclick="edit.CommitAsync">Save</button>
+                                <button type="button" @onclick="edit.CancelAsync">Cancel</button>
+                            </EditTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="product => product.Category" Title="Category" />
+                        <PropertyColumn Property="product => product.Price" Title="Price" Format="C2" />
+                    </VekDataGrid>
+                    @if (_editMessage is not null)
+                    {
+                        <p role="status" class="edit-message">@_editMessage</p>
+                    }
+                </div>
+            }
+        </section>
+
+        <section id="code" class="docs-section-content" aria-labelledby="code-heading">
+            <h2 id="code-heading">Code</h2>
+            <div class="code-sample">
+                <div class="code-tabs" role="group" aria-label="Code sample files">
+                    <button type="button" class="code-tab @(!_showCodeBehind ? "is-active" : null)" data-sample="razor" aria-pressed="@(!_showCodeBehind)" @onclick="ShowRazor">Sample.razor</button>
+                    <button type="button" class="code-tab @(_showCodeBehind ? "is-active" : null)" data-sample="code-behind" aria-pressed="@_showCodeBehind" @onclick="ShowCodeBehind">Sample.razor.cs</button>
+                </div>
+                <pre><code>@SelectedCode</code></pre>
+            </div>
+        </section>
+
+        <section id="edit-modes" class="docs-section-content" aria-labelledby="edit-modes-heading">
+            <h2 id="edit-modes-heading">Edit modes and validation</h2>
+            <p>Choose <code>Cell</code>, <code>Row</code>, or <code>Form</code>. Each editable property column supplies an <code>EditTemplate</code> that receives the draft and its <code>EditContext</code>. Use <code>CloneItem</code> when the default shallow copy is not sufficient.</p>
+            <p>The grid validates the edit context before calling <code>CommitEdit</code>. Return false from that callback to keep the draft open. A successful commit raises <code>ItemCommitted</code>; cancel discards the draft and raises <code>EditCancelled</code>.</p>
+        </section>
+    </article>
+
+    <nav class="docs-toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <a href="/docs/components/vekdatagrid/editing#live-example">Live example</a>
+        <a href="/docs/components/vekdatagrid/editing#code">Code</a>
+        <a href="/docs/components/vekdatagrid/editing#edit-modes">Edit modes</a>
+    </nav>
+</div>

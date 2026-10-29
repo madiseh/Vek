@@ -74,6 +74,14 @@ public partial class PropertyColumn<TItem, TValue>
     [Parameter]
     public RenderFragment<VekDataGridFilterContext>? FilterTemplate { get; set; }
 
+    /// <summary>Gets or sets whether this column can enter edit mode.</summary>
+    [Parameter]
+    public bool Editable { get; set; }
+
+    /// <summary>Gets or sets a custom editor rendered for this column.</summary>
+    [Parameter]
+    public RenderFragment<VekDataGridEditContext<TItem>>? EditTemplate { get; set; }
+
     private Func<TItem, TValue>? _propertyGetter;
     private VekDataGrid<TItem>? _registeredGrid;
     private string? _lastPropertyExpression;
@@ -83,6 +91,7 @@ public partial class PropertyColumn<TItem, TValue>
     private bool _lastSortable;
     private bool _lastFilterable;
     private VekDataGridFilterOperator _lastFilterOperator;
+    private bool _lastEditable;
 
     /// <summary>
     /// Updates the compiled property accessor and registers this column with its grid.
@@ -102,7 +111,8 @@ public partial class PropertyColumn<TItem, TValue>
             || Format != _lastFormat
             || Sortable != _lastSortable
             || Filterable != _lastFilterable
-            || FilterOperator != _lastFilterOperator;
+            || FilterOperator != _lastFilterOperator
+            || Editable != _lastEditable;
 
         if (_propertyGetter is null || propertyExpression != _lastPropertyExpression)
         {
@@ -128,6 +138,7 @@ public partial class PropertyColumn<TItem, TValue>
         _lastSortable = Sortable;
         _lastFilterable = Filterable;
         _lastFilterOperator = FilterOperator;
+        _lastEditable = Editable;
     }
 
     string IVekDataGridColumn<TItem>.Title => string.IsNullOrWhiteSpace(Title)
@@ -151,6 +162,10 @@ public partial class PropertyColumn<TItem, TValue>
     RenderFragment<VekDataGridFilterContext>? IVekDataGridColumn<TItem>.FilterTemplate => FilterTemplate;
 
     bool IVekDataGridColumn<TItem>.IsSelectionColumn => false;
+
+    bool IVekDataGridColumn<TItem>.Editable => Editable;
+    RenderFragment<VekDataGridEditContext<TItem>>? IVekDataGridColumn<TItem>.EditTemplate => EditTemplate;
+    string IVekDataGridColumn<TItem>.GetRowLabel(TItem item) => Convert.ToString(_propertyGetter!(item)) ?? string.Empty;
 
     RenderFragment<TItem> IVekDataGridColumn<TItem>.CellTemplate => item => builder =>
     {

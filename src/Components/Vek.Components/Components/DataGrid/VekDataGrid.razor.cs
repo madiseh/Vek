@@ -11,6 +11,12 @@ public partial class VekDataGrid<TItem>
     private readonly List<ActiveSort> _sorts = [];
     private readonly List<VekDataGridFilter> _filters = [];
     private int _currentPage = 1;
+    private TItem? _editingOriginal;
+    private TItem? _editingDraft;
+    private IVekDataGridColumn<TItem>? _editingColumn;
+    private EditContext? _editContext;
+    private VekDataGridEditContext<TItem>? _activeEditContext;
+    private bool _isEditing;
 
     private sealed record ActiveSort(IVekDataGridColumn<TItem> Column, VekSortDirection Direction);
 
@@ -85,6 +91,30 @@ public partial class VekDataGrid<TItem>
     /// <summary>Gets or sets the policy used when filters hide selected rows.</summary>
     [Parameter]
     public VekDataGridFilteredSelectionMode FilteredSelectionMode { get; set; }
+
+    /// <summary>Gets or sets the grid's editing mode.</summary>
+    [Parameter]
+    public VekDataGridEditMode EditMode { get; set; }
+
+    /// <summary>Gets or sets a callback invoked after a draft is created.</summary>
+    [Parameter]
+    public EventCallback<TItem> EditStarted { get; set; }
+
+    /// <summary>Gets or sets a strategy that creates an isolated draft item.</summary>
+    [Parameter]
+    public Func<TItem, TItem>? CloneItem { get; set; }
+
+    /// <summary>Gets or sets a callback that validates and accepts a draft. Return false to keep editing.</summary>
+    [Parameter]
+    public Func<TItem, Task<bool>>? CommitEdit { get; set; }
+
+    /// <summary>Gets or sets a callback invoked after a draft is committed.</summary>
+    [Parameter]
+    public EventCallback<TItem> ItemCommitted { get; set; }
+
+    /// <summary>Gets or sets a callback invoked after an edit draft is canceled.</summary>
+    [Parameter]
+    public EventCallback<TItem> EditCancelled { get; set; }
 
     /// <summary>
     /// Gets or sets whether sorting is disabled, limited to one column, or applied to multiple columns.
@@ -230,6 +260,87 @@ public partial class VekDataGrid<TItem>
     }
 
     private IEqualityComparer<TItem> ItemComparer => SelectionComparer ?? EqualityComparer<TItem>.Default;
+
+    /// <summary>Gets whether the row has any editable columns.</summary>
+    public bool CanEditRow => EditMode != VekDataGridEditMode.None
+        && _columns.Any(column => column.Editable && column.EditTemplate is not null);
+
+    /// <summary>Gets whether the requested item and column are being edited.</summary>
+    private bool IsEditing(TItem item, IVekDataGridColumn<TItem> column) => _isEditing
+        && ItemComparer.Equals(_editingOriginal!, item)
+        && (EditMode != VekDataGridEditMode.Cell || ReferenceEquals(_editingColumn, column));
+
+    /// <summary>Gets the active draft template context when the requested cell is being edited.</summary>
+    private VekDataGridEditContext<TItem>? GetEditContext(TItem item, IVekDataGridColumn<TItem> column) =>
+        IsEditing(item, column) ? _activeEditContext : null;
+
+    /// <summary>Starts editing a row or a single cell using an isolated draft.</summary>
+    private async Task StartEditAsync(TItem item, IVekDataGridColumn<TItem>? column = null)
+    {
+        if (!CanEditRow || _isEditing || (EditMode == VekDataGridEditMode.Cell && (column is null || !column.Editable)))
+            return;
+
+        _editingOriginal = item;
+        _editingDraft = CloneItem is null ? CloneByMemberwiseCopy(item) : CloneItem(item);
+        _editingColumn = column;
+        _isEditing = true;
+        _editContext = new EditContext(_editingDraft!);
+        _activeEditContext = new VekDataGridEditContext<TItem>(
+            _editingDraft!, _editContext, UpdateEditDraft, CommitActiveEditAsync, CancelActiveEditAsync);
+        await EditStarted.InvokeAsync(_editingOriginal);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>Replaces the active edit draft and its validation context.</summary>
+    public void UpdateEditDraft(TItem item)
+    {
+        if (!_isEditing) return;
+        _editingDraft = item;
+        _editContext = new EditContext(item!);
+        _activeEditContext = new VekDataGridEditContext<TItem>(
+            item, _editContext, UpdateEditDraft, CommitActiveEditAsync, CancelActiveEditAsync);
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private static TItem CloneByMemberwiseCopy(TItem item)
+    {
+        if (item is null) return item;
+        var clone = item.GetType().GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        return clone is null ? item : (TItem)clone.Invoke(item, null)!;
+    }
+
+    private async Task<bool> CommitActiveEditAsync()
+    {
+        if (!_isEditing || _editingDraft is null || _editContext is null || !_editContext.Validate()) return false;
+        if (CommitEdit is not null && !await CommitEdit(_editingDraft)) return false;
+
+        await ItemCommitted.InvokeAsync(_editingDraft);
+        ClearEditState();
+        await InvokeAsync(StateHasChanged);
+        return true;
+    }
+
+    private async Task CancelActiveEditAsync()
+    {
+        if (!_isEditing) return;
+        await EditCancelled.InvokeAsync(_editingOriginal!);
+        ClearEditState();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void ClearEditState()
+    {
+        _editingOriginal = default;
+        _editingDraft = default;
+        _editingColumn = null;
+        _editContext = null;
+        _activeEditContext = null;
+        _isEditing = false;
+    }
+
+    private string GetEditLabel(TItem item) => _columns.FirstOrDefault(column => column.Editable)?.GetRowLabel(item)
+        ?? Convert.ToString(item, CultureInfo.CurrentCulture)
+        ?? "row";
 
     private List<TItem> GetPageItems() => GetSortedItems()
         .Skip((_currentPage - 1) * EffectivePageSize)

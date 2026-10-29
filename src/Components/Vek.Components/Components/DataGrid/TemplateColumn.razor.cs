@@ -72,6 +72,9 @@ public partial class TemplateColumn<TItem>
     VekDataGridFilterOperator IVekDataGridColumn<TItem>.FilterOperator => VekDataGridFilterOperator.Contains;
     RenderFragment<VekDataGridFilterContext>? IVekDataGridColumn<TItem>.FilterTemplate => null;
     bool IVekDataGridColumn<TItem>.IsSelectionColumn => false;
+    bool IVekDataGridColumn<TItem>.Editable => false;
+    RenderFragment<VekDataGridEditContext<TItem>>? IVekDataGridColumn<TItem>.EditTemplate => null;
+    string IVekDataGridColumn<TItem>.GetRowLabel(TItem item) => Title;
 
     string IVekDataGridColumn<TItem>.Title => Title;
 

@@ -20,6 +20,9 @@ internal interface IVekDataGridColumn<TItem>
     VekDataGridFilterOperator FilterOperator { get; }
     RenderFragment<VekDataGridFilterContext>? FilterTemplate { get; }
     bool IsSelectionColumn { get; }
+    bool Editable { get; }
+    RenderFragment<VekDataGridEditContext<TItem>>? EditTemplate { get; }
+    string GetRowLabel(TItem item);
 
     /// <summary>
     /// Gets the heading displayed for the column.

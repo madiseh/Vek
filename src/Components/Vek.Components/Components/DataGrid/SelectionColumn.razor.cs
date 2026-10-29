@@ -9,6 +9,7 @@ public partial class SelectionColumn<TItem> : IDisposable, IVekDataGridColumn<TI
 
     private VekDataGrid<TItem>? _registeredGrid;
 
+    /// <summary>Registers the selection column with its parent grid.</summary>
     protected override void OnParametersSet()
     {
         if (Grid is null) throw new InvalidOperationException("SelectionColumn must be declared inside a VekDataGrid.");
@@ -25,6 +26,9 @@ public partial class SelectionColumn<TItem> : IDisposable, IVekDataGridColumn<TI
     VekDataGridFilterOperator IVekDataGridColumn<TItem>.FilterOperator => VekDataGridFilterOperator.Contains;
     RenderFragment<VekDataGridFilterContext>? IVekDataGridColumn<TItem>.FilterTemplate => null;
     bool IVekDataGridColumn<TItem>.IsSelectionColumn => true;
+    bool IVekDataGridColumn<TItem>.Editable => false;
+    RenderFragment<VekDataGridEditContext<TItem>>? IVekDataGridColumn<TItem>.EditTemplate => null;
+    string IVekDataGridColumn<TItem>.GetRowLabel(TItem item) => "Select";
     string IVekDataGridColumn<TItem>.Title => "Select";
     Comparison<TItem> IVekDataGridColumn<TItem>.CompareItems => static (_, _) => 0;
     RenderFragment<TItem> IVekDataGridColumn<TItem>.CellTemplate => item => builder =>

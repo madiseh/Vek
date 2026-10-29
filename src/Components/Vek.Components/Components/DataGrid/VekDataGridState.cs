@@ -93,6 +93,42 @@ public enum VekDataGridFilteredSelectionMode
     Clear
 }
 
+/// <summary>Controls how grid rows expose their editable fields.</summary>
+public enum VekDataGridEditMode
+{
+    /// <summary>Editing is disabled.</summary>
+    None,
+    /// <summary>Edits one cell at a time.</summary>
+    Cell,
+    /// <summary>Edits all configured cells for one row at a time.</summary>
+    Row,
+    /// <summary>Edits one row through a form-oriented template.</summary>
+    Form
+}
+
+/// <summary>Provides a draft item, validation context, and lifecycle actions to an edit template.</summary>
+/// <typeparam name="TItem">The type of item represented by the grid.</typeparam>
+public sealed class VekDataGridEditContext<TItem>
+{
+    private readonly Action<TItem> _updateItem;
+    private readonly Func<Task<bool>> _commit;
+    private readonly Func<Task> _cancel;
+
+    internal VekDataGridEditContext(TItem item, EditContext editContext, Action<TItem> updateItem, Func<Task<bool>> commit, Func<Task> cancel)
+        => (Item, EditContext, _updateItem, _commit, _cancel) = (item, editContext, updateItem, commit, cancel);
+
+    /// <summary>Gets the current editable draft item.</summary>
+    public TItem Item { get; }
+    /// <summary>Gets the validation context associated with the draft.</summary>
+    public EditContext EditContext { get; }
+    /// <summary>Replaces the current draft item.</summary>
+    public void UpdateItem(TItem item) => _updateItem(item);
+    /// <summary>Validates and attempts to commit the draft.</summary>
+    public Func<Task<bool>> CommitAsync => _commit;
+    /// <summary>Discards the draft and exits edit mode.</summary>
+    public Func<Task> CancelAsync => _cancel;
+}
+
 /// <summary>Provides a custom filter template with apply and clear actions.</summary>
 public sealed class VekDataGridFilterContext
 {
