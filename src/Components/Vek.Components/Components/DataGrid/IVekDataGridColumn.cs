@@ -26,6 +26,7 @@ internal interface IVekDataGridColumn<TItem>
     bool Groupable { get; }
     Func<TItem, object?>? GroupBy { get; }
     RenderFragment<VekDataGridGroupContext<TItem>>? GroupTemplate { get; }
+    Func<TItem, object?>? AggregateBy { get; }
 
     /// <summary>
     /// Gets the heading displayed for the column.

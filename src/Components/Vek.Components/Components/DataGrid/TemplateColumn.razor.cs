@@ -78,6 +78,7 @@ public partial class TemplateColumn<TItem>
     bool IVekDataGridColumn<TItem>.Groupable => false;
     Func<TItem, object?>? IVekDataGridColumn<TItem>.GroupBy => null;
     RenderFragment<VekDataGridGroupContext<TItem>>? IVekDataGridColumn<TItem>.GroupTemplate => null;
+    Func<TItem, object?>? IVekDataGridColumn<TItem>.AggregateBy => null;
 
     string IVekDataGridColumn<TItem>.Title => Title;
 

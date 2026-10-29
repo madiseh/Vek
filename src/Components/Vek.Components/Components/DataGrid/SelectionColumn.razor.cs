@@ -32,6 +32,7 @@ public partial class SelectionColumn<TItem> : IDisposable, IVekDataGridColumn<TI
     bool IVekDataGridColumn<TItem>.Groupable => false;
     Func<TItem, object?>? IVekDataGridColumn<TItem>.GroupBy => null;
     RenderFragment<VekDataGridGroupContext<TItem>>? IVekDataGridColumn<TItem>.GroupTemplate => null;
+    Func<TItem, object?>? IVekDataGridColumn<TItem>.AggregateBy => null;
     string IVekDataGridColumn<TItem>.Title => "Select";
     Comparison<TItem> IVekDataGridColumn<TItem>.CompareItems => static (_, _) => 0;
     RenderFragment<TItem> IVekDataGridColumn<TItem>.CellTemplate => item => builder =>

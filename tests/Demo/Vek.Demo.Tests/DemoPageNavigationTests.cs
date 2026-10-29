@@ -226,6 +226,29 @@ public sealed class DemoPageNavigationTests : BunitContext
     }
 
     /// <summary>
+    /// Verifies the aggregation guide displays group summaries and its aggregate configuration.
+    /// </summary>
+    [Fact]
+    public void DataGridAggregationRouteShowsLiveGridAndExample()
+    {
+        Services.AddSingleton<IDemoProductProvider>(new TestProductProvider(
+        [
+            new DemoProduct(1, "Desk Lamp", "Furniture", 49.99m),
+            new DemoProduct(2, "Task Chair", "Furniture", 199.00m),
+            new DemoProduct(3, "Notebook Set", "Stationery", 12.90m)
+        ]));
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo("/docs/components/vekdatagrid/aggregation");
+
+        var cut = Render<Routes>();
+
+        Assert.Equal("VekDataGrid: Aggregation", cut.Find("main h1").TextContent.Trim());
+        Assert.Contains("Furniture", cut.Find("tbody").TextContent);
+        Assert.Contains("Aggregates=\"_aggregates\"", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("Sum:", cut.Find("tfoot").TextContent);
+    }
+
+    /// <summary>
     /// Verifies that the code sample switches from Razor markup to its C# code-behind.
     /// </summary>
     [Fact]

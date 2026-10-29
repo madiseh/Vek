@@ -123,6 +123,24 @@
                     }
                 }
             </tbody>
+            @if (Aggregates.Any(aggregate => aggregate.Scope is VekDataGridAggregateScope.Footer or VekDataGridAggregateScope.Both))
+            {
+                var footerContext = CreateFooterContext();
+                <tfoot>
+                    <tr class="aggregate-footer">
+                        <td colspan="@Math.Max(_columns.Count, 1)">
+                            @if (FooterTemplate is not null)
+                            {
+                                @FooterTemplate(footerContext)
+                            }
+                            @foreach (var aggregate in footerContext.Aggregates)
+                            {
+                                @RenderAggregate(aggregate, footerContext.Items)
+                            }
+                        </td>
+                    </tr>
+                </tfoot>
+            }
         </table>
     </div>
 

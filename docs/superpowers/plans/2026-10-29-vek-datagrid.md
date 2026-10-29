@@ -159,12 +159,12 @@ Task 1 defines these Vek-owned contracts, then later tasks extend them only when
 
 **Interfaces:** Produces average, count, custom, max, min, and sum aggregation definitions; aggregate templates; footer templates; group-level aggregation.
 
-- [ ] Add tests `BuiltInAggregatesProduceExpectedValues`, `CustomAggregateUsesProvidedSelector`, `FooterTemplateReceivesCurrentItems`, and `GroupedRowsShowTheirOwnAggregates`.
-- [ ] Run focused aggregation tests and confirm failures.
-- [ ] Implement aggregate computation over defined grid/group scopes and custom rendering.
-- [ ] Run focused aggregation tests and component suite.
-- [ ] Add the live Aggregation page and verify route/navigation.
-- [ ] Commit as `feat: add data grid aggregation`.
+- [x] Add tests `BuiltInAggregatesProduceExpectedValues`, `CustomAggregateUsesProvidedSelector`, `FooterTemplateReceivesCurrentItems`, and `GroupedRowsShowTheirOwnAggregates`.
+- [x] Run focused aggregation tests and confirm failures.
+- [x] Implement aggregate computation over defined grid/group scopes and custom rendering.
+- [x] Run focused aggregation tests and component suite.
+- [x] Add the live Aggregation page and verify route/navigation.
+- [x] Commit as `feat: add data grid aggregation`.
 
 ### Task 9: Hierarchical row details
 

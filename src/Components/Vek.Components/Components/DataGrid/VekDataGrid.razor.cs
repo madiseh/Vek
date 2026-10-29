@@ -132,6 +132,14 @@ public partial class VekDataGrid<TItem>
     [Parameter]
     public EventCallback<IReadOnlyList<VekDataGridGroupDefinition>> GroupChanged { get; set; }
 
+    /// <summary>Gets or sets the calculations displayed in the grid footer and group headers.</summary>
+    [Parameter]
+    public IReadOnlyList<VekDataGridAggregateDefinition<TItem>> Aggregates { get; set; } = Array.Empty<VekDataGridAggregateDefinition<TItem>>();
+
+    /// <summary>Gets or sets custom content for the aggregate footer.</summary>
+    [Parameter]
+    public RenderFragment<VekDataGridFooterContext<TItem>>? FooterTemplate { get; set; }
+
     /// <summary>
     /// Gets or sets whether sorting is disabled, limited to one column, or applied to multiple columns.
     /// </summary>
@@ -415,7 +423,74 @@ public partial class VekDataGrid<TItem>
         node.Level,
         node.Items,
         IsGroupExpanded(node.Path),
-        () => ToggleGroupAsync(node.Path));
+        () => ToggleGroupAsync(node.Path),
+        ComputeAggregates(node.Items, VekDataGridAggregateScope.Group));
+
+    private VekDataGridFooterContext<TItem> CreateFooterContext()
+    {
+        var items = GetSortedItems();
+        return new VekDataGridFooterContext<TItem>(items, ComputeAggregates(items, VekDataGridAggregateScope.Footer));
+    }
+
+    private IReadOnlyList<VekDataGridAggregateResult> ComputeAggregates(
+        IReadOnlyList<TItem> items,
+        VekDataGridAggregateScope scope) => Aggregates
+        .Where(definition => definition.Scope == VekDataGridAggregateScope.Both || definition.Scope == scope)
+        .Select(definition => ComputeAggregate(definition, items))
+        .ToArray();
+
+    private VekDataGridAggregateResult ComputeAggregate(VekDataGridAggregateDefinition<TItem> definition, IReadOnlyList<TItem> items)
+    {
+        var column = _columns.FirstOrDefault(candidate => candidate.Key == definition.ColumnKey);
+        var selector = definition.Selector ?? column?.AggregateBy;
+        if (selector is null)
+            return new VekDataGridAggregateResult(definition.Key, definition.Key, null, string.Empty);
+
+        var values = items.Select(selector).ToArray();
+        var nonNullValues = values.Where(value => value is not null).ToArray();
+        object? result = definition.Type switch
+        {
+            VekDataGridAggregateType.Count => nonNullValues.Length,
+            VekDataGridAggregateType.Custom => definition.CustomAggregate?.Invoke(values),
+            VekDataGridAggregateType.Sum => NumericValues(nonNullValues).Sum(),
+            VekDataGridAggregateType.Average => NumericValues(nonNullValues) is { Length: > 0 } numbers ? numbers.Average() : null,
+            VekDataGridAggregateType.Min => nonNullValues.OrderBy(value => value, Comparer<object?>.Create(CompareGroupValues)).FirstOrDefault(),
+            VekDataGridAggregateType.Max => nonNullValues.OrderBy(value => value, Comparer<object?>.Create(CompareGroupValues)).LastOrDefault(),
+            _ => null
+        };
+
+        var formatted = result is IFormattable formattable && definition.Format is not null
+            ? formattable.ToString(definition.Format, CultureInfo.CurrentCulture) ?? string.Empty
+            : Convert.ToString(result, CultureInfo.CurrentCulture) ?? string.Empty;
+        return new VekDataGridAggregateResult(definition.Key, definition.Key, result, formatted);
+    }
+
+    private static decimal[] NumericValues(IEnumerable<object?> values)
+    {
+        try
+        {
+            return values.Select(value => Convert.ToDecimal(value, CultureInfo.CurrentCulture)).ToArray();
+        }
+        catch (Exception exception) when (exception is FormatException or InvalidCastException or OverflowException)
+        {
+            return [];
+        }
+    }
+
+    private RenderFragment RenderAggregate(VekDataGridAggregateResult result, IReadOnlyList<TItem> items) => builder =>
+    {
+        var definition = Aggregates.FirstOrDefault(aggregate => aggregate.Key == result.Key);
+        if (definition?.Template is not null)
+        {
+            builder.AddContent(0, definition.Template(new VekDataGridAggregateContext<TItem>(
+                definition, items, result.Value, result.FormattedValue)));
+            return;
+        }
+        builder.OpenElement(0, "span");
+        builder.AddAttribute(1, "class", "aggregate-value");
+        builder.AddContent(2, $"{result.Title}: {result.FormattedValue}");
+        builder.CloseElement();
+    };
 
     private RenderFragment RenderGroupRows(IReadOnlyList<GroupNode> groups) => builder =>
     {
@@ -439,7 +514,11 @@ public partial class VekDataGrid<TItem>
             if (group.Column.GroupTemplate is not null)
                 builder.AddContent(sequence++, group.Column.GroupTemplate(context));
             else
-                builder.AddContent(sequence++, $"{group.Column.Title}: {group.Value ?? "(empty)"} ({group.Items.Count})");
+                builder.AddContent(sequence++, $"{group.Column.Title}: {group.Value ?? "(empty)"} ({group.Items.Count}) ");
+            foreach (var aggregate in context.Aggregates)
+            {
+                builder.AddContent(sequence++, RenderAggregate(aggregate, group.Items));
+            }
             builder.CloseElement();
             builder.CloseElement();
 

@@ -1,0 +1,64 @@
+@page "/docs/components/vekdatagrid/aggregation"
+@layout DocumentationLayout
+
+<PageTitle>VekDataGrid Aggregation | Vek Components</PageTitle>
+
+<div class="docs-page-layout">
+    <article class="docs-article">
+        <h1>VekDataGrid: Aggregation</h1>
+        <p class="docs-intro">Summarize the filtered products and each group with built-in or custom aggregate calculations.</p>
+
+        <section id="live-example" class="docs-section-content" aria-labelledby="live-example-heading">
+            <h2 id="live-example-heading">Live example</h2>
+            <p>Expand a category to see its price total. The footer summarizes all filtered products.</p>
+            @if (_products is null)
+            {
+                <p class="docs-loading" role="status">Loading sample products...</p>
+            }
+            else
+            {
+                <div class="docs-example-frame">
+                    <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="10" GroupBy="_groups" Aggregates="_aggregates">
+                        <ChildContent>
+                            <PropertyColumn Property="product => product.Name" Title="Name" />
+                            <PropertyColumn Property="product => product.Category" Title="Category" Key="Category">
+                                <GroupTemplate Context="group">
+                                    <strong>@group.Title: @group.Value</strong>
+                                    <span class="group-summary">@AggregateSummary(group.Aggregates)</span>
+                                </GroupTemplate>
+                            </PropertyColumn>
+                            <PropertyColumn Property="product => product.Price" Title="Price" Key="Price" Format="C2" />
+                        </ChildContent>
+                        <FooterTemplate Context="footer">
+                            <strong>@footer.Items.Count filtered products.</strong>
+                        </FooterTemplate>
+                    </VekDataGrid>
+                </div>
+            }
+        </section>
+
+        <section id="code" class="docs-section-content" aria-labelledby="code-heading">
+            <h2 id="code-heading">Code</h2>
+            <div class="code-sample">
+                <div class="code-tabs" role="group" aria-label="Code sample files">
+                    <button type="button" class="code-tab @(!_showCodeBehind ? "is-active" : null)" data-sample="razor" aria-pressed="@(!_showCodeBehind)" @onclick="ShowRazor">Sample.razor</button>
+                    <button type="button" class="code-tab @(_showCodeBehind ? "is-active" : null)" data-sample="code-behind" aria-pressed="@_showCodeBehind" @onclick="ShowCodeBehind">Sample.razor.cs</button>
+                </div>
+                <pre><code>@SelectedCode</code></pre>
+            </div>
+        </section>
+
+        <section id="aggregate-types" class="docs-section-content" aria-labelledby="aggregate-types-heading">
+            <h2 id="aggregate-types-heading">Aggregate types and scopes</h2>
+            <p>Choose Sum, Average, Count, Min, Max, or provide a custom aggregate. The default selector comes from the column; a definition can override it. Numeric operations skip null values, and Count counts non-null selected values.</p>
+            <p>Choose footer, group, or both scopes. Aggregate and footer templates receive their items and computed values, while a group template can render the aggregates for its own rows.</p>
+        </section>
+    </article>
+
+    <nav class="docs-toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <a href="/docs/components/vekdatagrid/aggregation#live-example">Live example</a>
+        <a href="/docs/components/vekdatagrid/aggregation#code">Code</a>
+        <a href="/docs/components/vekdatagrid/aggregation#aggregate-types">Aggregate types</a>
+    </nav>
+</div>

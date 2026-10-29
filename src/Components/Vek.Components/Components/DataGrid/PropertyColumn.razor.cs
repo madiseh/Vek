@@ -94,6 +94,10 @@ public partial class PropertyColumn<TItem, TValue>
     [Parameter]
     public RenderFragment<VekDataGridGroupContext<TItem>>? GroupTemplate { get; set; }
 
+    /// <summary>Gets or sets an optional value selector used by aggregate definitions.</summary>
+    [Parameter]
+    public Func<TItem, object?>? AggregateBy { get; set; }
+
     private Func<TItem, TValue>? _propertyGetter;
     private VekDataGrid<TItem>? _registeredGrid;
     private string? _lastPropertyExpression;
@@ -181,6 +185,7 @@ public partial class PropertyColumn<TItem, TValue>
     bool IVekDataGridColumn<TItem>.Groupable => Groupable;
     Func<TItem, object?>? IVekDataGridColumn<TItem>.GroupBy => Groupable ? GroupBy ?? (item => _propertyGetter!(item)) : null;
     RenderFragment<VekDataGridGroupContext<TItem>>? IVekDataGridColumn<TItem>.GroupTemplate => GroupTemplate;
+    Func<TItem, object?>? IVekDataGridColumn<TItem>.AggregateBy => AggregateBy ?? (item => _propertyGetter!(item));
 
     RenderFragment<TItem> IVekDataGridColumn<TItem>.CellTemplate => item => builder =>
     {

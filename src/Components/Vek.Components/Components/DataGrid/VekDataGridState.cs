@@ -115,6 +115,91 @@ public enum VekDataGridGroupSortOrder
     Descending
 }
 
+/// <summary>Chooses the calculation performed for an aggregate definition.</summary>
+public enum VekDataGridAggregateType
+{
+    /// <summary>Adds the non-null numeric values.</summary>
+    Sum,
+    /// <summary>Calculates the mean of non-null numeric values.</summary>
+    Average,
+    /// <summary>Counts non-null selected values.</summary>
+    Count,
+    /// <summary>Returns the least non-null selected value.</summary>
+    Min,
+    /// <summary>Returns the greatest non-null selected value.</summary>
+    Max,
+    /// <summary>Uses the aggregate delegate supplied by the caller.</summary>
+    Custom
+}
+
+/// <summary>Controls whether an aggregate appears in the overall footer, group headers, or both.</summary>
+public enum VekDataGridAggregateScope
+{
+    /// <summary>Shows the aggregate in the grid footer.</summary>
+    Footer,
+    /// <summary>Shows the aggregate in group headers.</summary>
+    Group,
+    /// <summary>Shows the aggregate in the footer and each group.</summary>
+    Both
+}
+
+/// <summary>Defines one built-in or custom aggregate calculation.</summary>
+/// <typeparam name="TItem">The type of item represented by the grid.</typeparam>
+/// <param name="Key">A stable key identifying this aggregate.</param>
+/// <param name="ColumnKey">The column whose values are used by the calculation.</param>
+/// <param name="Type">The aggregate operation.</param>
+/// <param name="CustomAggregate">An optional calculation used for custom aggregates.</param>
+/// <param name="Format">An optional format string for displayed values.</param>
+/// <param name="Scope">The surfaces on which this aggregate appears.</param>
+/// <param name="Template">An optional custom renderer for this aggregate.</param>
+/// <param name="Selector">An optional custom value selector overriding the column selector.</param>
+public sealed record VekDataGridAggregateDefinition<TItem>(
+    string Key,
+    string ColumnKey,
+    VekDataGridAggregateType Type,
+    Func<IReadOnlyList<object?>, object?>? CustomAggregate = null,
+    string? Format = null,
+    VekDataGridAggregateScope Scope = VekDataGridAggregateScope.Both,
+    RenderFragment<VekDataGridAggregateContext<TItem>>? Template = null,
+    Func<TItem, object?>? Selector = null);
+
+/// <summary>Contains the calculated value and item scope for an aggregate template.</summary>
+/// <typeparam name="TItem">The type of item represented by the grid.</typeparam>
+public sealed class VekDataGridAggregateContext<TItem>
+{
+    internal VekDataGridAggregateContext(VekDataGridAggregateDefinition<TItem> definition, IReadOnlyList<TItem> items, object? value, string formattedValue)
+        => (Definition, Items, Value, FormattedValue) = (definition, items, value, formattedValue);
+
+    /// <summary>Gets the definition that produced this result.</summary>
+    public VekDataGridAggregateDefinition<TItem> Definition { get; }
+    /// <summary>Gets the items included in this calculation.</summary>
+    public IReadOnlyList<TItem> Items { get; }
+    /// <summary>Gets the raw aggregate value.</summary>
+    public object? Value { get; }
+    /// <summary>Gets the value formatted for display.</summary>
+    public string FormattedValue { get; }
+}
+
+/// <summary>Describes a calculated aggregate value.</summary>
+/// <param name="Key">The key of the aggregate definition.</param>
+/// <param name="Title">The title displayed beside the result.</param>
+/// <param name="Value">The raw aggregate value.</param>
+/// <param name="FormattedValue">The value formatted for display.</param>
+public sealed record VekDataGridAggregateResult(string Key, string Title, object? Value, string FormattedValue);
+
+/// <summary>Provides the filtered item scope and aggregate results to footer content.</summary>
+/// <typeparam name="TItem">The type of item represented by the grid.</typeparam>
+public sealed class VekDataGridFooterContext<TItem>
+{
+    internal VekDataGridFooterContext(IReadOnlyList<TItem> items, IReadOnlyList<VekDataGridAggregateResult> aggregates)
+        => (Items, Aggregates) = (items, aggregates);
+
+    /// <summary>Gets the items included in the overall footer calculations.</summary>
+    public IReadOnlyList<TItem> Items { get; }
+    /// <summary>Gets the aggregate results displayed by the grid.</summary>
+    public IReadOnlyList<VekDataGridAggregateResult> Aggregates { get; }
+}
+
 /// <summary>Describes one level in the grid's nested grouping order.</summary>
 /// <param name="ColumnKey">The stable key of the column used to group rows.</param>
 /// <param name="SortOrder">The order in which distinct group values appear.</param>
@@ -126,9 +211,9 @@ public sealed record VekDataGridGroupDefinition(
 /// <typeparam name="TItem">The type of item represented by the grid.</typeparam>
 public sealed class VekDataGridGroupContext<TItem>
 {
-    internal VekDataGridGroupContext(string columnKey, string title, object? value, int level, IReadOnlyList<TItem> items, bool expanded, Func<Task> toggleAsync)
-        => (ColumnKey, Title, Value, Level, Items, Count, Expanded, ToggleAsync) =
-            (columnKey, title, value, level, items, items.Count, expanded, toggleAsync);
+    internal VekDataGridGroupContext(string columnKey, string title, object? value, int level, IReadOnlyList<TItem> items, bool expanded, Func<Task> toggleAsync, IReadOnlyList<VekDataGridAggregateResult> aggregates)
+        => (ColumnKey, Title, Value, Level, Items, Count, Expanded, ToggleAsync, Aggregates) =
+            (columnKey, title, value, level, items, items.Count, expanded, toggleAsync, aggregates);
 
     /// <summary>Gets the stable key of the grouping column.</summary>
     public string ColumnKey { get; }
@@ -146,6 +231,8 @@ public sealed class VekDataGridGroupContext<TItem>
     public bool Expanded { get; }
     /// <summary>Toggles whether the group's children are visible.</summary>
     public Func<Task> ToggleAsync { get; }
+    /// <summary>Gets the aggregate results calculated for this group.</summary>
+    public IReadOnlyList<VekDataGridAggregateResult> Aggregates { get; }
 }
 
 /// <summary>Provides a draft item, validation context, and lifecycle actions to an edit template.</summary>
