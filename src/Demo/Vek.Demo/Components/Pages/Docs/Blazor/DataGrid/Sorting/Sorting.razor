@@ -13,7 +13,7 @@
         <section id="live-example" class="docs-section-content" aria-labelledby="live-example-heading">
             <h2 id="live-example-heading">Live example</h2>
             <p>
-                Select a heading to sort by that column. Hold Ctrl while selecting another heading to add a secondary sort.
+                Click anywhere in a heading to cycle through ascending, descending, and unsorted. Hold Ctrl while selecting another heading to add a secondary sort.
             </p>
             @if (_products is null)
             {
@@ -53,7 +53,8 @@
             <h2 id="sort-modes-heading">Sort modes</h2>
             <p>
                 Choose <code>None</code>, <code>Single</code>, or <code>Multiple</code>. Multiple sorts keep their priority order;
-                click a heading with Alt to remove that sort. A custom selector or comparer can define specialized ordering.
+                click a heading with Alt to remove that sort. Set <code>AllowUnsorted</code> to false to keep a column sorted after it is selected.
+                A custom selector or comparer can define specialized ordering.
             </p>
         </section>
     </article>

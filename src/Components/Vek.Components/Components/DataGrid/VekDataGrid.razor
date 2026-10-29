@@ -101,7 +101,9 @@
                     {
                         var sortPriority = GetSortPriority(column);
                         <th scope="col" data-column-key="@column.Key" draggable="@(CanReorderInHeader ? "true" : "false")"
-                            class="@GetHeaderClass(column.Key)" aria-sort="@GetAriaSort(column)"
+                            class="@GetHeaderClass(column.Key) @(column.Sortable && SortMode != VekDataGridSortMode.None ? "is-sortable" : null)"
+                            aria-sort="@GetAriaSort(column)"
+                            @onclick="args => SortBy(column, args)"
                             style="@GetColumnWidthStyle(column) @HeaderStyle?.Invoke(column.Key)"
                             tabindex="@(CanReorderInHeader ? 0 : null)"
                             aria-description="@(CanReorderInHeader ? "Use the left and right arrow keys to move this column." : null)"
@@ -131,8 +133,7 @@
                                 <button type="button"
                                         class="sort-button"
                                         disabled="@(SortMode == VekDataGridSortMode.None || !column.Sortable)"
-                                        aria-label="Sort by @column.Title"
-                                        @onclick="args => SortBy(column, args)">
+                                        aria-label="Sort by @column.Title">
                                     @column.Title
                                     @if (sortPriority.HasValue)
                                     {
@@ -142,13 +143,16 @@
                             }
                             @if (FilterMode == VekDataGridFilterMode.ColumnMenu && column.Filterable)
                             {
-                                @RenderFilterControl(column)
+                                <span class="sort-interactive-control" @onclick:stopPropagation="true">
+                                    @RenderFilterControl(column)
+                                </span>
                             }
                             @if (ColumnResizeMode == VekDataGridColumnResizeMode.Column)
                             {
                                 <input type="range" class="column-width-control" aria-label="Resize @column.Title column"
                                        min="@Math.Max(column.MinWidth, 32)" max="@Math.Max(column.MaxWidth, Math.Max(column.MinWidth, 32))"
                                        step="8" value="@GetColumnWidthValue(column)"
+                                       @onclick:stopPropagation="true"
                                        @oninput="args => ResizeColumnFromInputAsync(column.Key, args)" />
                             }
                         </th>

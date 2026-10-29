@@ -657,10 +657,10 @@ public partial class VekDataGrid<TItem> : IDisposable
     public VekDataGridSortMode SortMode { get; set; } = VekDataGridSortMode.Single;
 
     /// <summary>
-    /// Gets or sets whether a sorted column can return to an unsorted state when clicked again.
+    /// Gets or sets whether a column cycles from descending back to unsorted when clicked again.
     /// </summary>
     [Parameter]
-    public bool AllowUnsorted { get; set; }
+    public bool AllowUnsorted { get; set; } = true;
 
     /// <summary>Gets or sets an optional predicate applied before column filters.</summary>
     [Parameter]
@@ -1656,13 +1656,13 @@ public partial class VekDataGrid<TItem> : IDisposable
         {
             if (index >= 0)
             {
-                if (AllowUnsorted)
+                var current = _sorts[index];
+                if (AllowUnsorted && current.Direction == VekSortDirection.Descending)
                 {
                     _sorts.RemoveAt(index);
                 }
                 else
                 {
-                    var current = _sorts[index];
                     _sorts[index] = current with
                     {
                         Direction = current.Direction == VekSortDirection.Ascending

@@ -7,24 +7,46 @@ namespace Vek.Components.Tests.DataGrid;
 public sealed class SortingTests : BunitContext
 {
     /// <summary>
-    /// Verifies that clicking the column heading toggles its sort direction.
+    /// Verifies that clicking anywhere in the column heading cycles through ascending, descending, and unsorted.
     /// </summary>
     [Fact]
-    public void ClickingNameHeaderTogglesAscendingAndDescendingOrder()
+    public void ClickingNameHeaderCyclesSortDirectionAndReturnsToOriginalOrder()
     {
         var cut = DataGridTestHelpers.RenderGrid(this, pageSize: 3);
 
-        cut.Find("thead button").Click();
+        cut.Find("thead button.sort-button").Click();
         cut.WaitForAssertion(() =>
             Assert.Equal(
                 new[] { "Desk Lamp", "Notebook Set", "Task Chair" },
                 DataGridTestHelpers.GetRowNames(cut)));
 
-        cut.Find("thead button").Click();
+        cut.Find("thead button.sort-button").Click();
         cut.WaitForAssertion(() =>
             Assert.Equal(
                 new[] { "Task Chair", "Notebook Set", "Desk Lamp" },
                 DataGridTestHelpers.GetRowNames(cut)));
+
+        cut.Find("thead button.sort-button").Click();
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(
+                new[] { "Task Chair", "Desk Lamp", "Notebook Set" },
+                DataGridTestHelpers.GetRowNames(cut));
+            Assert.Equal("none", cut.Find("thead th").GetAttribute("aria-sort"));
+        });
+    }
+
+    /// <summary>Verifies clicking the column heading outside its title button also sorts the column.</summary>
+    [Fact]
+    public void ClickingColumnHeaderAreaSortsColumn()
+    {
+        var cut = DataGridTestHelpers.RenderGrid(this, pageSize: 3);
+
+        cut.Find("thead th").Click();
+
+        Assert.Equal(
+            new[] { "Desk Lamp", "Notebook Set", "Task Chair" },
+            DataGridTestHelpers.GetRowNames(cut));
     }
 
     /// <summary>
@@ -35,7 +57,7 @@ public sealed class SortingTests : BunitContext
     {
         var cut = DataGridTestHelpers.RenderGrid(this, pageSize: 3, VekDataGridSortMode.None);
 
-        cut.Find("thead button").Click();
+        cut.Find("thead th").Click();
 
         Assert.Equal(
             new[] { "Task Chair", "Desk Lamp", "Notebook Set" },
