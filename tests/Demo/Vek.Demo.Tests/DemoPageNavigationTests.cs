@@ -81,6 +81,30 @@ public sealed class DemoPageNavigationTests : BunitContext
     }
 
     /// <summary>
+    /// Verifies that the sorting guide shows a live multi-column grid and its sample markup.
+    /// </summary>
+    [Fact]
+    public void DataGridSortingRouteShowsLiveGridAndExample()
+    {
+        Services.AddSingleton<IDemoProductProvider>(new TestProductProvider(
+        [
+            new DemoProduct(1, "Desk Lamp", "Furniture", 49.99m),
+            new DemoProduct(2, "Task Chair", "Furniture", 199.00m)
+        ]));
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo("/docs/components/vekdatagrid/sorting");
+
+        var cut = Render<Routes>();
+
+        Assert.Equal("VekDataGrid: Sorting", cut.Find("main h1").TextContent.Trim());
+        Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
+        Assert.Contains("SortMode=\"VekDataGridSortMode.Multiple\"", cut.Find(".code-sample pre code").TextContent);
+        Assert.Equal(
+            "/docs/components/vekdatagrid/sorting",
+            cut.Find(".docs-sidebar a.active").GetAttribute("href"));
+    }
+
+    /// <summary>
     /// Verifies that the code sample switches from Razor markup to its C# code-behind.
     /// </summary>
     [Fact]

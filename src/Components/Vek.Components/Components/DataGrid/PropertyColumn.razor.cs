@@ -40,13 +40,31 @@ public partial class PropertyColumn<TItem, TValue>
     [Parameter]
     public RenderFragment<TItem>? CellTemplate { get; set; }
 
+    /// <summary>
+    /// Gets or sets whether users can sort by this column.
+    /// </summary>
+    [Parameter]
+    public bool Sortable { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a custom value selector used when sorting this column.
+    /// </summary>
+    [Parameter]
+    public Func<TItem, object?>? SortBy { get; set; }
+
+    /// <summary>
+    /// Gets or sets a custom comparer used when sorting this column.
+    /// </summary>
+    [Parameter]
+    public IComparer<object?>? SortComparer { get; set; }
+
     private Func<TItem, TValue>? _propertyGetter;
     private VekDataGrid<TItem>? _registeredGrid;
     private string? _lastPropertyExpression;
     private string? _lastKey;
     private string? _lastTitle;
     private string? _lastFormat;
-    private RenderFragment<TItem>? _lastCellTemplate;
+    private bool _lastSortable;
 
     /// <summary>
     /// Updates the compiled property accessor and registers this column with its grid.
@@ -64,7 +82,7 @@ public partial class PropertyColumn<TItem, TValue>
             || Key != _lastKey
             || Title != _lastTitle
             || Format != _lastFormat
-            || CellTemplate != _lastCellTemplate;
+            || Sortable != _lastSortable;
 
         if (_propertyGetter is null || propertyExpression != _lastPropertyExpression)
         {
@@ -87,7 +105,7 @@ public partial class PropertyColumn<TItem, TValue>
         _lastKey = Key;
         _lastTitle = Title;
         _lastFormat = Format;
-        _lastCellTemplate = CellTemplate;
+        _lastSortable = Sortable;
     }
 
     string IVekDataGridColumn<TItem>.Title => string.IsNullOrWhiteSpace(Title)
@@ -97,6 +115,8 @@ public partial class PropertyColumn<TItem, TValue>
     string IVekDataGridColumn<TItem>.Key => string.IsNullOrWhiteSpace(Key)
         ? _lastPropertyExpression!
         : Key;
+
+    bool IVekDataGridColumn<TItem>.Sortable => Sortable;
 
     RenderFragment<TItem> IVekDataGridColumn<TItem>.CellTemplate => item => builder =>
     {
@@ -118,8 +138,12 @@ public partial class PropertyColumn<TItem, TValue>
 
     Comparison<TItem> IVekDataGridColumn<TItem>.CompareItems => CompareItems;
 
-    private int CompareItems(TItem left, TItem right) =>
-        Comparer<TValue>.Default.Compare(_propertyGetter!(left), _propertyGetter(right));
+    private int CompareItems(TItem left, TItem right)
+    {
+        var leftValue = SortBy is null ? _propertyGetter!(left) : SortBy(left);
+        var rightValue = SortBy is null ? _propertyGetter!(right) : SortBy(right);
+        return (SortComparer ?? Comparer<object?>.Default).Compare(leftValue, rightValue);
+    }
 
     private string GetDefaultTitle()
     {

@@ -27,11 +27,20 @@ public partial class TemplateColumn<TItem>
     [Parameter, EditorRequired]
     public RenderFragment<TItem> CellTemplate { get; set; } = default!;
 
+    /// <summary>
+    /// Gets or sets whether users can sort by this column.
+    /// </summary>
+    [Parameter]
+    public bool Sortable { get; set; }
+
     private VekDataGrid<TItem>? _registeredGrid;
     private string? _lastKey;
     private string? _lastTitle;
-    private RenderFragment<TItem>? _lastCellTemplate;
+    private bool _lastSortable;
 
+    /// <summary>
+    /// Registers the column when its parameters are set.
+    /// </summary>
     protected override void OnParametersSet()
     {
         if (Grid is null)
@@ -45,17 +54,19 @@ public partial class TemplateColumn<TItem>
             _registeredGrid = Grid;
             _registeredGrid.RegisterColumn(this);
         }
-        else if (Key != _lastKey || Title != _lastTitle || CellTemplate != _lastCellTemplate)
+        else if (Key != _lastKey || Title != _lastTitle || Sortable != _lastSortable)
         {
             _registeredGrid.RefreshColumn(this);
         }
 
         _lastKey = Key;
         _lastTitle = Title;
-        _lastCellTemplate = CellTemplate;
+        _lastSortable = Sortable;
     }
 
     string IVekDataGridColumn<TItem>.Key => Key ?? Title;
+
+    bool IVekDataGridColumn<TItem>.Sortable => Sortable;
 
     string IVekDataGridColumn<TItem>.Title => Title;
 

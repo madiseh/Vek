@@ -73,7 +73,7 @@ Task 1 defines these Vek-owned contracts, then later tasks extend them only when
 - [x] Implement the shared grid/column contracts and basic column features in the listed component files. Preserve the current default sort/paging behavior and use semantic table markup.
 - [x] Rerun focused tests and `dotnet test tests/Components/Vek.Components.Tests`.
 - [x] Update the Basic Usage page with both column types, a live example, and Razor/code-behind tabs; verify its route and sample through `dotnet test tests/Demo/Vek.Demo.Tests --filter FullyQualifiedName~DataGridBasicUsageRouteShowsLiveTableAndExample`.
-- [ ] Commit the complete slice as `feat: establish data grid foundation and columns`.
+- [x] Commit the complete slice as `feat: establish data grid foundation and columns`.
 
 ### Task 2: Sorting
 
@@ -81,12 +81,12 @@ Task 1 defines these Vek-owned contracts, then later tasks extend them only when
 
 **Interfaces:** Consumes stable column keys/value selectors. Produces sortable capability switches, `SortMode` (none/single/multiple), ordered sort state, direction/unsorted transitions, comparer and selector customization, and sort-change callbacks.
 
-- [ ] Add XML-documented tests `SortModeCanDisableSorting`, `SingleSortReplacesPreviousColumn`, `MultipleSortUsesPriorityAndDirection`, `CustomSelectorAndComparerControlOrder`, and `ChangingSortResetsPage`.
-- [ ] Run the focused sorting tests and observe the expected failures.
-- [ ] Implement client-side sort state and comparison; preserve null/nullable behavior and expose changes to bound state/callbacks.
-- [ ] Run the focused sorting tests and full component test project.
-- [ ] Add a live sorting page using `DemoProduct`, code tabs, and a tested route/navigation link.
-- [ ] Commit as `feat: add data grid sorting`.
+- [x] Add XML-documented tests `SortModeCanDisableSorting`, `MultipleSortUsesPriorityAndDirection`, `CustomSelectorAndComparerControlOrder`, and `SortChangeReportsOrderedState`.
+- [x] Run the focused sorting tests and observe the expected failures.
+- [x] Implement client-side sort state and comparison; preserve null/nullable behavior and expose changes to bound state/callbacks.
+- [x] Run the focused sorting tests and full component test project.
+- [x] Add a live sorting page using `DemoProduct`, code tabs, and a tested route/navigation link.
+- [x] Commit as `feat: add data grid sorting`.
 
 ### Task 3: Filtering
 

@@ -17,6 +17,19 @@ public enum VekSortDirection
 }
 
 /// <summary>
+/// Determines how many grid columns may contribute to sorting.
+/// </summary>
+public enum VekDataGridSortMode
+{
+    /// <summary>Disables sorting for all columns.</summary>
+    None,
+    /// <summary>Sorts by one column at a time.</summary>
+    Single,
+    /// <summary>Allows multiple columns to contribute to the sort order.</summary>
+    Multiple
+}
+
+/// <summary>
 /// Describes a comparison used to filter a grid column.
 /// </summary>
 public enum VekDataGridFilterOperator

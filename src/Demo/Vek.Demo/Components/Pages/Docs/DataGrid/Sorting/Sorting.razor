@@ -1,0 +1,67 @@
+@page "/docs/components/vekdatagrid/sorting"
+@layout DocumentationLayout
+
+<PageTitle>VekDataGrid Sorting | Vek Components</PageTitle>
+
+<div class="docs-page-layout">
+    <article class="docs-article">
+        <h1>VekDataGrid: Sorting</h1>
+        <p class="docs-intro">
+            Sort by one column or combine columns to create a prioritized order.
+        </p>
+
+        <section id="live-example" class="docs-section-content" aria-labelledby="live-example-heading">
+            <h2 id="live-example-heading">Live example</h2>
+            <p>
+                Select a heading to sort by that column. Hold Ctrl while selecting another heading to add a secondary sort.
+            </p>
+            @if (_products is null)
+            {
+                <p class="docs-loading" role="status">Loading sample products...</p>
+            }
+            else
+            {
+                <div class="docs-example-frame">
+                    <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="10" SortMode="VekDataGridSortMode.Multiple">
+                        <PropertyColumn Property="product => product.Name" Title="Name" />
+                        <PropertyColumn Property="product => product.Category" Title="Category" />
+                        <PropertyColumn Property="product => product.Price" Title="Price" Format="C2" />
+                    </VekDataGrid>
+                </div>
+            }
+        </section>
+
+        <section id="code" class="docs-section-content" aria-labelledby="code-heading">
+            <h2 id="code-heading">Code</h2>
+            <p>Enable multi-column sorting with <code>SortMode="Multiple"</code>.</p>
+            <div class="code-sample">
+                <div class="code-tabs" role="group" aria-label="Code sample files">
+                    <button type="button" class="code-tab @(!_showCodeBehind ? "is-active" : null)"
+                            data-sample="razor" aria-pressed="@(!_showCodeBehind)" @onclick="ShowRazor">
+                        Sample.razor
+                    </button>
+                    <button type="button" class="code-tab @(_showCodeBehind ? "is-active" : null)"
+                            data-sample="code-behind" aria-pressed="@_showCodeBehind" @onclick="ShowCodeBehind">
+                        Sample.razor.cs
+                    </button>
+                </div>
+                <pre><code>@SelectedCode</code></pre>
+            </div>
+        </section>
+
+        <section id="sort-modes" class="docs-section-content" aria-labelledby="sort-modes-heading">
+            <h2 id="sort-modes-heading">Sort modes</h2>
+            <p>
+                Choose <code>None</code>, <code>Single</code>, or <code>Multiple</code>. Multiple sorts keep their priority order;
+                click a heading with Alt to remove that sort. A custom selector or comparer can define specialized ordering.
+            </p>
+        </section>
+    </article>
+
+    <nav class="docs-toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <a href="/docs/components/vekdatagrid/sorting#live-example">Live example</a>
+        <a href="/docs/components/vekdatagrid/sorting#code">Code</a>
+        <a href="/docs/components/vekdatagrid/sorting#sort-modes">Sort modes</a>
+    </nav>
+</div>

@@ -12,6 +12,11 @@ internal interface IVekDataGridColumn<TItem>
     string Key { get; }
 
     /// <summary>
+    /// Gets whether this column can be sorted.
+    /// </summary>
+    bool Sortable { get; }
+
+    /// <summary>
     /// Gets the heading displayed for the column.
     /// </summary>
     string Title { get; }

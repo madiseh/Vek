@@ -22,12 +22,17 @@
                 <tr>
                     @foreach (var column in _columns)
                     {
+                        var sortPriority = GetSortPriority(column);
                         <th scope="col" aria-sort="@GetAriaSort(column)">
-                            <button type="button" class="sort-button" @onclick="() => SortBy(column)">
+                            <button type="button"
+                                    class="sort-button"
+                                    disabled="@(SortMode == VekDataGridSortMode.None || !column.Sortable)"
+                                    aria-label="Sort by @column.Title"
+                                    @onclick="args => SortBy(column, args)">
                                 @column.Title
-                                @if (ReferenceEquals(_sortColumn, column))
+                                @if (sortPriority.HasValue)
                                 {
-                                    <span class="sort-indicator" aria-hidden="true">@(_sortAscending ? "↑" : "↓")</span>
+                                    <span class="sort-indicator" aria-hidden="true">@GetSortIndicator(column)</span>
                                 }
                             </button>
                         </th>
