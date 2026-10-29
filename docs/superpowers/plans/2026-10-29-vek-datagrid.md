@@ -185,12 +185,12 @@ Task 1 defines these Vek-owned contracts, then later tasks extend them only when
 
 **Interfaces:** Uses the Task 1 `VekDataGridState<TItem>` and `VekDataGridData<TItem>` contracts. Produces mutually exclusive local/server sources, async load with cancellation, total count, loading/empty/error presentation, refresh, and server sort/filter/page state.
 
-- [ ] Add tests `ServerDataReceivesCurrentState`, `ServerDataReturnsPageAndTotalCount`, `NewRequestCancelsPreviousRequest`, `StaleResponseCannotReplaceNewerData`, and `ServerFailureCanRenderErrorContent`.
-- [ ] Run focused server-data tests and confirm failures.
-- [ ] Implement the async source contract and state transitions. Reject invalid source combinations with a clear exception.
-- [ ] Run focused server-data tests and component suite.
-- [ ] Add a Demo callback that applies the state to the existing `DemoProduct` sample provider; add the live Server Data page and route test.
-- [ ] Commit as `feat: add server-backed data grid loading`.
+- [x] Add tests `ServerDataReceivesCurrentState`, `ServerDataReturnsPageAndTotalCount`, `NewRequestCancelsPreviousRequest`, `StaleResponseCannotReplaceNewerData`, and `ServerFailureCanRenderErrorContent`.
+- [x] Run focused server-data tests and confirm failures.
+- [x] Implement the async source contract and state transitions. Reject invalid source combinations with a clear exception.
+- [x] Run focused server-data tests and component suite.
+- [x] Add a Demo callback that applies the state to the existing `DemoProduct` sample provider; add the live Server Data page and route test.
+- [x] Commit as `feat: add server-backed data grid loading`.
 
 ### Task 11: Virtualization
 

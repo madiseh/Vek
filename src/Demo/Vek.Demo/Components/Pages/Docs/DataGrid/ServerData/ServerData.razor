@@ -1,0 +1,51 @@
+@page "/docs/components/vekdatagrid/server-data"
+@layout DocumentationLayout
+
+<PageTitle>VekDataGrid Server Data | Vek Components</PageTitle>
+
+<div class="docs-page-layout">
+    <article class="docs-article">
+        <h1>VekDataGrid: Server Data</h1>
+        <p class="docs-intro">Load only the requested page and let the data source apply the grid's current sort and filter state.</p>
+
+        <section id="live-example" class="docs-section-content" aria-labelledby="live-example-heading">
+            <h2 id="live-example-heading">Live example</h2>
+            <p>Sorting, filtering, and paging send a new cancellable request to the sample provider.</p>
+            <div class="docs-example-frame">
+                <VekDataGrid TItem="DemoProduct" ServerData="LoadServerPageAsync" PageSize="5">
+                    <LoadingContent><p role="status">Loading products…</p></LoadingContent>
+                    <ErrorContent Context="error"><p role="alert">Could not load products: @error.Message</p></ErrorContent>
+                    <EmptyContent><p>No products match this request.</p></EmptyContent>
+                    <ChildContent>
+                        <PropertyColumn Property="product => product.Name" Title="Name" FilterOperator="VekDataGridFilterOperator.Contains" />
+                        <PropertyColumn Property="product => product.Category" Title="Category" FilterOperator="VekDataGridFilterOperator.Contains" />
+                        <PropertyColumn Property="product => product.Price" Title="Price" Format="C2" FilterOperator="VekDataGridFilterOperator.GreaterThanOrEqual" />
+                    </ChildContent>
+                </VekDataGrid>
+            </div>
+        </section>
+
+        <section id="code" class="docs-section-content" aria-labelledby="code-heading">
+            <h2 id="code-heading">Code</h2>
+            <div class="code-sample">
+                <div class="code-tabs" role="group" aria-label="Code sample files">
+                    <button type="button" class="code-tab @(!_showCodeBehind ? "is-active" : null)" data-sample="razor" aria-pressed="@(!_showCodeBehind)" @onclick="ShowRazor">Sample.razor</button>
+                    <button type="button" class="code-tab @(_showCodeBehind ? "is-active" : null)" data-sample="code-behind" aria-pressed="@_showCodeBehind" @onclick="ShowCodeBehind">Sample.razor.cs</button>
+                </div>
+                <pre><code>@SelectedCode</code></pre>
+            </div>
+        </section>
+
+        <section id="server-contract" class="docs-section-content" aria-labelledby="server-contract-heading">
+            <h2 id="server-contract-heading">Server request contract</h2>
+            <p>The source receives the requested page, page size, sort definitions, filters, and a cancellation token. Return the page rows together with the total number of matching rows. A new request cancels the previous one; failures can be presented with <code>ErrorContent</code>, and <code>RefreshServerDataAsync</code> reloads the current request.</p>
+        </section>
+    </article>
+
+    <nav class="docs-toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <a href="/docs/components/vekdatagrid/server-data#live-example">Live example</a>
+        <a href="/docs/components/vekdatagrid/server-data#code">Code</a>
+        <a href="/docs/components/vekdatagrid/server-data#server-contract">Server request contract</a>
+    </nav>
+</div>

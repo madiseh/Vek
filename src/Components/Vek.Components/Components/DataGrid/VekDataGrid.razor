@@ -2,13 +2,13 @@
 @typeparam TItem
 
 @{
-    var sortedItems = GetSortedItems();
-    var totalPages = GetTotalPages(sortedItems.Count);
+    var sortedItems = ServerData is null ? GetSortedItems() : _serverItems.ToList();
+    var totalItemCount = ServerData is null ? sortedItems.Count : _serverTotalItems;
+    var totalPages = GetTotalPages(totalItemCount);
     _currentPage = Math.Clamp(_currentPage, 1, totalPages);
-    var pageItems = sortedItems
-        .Skip((_currentPage - 1) * EffectivePageSize)
-        .Take(EffectivePageSize)
-        .ToList();
+    var pageItems = ServerData is null
+        ? sortedItems.Skip((_currentPage - 1) * EffectivePageSize).Take(EffectivePageSize).ToList()
+        : sortedItems;
 }
 
 <CascadingValue Value="this" IsFixed="true">
@@ -16,7 +16,7 @@
 </CascadingValue>
 
 <div class="vek-data-grid @Class">
-    @{ var pagerContext = CreatePagerContext(sortedItems.Count, totalPages); }
+    @{ var pagerContext = CreatePagerContext(totalItemCount, totalPages); }
     @if (FilterMode == VekDataGridFilterMode.Simple && _columns.Any(column => column.Filterable))
     {
         <div class="filter-panel" aria-label="Filters">
@@ -82,10 +82,24 @@
                 }
             </thead>
             <tbody>
-                @if (pageItems.Count == 0)
+                @if (ServerData is not null && _serverLoading)
+                {
+                    <tr><td class="loading-state" colspan="@Math.Max(_columns.Count, 1)">@(LoadingContent is null ? "Loading items..." : null) @LoadingContent</td></tr>
+                }
+                else if (ServerData is not null && _serverError is not null)
+                {
+                    <tr><td class="error-state" colspan="@Math.Max(_columns.Count, 1)">
+                        @if (ErrorContent is null) { @_serverError.Message }
+                        else { @ErrorContent(_serverError) }
+                    </td></tr>
+                }
+                else if (pageItems.Count == 0)
                 {
                     <tr>
-                        <td class="empty-state" colspan="@Math.Max(_columns.Count, 1)">No items to display.</td>
+                        <td class="empty-state" colspan="@Math.Max(_columns.Count, 1)">
+                            @if (EmptyContent is null) { @("No items to display.") }
+                            else { @EmptyContent }
+                        </td>
                     </tr>
                 }
                 else if (EffectiveGroups.Count > 0)

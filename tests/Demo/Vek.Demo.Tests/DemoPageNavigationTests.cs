@@ -271,6 +271,27 @@ public sealed class DemoPageNavigationTests : BunitContext
     }
 
     /// <summary>
+    /// Verifies the server data guide loads a page from the provider and exposes its source example.
+    /// </summary>
+    [Fact]
+    public void DataGridServerDataRouteShowsLiveGridAndExample()
+    {
+        Services.AddSingleton<IDemoProductProvider>(new TestProductProvider(
+        [
+            new DemoProduct(1, "Desk Lamp", "Furniture", 49.99m),
+            new DemoProduct(2, "Task Chair", "Furniture", 199.00m)
+        ]));
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo("/docs/components/vekdatagrid/server-data");
+
+        var cut = Render<Routes>();
+
+        Assert.Equal("VekDataGrid: Server Data", cut.Find("main h1").TextContent.Trim());
+        Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
+        Assert.Contains("ServerData=\"LoadServerPageAsync\"", cut.Find(".code-sample pre code").TextContent);
+    }
+
+    /// <summary>
     /// Verifies that the code sample switches from Razor markup to its C# code-behind.
     /// </summary>
     [Fact]

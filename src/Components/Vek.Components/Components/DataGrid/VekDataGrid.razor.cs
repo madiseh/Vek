@@ -20,6 +20,15 @@ public partial class VekDataGrid<TItem>
     private VekDataGridEditContext<TItem>? _activeEditContext;
     private bool _isEditing;
     private bool _initialExpansionApplied;
+    private IEnumerable<TItem> _items = Array.Empty<TItem>();
+    private bool _itemsParameterWasSet;
+    private IReadOnlyList<TItem> _serverItems = Array.Empty<TItem>();
+    private int _serverTotalItems;
+    private bool _serverLoading;
+    private Exception? _serverError;
+    private CancellationTokenSource? _serverLoadCancellation;
+    private long _serverRequestVersion;
+    private bool _serverInitialized;
 
     private sealed record ActiveSort(IVekDataGridColumn<TItem> Column, VekSortDirection Direction);
     private sealed record GroupNode(
@@ -33,8 +42,81 @@ public partial class VekDataGrid<TItem>
     /// <summary>
     /// Gets or sets the complete collection of items displayed by the grid.
     /// </summary>
-    [Parameter, EditorRequired]
-    public IEnumerable<TItem> Items { get; set; } = Array.Empty<TItem>();
+    [Parameter]
+    public IEnumerable<TItem> Items
+    {
+        get => _items;
+        set
+        {
+            _items = value ?? Array.Empty<TItem>();
+            _itemsParameterWasSet = true;
+        }
+    }
+
+    /// <summary>Gets or sets the asynchronous page source. Use instead of the local Items parameter.</summary>
+    [Parameter]
+    public Func<VekDataGridState<TItem>, CancellationToken, Task<VekDataGridData<TItem>>>? ServerData { get; set; }
+
+    /// <summary>Gets or sets custom content displayed while a server request is running.</summary>
+    [Parameter]
+    public RenderFragment? LoadingContent { get; set; }
+
+    /// <summary>Gets or sets custom content displayed when a server request fails.</summary>
+    [Parameter]
+    public RenderFragment<Exception>? ErrorContent { get; set; }
+
+    /// <summary>Gets or sets custom content displayed when the current result set is empty.</summary>
+    [Parameter]
+    public RenderFragment? EmptyContent { get; set; }
+
+    /// <summary>Gets whether a server request is currently running.</summary>
+    public bool IsLoading => _serverLoading;
+
+    /// <summary>Gets the total number of matching items before paging.</summary>
+    public int TotalItems => ServerData is null ? GetSortedItems().Count : _serverTotalItems;
+
+    /// <summary>Reloads the current page from the configured server source.</summary>
+    public Task RefreshServerDataAsync() => ServerData is null
+        ? throw new InvalidOperationException("ServerData must be configured before refreshing server items.")
+        : LoadServerDataAsync();
+
+    private async Task LoadServerDataAsync()
+    {
+        var source = ServerData ?? throw new InvalidOperationException("ServerData must be configured before loading server items.");
+        var previousRequest = _serverLoadCancellation;
+        var requestCancellation = new CancellationTokenSource();
+        _serverLoadCancellation = requestCancellation;
+        var requestVersion = ++_serverRequestVersion;
+        previousRequest?.Cancel();
+        _serverLoading = true;
+        _serverError = null;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            var result = await source(CurrentState, requestCancellation.Token);
+            if (requestVersion != _serverRequestVersion || requestCancellation.IsCancellationRequested) return;
+            _serverItems = result.Items ?? Array.Empty<TItem>();
+            _serverTotalItems = Math.Max(0, result.TotalItems);
+        }
+        catch (OperationCanceledException) when (requestCancellation.IsCancellationRequested)
+        {
+        }
+        catch (Exception exception)
+        {
+            if (requestVersion == _serverRequestVersion) _serverError = exception;
+        }
+        finally
+        {
+            if (requestVersion == _serverRequestVersion)
+            {
+                _serverLoading = false;
+                _serverLoadCancellation = null;
+                await InvokeAsync(StateHasChanged);
+            }
+            requestCancellation.Dispose();
+        }
+    }
 
     /// <summary>
     /// Gets or sets the maximum number of rows displayed on each page. Defaults to 10.
@@ -212,7 +294,8 @@ public partial class VekDataGrid<TItem>
             _currentPage = 1;
             await FilterChanged.InvokeAsync(_filters.ToArray());
             await NotifySelectionAfterFilteringAsync();
-            await InvokeAsync(StateHasChanged);
+            if (ServerData is not null) await LoadServerDataAsync();
+            else await InvokeAsync(StateHasChanged);
             return;
         }
 
@@ -220,7 +303,8 @@ public partial class VekDataGrid<TItem>
         _currentPage = 1;
         await FilterChanged.InvokeAsync(_filters.ToArray());
         await NotifySelectionAfterFilteringAsync();
-        await InvokeAsync(StateHasChanged);
+        if (ServerData is not null) await LoadServerDataAsync();
+        else await InvokeAsync(StateHasChanged);
     }
 
     /// <summary>Clears one column filter or all filters when no key is supplied.</summary>
@@ -231,7 +315,8 @@ public partial class VekDataGrid<TItem>
         _currentPage = 1;
         await FilterChanged.InvokeAsync(_filters.ToArray());
         await NotifySelectionAfterFilteringAsync();
-        await InvokeAsync(StateHasChanged);
+        if (ServerData is not null) await LoadServerDataAsync();
+        else await InvokeAsync(StateHasChanged);
     }
 
     internal string? GetFilterValue(string key) => _filters.FirstOrDefault(filter => filter.ColumnKey == key)?.Value?.ToString();
@@ -449,10 +534,11 @@ public partial class VekDataGrid<TItem>
         builder.CloseElement();
     };
 
-    private List<TItem> GetPageItems() => GetSortedItems()
-        .Skip((_currentPage - 1) * EffectivePageSize)
-        .Take(EffectivePageSize)
-        .ToList();
+    private List<TItem> GetPageItems() => ServerData is not null
+        ? _serverItems.ToList()
+        : GetSortedItems().Skip((_currentPage - 1) * EffectivePageSize).Take(EffectivePageSize).ToList();
+
+    private IReadOnlyList<TItem> GetCurrentItems() => ServerData is null ? Items.ToArray() : _serverItems;
 
     private IReadOnlyList<(VekDataGridGroupDefinition Definition, IVekDataGridColumn<TItem> Column, Func<TItem, object?> Selector)> EffectiveGroups => GroupBy
         .Select(definition => (Definition: definition, Column: _columns.FirstOrDefault(column => column.Key == definition.ColumnKey)))
@@ -682,7 +768,29 @@ public partial class VekDataGrid<TItem>
     /// <summary>Clamps the current page when incoming data or parameters reduce the page count.</summary>
     protected override async Task OnParametersSetAsync()
     {
-        var lastPage = GetTotalPages(GetSortedItems().Count);
+        if (ServerData is not null && _itemsParameterWasSet)
+            throw new InvalidOperationException("Items and ServerData are mutually exclusive. Provide exactly one data source.");
+
+        if (ServerData is not null)
+        {
+            if (!_serverInitialized)
+            {
+                _serverInitialized = true;
+                await LoadServerDataAsync();
+            }
+        }
+        else if (_serverInitialized)
+        {
+            _serverRequestVersion++;
+            _serverLoadCancellation?.Cancel();
+            _serverItems = Array.Empty<TItem>();
+            _serverTotalItems = 0;
+            _serverError = null;
+            _serverLoading = false;
+            _serverInitialized = false;
+        }
+
+        var lastPage = GetTotalPages(TotalItems);
         if (_currentPage > lastPage)
         {
             _currentPage = lastPage;
@@ -696,7 +804,7 @@ public partial class VekDataGrid<TItem>
             await SelectedItemChanged.InvokeAsync(SelectedItem);
         }
 
-        var rows = Items?.ToList() ?? [];
+        var rows = GetCurrentItems().ToList();
         if (!_initialExpansionApplied)
         {
             _expandedRows = InitiallyExpanded is null ? [] : rows.Where(InitiallyExpanded).ToList();
@@ -717,7 +825,7 @@ public partial class VekDataGrid<TItem>
     private bool ReconcileSelection()
     {
         if (SelectedItems.Count == 0 && SelectedItem is null) return false;
-        var currentItems = Items?.ToList() ?? [];
+        var currentItems = GetCurrentItems().ToList();
         var reconciled = SelectedItems.Select(selected =>
                 currentItems.FirstOrDefault(current => ItemComparer.Equals(current, selected)) ?? selected)
             .ToList();
@@ -750,8 +858,6 @@ public partial class VekDataGrid<TItem>
     }
 
     /// <summary>Gets the total item count after filtering and before paging.</summary>
-    public int TotalItems => GetSortedItems().Count;
-
     internal void RegisterColumn(IVekDataGridColumn<TItem> column)
     {
         if (_columns.Contains(column))
@@ -781,6 +887,7 @@ public partial class VekDataGrid<TItem>
 
     private List<TItem> GetSortedItems()
     {
+        if (ServerData is not null) return _serverItems.ToList();
         var items = Items?.Where(item => QuickFilter?.Invoke(item) ?? true)
             .Where(MatchesFilters).ToList() ?? [];
         if (_sorts.Count == 0)
@@ -855,7 +962,8 @@ public partial class VekDataGrid<TItem>
     {
         _currentPage = Math.Clamp(page, 1, GetTotalPages(TotalItems));
         await CurrentPageChanged.InvokeAsync(_currentPage);
-        await InvokeAsync(StateHasChanged);
+        if (ServerData is not null) await LoadServerDataAsync();
+        else await InvokeAsync(StateHasChanged);
     }
 
     private async Task SetPageSizeAsync(ChangeEventArgs args)
@@ -871,7 +979,8 @@ public partial class VekDataGrid<TItem>
         _currentPage = 1;
         await PageSizeChanged.InvokeAsync(pageSize);
         await CurrentPageChanged.InvokeAsync(_currentPage);
-        await InvokeAsync(StateHasChanged);
+        if (ServerData is not null) await LoadServerDataAsync();
+        else await InvokeAsync(StateHasChanged);
     }
 
     private VekDataGridPagerContext<TItem> CreatePagerContext(int totalItems, int totalPages) => new(
@@ -954,6 +1063,7 @@ public partial class VekDataGrid<TItem>
 
         _currentPage = 1;
         await SortChanged.InvokeAsync(GetSortState());
+        if (ServerData is not null) await LoadServerDataAsync();
     }
 
     private int CompareByActiveSorts(TItem left, TItem right)
