@@ -21,6 +21,12 @@ Before carrying out work covered by a guide below, read and follow that guide. I
 - Put namespaces shared by C# files in the project-level `GlobalUsings.cs` file with `global using` directives instead of repeating file-local `using` directives.
 - When a namespace is needed in both Razor markup and C# files, add it to both central import locations; Razor `@using` directives do not apply to standalone C# files.
 
+## Testing and TDD
+
+- For every functional or code change, add or update at least one automated test for the observable behavior before changing production code.
+- TDD is mandatory for functional and code changes: write the test first, run it to confirm it fails for the expected reason, implement the behavior, rerun the focused test to pass, then run the relevant test suite.
+- Every C# test method marked with `[Fact]` or `[Theory]` must have an XML `/// <summary>` immediately above the test attribute. Describe the behavior the test protects.
+
 ## Code Discovery and Token Use
 
 - Always prefer Codebase Memory MCP graph tools over grep, glob, or file search for code discovery. This reduces unnecessary source reads and token use.

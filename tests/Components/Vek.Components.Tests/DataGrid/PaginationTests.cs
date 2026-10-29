@@ -4,6 +4,9 @@ namespace Vek.Components.Tests.DataGrid;
 
 public sealed class PaginationTests : BunitContext
 {
+    /// <summary>
+    /// Verifies that the pager navigates forward and backward between result pages.
+    /// </summary>
     [Fact]
     public void NextAndPreviousButtonsNavigateBetweenPages()
     {

@@ -4,6 +4,9 @@ namespace Vek.Components.Tests.DataGrid;
 
 public sealed class SortingTests : BunitContext
 {
+    /// <summary>
+    /// Verifies that clicking the column heading toggles its sort direction.
+    /// </summary>
     [Fact]
     public void ClickingNameHeaderTogglesAscendingAndDescendingOrder()
     {
