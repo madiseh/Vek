@@ -1,0 +1,63 @@
+@page "/docs/components/vekdatagrid/pagination"
+@layout DocumentationLayout
+
+<PageTitle>VekDataGrid Pagination | Vek Components</PageTitle>
+
+<div class="docs-page-layout">
+    <article class="docs-article">
+        <h1>VekDataGrid: Pagination</h1>
+        <p class="docs-intro">Control the current page and page size, or replace the built-in pager with a custom surface.</p>
+
+        <section id="live-example" class="docs-section-content" aria-labelledby="live-example-heading">
+            <h2 id="live-example-heading">Live example</h2>
+            <p>Change the rows per page or use the custom pager below the table.</p>
+            @if (_products is null)
+            {
+                <p class="docs-loading" role="status">Loading sample products...</p>
+            }
+            else
+            {
+                <div class="docs-example-frame">
+                    <VekDataGrid TItem="DemoProduct" Items="_products" @bind-CurrentPage="_currentPage" @bind-PageSize="_pageSize" PageSizeOptions="_pageSizeOptions">
+                        <ChildContent>
+                            <PropertyColumn Property="product => product.Name" Title="Name" />
+                            <PropertyColumn Property="product => product.Category" Title="Category" />
+                            <PropertyColumn Property="product => product.Price" Title="Price" Format="C2" />
+                        </ChildContent>
+                        <PagerContent Context="pager">
+                            <nav class="custom-pager" aria-label="Custom product pagination">
+                                <button type="button" aria-label="Previous page" disabled="@(pager.State.Page <= 1)" @onclick="() => pager.SetPageAsync(pager.State.Page - 1)">Previous</button>
+                                <span>Page @pager.State.Page of @pager.TotalPages · @pager.TotalItems products</span>
+                                <button type="button" aria-label="Next page" disabled="@(pager.State.Page >= pager.TotalPages)" @onclick="() => pager.SetPageAsync(pager.State.Page + 1)">Next</button>
+                            </nav>
+                        </PagerContent>
+                    </VekDataGrid>
+                </div>
+            }
+        </section>
+
+        <section id="code" class="docs-section-content" aria-labelledby="code-heading">
+            <h2 id="code-heading">Code</h2>
+            <div class="code-sample">
+                <div class="code-tabs" role="group" aria-label="Code sample files">
+                    <button type="button" class="code-tab @(!_showCodeBehind ? "is-active" : null)" data-sample="razor" aria-pressed="@(!_showCodeBehind)" @onclick="ShowRazor">Sample.razor</button>
+                    <button type="button" class="code-tab @(_showCodeBehind ? "is-active" : null)" data-sample="code-behind" aria-pressed="@_showCodeBehind" @onclick="ShowCodeBehind">Sample.razor.cs</button>
+                </div>
+                <pre><code>@SelectedCode</code></pre>
+            </div>
+        </section>
+
+        <section id="paging-state" class="docs-section-content" aria-labelledby="paging-state-heading">
+            <h2 id="paging-state-heading">Paging state</h2>
+            <p>Bind <code>CurrentPage</code> and <code>PageSize</code> to keep paging state in the parent. Set <code>PageSizeOptions</code> to customize the built-in selector. A custom <code>PagerContent</code> receives current state, total item and page counts, and async actions to change the page or page size.</p>
+            <p>When filters or sorting change, the grid returns to the first page. If the item collection shrinks, the current page is clamped to the remaining pages.</p>
+        </section>
+    </article>
+
+    <nav class="docs-toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <a href="/docs/components/vekdatagrid/pagination#live-example">Live example</a>
+        <a href="/docs/components/vekdatagrid/pagination#code">Code</a>
+        <a href="/docs/components/vekdatagrid/pagination#paging-state">Paging state</a>
+    </nav>
+</div>

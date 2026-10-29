@@ -16,6 +16,7 @@
 </CascadingValue>
 
 <div class="vek-data-grid @Class">
+    @{ var pagerContext = CreatePagerContext(sortedItems.Count, totalPages); }
     @if (FilterMode == VekDataGridFilterMode.Simple && _columns.Any(column => column.Filterable))
     {
         <div class="filter-panel" aria-label="Filters">
@@ -85,11 +86,26 @@
         </table>
     </div>
 
-    <nav class="pager" aria-label="Table pagination">
-        <button type="button" @onclick="PreviousPage" disabled="@(_currentPage <= 1)">Previous</button>
-        <span>Page @_currentPage of @totalPages</span>
-        <button type="button" @onclick="NextPage" disabled="@(_currentPage >= totalPages)">Next</button>
-    </nav>
+    @if (PagerContent is null)
+    {
+        <nav class="pager" aria-label="Table pagination">
+            <label>Rows per page
+                <select aria-label="Rows per page" value="@EffectivePageSize" @onchange="SetPageSizeAsync">
+                    @foreach (var option in PageSizeOptions.Where(option => option > 0).Append(EffectivePageSize).Distinct().Order())
+                    {
+                        <option value="@option">@option</option>
+                    }
+                </select>
+            </label>
+            <button type="button" aria-label="Previous page" @onclick="() => SetCurrentPageAsync(_currentPage - 1)" disabled="@(_currentPage <= 1)">Previous</button>
+            <span>Page @_currentPage of @totalPages</span>
+            <button type="button" aria-label="Next page" @onclick="() => SetCurrentPageAsync(_currentPage + 1)" disabled="@(_currentPage >= totalPages)">Next</button>
+        </nav>
+    }
+    else
+    {
+        @PagerContent(pagerContext)
+    }
 </div>
 
 @code {

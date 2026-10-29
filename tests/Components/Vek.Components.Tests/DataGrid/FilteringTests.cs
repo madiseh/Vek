@@ -66,7 +66,7 @@ public sealed class FilteringTests : BunitContext
     public async Task ApplyingFilterResetsPage()
     {
         var cut = RenderFilterGrid(pageSize: 1);
-        cut.Find(".pager button:last-child").Click();
+        cut.Find(".pager button[aria-label='Next page']").Click();
         Assert.Contains("Page 2 of 3", cut.Markup);
 
         await cut.InvokeAsync(() => cut.Instance.ApplyFilterAsync("Name", VekDataGridFilterOperator.Contains, "Notebook"));

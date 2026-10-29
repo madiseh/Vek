@@ -1,0 +1,22 @@
+.custom-pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.custom-pager button {
+    border: 1px solid var(--docs-border, #d5dbe4);
+    border-radius: 0.5rem;
+    background: var(--docs-surface, #fff);
+    color: inherit;
+    cursor: pointer;
+    padding: 0.45rem 0.75rem;
+}
+
+.custom-pager button:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}

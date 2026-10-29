@@ -26,6 +26,30 @@ public partial class VekDataGrid<TItem>
     [Parameter]
     public int PageSize { get; set; } = 10;
 
+    /// <summary>Gets or sets the current one-based page for two-way binding.</summary>
+    [Parameter]
+    public int CurrentPage
+    {
+        get => _currentPage;
+        set => _currentPage = Math.Max(value, 1);
+    }
+
+    /// <summary>Gets or sets the available choices in the rows-per-page selector.</summary>
+    [Parameter]
+    public IReadOnlyList<int> PageSizeOptions { get; set; } = new[] { 10, 25, 50 };
+
+    /// <summary>Gets or sets a callback invoked when the current page changes.</summary>
+    [Parameter]
+    public EventCallback<int> CurrentPageChanged { get; set; }
+
+    /// <summary>Gets or sets a callback invoked when the page size changes.</summary>
+    [Parameter]
+    public EventCallback<int> PageSizeChanged { get; set; }
+
+    /// <summary>Gets or sets optional content used in place of the built-in pager.</summary>
+    [Parameter]
+    public RenderFragment<VekDataGridPagerContext<TItem>>? PagerContent { get; set; }
+
     /// <summary>
     /// Gets or sets whether sorting is disabled, limited to one column, or applied to multiple columns.
     /// </summary>
@@ -119,6 +143,20 @@ public partial class VekDataGrid<TItem>
     public RenderFragment? ChildContent { get; set; }
 
     private int EffectivePageSize => Math.Max(PageSize, 1);
+
+    /// <summary>Clamps the current page when incoming data or parameters reduce the page count.</summary>
+    protected override async Task OnParametersSetAsync()
+    {
+        var lastPage = GetTotalPages(GetSortedItems().Count);
+        if (_currentPage > lastPage)
+        {
+            _currentPage = lastPage;
+            await CurrentPageChanged.InvokeAsync(_currentPage);
+        }
+    }
+
+    /// <summary>Gets the total item count after filtering and before paging.</summary>
+    public int TotalItems => GetSortedItems().Count;
 
     internal void RegisterColumn(IVekDataGridColumn<TItem> column)
     {
@@ -219,6 +257,36 @@ public partial class VekDataGrid<TItem>
         ? 1
         : (itemCount - 1) / EffectivePageSize + 1;
 
+    private async Task SetCurrentPageAsync(int page)
+    {
+        _currentPage = Math.Clamp(page, 1, GetTotalPages(TotalItems));
+        await CurrentPageChanged.InvokeAsync(_currentPage);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task SetPageSizeAsync(ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), out var pageSize)) return;
+        await SetPageSizeAsync(pageSize);
+    }
+
+    private async Task SetPageSizeAsync(int pageSize)
+    {
+        if (pageSize < 1) return;
+        PageSize = pageSize;
+        _currentPage = 1;
+        await PageSizeChanged.InvokeAsync(pageSize);
+        await CurrentPageChanged.InvokeAsync(_currentPage);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private VekDataGridPagerContext<TItem> CreatePagerContext(int totalItems, int totalPages) => new(
+        CurrentState,
+        totalItems,
+        totalPages,
+        SetCurrentPageAsync,
+        SetPageSizeAsync);
+
     private string GetAriaSort(IVekDataGridColumn<TItem> column)
     {
         var activeSort = _sorts.FirstOrDefault(sort => ReferenceEquals(sort.Column, column));
@@ -315,7 +383,4 @@ public partial class VekDataGrid<TItem>
             index + 1))
         .ToArray();
 
-    private void PreviousPage() => _currentPage = Math.Max(1, _currentPage - 1);
-
-    private void NextPage() => _currentPage = Math.Min(GetTotalPages(GetSortedItems().Count), _currentPage + 1);
 }

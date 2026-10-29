@@ -107,12 +107,12 @@ Task 1 defines these Vek-owned contracts, then later tasks extend them only when
 
 **Interfaces:** Consumes `VekDataGridState<TItem>`. Produces bindable current page/page size, total count, custom pager content, page-size changes, and page navigation.
 
-- [ ] Add tests `RowsPerPageCanChange`, `PagerContentReceivesCurrentState`, `PageIsClampedWhenItemsShrink`, and `EmptyItemsKeepOneValidPage`; retain existing next/previous test.
-- [ ] Run focused paging tests and confirm expected failures.
-- [ ] Implement client paging and pager state transitions; reset page when page size changes.
-- [ ] Run focused paging tests and component suite.
-- [ ] Add the live Pagination page and test navigation.
-- [ ] Commit as `feat: add data grid paging`.
+- [x] Add tests `RowsPerPageCanChange`, `PagerContentReceivesCurrentState`, `PageIsClampedWhenItemsShrink`, and `EmptyItemsKeepOneValidPage`; retain existing next/previous test.
+- [x] Run focused paging tests and confirm expected failures.
+- [x] Implement client paging and pager state transitions; reset page when page size changes.
+- [x] Run focused paging tests and component suite.
+- [x] Add the live Pagination page and test navigation.
+- [x] Commit as `feat: add data grid paging`.
 
 ### Task 5: Row selection
 

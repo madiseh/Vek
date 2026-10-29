@@ -129,6 +129,30 @@ public sealed class DemoPageNavigationTests : BunitContext
     }
 
     /// <summary>
+    /// Verifies the pagination guide displays a live grid and custom pager sample.
+    /// </summary>
+    [Fact]
+    public void DataGridPaginationRouteShowsLiveGridAndExample()
+    {
+        Services.AddSingleton<IDemoProductProvider>(new TestProductProvider(
+        [
+            new DemoProduct(1, "Desk Lamp", "Furniture", 49.99m),
+            new DemoProduct(2, "Task Chair", "Furniture", 199.00m)
+        ]));
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo("/docs/components/vekdatagrid/pagination");
+
+        var cut = Render<Routes>();
+
+        Assert.Equal("VekDataGrid: Pagination", cut.Find("main h1").TextContent.Trim());
+        Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
+        Assert.Contains("<PagerContent Context=\"pager\">", cut.Find(".code-sample pre code").TextContent);
+        Assert.Equal(
+            "/docs/components/vekdatagrid/pagination",
+            cut.Find(".docs-sidebar a.active").GetAttribute("href"));
+    }
+
+    /// <summary>
     /// Verifies that the code sample switches from Razor markup to its C# code-behind.
     /// </summary>
     [Fact]

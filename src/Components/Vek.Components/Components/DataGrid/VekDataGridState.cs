@@ -87,6 +87,31 @@ public sealed class VekDataGridFilterContext
     public Action Clear { get; }
 }
 
+/// <summary>Provides paging state, counts, and actions to custom pager content.</summary>
+/// <typeparam name="TItem">The type of item represented by the grid.</typeparam>
+public sealed class VekDataGridPagerContext<TItem>
+{
+    internal VekDataGridPagerContext(
+        VekDataGridState<TItem> state,
+        int totalItems,
+        int totalPages,
+        Func<int, Task> setPageAsync,
+        Func<int, Task> setPageSizeAsync)
+        => (State, TotalItems, TotalPages, SetPageAsync, SetPageSizeAsync) =
+            (state, totalItems, totalPages, setPageAsync, setPageSizeAsync);
+
+    /// <summary>Gets the current page, page size, sort, and filter state.</summary>
+    public VekDataGridState<TItem> State { get; }
+    /// <summary>Gets the total number of items after filtering and before paging.</summary>
+    public int TotalItems { get; }
+    /// <summary>Gets the total number of available pages.</summary>
+    public int TotalPages { get; }
+    /// <summary>Moves to the requested one-based page.</summary>
+    public Func<int, Task> SetPageAsync { get; }
+    /// <summary>Changes the number of rows displayed per page.</summary>
+    public Func<int, Task> SetPageSizeAsync { get; }
+}
+
 /// <summary>
 /// Describes one ordered sort operation in a grid state.
 /// </summary>
