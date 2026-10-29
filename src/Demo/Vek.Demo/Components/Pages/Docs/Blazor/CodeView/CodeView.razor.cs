@@ -1,4 +1,4 @@
-namespace Vek.Demo.Components.Pages.Docs.CodeView;
+namespace Vek.Demo.Components.Pages.Docs.Blazor.CodeView;
 
 public partial class CodeView
 {

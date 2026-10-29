@@ -36,6 +36,27 @@ public sealed class DemoPageNavigationTests : BunitContext
         Assert.Equal("Getting Started", cut.Find("main h1").TextContent.Trim());
     }
 
+    /// <summary>Verifies that VekCodeView has a sibling navigation group and its basic-usage page renders all language samples.</summary>
+    [Fact]
+    public void CodeViewBasicUsageRouteShowsExamplesAndSiblingNavigation()
+    {
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo("/docs/components/vekcodeview/basic-usage");
+
+        var cut = Render<Routes>();
+
+        Assert.Equal("VekCodeView: Basic Usage", cut.Find("main h1").TextContent.Trim());
+        Assert.Equal(
+            new[] { "VekDataGrid", "VekCodeView" },
+            cut.FindAll(".docs-component-group").Select(group => group.TextContent.Trim()));
+        Assert.Equal(
+            "Basic Usage",
+            cut.Find(".docs-sidebar a[href='/docs/components/vekcodeview/basic-usage']").TextContent.Trim());
+        Assert.Equal(4, cut.FindAll(".vek-code-view").Count);
+        Assert.Contains("Hello, Vek!", cut.FindAll(".vek-code-view")[1].TextContent);
+        Assert.Contains("SELECT name, created_at", cut.FindAll(".vek-code-view")[3].TextContent);
+    }
+
     /// <summary>
     /// Verifies that the Components navigation group starts collapsed until the user opens it.
     /// </summary>
