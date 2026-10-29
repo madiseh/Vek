@@ -5,6 +5,17 @@
     text-rendering: optimizeLegibility;
     background: #171824;
     color: #eeeefa;
+    --docs-muted: #bfc0d0;
+    --docs-on-surface: #20242b;
+}
+
+.vek-data-grid .group-header td,
+.vek-data-grid .aggregate-footer td {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.9rem;
+    white-space: normal;
 }
 
 *,

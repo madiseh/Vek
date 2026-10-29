@@ -24,7 +24,6 @@
                             <PropertyColumn Property="product => product.Category" Title="Category" Key="Category">
                                 <GroupTemplate Context="group">
                                     <strong>@group.Title: @group.Value</strong>
-                                    <span class="group-summary">@AggregateSummary(group.Aggregates)</span>
                                 </GroupTemplate>
                             </PropertyColumn>
                             <PropertyColumn Property="product => product.Price" Title="Price" Key="Price" Format="C2" />

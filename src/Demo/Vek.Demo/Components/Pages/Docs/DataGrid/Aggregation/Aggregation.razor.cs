@@ -10,7 +10,6 @@ public partial class Aggregation
             <PropertyColumn Property="product => product.Category" Title="Category" Key="Category">
                 <GroupTemplate Context="group">
                     <strong>@group.Title: @group.Value</strong>
-                    <span>@group.Aggregates.Single(result => result.Key == "Sum").FormattedValue</span>
                 </GroupTemplate>
             </PropertyColumn>
             <PropertyColumn Property="product => product.Price" Title="Price" Key="Price" />
@@ -55,9 +54,6 @@ public partial class Aggregation
     private bool _showCodeBehind;
 
     private string SelectedCode => _showCodeBehind ? CodeBehindExample : RazorExample;
-    private static string AggregateSummary(IReadOnlyList<VekDataGridAggregateResult> aggregates) =>
-        aggregates.FirstOrDefault(result => result.Key == "Sum")?.FormattedValue ?? string.Empty;
-
     protected override async Task OnInitializedAsync() => _products = await ProductProvider.GetProductsAsync();
     private void ShowRazor() => _showCodeBehind = false;
     private void ShowCodeBehind() => _showCodeBehind = true;

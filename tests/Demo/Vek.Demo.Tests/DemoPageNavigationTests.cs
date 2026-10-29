@@ -123,6 +123,11 @@ public sealed class DemoPageNavigationTests : BunitContext
         Assert.Equal("VekDataGrid: Filtering", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
         Assert.Contains("FilterMode=\"VekDataGridFilterMode.ColumnRow\"", cut.Find(".code-sample pre code").TextContent);
+        var filterModeButtons = cut.FindAll(".filter-mode-picker button");
+        Assert.Equal("true", filterModeButtons[0].GetAttribute("aria-pressed"));
+        Assert.Equal("false", filterModeButtons[1].GetAttribute("aria-pressed"));
+        filterModeButtons[1].Click();
+        Assert.Equal("true", cut.FindAll(".filter-mode-picker button")[1].GetAttribute("aria-pressed"));
         Assert.Equal(
             "/docs/components/vekdatagrid/filtering",
             cut.Find(".docs-sidebar a.active").GetAttribute("href"));
@@ -244,6 +249,7 @@ public sealed class DemoPageNavigationTests : BunitContext
 
         Assert.Equal("VekDataGrid: Aggregation", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Furniture", cut.Find("tbody").TextContent);
+        Assert.Equal(1, cut.Find(".group-header").TextContent.Split("$248.99").Length - 1);
         Assert.Contains("Aggregates=\"_aggregates\"", cut.Find(".code-sample pre code").TextContent);
         Assert.Contains("Sum:", cut.Find("tfoot").TextContent);
     }

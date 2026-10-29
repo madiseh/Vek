@@ -12,9 +12,9 @@
             <h2 id="live-example-heading">Live example</h2>
             <p>Choose a filter layout, then enter a value to narrow the products.</p>
             <div class="filter-mode-picker" role="group" aria-label="Filter layout">
-                <button type="button" class="@ModeClass(VekDataGridFilterMode.Simple)" @onclick="() => SetMode(VekDataGridFilterMode.Simple)">Panel</button>
-                <button type="button" class="@ModeClass(VekDataGridFilterMode.ColumnMenu)" @onclick="() => SetMode(VekDataGridFilterMode.ColumnMenu)">Column menu</button>
-                <button type="button" class="@ModeClass(VekDataGridFilterMode.ColumnRow)" @onclick="() => SetMode(VekDataGridFilterMode.ColumnRow)">Filter row</button>
+                <button type="button" class="@ModeClass(VekDataGridFilterMode.Simple)" aria-pressed="@(_filterMode == VekDataGridFilterMode.Simple ? "true" : "false")" @onclick="() => SetMode(VekDataGridFilterMode.Simple)">Panel</button>
+                <button type="button" class="@ModeClass(VekDataGridFilterMode.ColumnMenu)" aria-pressed="@(_filterMode == VekDataGridFilterMode.ColumnMenu ? "true" : "false")" @onclick="() => SetMode(VekDataGridFilterMode.ColumnMenu)">Column menu</button>
+                <button type="button" class="@ModeClass(VekDataGridFilterMode.ColumnRow)" aria-pressed="@(_filterMode == VekDataGridFilterMode.ColumnRow ? "true" : "false")" @onclick="() => SetMode(VekDataGridFilterMode.ColumnRow)">Filter row</button>
             </div>
             @if (_products is null)
             {

@@ -11,12 +11,19 @@
     border: 1px solid var(--docs-border, #d5dbe4);
     border-radius: 0.5rem;
     background: var(--docs-surface, #fff);
-    color: inherit;
+    color: var(--docs-on-surface, #20242b);
     cursor: pointer;
+    min-height: 2.75rem;
     padding: 0.45rem 0.75rem;
+}
+
+.custom-pager button:not(:disabled):hover {
+    border-color: #aeb7c5;
+    background: #f3f5f8;
 }
 
 .custom-pager button:disabled {
     cursor: not-allowed;
-    opacity: 0.55;
+    color: #687387;
+    background: #f8fafc;
 }
