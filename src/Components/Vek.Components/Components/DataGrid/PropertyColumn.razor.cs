@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Components;
-
 namespace Vek.Components.Components.DataGrid;
 
 /// <summary>
@@ -24,10 +22,31 @@ public partial class PropertyColumn<TItem, TValue>
     [Parameter]
     public string? Title { get; set; }
 
+    /// <summary>
+    /// Gets or sets the stable key used to identify this column.
+    /// </summary>
+    [Parameter]
+    public string? Key { get; set; }
+
+    /// <summary>
+    /// Gets or sets the format string used when displaying formattable values.
+    /// </summary>
+    [Parameter]
+    public string? Format { get; set; }
+
+    /// <summary>
+    /// Gets or sets the optional template used to render this column's cells.
+    /// </summary>
+    [Parameter]
+    public RenderFragment<TItem>? CellTemplate { get; set; }
+
     private Func<TItem, TValue>? _propertyGetter;
     private VekDataGrid<TItem>? _registeredGrid;
     private string? _lastPropertyExpression;
+    private string? _lastKey;
     private string? _lastTitle;
+    private string? _lastFormat;
+    private RenderFragment<TItem>? _lastCellTemplate;
 
     /// <summary>
     /// Updates the compiled property accessor and registers this column with its grid.
@@ -42,7 +61,10 @@ public partial class PropertyColumn<TItem, TValue>
         var propertyExpression = Property.ToString();
         var definitionChanged = _propertyGetter is null
             || propertyExpression != _lastPropertyExpression
-            || Title != _lastTitle;
+            || Key != _lastKey
+            || Title != _lastTitle
+            || Format != _lastFormat
+            || CellTemplate != _lastCellTemplate;
 
         if (_propertyGetter is null || propertyExpression != _lastPropertyExpression)
         {
@@ -62,15 +84,37 @@ public partial class PropertyColumn<TItem, TValue>
         }
 
         _lastPropertyExpression = propertyExpression;
+        _lastKey = Key;
         _lastTitle = Title;
+        _lastFormat = Format;
+        _lastCellTemplate = CellTemplate;
     }
 
     string IVekDataGridColumn<TItem>.Title => string.IsNullOrWhiteSpace(Title)
         ? GetDefaultTitle()
         : Title;
 
+    string IVekDataGridColumn<TItem>.Key => string.IsNullOrWhiteSpace(Key)
+        ? _lastPropertyExpression!
+        : Key;
+
     RenderFragment<TItem> IVekDataGridColumn<TItem>.CellTemplate => item => builder =>
-        builder.AddContent(0, _propertyGetter!(item));
+    {
+        if (CellTemplate is not null)
+        {
+            builder.AddContent(0, CellTemplate(item));
+            return;
+        }
+
+        var value = _propertyGetter!(item);
+        object? content = value;
+        if (Format is not null && value is IFormattable formattable)
+        {
+            content = formattable.ToString(Format, CultureInfo.CurrentCulture);
+        }
+
+        builder.AddContent(0, content);
+    };
 
     Comparison<TItem> IVekDataGridColumn<TItem>.CompareItems => CompareItems;
 

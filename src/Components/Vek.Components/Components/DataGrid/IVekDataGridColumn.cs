@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Components;
-
 namespace Vek.Components.Components.DataGrid;
 
 /// <summary>
@@ -8,6 +6,11 @@ namespace Vek.Components.Components.DataGrid;
 /// <typeparam name="TItem">The type of item represented by each row.</typeparam>
 internal interface IVekDataGridColumn<TItem>
 {
+    /// <summary>
+    /// Gets the stable identifier for this column.
+    /// </summary>
+    string Key { get; }
+
     /// <summary>
     /// Gets the heading displayed for the column.
     /// </summary>

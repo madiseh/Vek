@@ -70,6 +70,7 @@ public sealed class DemoPageNavigationTests : BunitContext
         Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
         var razorExample = cut.Find(".code-sample pre code").TextContent;
         Assert.Contains("<VekDataGrid", razorExample);
+        Assert.Contains("<TemplateColumn", razorExample);
         Assert.DoesNotContain("GetProductsAsync", razorExample);
         Assert.Equal(
             "/docs/components/vekdatagrid/basic-usage",

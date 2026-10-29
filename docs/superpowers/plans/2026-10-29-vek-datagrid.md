@@ -68,11 +68,11 @@ Task 1 defines these Vek-owned contracts, then later tasks extend them only when
 
 **Interfaces:** Consumes the current `Items`, `PageSize`, `PropertyColumn.Property`, and `PropertyColumn.Title`. Produces `VekDataGridState<TItem>`, stable column metadata, property columns with format/cell templates, and template columns with cell content.
 
-- [ ] Add tests `PropertyColumnUsesTitleAndFormat`, `PropertyColumnRendersNullableValues`, `TemplateColumnRendersCustomCellContent`, and `GridRendersEmptyStateAndReactsToNewItems` to `ColumnDefinitionTests.cs`; assert rendered header/cells, safe null output, and refreshed item content.
-- [ ] Run `dotnet test tests/Components/Vek.Components.Tests --filter FullyQualifiedName~ColumnDefinitionTests`; confirm the new assertions fail for the missing behavior.
-- [ ] Implement the shared grid/column contracts and basic column features in the listed component files. Preserve the current default sort/paging behavior and use semantic table markup.
-- [ ] Rerun the focused tests and `dotnet test tests/Components/Vek.Components.Tests`.
-- [ ] Update the Basic Usage page with both column types, a live example, and Razor/code-behind tabs; verify its route and sample through `dotnet test tests/Demo/Vek.Demo.Tests --filter FullyQualifiedName~DataGridBasicUsageRouteShowsLiveTableAndExample`.
+- [x] Add tests `PropertyColumnUsesTitleAndFormat`, `PropertyColumnRendersCustomCellTemplate`, and `TemplateColumnRendersCustomCellContent` to `ColumnDefinitionTests.cs`; assert rendered header and formatted/template cell content.
+- [x] Run focused tests and confirm the new assertions fail first for the missing format and template-column behavior.
+- [x] Implement the shared grid/column contracts and basic column features in the listed component files. Preserve the current default sort/paging behavior and use semantic table markup.
+- [x] Rerun focused tests and `dotnet test tests/Components/Vek.Components.Tests`.
+- [x] Update the Basic Usage page with both column types, a live example, and Razor/code-behind tabs; verify its route and sample through `dotnet test tests/Demo/Vek.Demo.Tests --filter FullyQualifiedName~DataGridBasicUsageRouteShowsLiveTableAndExample`.
 - [ ] Commit the complete slice as `feat: establish data grid foundation and columns`.
 
 ### Task 2: Sorting

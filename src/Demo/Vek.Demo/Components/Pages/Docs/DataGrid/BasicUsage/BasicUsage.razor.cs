@@ -9,7 +9,10 @@ public partial class BasicUsage
         <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="10">
             <PropertyColumn Property="product => product.Name" Title="Name" />
             <PropertyColumn Property="product => product.Category" Title="Category" />
-            <PropertyColumn Property="product => product.Price" Title="Price" />
+            <PropertyColumn Property="product => product.Price" Title="Price" Format="C2" />
+            <TemplateColumn Key="product-id" Title="Product ID">
+                <CellTemplate Context="product">@product.Id</CellTemplate>
+            </TemplateColumn>
         </VekDataGrid>
         """;
 
