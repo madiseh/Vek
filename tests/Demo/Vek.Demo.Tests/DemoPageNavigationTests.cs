@@ -292,6 +292,22 @@ public sealed class DemoPageNavigationTests : BunitContext
     }
 
     /// <summary>
+    /// Verifies the virtualization guide shows its large sample and both client and server range examples.
+    /// </summary>
+    [Fact]
+    public void DataGridVirtualizationRouteShowsLargeSampleAndExamples()
+    {
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo("/docs/components/vekdatagrid/virtualization");
+
+        var cut = Render<Routes>();
+
+        Assert.Equal("VekDataGrid: Virtualization", cut.Find("main h1").TextContent.Trim());
+        Assert.Contains("VirtualizeRows=\"true\"", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("ServerVirtualData=\"LoadVirtualRangeAsync\"", cut.Find(".code-sample pre code").TextContent);
+    }
+
+    /// <summary>
     /// Verifies that the code sample switches from Razor markup to its C# code-behind.
     /// </summary>
     [Fact]

@@ -93,6 +93,37 @@
                         else { @ErrorContent(_serverError) }
                     </td></tr>
                 }
+                else if (VirtualizeRows)
+                {
+                    @if (ServerVirtualData is null)
+                    {
+                        <Virtualize TItem="TItem" Items="sortedItems" ItemSize="VirtualItemSize"
+                                    OverscanCount="VirtualOverscanCount" MaxItemCount="VirtualMaxItemCount"
+                                    SpacerElement="tr" Context="virtualItem" @ref="_virtualizer">
+                            <ChildContent Context="virtualItem">@VirtualizedRowTemplate(virtualItem)</ChildContent>
+                            <Placeholder Context="placeholder">
+                                <tr style="height: @(VirtualItemSize)px"><td class="loading-state" colspan="@Math.Max(_columns.Count, 1)">Loading rows…</td></tr>
+                            </Placeholder>
+                            <EmptyContent>
+                                <tr><td class="empty-state" colspan="@Math.Max(_columns.Count, 1)">No items to display.</td></tr>
+                            </EmptyContent>
+                        </Virtualize>
+                    }
+                    else
+                    {
+                        <Virtualize TItem="TItem" ItemsProvider="LoadVirtualItemsAsync" ItemSize="VirtualItemSize"
+                                    OverscanCount="VirtualOverscanCount" MaxItemCount="VirtualMaxItemCount"
+                                    SpacerElement="tr" Context="virtualItem" @ref="_virtualizer">
+                            <ChildContent Context="virtualItem">@VirtualizedRowTemplate(virtualItem)</ChildContent>
+                            <Placeholder Context="placeholder">
+                                <tr style="height: @(VirtualItemSize)px"><td class="loading-state" colspan="@Math.Max(_columns.Count, 1)">Loading rows…</td></tr>
+                            </Placeholder>
+                            <EmptyContent>
+                                <tr><td class="empty-state" colspan="@Math.Max(_columns.Count, 1)">No items to display.</td></tr>
+                            </EmptyContent>
+                        </Virtualize>
+                    }
+                }
                 else if (pageItems.Count == 0)
                 {
                     <tr>
@@ -110,37 +141,7 @@
                 {
                     @foreach (var item in pageItems)
                     {
-                        <tr class="@(IsItemSelected(item) ? "is-selected" : null)"
-                            aria-selected="@IsItemSelected(item)"
-                            @onclick="() => SelectRowAsync(item)">
-                            @foreach (var column in _columns)
-                            {
-                                <td>
-                                    @if (IsEditing(item, column) && column.EditTemplate is not null)
-                                    {
-                                        <CascadingValue Value="_editContext">
-                                            @column.EditTemplate(GetEditContext(item, column)!)
-                                        </CascadingValue>
-                                    }
-                                    else
-                                    {
-                                        @column.CellTemplate(item)
-                                        @if (EditMode == VekDataGridEditMode.Cell && column.Editable && column.EditTemplate is not null)
-                                        {
-                                            <button type="button" class="edit-cell-button" aria-label="Edit @column.Title"
-                                                    @onclick:stopPropagation="true" @onclick="() => StartEditAsync(item, column)">Edit</button>
-                                        }
-                                        @if ((EditMode is VekDataGridEditMode.Row or VekDataGridEditMode.Form)
-                                            && CanEditRow && ReferenceEquals(column, _columns.FirstOrDefault()))
-                                        {
-                                            <button type="button" class="edit-row-button" aria-label="Edit row @GetRowLabel(item)"
-                                                    @onclick:stopPropagation="true" @onclick="() => StartEditAsync(item)">Edit</button>
-                                        }
-                                    }
-                                </td>
-                            }
-                        </tr>
-                        @RenderRowDetails(item)
+                        @VirtualizedRowTemplate(item)
                     }
                 }
             </tbody>
@@ -165,7 +166,7 @@
         </table>
     </div>
 
-    @if (PagerContent is null)
+    @if (!VirtualizeRows && PagerContent is null)
     {
         <nav class="pager" aria-label="Table pagination">
             <label>Rows per page
@@ -181,9 +182,9 @@
             <button type="button" aria-label="Next page" @onclick="() => SetCurrentPageAsync(_currentPage + 1)" disabled="@(_currentPage >= totalPages)">Next</button>
         </nav>
     }
-    else
+    else if (!VirtualizeRows)
     {
-        @PagerContent(pagerContext)
+        @PagerContent?.Invoke(pagerContext)
     }
 </div>
 

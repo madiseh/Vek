@@ -29,6 +29,8 @@ public partial class VekDataGrid<TItem>
     private CancellationTokenSource? _serverLoadCancellation;
     private long _serverRequestVersion;
     private bool _serverInitialized;
+    private IReadOnlyList<TItem> _virtualServerItems = Array.Empty<TItem>();
+    private Virtualize<TItem>? _virtualizer;
 
     private sealed record ActiveSort(IVekDataGridColumn<TItem> Column, VekSortDirection Direction);
     private sealed record GroupNode(
@@ -68,6 +70,26 @@ public partial class VekDataGrid<TItem>
     /// <summary>Gets or sets custom content displayed when the current result set is empty.</summary>
     [Parameter]
     public RenderFragment? EmptyContent { get; set; }
+
+    /// <summary>Gets or sets whether rows are rendered through the framework virtualizer.</summary>
+    [Parameter]
+    public bool VirtualizeRows { get; set; }
+
+    /// <summary>Gets or sets the estimated height in pixels for each virtualized row.</summary>
+    [Parameter]
+    public float VirtualItemSize { get; set; } = 48;
+
+    /// <summary>Gets or sets the number of additional rows rendered before and after the viewport.</summary>
+    [Parameter]
+    public int VirtualOverscanCount { get; set; } = 3;
+
+    /// <summary>Gets or sets the maximum number of rows the virtualizer may render at once.</summary>
+    [Parameter]
+    public int VirtualMaxItemCount { get; set; } = 100;
+
+    /// <summary>Gets or sets the asynchronous range source used for server virtualization.</summary>
+    [Parameter]
+    public Func<VekDataGridState<TItem>, int, int, CancellationToken, Task<VekDataGridData<TItem>>>? ServerVirtualData { get; set; }
 
     /// <summary>Gets whether a server request is currently running.</summary>
     public bool IsLoading => _serverLoading;
@@ -294,8 +316,7 @@ public partial class VekDataGrid<TItem>
             _currentPage = 1;
             await FilterChanged.InvokeAsync(_filters.ToArray());
             await NotifySelectionAfterFilteringAsync();
-            if (ServerData is not null) await LoadServerDataAsync();
-            else await InvokeAsync(StateHasChanged);
+            await ReloadAfterStateChangeAsync();
             return;
         }
 
@@ -303,8 +324,7 @@ public partial class VekDataGrid<TItem>
         _currentPage = 1;
         await FilterChanged.InvokeAsync(_filters.ToArray());
         await NotifySelectionAfterFilteringAsync();
-        if (ServerData is not null) await LoadServerDataAsync();
-        else await InvokeAsync(StateHasChanged);
+        await ReloadAfterStateChangeAsync();
     }
 
     /// <summary>Clears one column filter or all filters when no key is supplied.</summary>
@@ -315,8 +335,7 @@ public partial class VekDataGrid<TItem>
         _currentPage = 1;
         await FilterChanged.InvokeAsync(_filters.ToArray());
         await NotifySelectionAfterFilteringAsync();
-        if (ServerData is not null) await LoadServerDataAsync();
-        else await InvokeAsync(StateHasChanged);
+        await ReloadAfterStateChangeAsync();
     }
 
     internal string? GetFilterValue(string key) => _filters.FirstOrDefault(filter => filter.ColumnKey == key)?.Value?.ToString();
@@ -534,11 +553,100 @@ public partial class VekDataGrid<TItem>
         builder.CloseElement();
     };
 
-    private List<TItem> GetPageItems() => ServerData is not null
-        ? _serverItems.ToList()
-        : GetSortedItems().Skip((_currentPage - 1) * EffectivePageSize).Take(EffectivePageSize).ToList();
+    private List<TItem> GetPageItems() => ServerVirtualData is not null
+        ? _virtualServerItems.ToList()
+        : ServerData is not null
+            ? _serverItems.ToList()
+            : GetSortedItems().Skip((_currentPage - 1) * EffectivePageSize).Take(EffectivePageSize).ToList();
 
-    private IReadOnlyList<TItem> GetCurrentItems() => ServerData is null ? Items.ToArray() : _serverItems;
+    private IReadOnlyList<TItem> GetCurrentItems() => ServerVirtualData is not null
+        ? _virtualServerItems
+        : ServerData is null ? Items.ToArray() : _serverItems;
+
+    private async ValueTask<ItemsProviderResult<TItem>> LoadVirtualItemsAsync(ItemsProviderRequest request)
+    {
+        var source = ServerVirtualData
+            ?? throw new InvalidOperationException("ServerVirtualData must be configured for server virtualization.");
+        var result = await source(CurrentState, request.StartIndex, request.Count, request.CancellationToken);
+        var totalItems = Math.Max(0, result.TotalItems);
+        var availableItems = Math.Max(0, totalItems - request.StartIndex);
+        var requestedItems = Math.Min(request.Count, availableItems);
+        var items = result.Items.Take(requestedItems).ToArray();
+        _virtualServerItems = items;
+        return new ItemsProviderResult<TItem>(items, totalItems);
+    }
+
+    private async Task RefreshVirtualDataAsync()
+    {
+        if (VirtualizeRows && ServerVirtualData is not null && _virtualizer is not null)
+            await _virtualizer.RefreshDataAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private Task ReloadAfterStateChangeAsync() => ServerData is not null
+        ? LoadServerDataAsync()
+        : VirtualizeRows && ServerVirtualData is not null
+            ? RefreshVirtualDataAsync()
+            : InvokeAsync(StateHasChanged);
+
+    private RenderFragment<TItem> VirtualizedRowTemplate => item => builder =>
+    {
+        if (VirtualizeRows && _columns.Any(column => column.IsHierarchyColumn))
+            throw new InvalidOperationException("Virtualization cannot be combined with hierarchical row details because expanded rows have variable heights.");
+
+        var sequence = 0;
+        var selected = IsItemSelected(item);
+        builder.OpenElement(sequence++, "tr");
+        builder.SetKey(item);
+        builder.AddAttribute(sequence++, "class", selected ? "is-selected" : null);
+        builder.AddAttribute(sequence++, "aria-selected", selected);
+        builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => SelectRowAsync(item)));
+
+        foreach (var column in _columns)
+        {
+            builder.OpenElement(sequence++, "td");
+            if (IsEditing(item, column) && column.EditTemplate is not null)
+            {
+                builder.OpenComponent<CascadingValue<EditContext>>(sequence++);
+                builder.AddAttribute(sequence++, nameof(CascadingValue<EditContext>.Value), _editContext);
+                builder.AddAttribute(sequence++, nameof(CascadingValue<EditContext>.ChildContent),
+                    column.EditTemplate(GetEditContext(item, column)!));
+                builder.CloseComponent();
+            }
+            else
+            {
+                builder.AddContent(sequence++, column.CellTemplate(item));
+                if (EditMode == VekDataGridEditMode.Cell && column.Editable && column.EditTemplate is not null)
+                {
+                    builder.OpenElement(sequence++, "button");
+                    builder.AddAttribute(sequence++, "type", "button");
+                    builder.AddAttribute(sequence++, "class", "edit-cell-button");
+                    builder.AddAttribute(sequence++, "aria-label", $"Edit {column.Title}");
+                    builder.AddEventStopPropagationAttribute(sequence++, "onclick", true);
+                    builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => StartEditAsync(item, column)));
+                    builder.AddContent(sequence++, "Edit");
+                    builder.CloseElement();
+                }
+
+                if ((EditMode is VekDataGridEditMode.Row or VekDataGridEditMode.Form)
+                    && CanEditRow && ReferenceEquals(column, _columns.FirstOrDefault()))
+                {
+                    builder.OpenElement(sequence++, "button");
+                    builder.AddAttribute(sequence++, "type", "button");
+                    builder.AddAttribute(sequence++, "class", "edit-row-button");
+                    builder.AddAttribute(sequence++, "aria-label", $"Edit row {GetRowLabel(item)}");
+                    builder.AddEventStopPropagationAttribute(sequence++, "onclick", true);
+                    builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => StartEditAsync(item)));
+                    builder.AddContent(sequence++, "Edit");
+                    builder.CloseElement();
+                }
+            }
+            builder.CloseElement();
+        }
+
+        builder.CloseElement();
+        builder.AddContent(sequence, RenderRowDetails(item));
+    };
 
     private IReadOnlyList<(VekDataGridGroupDefinition Definition, IVekDataGridColumn<TItem> Column, Func<TItem, object?> Selector)> EffectiveGroups => GroupBy
         .Select(definition => (Definition: definition, Column: _columns.FirstOrDefault(column => column.Key == definition.ColumnKey)))
@@ -768,6 +876,26 @@ public partial class VekDataGrid<TItem>
     /// <summary>Clamps the current page when incoming data or parameters reduce the page count.</summary>
     protected override async Task OnParametersSetAsync()
     {
+        if (VirtualizeRows)
+        {
+            if (VirtualItemSize <= 0 || VirtualMaxItemCount <= 0 || VirtualOverscanCount < 0)
+                throw new InvalidOperationException("Virtualization requires a positive item size and max count, and a non-negative overscan count.");
+            if (GroupBy.Count > 0)
+                throw new InvalidOperationException("Virtualization cannot be combined with grouping because group rows do not have a fixed height.");
+            if (_columns.Any(column => column.IsHierarchyColumn))
+                throw new InvalidOperationException("Virtualization cannot be combined with hierarchical row details because expanded rows have variable heights.");
+            if (ServerData is not null)
+                throw new InvalidOperationException("Virtualization cannot be combined with paged ServerData. Use ServerVirtualData instead.");
+            if (ServerVirtualData is null && !_itemsParameterWasSet)
+                throw new InvalidOperationException("Client virtualization requires the Items parameter.");
+            if (ServerVirtualData is not null && _itemsParameterWasSet)
+                throw new InvalidOperationException("Server virtualization and Items are mutually exclusive. Provide exactly one data source.");
+        }
+        else if (ServerVirtualData is not null)
+        {
+            throw new InvalidOperationException("ServerVirtualData requires VirtualizeRows to be enabled.");
+        }
+
         if (ServerData is not null && _itemsParameterWasSet)
             throw new InvalidOperationException("Items and ServerData are mutually exclusive. Provide exactly one data source.");
 
@@ -962,8 +1090,7 @@ public partial class VekDataGrid<TItem>
     {
         _currentPage = Math.Clamp(page, 1, GetTotalPages(TotalItems));
         await CurrentPageChanged.InvokeAsync(_currentPage);
-        if (ServerData is not null) await LoadServerDataAsync();
-        else await InvokeAsync(StateHasChanged);
+        await ReloadAfterStateChangeAsync();
     }
 
     private async Task SetPageSizeAsync(ChangeEventArgs args)
@@ -979,8 +1106,7 @@ public partial class VekDataGrid<TItem>
         _currentPage = 1;
         await PageSizeChanged.InvokeAsync(pageSize);
         await CurrentPageChanged.InvokeAsync(_currentPage);
-        if (ServerData is not null) await LoadServerDataAsync();
-        else await InvokeAsync(StateHasChanged);
+        await ReloadAfterStateChangeAsync();
     }
 
     private VekDataGridPagerContext<TItem> CreatePagerContext(int totalItems, int totalPages) => new(
@@ -1063,7 +1189,7 @@ public partial class VekDataGrid<TItem>
 
         _currentPage = 1;
         await SortChanged.InvokeAsync(GetSortState());
-        if (ServerData is not null) await LoadServerDataAsync();
+        await ReloadAfterStateChangeAsync();
     }
 
     private int CompareByActiveSorts(TItem left, TItem right)

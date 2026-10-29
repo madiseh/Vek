@@ -198,12 +198,12 @@ Task 1 defines these Vek-owned contracts, then later tasks extend them only when
 
 **Interfaces:** Produces bounded client rendering and range-based async server loading using `VekDataGridState<TItem>` plus start/count/cancellation, with explicit row size and constrained-height requirements.
 
-- [ ] Add tests `ClientVirtualizationRendersVisibleRange`, `ServerVirtualizationRequestsRequestedRange`, `VirtualRangeClampsAtEnd`, and `VirtualizationRejectsUnsupportedGroupingCombination`.
-- [ ] Run focused virtualization tests and confirm failures.
-- [ ] Implement client and server virtualization; document and enforce feature combinations that cannot coexist.
-- [ ] Run focused virtualization tests and component suite.
-- [ ] Add the live Virtualization page with a larger generated `DemoProduct` collection and tested route.
-- [ ] Commit as `feat: add data grid virtualization`.
+- [x] Add tests `ClientVirtualizationRendersVisibleRange`, `ServerVirtualizationRequestsRequestedRange`, `VirtualRangeClampsAtEnd`, and `VirtualizationRejectsUnsupportedGroupingCombination`.
+- [x] Run focused virtualization tests and confirm failures.
+- [x] Implement client and server virtualization; document and enforce feature combinations that cannot coexist.
+- [x] Run focused virtualization tests and component suite.
+- [x] Add the live Virtualization page with a larger generated `DemoProduct` collection and tested route.
+- [x] Commit as `feat: add data grid virtualization`.
 
 ### Task 12: Column management
 

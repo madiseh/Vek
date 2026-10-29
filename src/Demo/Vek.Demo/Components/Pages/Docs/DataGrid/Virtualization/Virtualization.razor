@@ -1,0 +1,66 @@
+@page "/docs/components/vekdatagrid/virtualization"
+@layout DocumentationLayout
+
+<PageTitle>VekDataGrid Virtualization | Vek Components</PageTitle>
+
+<div class="docs-page-layout">
+    <article class="docs-article">
+        <h1>VekDataGrid: Virtualization</h1>
+        <p class="docs-intro">Render a small viewport-sized window from a large local collection or request ranges from a remote data source.</p>
+
+        <section id="client-virtualization" class="docs-section-content" aria-labelledby="client-virtualization-heading">
+            <h2 id="client-virtualization-heading">Client data</h2>
+            <p>The grid has 500 product records. Sorting and filtering apply before the virtualizer renders the visible window.</p>
+            <div class="docs-example-frame">
+                <VekDataGrid TItem="DemoProduct" Items="_products" VirtualizeRows="true"
+                             VirtualItemSize="48" VirtualOverscanCount="4" VirtualMaxItemCount="80">
+                    <ChildContent>
+                        <PropertyColumn Property="product => product.Name" Title="Name" />
+                        <PropertyColumn Property="product => product.Category" Title="Category" />
+                        <PropertyColumn Property="product => product.Price" Title="Price" Format="C2" />
+                    </ChildContent>
+                </VekDataGrid>
+            </div>
+        </section>
+
+        <section id="server-virtualization" class="docs-section-content" aria-labelledby="server-virtualization-heading">
+            <h2 id="server-virtualization-heading">Server data</h2>
+            <p>The source receives a start index and requested row count with the current sort/filter state. It can cancel work when the visible range changes.</p>
+            <div class="docs-example-frame">
+                <VekDataGrid TItem="DemoProduct" VirtualizeRows="true"
+                             ServerVirtualData="LoadVirtualRangeAsync" VirtualItemSize="48" VirtualOverscanCount="4">
+                    <ChildContent>
+                        <PropertyColumn Property="product => product.Name" Title="Name" />
+                        <PropertyColumn Property="product => product.Category" Title="Category" />
+                        <PropertyColumn Property="product => product.Price" Title="Price" Format="C2" />
+                    </ChildContent>
+                </VekDataGrid>
+            </div>
+        </section>
+
+        <section id="code" class="docs-section-content" aria-labelledby="code-heading">
+            <h2 id="code-heading">Code</h2>
+            <div class="code-sample">
+                <div class="code-tabs" role="group" aria-label="Code sample files">
+                    <button type="button" class="code-tab @(!_showCodeBehind ? "is-active" : null)" data-sample="razor" aria-pressed="@(!_showCodeBehind)" @onclick="ShowRazor">Sample.razor</button>
+                    <button type="button" class="code-tab @(_showCodeBehind ? "is-active" : null)" data-sample="code-behind" aria-pressed="@_showCodeBehind" @onclick="ShowCodeBehind">Sample.razor.cs</button>
+                </div>
+                <pre><code>@SelectedCode</code></pre>
+            </div>
+        </section>
+
+        <section id="virtualization-options" class="docs-section-content" aria-labelledby="virtualization-options-heading">
+            <h2 id="virtualization-options-heading">Sizing and supported features</h2>
+            <p><code>VirtualItemSize</code> should match the rendered row height. <code>VirtualOverscanCount</code> adds rows around the viewport, and <code>VirtualMaxItemCount</code> bounds each render. Virtualization uses the document scroll container and hides the pager.</p>
+            <p>Grouping and hierarchical row details are rejected because they introduce variable-height rows. For server ranges, return the matching total and no more rows than the requested count; the grid also trims responses that extend beyond the reported end.</p>
+        </section>
+    </article>
+
+    <nav class="docs-toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <a href="/docs/components/vekdatagrid/virtualization#client-virtualization">Client data</a>
+        <a href="/docs/components/vekdatagrid/virtualization#server-virtualization">Server data</a>
+        <a href="/docs/components/vekdatagrid/virtualization#code">Code</a>
+        <a href="/docs/components/vekdatagrid/virtualization#virtualization-options">Sizing</a>
+    </nav>
+</div>
