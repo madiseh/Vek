@@ -253,6 +253,54 @@ public sealed class VekDataGridRowDetailContext<TItem>
     public Func<Task> ToggleAsync { get; }
 }
 
+/// <summary>Provides a row and common actions to row-level action content.</summary>
+/// <typeparam name="TItem">The type of item represented by the grid.</typeparam>
+public sealed class VekDataGridRowContext<TItem>
+{
+    internal VekDataGridRowContext(
+        TItem item,
+        int index,
+        bool selected,
+        Func<Task> selectAsync,
+        Func<Task> toggleDetailsAsync,
+        Func<Task> editAsync)
+        => (Item, Index, IsSelected, SelectAsync, ToggleDetailsAsync, EditAsync) =
+            (item, index, selected, selectAsync, toggleDetailsAsync, editAsync);
+
+    /// <summary>Gets the row item.</summary>
+    public TItem Item { get; }
+    /// <summary>Gets the zero-based index in the current result set.</summary>
+    public int Index { get; }
+    /// <summary>Gets whether this item is currently selected.</summary>
+    public bool IsSelected { get; }
+    /// <summary>Selects or deselects this row according to the grid's selection mode.</summary>
+    public Func<Task> SelectAsync { get; }
+    /// <summary>Toggles this row's detail content when a hierarchy column is configured.</summary>
+    public Func<Task> ToggleDetailsAsync { get; }
+    /// <summary>Starts editing this row when the grid has an editable column.</summary>
+    public Func<Task> EditAsync { get; }
+}
+
+/// <summary>Provides a cell and an edit action to cell-level action content.</summary>
+/// <typeparam name="TItem">The type of item represented by the grid.</typeparam>
+public sealed class VekDataGridCellContext<TItem>
+{
+    internal VekDataGridCellContext(TItem item, string columnKey, string columnTitle, int rowIndex, Func<Task> editAsync)
+        => (Item, ColumnKey, ColumnTitle, RowIndex, EditAsync) =
+            (item, columnKey, columnTitle, rowIndex, editAsync);
+
+    /// <summary>Gets the row item that owns this cell.</summary>
+    public TItem Item { get; }
+    /// <summary>Gets the stable key of the column that owns this cell.</summary>
+    public string ColumnKey { get; }
+    /// <summary>Gets the display title of the column that owns this cell.</summary>
+    public string ColumnTitle { get; }
+    /// <summary>Gets the zero-based index in the current result set.</summary>
+    public int RowIndex { get; }
+    /// <summary>Starts editing this cell when its column is editable.</summary>
+    public Func<Task> EditAsync { get; }
+}
+
 /// <summary>Describes one level in the grid's nested grouping order.</summary>
 /// <param name="ColumnKey">The stable key of the column used to group rows.</param>
 /// <param name="SortOrder">The order in which distinct group values appear.</param>

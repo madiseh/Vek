@@ -367,6 +367,48 @@ public sealed class DemoPageNavigationTests : BunitContext
     }
 
     /// <summary>
+    /// Verifies row context actions display the selected product and cell action state.
+    /// </summary>
+    [Fact]
+    public void DataGridContextActionsRouteShowsRowAndCellActions()
+    {
+        Services.AddSingleton<IDemoProductProvider>(new TestProductProvider(
+        [
+            new DemoProduct(1, "Desk Lamp", "Lighting", 49.99m),
+            new DemoProduct(2, "Task Chair", "Furniture", 199.00m)
+        ]));
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo("/docs/components/vekdatagrid/context-actions");
+
+        var cut = Render<Routes>();
+
+        Assert.Equal("VekDataGrid: Context Actions", cut.Find("main h1").TextContent.Trim());
+        cut.Find("button[aria-label='Show actions for Desk Lamp']").Click();
+        Assert.Contains("Selected product: Desk Lamp", cut.Find(".action-feedback").TextContent);
+        Assert.Contains("RowActionsTemplate", cut.Find(".code-sample pre code").TextContent);
+    }
+
+    /// <summary>
+    /// Verifies the observability guide refreshes the live table when an item is appended.
+    /// </summary>
+    [Fact]
+    public void DataGridObservabilityRouteRefreshesOnCollectionChanges()
+    {
+        Services.AddSingleton<IDemoProductProvider>(new TestProductProvider(
+        [new DemoProduct(1, "Desk Lamp", "Lighting", 49.99m)]));
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo("/docs/components/vekdatagrid/observability");
+
+        var cut = Render<Routes>();
+
+        Assert.Equal("VekDataGrid: Collection Observability", cut.Find("main h1").TextContent.Trim());
+        cut.Find("button[aria-label='Add sample product']").Click();
+        cut.WaitForAssertion(() => Assert.Contains("Observable Product 2", cut.Find("tbody").TextContent));
+        cut.Find("button[data-sample='code-behind']").Click();
+        Assert.Contains("ObservableCollection", cut.Find(".code-sample pre code").TextContent);
+    }
+
+    /// <summary>
     /// Verifies that the code sample switches from Razor markup to its C# code-behind.
     /// </summary>
     [Fact]

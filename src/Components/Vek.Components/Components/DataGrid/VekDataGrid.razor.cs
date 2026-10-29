@@ -5,7 +5,7 @@ namespace Vek.Components.Components.DataGrid;
 /// </summary>
 /// <typeparam name="TItem">The type of item represented by each row.</typeparam>
 [CascadingTypeParameter(nameof(TItem))]
-public partial class VekDataGrid<TItem>
+public partial class VekDataGrid<TItem> : IDisposable
 {
     private readonly List<IVekDataGridColumn<TItem>> _columns = [];
     private readonly List<ActiveSort> _sorts = [];
@@ -21,6 +21,8 @@ public partial class VekDataGrid<TItem>
     private bool _isEditing;
     private bool _initialExpansionApplied;
     private IEnumerable<TItem> _items = Array.Empty<TItem>();
+    private INotifyCollectionChanged? _observableItems;
+    private bool _disposed;
     private bool _itemsParameterWasSet;
     private IReadOnlyList<TItem> _serverItems = Array.Empty<TItem>();
     private int _serverTotalItems;
@@ -56,9 +58,85 @@ public partial class VekDataGrid<TItem>
         get => _items;
         set
         {
-            _items = value ?? Array.Empty<TItem>();
+            var nextItems = value ?? Array.Empty<TItem>();
+            if (!ReferenceEquals(_items, nextItems))
+            {
+                if (_observableItems is not null) _observableItems.CollectionChanged -= ItemsCollectionChanged;
+                _items = nextItems;
+                _observableItems = _items as INotifyCollectionChanged;
+                if (_observableItems is not null) _observableItems.CollectionChanged += ItemsCollectionChanged;
+            }
             _itemsParameterWasSet = true;
         }
+    }
+
+    private void ItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args)
+    {
+        if (_disposed) return;
+        _ = InvokeAsync(RefreshAfterCollectionChangeAsync);
+    }
+
+    private async Task RefreshAfterCollectionChangeAsync()
+    {
+        if (_disposed) return;
+        var totalPages = GetTotalPages(TotalItems);
+        if (_currentPage > totalPages)
+        {
+            _currentPage = totalPages;
+            await CurrentPageChanged.InvokeAsync(_currentPage);
+        }
+
+        if (ReconcileObservableSelection())
+        {
+            await SelectedItemsChanged.InvokeAsync(SelectedItems);
+            await SelectedItemChanged.InvokeAsync(SelectedItem);
+        }
+
+        var rows = GetCurrentItems().ToList();
+        _expandedRows = _expandedRows
+            .Select(expanded => rows.FirstOrDefault(row => DetailsComparer.Equals(row, expanded)))
+            .Where(row => row is not null)
+            .Cast<TItem>()
+            .Distinct(DetailsComparer)
+            .ToList();
+        if (SingleExpandedRow && _expandedRows.Count > 1) _expandedRows = _expandedRows.Take(1).ToList();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private bool ReconcileObservableSelection()
+    {
+        var currentItems = GetCurrentItems().ToList();
+        var reconciled = SelectedItems
+            .Select(selected => currentItems.FirstOrDefault(current => ItemComparer.Equals(current, selected)))
+            .Where(item => item is not null)
+            .Cast<TItem>()
+            .Distinct(ItemComparer)
+            .ToList();
+        var selectedItem = SelectedItem is null
+            ? reconciled.FirstOrDefault()
+            : currentItems.FirstOrDefault(current => ItemComparer.Equals(current, SelectedItem));
+        if (FilteredSelectionMode == VekDataGridFilteredSelectionMode.Clear)
+        {
+            reconciled.RemoveAll(item => !MatchesCurrentFilters(item));
+            if (selectedItem is not null && !MatchesCurrentFilters(selectedItem)) selectedItem = default;
+        }
+
+        var changed = !reconciled.SequenceEqual(SelectedItems, ItemComparer)
+            || (SelectedItem is not null && selectedItem is not null && !ReferenceEquals(SelectedItem, selectedItem))
+            || (SelectedItem is not null && selectedItem is null);
+        SelectedItems = reconciled;
+        SelectedItem = selectedItem;
+        return changed;
+    }
+
+    /// <summary>Stops observing item changes and cancels an active server request.</summary>
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+        if (_observableItems is not null) _observableItems.CollectionChanged -= ItemsCollectionChanged;
+        _observableItems = null;
+        _serverLoadCancellation?.Cancel();
     }
 
     /// <summary>Gets or sets the asynchronous page source. Use instead of the local Items parameter.</summary>
@@ -88,6 +166,14 @@ public partial class VekDataGrid<TItem>
     /// <summary>Gets or sets custom cell content for each row. The template must render valid table cells.</summary>
     [Parameter]
     public RenderFragment<TItem>? RowTemplate { get; set; }
+
+    /// <summary>Gets or sets action content appended to each row.</summary>
+    [Parameter]
+    public RenderFragment<VekDataGridRowContext<TItem>>? RowActionsTemplate { get; set; }
+
+    /// <summary>Gets or sets action content rendered inside each data cell.</summary>
+    [Parameter]
+    public RenderFragment<VekDataGridCellContext<TItem>>? CellActionsTemplate { get; set; }
 
     /// <summary>Gets or sets the culture used to format values, aggregates, and edit contexts.</summary>
     [Parameter]
@@ -207,7 +293,7 @@ public partial class VekDataGrid<TItem>
     private IEnumerable<IVekDataGridColumn<TItem>> SearchableColumns => string.IsNullOrWhiteSpace(_columnSearch)
         ? _columns
         : _columns.Where(column => column.Title.Contains(_columnSearch.Trim(), StringComparison.OrdinalIgnoreCase));
-    private int VisibleColumnCount => Math.Max(VisibleColumns.Count, 1);
+    private int VisibleColumnCount => Math.Max(VisibleColumns.Count, 1) + (RowActionsTemplate is null ? 0 : 1);
     private bool CanReorderInPanel => ColumnReorderMode is VekDataGridColumnReorderMode.Panel or VekDataGridColumnReorderMode.Both;
     private bool CanReorderInHeader => ColumnReorderMode is VekDataGridColumnReorderMode.Header or VekDataGridColumnReorderMode.Both;
     private int? CurrentContainerWidth => _containerWidth ?? ContainerWidth;
@@ -333,6 +419,24 @@ public partial class VekDataGrid<TItem>
     private string? GetRowClass(TItem item, int index)
         => string.Join(' ', new[] { IsItemSelected(item) ? "is-selected" : null, RowClass?.Invoke(item, index) }
             .Where(value => !string.IsNullOrWhiteSpace(value)));
+
+    private VekDataGridRowContext<TItem> CreateRowActionsContext(TItem item, int index) => new(
+        item,
+        index,
+        IsItemSelected(item),
+        () => SelectItemAsync(item),
+        () => ToggleRowDetailsAsync(item),
+        () => EditItemAsync(item));
+
+    private VekDataGridCellContext<TItem> CreateCellActionsContext(
+        TItem item,
+        IVekDataGridColumn<TItem> column,
+        int rowIndex) => new(
+            item,
+            column.Key,
+            column.Title,
+            rowIndex,
+            () => EditCellAsync(item, column.Key));
 
     private void ToggleColumnPanel() => _columnPanelOpen = !_columnPanelOpen;
 
@@ -621,6 +725,20 @@ public partial class VekDataGrid<TItem>
         await ReloadAfterStateChangeAsync();
     }
 
+    /// <summary>Clears every active filter.</summary>
+    public Task ClearFiltersAsync() => ClearFilterAsync();
+
+    /// <summary>Clears every active sort and notifies bound consumers.</summary>
+    public async Task ClearSortAsync()
+    {
+        _sorts.Clear();
+        await SortChanged.InvokeAsync(Array.Empty<VekDataGridSort>());
+        await ReloadAfterStateChangeAsync();
+    }
+
+    /// <summary>Reloads the current data source or rerenders local items.</summary>
+    public Task ReloadAsync() => ReloadAfterStateChangeAsync();
+
     internal string? GetFilterValue(string key) => _filters.FirstOrDefault(filter => filter.ColumnKey == key)?.Value?.ToString();
 
     internal Task ApplyTextFilter(IVekDataGridColumn<TItem> column, string? value) =>
@@ -665,6 +783,11 @@ public partial class VekDataGrid<TItem>
         ? ToggleSelectionAsync(item, SelectionMode == VekDataGridSelectionMode.Single || !IsItemSelected(item))
         : Task.CompletedTask;
 
+    /// <summary>Selects or deselects one item according to the current selection mode.</summary>
+    public Task SelectItemAsync(TItem item) => !CanSelectItem(item)
+        ? Task.CompletedTask
+        : ToggleSelectionAsync(item, SelectionMode == VekDataGridSelectionMode.Single || !IsItemSelected(item));
+
     /// <summary>Gets whether every row on the current page is selected.</summary>
     public bool AreAllVisibleItemsSelected()
     {
@@ -688,11 +811,50 @@ public partial class VekDataGrid<TItem>
         await InvokeAsync(StateHasChanged);
     }
 
+    /// <summary>Selects or deselects all selectable items on the current page.</summary>
+    public Task SelectAllAsync(bool selected) => ToggleAllVisibleItemsAsync(selected);
+
+    /// <summary>Expands the details for all current items, or the first item in single-row mode.</summary>
+    public async Task ExpandAllAsync()
+    {
+        var rows = GetSortedItems();
+        _expandedRows = SingleExpandedRow ? rows.Take(1).ToList() : rows;
+        await RowDetailsExpandedChanged.InvokeAsync(_expandedRows.ToArray());
+        await InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>Collapses every expanded row detail.</summary>
+    public async Task CollapseAllAsync()
+    {
+        _expandedRows.Clear();
+        await RowDetailsExpandedChanged.InvokeAsync(_expandedRows.ToArray());
+        await InvokeAsync(StateHasChanged);
+    }
+
     private IEqualityComparer<TItem> ItemComparer => SelectionComparer ?? EqualityComparer<TItem>.Default;
 
     /// <summary>Gets whether the row has any editable columns.</summary>
     public bool CanEditRow => EditMode != VekDataGridEditMode.None
         && VisibleColumns.Any(column => column.Editable && column.EditTemplate is not null);
+
+    /// <summary>Starts editing a row using the configured row or form editing mode.</summary>
+    public Task EditItemAsync(TItem item) => StartEditAsync(item);
+
+    /// <summary>Starts editing a cell by its stable column key.</summary>
+    public Task EditCellAsync(TItem item, string columnKey)
+    {
+        var column = _columns.FirstOrDefault(candidate => candidate.Key == columnKey)
+            ?? throw new ArgumentException($"No column with key '{columnKey}' is registered.", nameof(columnKey));
+        if (!column.Editable || column.EditTemplate is null)
+            throw new InvalidOperationException($"Column '{columnKey}' does not have an editable template.");
+        return StartEditAsync(item, column);
+    }
+
+    /// <summary>Validates and commits the current edit draft.</summary>
+    public Task<bool> CommitEditAsync() => CommitActiveEditAsync();
+
+    /// <summary>Cancels the current edit draft.</summary>
+    public Task CancelEditAsync() => CancelActiveEditAsync();
 
     /// <summary>Gets whether the requested item and column are being edited.</summary>
     private bool IsEditing(TItem item, IVekDataGridColumn<TItem> column) => _isEditing
@@ -802,21 +964,8 @@ public partial class VekDataGrid<TItem>
 
     private async Task ToggleAllRowDetailsAsync()
     {
-        var rows = GetSortedItems();
-        if (AreAllRowsExpanded())
-        {
-            _expandedRows.Clear();
-        }
-        else if (SingleExpandedRow)
-        {
-            _expandedRows = rows.Take(1).ToList();
-        }
-        else
-        {
-            _expandedRows = rows;
-        }
-        await RowDetailsExpandedChanged.InvokeAsync(_expandedRows.ToArray());
-        await InvokeAsync(StateHasChanged);
+        if (AreAllRowsExpanded()) await CollapseAllAsync();
+        else await ExpandAllAsync();
     }
 
     private VekDataGridRowDetailContext<TItem> CreateRowDetailContext(TItem item) => new(
@@ -936,8 +1085,25 @@ public partial class VekDataGrid<TItem>
                         builder.CloseElement();
                     }
                 }
+                if (CellActionsTemplate is not null)
+                {
+                    builder.OpenElement(sequence++, "span");
+                    builder.AddAttribute(sequence++, "class", "cell-actions");
+                    builder.AddEventStopPropagationAttribute(sequence++, "onclick", true);
+                    builder.AddContent(sequence++, CellActionsTemplate(CreateCellActionsContext(item, column, rowIndex)));
+                    builder.CloseElement();
+                }
                 builder.CloseElement();
             }
+        }
+
+        if (RowActionsTemplate is not null)
+        {
+            builder.OpenElement(sequence++, "td");
+            builder.AddAttribute(sequence++, "class", "row-actions");
+            builder.AddEventStopPropagationAttribute(sequence++, "onclick", true);
+            builder.AddContent(sequence++, RowActionsTemplate(CreateRowActionsContext(item, rowIndex)));
+            builder.CloseElement();
         }
 
         builder.CloseElement();
@@ -1158,8 +1324,24 @@ public partial class VekDataGrid<TItem>
                             builder.CloseElement();
                         }
                     }
+                    if (CellActionsTemplate is not null)
+                    {
+                        builder.OpenElement(sequence++, "span");
+                        builder.AddAttribute(sequence++, "class", "cell-actions");
+                        builder.AddEventStopPropagationAttribute(sequence++, "onclick", true);
+                        builder.AddContent(sequence++, CellActionsTemplate(CreateCellActionsContext(item, column, rowIndex)));
+                        builder.CloseElement();
+                    }
                     builder.CloseElement();
                 }
+            }
+            if (RowActionsTemplate is not null)
+            {
+                builder.OpenElement(sequence++, "td");
+                builder.AddAttribute(sequence++, "class", "row-actions");
+                builder.AddEventStopPropagationAttribute(sequence++, "onclick", true);
+                builder.AddContent(sequence++, RowActionsTemplate(CreateRowActionsContext(item, rowIndex)));
+                builder.CloseElement();
             }
             builder.CloseElement();
             builder.AddContent(sequence++, RenderRowDetails(item));

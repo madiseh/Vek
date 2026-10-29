@@ -1,0 +1,55 @@
+@page "/docs/components/vekdatagrid/observability"
+@layout DocumentationLayout
+
+<PageTitle>VekDataGrid Collection Observability | Vek Components</PageTitle>
+
+<div class="docs-page-layout">
+    <article class="docs-article">
+        <h1>VekDataGrid: Collection Observability</h1>
+        <p class="docs-intro">Keep the visible rows in sync when an observable collection changes.</p>
+
+        <section id="live-example" class="docs-section-content" aria-labelledby="live-example-heading">
+            <h2 id="live-example-heading">Live example</h2>
+            <p>Add a product to the collection. The grid subscribes to collection changes and refreshes its rows and selection state.</p>
+            @if (_products is null)
+            {
+                <p class="docs-loading" role="status">Loading sample products...</p>
+            }
+            else
+            {
+                <div class="docs-example-frame">
+                    <button type="button" class="add-product-button" aria-label="Add sample product" @onclick="AddProduct">Add sample product</button>
+                    <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="10" AriaLabel="Observable product inventory">
+                        <PropertyColumn Property="product => product.Name" Title="Name" Key="Name" />
+                        <PropertyColumn Property="product => product.Category" Title="Category" Key="Category" />
+                        <PropertyColumn Property="product => product.Price" Title="Price" Key="Price" Format="C2" />
+                    </VekDataGrid>
+                </div>
+            }
+        </section>
+
+        <section id="code" class="docs-section-content" aria-labelledby="code-heading">
+            <h2 id="code-heading">Code</h2>
+            <div class="code-sample">
+                <div class="code-tabs" role="group" aria-label="Code sample files">
+                    <button type="button" class="code-tab @(!_showCodeBehind ? "is-active" : null)" data-sample="razor" aria-pressed="@(!_showCodeBehind)" @onclick="ShowRazor">Sample.razor</button>
+                    <button type="button" class="code-tab @(_showCodeBehind ? "is-active" : null)" data-sample="code-behind" aria-pressed="@_showCodeBehind" @onclick="ShowCodeBehind">Sample.razor.cs</button>
+                </div>
+                <pre><code>@SelectedCode</code></pre>
+            </div>
+        </section>
+
+        <section id="updates" class="docs-section-content" aria-labelledby="updates-heading">
+            <h2 id="updates-heading">Collection changes</h2>
+            <p>When <code>Items</code> implements <code>INotifyCollectionChanged</code>, the grid subscribes while that collection is assigned and refreshes after inserts, removals, moves, or replacements.</p>
+            <p>When the <code>Items</code> source is replaced or the grid is disposed, it removes the old event subscription. Ordinary enumerable sources continue to render when their owning component rerenders.</p>
+        </section>
+    </article>
+
+    <nav class="docs-toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <a href="/docs/components/vekdatagrid/observability#live-example">Live example</a>
+        <a href="/docs/components/vekdatagrid/observability#code">Code</a>
+        <a href="/docs/components/vekdatagrid/observability#updates">Collection changes</a>
+    </nav>
+</div>

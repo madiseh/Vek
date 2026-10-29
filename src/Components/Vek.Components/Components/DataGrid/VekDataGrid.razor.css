@@ -147,6 +147,19 @@ td {
     font-variant-numeric: tabular-nums;
 }
 
+.cell-actions,
+.row-actions {
+    white-space: nowrap;
+}
+
+.cell-actions {
+    margin-inline-start: 0.5rem;
+}
+
+.row-actions-header {
+    min-width: 5rem;
+}
+
 thead.is-sticky th {
     position: sticky;
     top: 0;

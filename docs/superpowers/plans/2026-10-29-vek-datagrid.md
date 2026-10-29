@@ -250,17 +250,17 @@ Task 1 defines these Vek-owned contracts, then later tasks extend them only when
 
 **Interfaces:** Produces row/cell context action templates/events, public state commands for clear filters/sort/reload/expand/collapse/edit/select, and automatic refresh for `INotifyCollectionChanged` sources.
 
-- [ ] Add XML-documented tests `ContextActionReceivesRowAndCell`, `PublicCommandsUpdateGridState`, and `ObservableCollectionChangesRefreshRows`.
-- [ ] Run focused tests and confirm expected failures.
-- [ ] Implement context action hooks, documented public commands, and safe event subscription/unsubscription for observable collections.
-- [ ] Run focused tests, all component tests, all Demo tests, and build the Demo project.
-- [ ] Add both live pages and verify both routes/navigation entries.
-- [ ] Review the full diff, confirm no excluded dependency or naming traces were introduced, then commit as `feat: add data grid context actions and observability`.
+- [x] Add XML-documented tests `ContextActionReceivesRowAndCell`, `PublicCommandsUpdateGridState`, and `ObservableCollectionChangesRefreshRows`.
+- [x] Run focused tests and confirm expected failures.
+- [x] Implement context action hooks, documented public commands, and safe event subscription/unsubscription for observable collections.
+- [x] Run focused tests, all component tests, all Demo tests, and build the Demo project.
+- [x] Add both live pages and verify both routes/navigation entries.
+- [x] Review the full diff, confirm no excluded dependency or naming traces were introduced, then commit as `feat: add data grid context actions and observability`.
 
 ## Final Verification
 
-- [ ] Run `dotnet test tests/Components/Vek.Components.Tests`.
-- [ ] Run `dotnet test tests/Demo/Vek.Demo.Tests`.
-- [ ] Run `dotnet build src/Demo/Vek.Demo/Vek.Demo.csproj`.
-- [ ] Search the changed project files and commit messages for prohibited external grid names/dependencies.
-- [ ] Review accessibility, responsive overflow, empty/loading/error states, feature interaction rules, and the full commit sequence.
+- [x] Run `dotnet test tests/Components/Vek.Components.Tests` (verified through the full solution test run).
+- [x] Run `dotnet test tests/Demo/Vek.Demo.Tests` (verified through the full solution test run).
+- [x] Run `dotnet build src/Demo/Vek.Demo/Vek.Demo.csproj`.
+- [x] Search the changed project files and commit messages for prohibited external grid names/dependencies.
+- [x] Review accessibility, responsive overflow, empty/loading/error states, feature interaction rules, and the full commit sequence.

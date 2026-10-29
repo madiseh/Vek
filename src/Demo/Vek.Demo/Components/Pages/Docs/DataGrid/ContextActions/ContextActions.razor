@@ -1,0 +1,67 @@
+@page "/docs/components/vekdatagrid/context-actions"
+@layout DocumentationLayout
+
+<PageTitle>VekDataGrid Context Actions | Vek Components</PageTitle>
+
+<div class="docs-page-layout">
+    <article class="docs-article">
+        <h1>VekDataGrid: Context Actions</h1>
+        <p class="docs-intro">Add row and cell actions with access to the item's stable column and current result index.</p>
+
+        <section id="live-example" class="docs-section-content" aria-labelledby="live-example-heading">
+            <h2 id="live-example-heading">Live example</h2>
+            <p>Use the row action to inspect a product. Cell actions can be limited to a column and receive an edit command in their context.</p>
+            @if (_products is null)
+            {
+                <p class="docs-loading" role="status">Loading sample products...</p>
+            }
+            else
+            {
+                <div class="docs-example-frame">
+                    <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="5"
+                                 RowActionsTemplate="RenderRowActions" CellActionsTemplate="RenderCellActions"
+                                 EditMode="VekDataGridEditMode.Cell" AriaLabel="Product actions">
+                        <ChildContent>
+                            <PropertyColumn Property="product => product.Name" Title="Name" Key="Name" />
+                            <PropertyColumn Property="product => product.Category" Title="Category" Key="Category" />
+                            <PropertyColumn Property="product => product.Price" Title="Price" Key="Price" Format="C2" Editable="true">
+                                <EditTemplate Context="edit"><output>@edit.Item.Price.ToString("C2", edit.Culture)</output></EditTemplate>
+                            </PropertyColumn>
+                        </ChildContent>
+                    </VekDataGrid>
+                    <p class="action-feedback" aria-live="polite">@_feedback</p>
+                </div>
+            }
+        </section>
+
+        <section id="code" class="docs-section-content" aria-labelledby="code-heading">
+            <h2 id="code-heading">Code</h2>
+            <div class="code-sample">
+                <div class="code-tabs" role="group" aria-label="Code sample files">
+                    <button type="button" class="code-tab @(!_showCodeBehind ? "is-active" : null)" data-sample="razor" aria-pressed="@(!_showCodeBehind)" @onclick="ShowRazor">Sample.razor</button>
+                    <button type="button" class="code-tab @(_showCodeBehind ? "is-active" : null)" data-sample="code-behind" aria-pressed="@_showCodeBehind" @onclick="ShowCodeBehind">Sample.razor.cs</button>
+                </div>
+                <pre><code>@SelectedCode</code></pre>
+            </div>
+        </section>
+
+        <section id="actions" class="docs-section-content" aria-labelledby="actions-heading">
+            <h2 id="actions-heading">Action contexts</h2>
+            <p><code>RowActionsTemplate</code> adds an action cell and provides the row item, index, selection state, and commands to select, toggle details, or edit.</p>
+            <p><code>CellActionsTemplate</code> adds actions inside each cell with the item, stable column key, title, row index, and an edit command. Actions stop row-click propagation.</p>
+        </section>
+
+        <section id="commands" class="docs-section-content" aria-labelledby="commands-heading">
+            <h2 id="commands-heading">Programmatic commands</h2>
+            <p>The grid exposes commands for clearing filters and sorting, reloading data, selecting rows, expanding or collapsing details, and starting or finishing edits.</p>
+        </section>
+    </article>
+
+    <nav class="docs-toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <a href="/docs/components/vekdatagrid/context-actions#live-example">Live example</a>
+        <a href="/docs/components/vekdatagrid/context-actions#code">Code</a>
+        <a href="/docs/components/vekdatagrid/context-actions#actions">Action contexts</a>
+        <a href="/docs/components/vekdatagrid/context-actions#commands">Programmatic commands</a>
+    </nav>
+</div>

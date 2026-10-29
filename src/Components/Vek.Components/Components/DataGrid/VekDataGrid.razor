@@ -89,6 +89,10 @@
                         {
                             <th scope="@(segment.Title is null ? "col" : "colgroup")" colspan="@segment.Span">@segment.Title</th>
                         }
+                        @if (RowActionsTemplate is not null)
+                        {
+                            <th class="row-actions-header" aria-hidden="true"></th>
+                        }
                     </tr>
                 }
                 @HeaderTemplate
@@ -149,6 +153,10 @@
                             }
                         </th>
                     }
+                    @if (RowActionsTemplate is not null)
+                    {
+                        <th class="row-actions-header" scope="col">Actions</th>
+                    }
                 </tr>
                 @if (FilterMode == VekDataGridFilterMode.ColumnRow)
                 {
@@ -156,6 +164,10 @@
                         @foreach (var column in VisibleColumns)
                         {
                             <th scope="col">@if (column.Filterable) { @RenderFilterControl(column) }</th>
+                        }
+                        @if (RowActionsTemplate is not null)
+                        {
+                            <th class="row-actions-header" scope="col"></th>
                         }
                     </tr>
                 }
