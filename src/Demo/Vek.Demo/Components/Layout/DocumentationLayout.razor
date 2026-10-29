@@ -1,0 +1,27 @@
+@inherits LayoutComponentBase
+
+<div class="docs-shell">
+    <aside class="docs-sidebar" aria-label="Documentation navigation">
+        <nav class="docs-nav">
+            <NavLink class="docs-link docs-link-top"
+                     href="/docs/getting-started"
+                     Match="NavLinkMatch.All">
+                Getting Started
+            </NavLink>
+
+            <details class="docs-section">
+                <summary>Components</summary>
+                <div class="docs-component-group">VekDataGrid</div>
+                <NavLink class="docs-link docs-link-nested"
+                         href="/docs/components/vekdatagrid/basic-usage"
+                         Match="NavLinkMatch.All">
+                    Basic Usage
+                </NavLink>
+            </details>
+        </nav>
+    </aside>
+
+    <main class="docs-main" id="main-content" tabindex="-1">
+        @Body
+    </main>
+</div>

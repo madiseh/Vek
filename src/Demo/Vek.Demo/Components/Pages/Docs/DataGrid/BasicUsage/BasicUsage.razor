@@ -1,0 +1,76 @@
+@page "/docs/components/vekdatagrid/basic-usage"
+@layout DocumentationLayout
+
+<PageTitle>VekDataGrid Basic Usage | Vek Components</PageTitle>
+
+<div class="docs-page-layout">
+    <article class="docs-article">
+        <h1>VekDataGrid: Basic Usage</h1>
+        <p class="docs-intro">
+            Display a collection of items in a sortable table with built-in pagination.
+        </p>
+
+        <section id="live-example" class="docs-section-content" aria-labelledby="live-example-heading">
+            <h2 id="live-example-heading">Live example</h2>
+            <p>
+                Click a column heading to sort the products. Use the pager to move between result pages.
+            </p>
+            @if (_products is null)
+            {
+                <p class="docs-loading" role="status">Loading sample products...</p>
+            }
+            else
+            {
+                <div class="docs-example-frame">
+                    <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="10" Class="docs-data-grid">
+                        <PropertyColumn Property="product => product.Name" Title="Name" />
+                        <PropertyColumn Property="product => product.Category" Title="Category" />
+                        <PropertyColumn Property="product => product.Price" Title="Price" />
+                    </VekDataGrid>
+                </div>
+            }
+        </section>
+
+        <section id="code" class="docs-section-content" aria-labelledby="code-heading">
+            <h2 id="code-heading">Code</h2>
+            <p>
+                Keep the component markup in <code>Sample.razor</code> and its data loading
+                logic in <code>Sample.razor.cs</code>.
+            </p>
+            <div class="code-sample">
+                <div class="code-tabs" role="group" aria-label="Code sample files">
+                    <button type="button"
+                            class="code-tab @(!_showCodeBehind ? "is-active" : null)"
+                            data-sample="razor"
+                            aria-pressed="@(!_showCodeBehind)"
+                            @onclick="ShowRazor">
+                        Sample.razor
+                    </button>
+                    <button type="button"
+                            class="code-tab @(_showCodeBehind ? "is-active" : null)"
+                            data-sample="code-behind"
+                            aria-pressed="@_showCodeBehind"
+                            @onclick="ShowCodeBehind">
+                        Sample.razor.cs
+                    </button>
+                </div>
+                <pre><code>@SelectedCode</code></pre>
+            </div>
+        </section>
+
+        <section id="sorting-and-pagination" class="docs-section-content" aria-labelledby="features-heading">
+            <h2 id="features-heading">Sorting and pagination</h2>
+            <p>
+                Each property column can be sorted by selecting its heading. Set <code>PageSize</code>
+                to choose how many rows appear on each page; it defaults to 10.
+            </p>
+        </section>
+    </article>
+
+    <nav class="docs-toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <a href="/docs/components/vekdatagrid/basic-usage#live-example">Live example</a>
+        <a href="/docs/components/vekdatagrid/basic-usage#code">Code</a>
+        <a href="/docs/components/vekdatagrid/basic-usage#sorting-and-pagination">Sorting and pagination</a>
+    </nav>
+</div>

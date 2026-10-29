@@ -23,4 +23,7 @@
   <Folder Name="/tests/Components/">
     <Project Path="tests/Components/Vek.Components.Tests/Vek.Components.Tests.csproj" />
   </Folder>
+  <Folder Name="/tests/Demo/">
+    <Project Path="tests/Demo/Vek.Demo.Tests/Vek.Demo.Tests.csproj" />
+  </Folder>
 </Solution>

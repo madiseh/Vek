@@ -1,33 +1,28 @@
 @page "/"
-@inject IDemoProductProvider ProductProvider
 
-<PageTitle>Vek Components Demo</PageTitle>
+<PageTitle>Vek Components | Blazor component library</PageTitle>
 
-<h1>Vek Components Demo</h1>
-
-<p>This app is the showcase host for reusable Blazor components in <code>Vek.Components</code>.</p>
-
-<h2>Simulated sample data</h2>
-<p>The sample products are loaded through the demo data port from the JSON adapter.</p>
-
-@if (_products is null)
-{
-    <p>Loading sample products…</p>
-}
-else
-{
-    <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="10" Class="product-grid">
-        <PropertyColumn Property="product => product.Name" Title="Name" />
-        <PropertyColumn Property="product => product.Category" Title="Category" />
-        <PropertyColumn Property="product => product.Price" Title="Price" />
-    </VekDataGrid>
-}
-
-@code {
-    private IReadOnlyList<DemoProduct>? _products;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _products = await ProductProvider.GetProductsAsync();
-    }
-}
+<main class="landing-page">
+    <section class="landing-hero" aria-labelledby="landing-title">
+        <p class="landing-eyebrow">VEK COMPONENTS</p>
+        <h1 id="landing-title">
+            Build polished Blazor apps.<br />
+            <span>Start with Vek.</span>
+        </h1>
+        <p class="landing-description">
+            Reusable, thoughtfully crafted components for .NET developers.
+        </p>
+        <div class="landing-actions">
+            <a class="landing-button landing-button-primary get-started-link"
+               href="/docs/getting-started">
+                Get started
+            </a>
+            <a class="landing-button landing-button-secondary github-link"
+               href="https://github.com/madiseh/Vek"
+               target="_blank"
+               rel="noopener noreferrer">
+                Star on GitHub
+            </a>
+        </div>
+    </section>
+</main>

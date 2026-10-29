@@ -1,0 +1,173 @@
+.docs-shell {
+    display: grid;
+    min-height: 100vh;
+    grid-template-columns: 16rem minmax(0, 1fr);
+    color: #eeeefa;
+    background: #171824;
+}
+
+.docs-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    border-right: 1px solid #30303f;
+    padding: 1.5rem 1rem;
+    background: #191a27;
+}
+
+.docs-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.docs-nav ::deep .docs-link,
+.docs-section summary {
+    display: flex;
+    min-height: 2.8rem;
+    align-items: center;
+    border-radius: 0.45rem;
+    padding: 0.65rem 0.9rem;
+    color: #c3c2d1;
+    font-size: 0.97rem;
+    font-weight: 550;
+    line-height: 1.35;
+    text-decoration: none;
+    transition: color 160ms ease, background-color 160ms ease;
+}
+
+.docs-nav ::deep .docs-link:hover,
+.docs-section summary:hover {
+    color: #fff;
+    background: #242435;
+}
+
+.docs-nav ::deep .docs-link.active {
+    color: #b6a6ff;
+    background: #28243d;
+}
+
+.docs-nav ::deep .docs-link:focus-visible,
+.docs-section summary:focus-visible {
+    outline: 3px solid #a997ff;
+    outline-offset: 2px;
+}
+
+.docs-section {
+    margin-top: 0.25rem;
+}
+
+.docs-section summary {
+    position: relative;
+    cursor: pointer;
+    list-style: none;
+}
+
+.docs-section summary::-webkit-details-marker {
+    display: none;
+}
+
+.docs-section summary::after {
+    position: absolute;
+    right: 1rem;
+    color: #9695a8;
+    content: "⌄";
+    font-size: 1.1rem;
+    transition: transform 160ms ease;
+}
+
+.docs-section:not([open]) summary::after {
+    transform: rotate(-90deg);
+}
+
+.docs-component-group {
+    margin: 0.5rem 0 0.15rem;
+    padding: 0.55rem 0.9rem 0.35rem 1.5rem;
+    color: #a8a7b8;
+    font-size: 0.88rem;
+    font-weight: 650;
+}
+
+.docs-nav ::deep .docs-link-nested {
+    margin-left: 0.75rem;
+    padding-left: 1.25rem;
+}
+
+.docs-main {
+    min-width: 0;
+    padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1.25rem, 4vw, 4.5rem);
+}
+
+.docs-main:focus {
+    outline: none;
+}
+
+@media (max-width: 860px) {
+    .docs-shell {
+        grid-template-columns: 13rem minmax(0, 1fr);
+    }
+
+    .docs-sidebar {
+        padding-inline: 0.75rem;
+    }
+
+    .docs-main {
+        padding-inline: 1.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .docs-shell {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .docs-sidebar {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid #30303f;
+        padding: 0.75rem 1rem;
+    }
+
+    .docs-nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.4rem;
+    }
+
+    .docs-section {
+        grid-column: 1 / -1;
+    }
+
+    .docs-section[open] {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .docs-section summary {
+        grid-column: 1 / -1;
+    }
+
+    .docs-component-group {
+        grid-column: 1 / -1;
+        margin-left: 0.4rem;
+    }
+
+    .docs-link-nested {
+        grid-column: 1 / -1;
+        margin-left: 0.4rem;
+    }
+
+    .docs-main {
+        padding: 1.75rem 1rem 3rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .docs-link,
+    .docs-section summary,
+    .docs-section summary::after {
+        transition: none;
+    }
+}
