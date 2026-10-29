@@ -9,18 +9,2994 @@
     "id": 2,
     "name": "Task Chair",
     "category": "Furniture",
-    "price": 189.00
+    "price": 189.0
   },
   {
     "id": 3,
     "name": "Notebook Set",
     "category": "Stationery",
-    "price": 12.50
+    "price": 12.5
   },
   {
     "id": 4,
     "name": "Monitor Stand",
     "category": "Accessories",
-    "price": 54.00
+    "price": 54.0
+  },
+  {
+    "id": 5,
+    "name": "Northstar LED Desk Lamp",
+    "category": "Lighting",
+    "price": 204.05
+  },
+  {
+    "id": 6,
+    "name": "Forma Ergonomic Task Chair",
+    "category": "Furniture",
+    "price": 267.06
+  },
+  {
+    "id": 7,
+    "name": "Paper & Pine A5 Dotted Notebook",
+    "category": "Stationery",
+    "price": 22.07
+  },
+  {
+    "id": 8,
+    "name": "Cobalt USB-C Hub",
+    "category": "Accessories",
+    "price": 124.08
+  },
+  {
+    "id": 9,
+    "name": "Aster 27-inch 4K Monitor",
+    "category": "Electronics",
+    "price": 393.09
+  },
+  {
+    "id": 10,
+    "name": "Northstar Arc Floor Lamp",
+    "category": "Lighting",
+    "price": 109.1
+  },
+  {
+    "id": 11,
+    "name": "Forma Walnut Writing Desk",
+    "category": "Furniture",
+    "price": 452.11
+  },
+  {
+    "id": 12,
+    "name": "Paper & Pine Hardcover Journal",
+    "category": "Stationery",
+    "price": 27.12
+  },
+  {
+    "id": 13,
+    "name": "Cobalt Woven Desk Mat",
+    "category": "Accessories",
+    "price": 129.13
+  },
+  {
+    "id": 14,
+    "name": "Aster Wireless Mechanical Keyboard",
+    "category": "Electronics",
+    "price": 578.14
+  },
+  {
+    "id": 15,
+    "name": "Northstar Linen Pendant Light",
+    "category": "Lighting",
+    "price": 294.15
+  },
+  {
+    "id": 16,
+    "name": "Forma Adjustable Standing Desk",
+    "category": "Furniture",
+    "price": 637.16
+  },
+  {
+    "id": 17,
+    "name": "Paper & Pine Gel Pen Set",
+    "category": "Stationery",
+    "price": 32.17
+  },
+  {
+    "id": 18,
+    "name": "Cobalt Wireless Charging Pad",
+    "category": "Accessories",
+    "price": 134.18
+  },
+  {
+    "id": 19,
+    "name": "Aster Noise-Cancelling Headphones",
+    "category": "Electronics",
+    "price": 763.19
+  },
+  {
+    "id": 20,
+    "name": "Northstar Brass Wall Sconce",
+    "category": "Lighting",
+    "price": 199.2
+  },
+  {
+    "id": 21,
+    "name": "Forma Oak Monitor Stand",
+    "category": "Furniture",
+    "price": 822.21
+  },
+  {
+    "id": 22,
+    "name": "Paper & Pine Mechanical Pencil",
+    "category": "Stationery",
+    "price": 37.22
+  },
+  {
+    "id": 23,
+    "name": "Cobalt Laptop Sleeve",
+    "category": "Accessories",
+    "price": 139.23
+  },
+  {
+    "id": 24,
+    "name": "Aster Wi-Fi 6 Router",
+    "category": "Electronics",
+    "price": 948.24
+  },
+  {
+    "id": 25,
+    "name": "Northstar Dimmable Table Lamp",
+    "category": "Lighting",
+    "price": 104.25
+  },
+  {
+    "id": 26,
+    "name": "Forma Modular Bookshelf",
+    "category": "Furniture",
+    "price": 207.26
+  },
+  {
+    "id": 27,
+    "name": "Paper & Pine Weekly Planner",
+    "category": "Stationery",
+    "price": 42.27
+  },
+  {
+    "id": 28,
+    "name": "Cobalt Aluminum Monitor Riser",
+    "category": "Accessories",
+    "price": 144.28
+  },
+  {
+    "id": 29,
+    "name": "Aster Portable SSD 1 TB",
+    "category": "Electronics",
+    "price": 1133.29
+  },
+  {
+    "id": 30,
+    "name": "Northstar Smart Bulb Set",
+    "category": "Lighting",
+    "price": 289.3
+  },
+  {
+    "id": 31,
+    "name": "Forma Lounge Armchair",
+    "category": "Furniture",
+    "price": 392.31
+  },
+  {
+    "id": 32,
+    "name": "Paper & Pine Index Card Box",
+    "category": "Stationery",
+    "price": 47.32
+  },
+  {
+    "id": 33,
+    "name": "Cobalt Cable Management Kit",
+    "category": "Accessories",
+    "price": 149.33
+  },
+  {
+    "id": 34,
+    "name": "Aster Bluetooth Speaker",
+    "category": "Electronics",
+    "price": 218.34
+  },
+  {
+    "id": 35,
+    "name": "Northstar Track Light Kit",
+    "category": "Lighting",
+    "price": 194.35
+  },
+  {
+    "id": 36,
+    "name": "Forma Two-Drawer Nightstand",
+    "category": "Furniture",
+    "price": 577.36
+  },
+  {
+    "id": 37,
+    "name": "Paper & Pine Fountain Pen",
+    "category": "Stationery",
+    "price": 52.37
+  },
+  {
+    "id": 38,
+    "name": "Cobalt Webcam Privacy Cover",
+    "category": "Accessories",
+    "price": 154.38
+  },
+  {
+    "id": 39,
+    "name": "Aster 1080p Webcam",
+    "category": "Electronics",
+    "price": 403.39
+  },
+  {
+    "id": 40,
+    "name": "Northstar Opal Glass Ceiling Light",
+    "category": "Lighting",
+    "price": 99.4
+  },
+  {
+    "id": 41,
+    "name": "Forma Round Dining Table",
+    "category": "Furniture",
+    "price": 762.41
+  },
+  {
+    "id": 42,
+    "name": "Paper & Pine Grid Paper Pad",
+    "category": "Stationery",
+    "price": 57.42
+  },
+  {
+    "id": 43,
+    "name": "Cobalt Magnetic Phone Stand",
+    "category": "Accessories",
+    "price": 159.43
+  },
+  {
+    "id": 44,
+    "name": "Aster USB-C Docking Station",
+    "category": "Electronics",
+    "price": 588.44
+  },
+  {
+    "id": 45,
+    "name": "Northstar Rechargeable Reading Lamp",
+    "category": "Lighting",
+    "price": 284.45
+  },
+  {
+    "id": 46,
+    "name": "Forma Compact Filing Cabinet",
+    "category": "Furniture",
+    "price": 147.46
+  },
+  {
+    "id": 47,
+    "name": "Paper & Pine Desk Organizer",
+    "category": "Stationery",
+    "price": 62.47
+  },
+  {
+    "id": 48,
+    "name": "Cobalt Compact Power Strip",
+    "category": "Accessories",
+    "price": 164.48
+  },
+  {
+    "id": 49,
+    "name": "Aster Smart Display 10-inch",
+    "category": "Electronics",
+    "price": 773.49
+  },
+  {
+    "id": 50,
+    "name": "Northstar Outdoor Path Light",
+    "category": "Lighting",
+    "price": 189.5
+  },
+  {
+    "id": 51,
+    "name": "Forma Upholstered Bench",
+    "category": "Furniture",
+    "price": 332.51
+  },
+  {
+    "id": 52,
+    "name": "Paper & Pine Letterpress Notecards",
+    "category": "Stationery",
+    "price": 7.52
+  },
+  {
+    "id": 53,
+    "name": "Cobalt Noise-Isolating Earbuds",
+    "category": "Accessories",
+    "price": 169.53
+  },
+  {
+    "id": 54,
+    "name": "Aster Laser Printer",
+    "category": "Electronics",
+    "price": 958.54
+  },
+  {
+    "id": 55,
+    "name": "Northstar Clamp-On Work Light",
+    "category": "Lighting",
+    "price": 94.55
+  },
+  {
+    "id": 56,
+    "name": "Forma Height-Adjustable Stool",
+    "category": "Furniture",
+    "price": 517.56
+  },
+  {
+    "id": 57,
+    "name": "Paper & Pine Refillable Marker Set",
+    "category": "Stationery",
+    "price": 12.57
+  },
+  {
+    "id": 58,
+    "name": "Cobalt Bluetooth Mouse",
+    "category": "Accessories",
+    "price": 174.58
+  },
+  {
+    "id": 59,
+    "name": "Aster E-Reader",
+    "category": "Electronics",
+    "price": 1143.59
+  },
+  {
+    "id": 60,
+    "name": "Northstar Minimalist Wall Light",
+    "category": "Lighting",
+    "price": 279.6
+  },
+  {
+    "id": 61,
+    "name": "Forma Floating Wall Shelf",
+    "category": "Furniture",
+    "price": 702.61
+  },
+  {
+    "id": 62,
+    "name": "Paper & Pine Document Folder",
+    "category": "Stationery",
+    "price": 17.62
+  },
+  {
+    "id": 63,
+    "name": "Cobalt Braided USB-C Cable",
+    "category": "Accessories",
+    "price": 179.63
+  },
+  {
+    "id": 64,
+    "name": "Aster Compact Projector",
+    "category": "Electronics",
+    "price": 228.64
+  },
+  {
+    "id": 65,
+    "name": "Solstice LED Desk Lamp",
+    "category": "Lighting",
+    "price": 184.65
+  },
+  {
+    "id": 66,
+    "name": "Haven Ergonomic Task Chair",
+    "category": "Furniture",
+    "price": 87.66
+  },
+  {
+    "id": 67,
+    "name": "Fieldnote A5 Dotted Notebook",
+    "category": "Stationery",
+    "price": 22.67
+  },
+  {
+    "id": 68,
+    "name": "Northridge USB-C Hub",
+    "category": "Accessories",
+    "price": 184.68
+  },
+  {
+    "id": 69,
+    "name": "Meridian 27-inch 4K Monitor",
+    "category": "Electronics",
+    "price": 413.69
+  },
+  {
+    "id": 70,
+    "name": "Solstice Arc Floor Lamp",
+    "category": "Lighting",
+    "price": 89.7
+  },
+  {
+    "id": 71,
+    "name": "Haven Walnut Writing Desk",
+    "category": "Furniture",
+    "price": 272.71
+  },
+  {
+    "id": 72,
+    "name": "Fieldnote Hardcover Journal",
+    "category": "Stationery",
+    "price": 27.72
+  },
+  {
+    "id": 73,
+    "name": "Northridge Woven Desk Mat",
+    "category": "Accessories",
+    "price": 9.73
+  },
+  {
+    "id": 74,
+    "name": "Meridian Wireless Mechanical Keyboard",
+    "category": "Electronics",
+    "price": 598.74
+  },
+  {
+    "id": 75,
+    "name": "Solstice Linen Pendant Light",
+    "category": "Lighting",
+    "price": 274.75
+  },
+  {
+    "id": 76,
+    "name": "Haven Adjustable Standing Desk",
+    "category": "Furniture",
+    "price": 457.76
+  },
+  {
+    "id": 77,
+    "name": "Fieldnote Gel Pen Set",
+    "category": "Stationery",
+    "price": 32.77
+  },
+  {
+    "id": 78,
+    "name": "Northridge Wireless Charging Pad",
+    "category": "Accessories",
+    "price": 14.78
+  },
+  {
+    "id": 79,
+    "name": "Meridian Noise-Cancelling Headphones",
+    "category": "Electronics",
+    "price": 783.79
+  },
+  {
+    "id": 80,
+    "name": "Solstice Brass Wall Sconce",
+    "category": "Lighting",
+    "price": 179.8
+  },
+  {
+    "id": 81,
+    "name": "Haven Oak Monitor Stand",
+    "category": "Furniture",
+    "price": 642.81
+  },
+  {
+    "id": 82,
+    "name": "Fieldnote Mechanical Pencil",
+    "category": "Stationery",
+    "price": 37.82
+  },
+  {
+    "id": 83,
+    "name": "Northridge Laptop Sleeve",
+    "category": "Accessories",
+    "price": 19.83
+  },
+  {
+    "id": 84,
+    "name": "Meridian Wi-Fi 6 Router",
+    "category": "Electronics",
+    "price": 968.84
+  },
+  {
+    "id": 85,
+    "name": "Solstice Dimmable Table Lamp",
+    "category": "Lighting",
+    "price": 84.85
+  },
+  {
+    "id": 86,
+    "name": "Haven Modular Bookshelf",
+    "category": "Furniture",
+    "price": 827.86
+  },
+  {
+    "id": 87,
+    "name": "Fieldnote Weekly Planner",
+    "category": "Stationery",
+    "price": 42.87
+  },
+  {
+    "id": 88,
+    "name": "Northridge Aluminum Monitor Riser",
+    "category": "Accessories",
+    "price": 24.88
+  },
+  {
+    "id": 89,
+    "name": "Meridian Portable SSD 1 TB",
+    "category": "Electronics",
+    "price": 1153.89
+  },
+  {
+    "id": 90,
+    "name": "Solstice Smart Bulb Set",
+    "category": "Lighting",
+    "price": 269.9
+  },
+  {
+    "id": 91,
+    "name": "Haven Lounge Armchair",
+    "category": "Furniture",
+    "price": 212.91
+  },
+  {
+    "id": 92,
+    "name": "Fieldnote Index Card Box",
+    "category": "Stationery",
+    "price": 47.92
+  },
+  {
+    "id": 93,
+    "name": "Northridge Cable Management Kit",
+    "category": "Accessories",
+    "price": 29.93
+  },
+  {
+    "id": 94,
+    "name": "Meridian Bluetooth Speaker",
+    "category": "Electronics",
+    "price": 238.94
+  },
+  {
+    "id": 95,
+    "name": "Solstice Track Light Kit",
+    "category": "Lighting",
+    "price": 174.95
+  },
+  {
+    "id": 96,
+    "name": "Haven Two-Drawer Nightstand",
+    "category": "Furniture",
+    "price": 397.96
+  },
+  {
+    "id": 97,
+    "name": "Fieldnote Fountain Pen",
+    "category": "Stationery",
+    "price": 52.97
+  },
+  {
+    "id": 98,
+    "name": "Northridge Webcam Privacy Cover",
+    "category": "Accessories",
+    "price": 34.98
+  },
+  {
+    "id": 99,
+    "name": "Meridian 1080p Webcam",
+    "category": "Electronics",
+    "price": 423.99
+  },
+  {
+    "id": 100,
+    "name": "Solstice Opal Glass Ceiling Light",
+    "category": "Lighting",
+    "price": 79.0
+  },
+  {
+    "id": 101,
+    "name": "Haven Round Dining Table",
+    "category": "Furniture",
+    "price": 582.01
+  },
+  {
+    "id": 102,
+    "name": "Fieldnote Grid Paper Pad",
+    "category": "Stationery",
+    "price": 57.02
+  },
+  {
+    "id": 103,
+    "name": "Northridge Magnetic Phone Stand",
+    "category": "Accessories",
+    "price": 39.03
+  },
+  {
+    "id": 104,
+    "name": "Meridian USB-C Docking Station",
+    "category": "Electronics",
+    "price": 608.04
+  },
+  {
+    "id": 105,
+    "name": "Solstice Rechargeable Reading Lamp",
+    "category": "Lighting",
+    "price": 264.05
+  },
+  {
+    "id": 106,
+    "name": "Haven Compact Filing Cabinet",
+    "category": "Furniture",
+    "price": 767.06
+  },
+  {
+    "id": 107,
+    "name": "Fieldnote Desk Organizer",
+    "category": "Stationery",
+    "price": 62.07
+  },
+  {
+    "id": 108,
+    "name": "Northridge Compact Power Strip",
+    "category": "Accessories",
+    "price": 44.08
+  },
+  {
+    "id": 109,
+    "name": "Meridian Smart Display 10-inch",
+    "category": "Electronics",
+    "price": 793.09
+  },
+  {
+    "id": 110,
+    "name": "Solstice Outdoor Path Light",
+    "category": "Lighting",
+    "price": 169.1
+  },
+  {
+    "id": 111,
+    "name": "Haven Upholstered Bench",
+    "category": "Furniture",
+    "price": 152.11
+  },
+  {
+    "id": 112,
+    "name": "Fieldnote Letterpress Notecards",
+    "category": "Stationery",
+    "price": 7.12
+  },
+  {
+    "id": 113,
+    "name": "Northridge Noise-Isolating Earbuds",
+    "category": "Accessories",
+    "price": 49.13
+  },
+  {
+    "id": 114,
+    "name": "Meridian Laser Printer",
+    "category": "Electronics",
+    "price": 978.14
+  },
+  {
+    "id": 115,
+    "name": "Solstice Clamp-On Work Light",
+    "category": "Lighting",
+    "price": 74.15
+  },
+  {
+    "id": 116,
+    "name": "Haven Height-Adjustable Stool",
+    "category": "Furniture",
+    "price": 337.16
+  },
+  {
+    "id": 117,
+    "name": "Fieldnote Refillable Marker Set",
+    "category": "Stationery",
+    "price": 12.17
+  },
+  {
+    "id": 118,
+    "name": "Northridge Bluetooth Mouse",
+    "category": "Accessories",
+    "price": 54.18
+  },
+  {
+    "id": 119,
+    "name": "Meridian E-Reader",
+    "category": "Electronics",
+    "price": 63.19
+  },
+  {
+    "id": 120,
+    "name": "Solstice Minimalist Wall Light",
+    "category": "Lighting",
+    "price": 259.2
+  },
+  {
+    "id": 121,
+    "name": "Haven Floating Wall Shelf",
+    "category": "Furniture",
+    "price": 522.21
+  },
+  {
+    "id": 122,
+    "name": "Fieldnote Document Folder",
+    "category": "Stationery",
+    "price": 17.22
+  },
+  {
+    "id": 123,
+    "name": "Northridge Braided USB-C Cable",
+    "category": "Accessories",
+    "price": 59.23
+  },
+  {
+    "id": 124,
+    "name": "Meridian Compact Projector",
+    "category": "Electronics",
+    "price": 248.24
+  },
+  {
+    "id": 125,
+    "name": "Luma LED Desk Lamp",
+    "category": "Lighting",
+    "price": 164.25
+  },
+  {
+    "id": 126,
+    "name": "Oakline Ergonomic Task Chair",
+    "category": "Furniture",
+    "price": 707.26
+  },
+  {
+    "id": 127,
+    "name": "Daymark A5 Dotted Notebook",
+    "category": "Stationery",
+    "price": 22.27
+  },
+  {
+    "id": 128,
+    "name": "Orbit USB-C Hub",
+    "category": "Accessories",
+    "price": 64.28
+  },
+  {
+    "id": 129,
+    "name": "Volt 27-inch 4K Monitor",
+    "category": "Electronics",
+    "price": 433.29
+  },
+  {
+    "id": 130,
+    "name": "Luma Arc Floor Lamp",
+    "category": "Lighting",
+    "price": 69.3
+  },
+  {
+    "id": 131,
+    "name": "Oakline Walnut Writing Desk",
+    "category": "Furniture",
+    "price": 92.31
+  },
+  {
+    "id": 132,
+    "name": "Daymark Hardcover Journal",
+    "category": "Stationery",
+    "price": 27.32
+  },
+  {
+    "id": 133,
+    "name": "Orbit Woven Desk Mat",
+    "category": "Accessories",
+    "price": 69.33
+  },
+  {
+    "id": 134,
+    "name": "Volt Wireless Mechanical Keyboard",
+    "category": "Electronics",
+    "price": 618.34
+  },
+  {
+    "id": 135,
+    "name": "Luma Linen Pendant Light",
+    "category": "Lighting",
+    "price": 254.35
+  },
+  {
+    "id": 136,
+    "name": "Oakline Adjustable Standing Desk",
+    "category": "Furniture",
+    "price": 277.36
+  },
+  {
+    "id": 137,
+    "name": "Daymark Gel Pen Set",
+    "category": "Stationery",
+    "price": 32.37
+  },
+  {
+    "id": 138,
+    "name": "Orbit Wireless Charging Pad",
+    "category": "Accessories",
+    "price": 74.38
+  },
+  {
+    "id": 139,
+    "name": "Volt Noise-Cancelling Headphones",
+    "category": "Electronics",
+    "price": 803.39
+  },
+  {
+    "id": 140,
+    "name": "Luma Brass Wall Sconce",
+    "category": "Lighting",
+    "price": 159.4
+  },
+  {
+    "id": 141,
+    "name": "Oakline Oak Monitor Stand",
+    "category": "Furniture",
+    "price": 462.41
+  },
+  {
+    "id": 142,
+    "name": "Daymark Mechanical Pencil",
+    "category": "Stationery",
+    "price": 37.42
+  },
+  {
+    "id": 143,
+    "name": "Orbit Laptop Sleeve",
+    "category": "Accessories",
+    "price": 79.43
+  },
+  {
+    "id": 144,
+    "name": "Volt Wi-Fi 6 Router",
+    "category": "Electronics",
+    "price": 988.44
+  },
+  {
+    "id": 145,
+    "name": "Luma Dimmable Table Lamp",
+    "category": "Lighting",
+    "price": 64.45
+  },
+  {
+    "id": 146,
+    "name": "Oakline Modular Bookshelf",
+    "category": "Furniture",
+    "price": 647.46
+  },
+  {
+    "id": 147,
+    "name": "Daymark Weekly Planner",
+    "category": "Stationery",
+    "price": 42.47
+  },
+  {
+    "id": 148,
+    "name": "Orbit Aluminum Monitor Riser",
+    "category": "Accessories",
+    "price": 84.48
+  },
+  {
+    "id": 149,
+    "name": "Volt Portable SSD 1 TB",
+    "category": "Electronics",
+    "price": 73.49
+  },
+  {
+    "id": 150,
+    "name": "Luma Smart Bulb Set",
+    "category": "Lighting",
+    "price": 249.5
+  },
+  {
+    "id": 151,
+    "name": "Oakline Lounge Armchair",
+    "category": "Furniture",
+    "price": 832.51
+  },
+  {
+    "id": 152,
+    "name": "Daymark Index Card Box",
+    "category": "Stationery",
+    "price": 47.52
+  },
+  {
+    "id": 153,
+    "name": "Orbit Cable Management Kit",
+    "category": "Accessories",
+    "price": 89.53
+  },
+  {
+    "id": 154,
+    "name": "Volt Bluetooth Speaker",
+    "category": "Electronics",
+    "price": 258.54
+  },
+  {
+    "id": 155,
+    "name": "Luma Track Light Kit",
+    "category": "Lighting",
+    "price": 154.55
+  },
+  {
+    "id": 156,
+    "name": "Oakline Two-Drawer Nightstand",
+    "category": "Furniture",
+    "price": 217.56
+  },
+  {
+    "id": 157,
+    "name": "Daymark Fountain Pen",
+    "category": "Stationery",
+    "price": 52.57
+  },
+  {
+    "id": 158,
+    "name": "Orbit Webcam Privacy Cover",
+    "category": "Accessories",
+    "price": 94.58
+  },
+  {
+    "id": 159,
+    "name": "Volt 1080p Webcam",
+    "category": "Electronics",
+    "price": 443.59
+  },
+  {
+    "id": 160,
+    "name": "Luma Opal Glass Ceiling Light",
+    "category": "Lighting",
+    "price": 59.6
+  },
+  {
+    "id": 161,
+    "name": "Oakline Round Dining Table",
+    "category": "Furniture",
+    "price": 402.61
+  },
+  {
+    "id": 162,
+    "name": "Daymark Grid Paper Pad",
+    "category": "Stationery",
+    "price": 57.62
+  },
+  {
+    "id": 163,
+    "name": "Orbit Magnetic Phone Stand",
+    "category": "Accessories",
+    "price": 99.63
+  },
+  {
+    "id": 164,
+    "name": "Volt USB-C Docking Station",
+    "category": "Electronics",
+    "price": 628.64
+  },
+  {
+    "id": 165,
+    "name": "Luma Rechargeable Reading Lamp",
+    "category": "Lighting",
+    "price": 244.65
+  },
+  {
+    "id": 166,
+    "name": "Oakline Compact Filing Cabinet",
+    "category": "Furniture",
+    "price": 587.66
+  },
+  {
+    "id": 167,
+    "name": "Daymark Desk Organizer",
+    "category": "Stationery",
+    "price": 62.67
+  },
+  {
+    "id": 168,
+    "name": "Orbit Compact Power Strip",
+    "category": "Accessories",
+    "price": 104.68
+  },
+  {
+    "id": 169,
+    "name": "Volt Smart Display 10-inch",
+    "category": "Electronics",
+    "price": 813.69
+  },
+  {
+    "id": 170,
+    "name": "Luma Outdoor Path Light",
+    "category": "Lighting",
+    "price": 149.7
+  },
+  {
+    "id": 171,
+    "name": "Oakline Upholstered Bench",
+    "category": "Furniture",
+    "price": 772.71
+  },
+  {
+    "id": 172,
+    "name": "Daymark Letterpress Notecards",
+    "category": "Stationery",
+    "price": 7.72
+  },
+  {
+    "id": 173,
+    "name": "Orbit Noise-Isolating Earbuds",
+    "category": "Accessories",
+    "price": 109.73
+  },
+  {
+    "id": 174,
+    "name": "Volt Laser Printer",
+    "category": "Electronics",
+    "price": 998.74
+  },
+  {
+    "id": 175,
+    "name": "Luma Clamp-On Work Light",
+    "category": "Lighting",
+    "price": 54.75
+  },
+  {
+    "id": 176,
+    "name": "Oakline Height-Adjustable Stool",
+    "category": "Furniture",
+    "price": 157.76
+  },
+  {
+    "id": 177,
+    "name": "Daymark Refillable Marker Set",
+    "category": "Stationery",
+    "price": 12.77
+  },
+  {
+    "id": 178,
+    "name": "Orbit Bluetooth Mouse",
+    "category": "Accessories",
+    "price": 114.78
+  },
+  {
+    "id": 179,
+    "name": "Volt E-Reader",
+    "category": "Electronics",
+    "price": 83.79
+  },
+  {
+    "id": 180,
+    "name": "Luma Minimalist Wall Light",
+    "category": "Lighting",
+    "price": 239.8
+  },
+  {
+    "id": 181,
+    "name": "Oakline Floating Wall Shelf",
+    "category": "Furniture",
+    "price": 342.81
+  },
+  {
+    "id": 182,
+    "name": "Daymark Document Folder",
+    "category": "Stationery",
+    "price": 17.82
+  },
+  {
+    "id": 183,
+    "name": "Orbit Braided USB-C Cable",
+    "category": "Accessories",
+    "price": 119.83
+  },
+  {
+    "id": 184,
+    "name": "Volt Compact Projector",
+    "category": "Electronics",
+    "price": 268.84
+  },
+  {
+    "id": 185,
+    "name": "Hearth & Home LED Desk Lamp",
+    "category": "Lighting",
+    "price": 144.85
+  },
+  {
+    "id": 186,
+    "name": "Meridian Ergonomic Task Chair",
+    "category": "Furniture",
+    "price": 527.86
+  },
+  {
+    "id": 187,
+    "name": "Margin A5 Dotted Notebook",
+    "category": "Stationery",
+    "price": 22.87
+  },
+  {
+    "id": 188,
+    "name": "Peak USB-C Hub",
+    "category": "Accessories",
+    "price": 124.88
+  },
+  {
+    "id": 189,
+    "name": "Arcadia 27-inch 4K Monitor",
+    "category": "Electronics",
+    "price": 453.89
+  },
+  {
+    "id": 190,
+    "name": "Hearth & Home Arc Floor Lamp",
+    "category": "Lighting",
+    "price": 49.9
+  },
+  {
+    "id": 191,
+    "name": "Meridian Walnut Writing Desk",
+    "category": "Furniture",
+    "price": 712.91
+  },
+  {
+    "id": 192,
+    "name": "Margin Hardcover Journal",
+    "category": "Stationery",
+    "price": 27.92
+  },
+  {
+    "id": 193,
+    "name": "Peak Woven Desk Mat",
+    "category": "Accessories",
+    "price": 129.93
+  },
+  {
+    "id": 194,
+    "name": "Arcadia Wireless Mechanical Keyboard",
+    "category": "Electronics",
+    "price": 638.94
+  },
+  {
+    "id": 195,
+    "name": "Hearth & Home Linen Pendant Light",
+    "category": "Lighting",
+    "price": 234.95
+  },
+  {
+    "id": 196,
+    "name": "Meridian Adjustable Standing Desk",
+    "category": "Furniture",
+    "price": 97.96
+  },
+  {
+    "id": 197,
+    "name": "Margin Gel Pen Set",
+    "category": "Stationery",
+    "price": 32.97
+  },
+  {
+    "id": 198,
+    "name": "Peak Wireless Charging Pad",
+    "category": "Accessories",
+    "price": 134.98
+  },
+  {
+    "id": 199,
+    "name": "Arcadia Noise-Cancelling Headphones",
+    "category": "Electronics",
+    "price": 823.99
+  },
+  {
+    "id": 200,
+    "name": "Hearth & Home Brass Wall Sconce",
+    "category": "Lighting",
+    "price": 139.0
+  },
+  {
+    "id": 201,
+    "name": "Meridian Oak Monitor Stand",
+    "category": "Furniture",
+    "price": 282.01
+  },
+  {
+    "id": 202,
+    "name": "Margin Mechanical Pencil",
+    "category": "Stationery",
+    "price": 37.02
+  },
+  {
+    "id": 203,
+    "name": "Peak Laptop Sleeve",
+    "category": "Accessories",
+    "price": 139.03
+  },
+  {
+    "id": 204,
+    "name": "Arcadia Wi-Fi 6 Router",
+    "category": "Electronics",
+    "price": 1008.04
+  },
+  {
+    "id": 205,
+    "name": "Hearth & Home Dimmable Table Lamp",
+    "category": "Lighting",
+    "price": 44.05
+  },
+  {
+    "id": 206,
+    "name": "Meridian Modular Bookshelf",
+    "category": "Furniture",
+    "price": 467.06
+  },
+  {
+    "id": 207,
+    "name": "Margin Weekly Planner",
+    "category": "Stationery",
+    "price": 42.07
+  },
+  {
+    "id": 208,
+    "name": "Peak Aluminum Monitor Riser",
+    "category": "Accessories",
+    "price": 144.08
+  },
+  {
+    "id": 209,
+    "name": "Arcadia Portable SSD 1 TB",
+    "category": "Electronics",
+    "price": 93.09
+  },
+  {
+    "id": 210,
+    "name": "Hearth & Home Smart Bulb Set",
+    "category": "Lighting",
+    "price": 229.1
+  },
+  {
+    "id": 211,
+    "name": "Meridian Lounge Armchair",
+    "category": "Furniture",
+    "price": 652.11
+  },
+  {
+    "id": 212,
+    "name": "Margin Index Card Box",
+    "category": "Stationery",
+    "price": 47.12
+  },
+  {
+    "id": 213,
+    "name": "Peak Cable Management Kit",
+    "category": "Accessories",
+    "price": 149.13
+  },
+  {
+    "id": 214,
+    "name": "Arcadia Bluetooth Speaker",
+    "category": "Electronics",
+    "price": 278.14
+  },
+  {
+    "id": 215,
+    "name": "Hearth & Home Track Light Kit",
+    "category": "Lighting",
+    "price": 134.15
+  },
+  {
+    "id": 216,
+    "name": "Meridian Two-Drawer Nightstand",
+    "category": "Furniture",
+    "price": 837.16
+  },
+  {
+    "id": 217,
+    "name": "Margin Fountain Pen",
+    "category": "Stationery",
+    "price": 52.17
+  },
+  {
+    "id": 218,
+    "name": "Peak Webcam Privacy Cover",
+    "category": "Accessories",
+    "price": 154.18
+  },
+  {
+    "id": 219,
+    "name": "Arcadia 1080p Webcam",
+    "category": "Electronics",
+    "price": 463.19
+  },
+  {
+    "id": 220,
+    "name": "Hearth & Home Opal Glass Ceiling Light",
+    "category": "Lighting",
+    "price": 39.2
+  },
+  {
+    "id": 221,
+    "name": "Meridian Round Dining Table",
+    "category": "Furniture",
+    "price": 222.21
+  },
+  {
+    "id": 222,
+    "name": "Margin Grid Paper Pad",
+    "category": "Stationery",
+    "price": 57.22
+  },
+  {
+    "id": 223,
+    "name": "Peak Magnetic Phone Stand",
+    "category": "Accessories",
+    "price": 159.23
+  },
+  {
+    "id": 224,
+    "name": "Arcadia USB-C Docking Station",
+    "category": "Electronics",
+    "price": 648.24
+  },
+  {
+    "id": 225,
+    "name": "Hearth & Home Rechargeable Reading Lamp",
+    "category": "Lighting",
+    "price": 224.25
+  },
+  {
+    "id": 226,
+    "name": "Meridian Compact Filing Cabinet",
+    "category": "Furniture",
+    "price": 407.26
+  },
+  {
+    "id": 227,
+    "name": "Margin Desk Organizer",
+    "category": "Stationery",
+    "price": 62.27
+  },
+  {
+    "id": 228,
+    "name": "Peak Compact Power Strip",
+    "category": "Accessories",
+    "price": 164.28
+  },
+  {
+    "id": 229,
+    "name": "Arcadia Smart Display 10-inch",
+    "category": "Electronics",
+    "price": 833.29
+  },
+  {
+    "id": 230,
+    "name": "Hearth & Home Outdoor Path Light",
+    "category": "Lighting",
+    "price": 129.3
+  },
+  {
+    "id": 231,
+    "name": "Meridian Upholstered Bench",
+    "category": "Furniture",
+    "price": 592.31
+  },
+  {
+    "id": 232,
+    "name": "Margin Letterpress Notecards",
+    "category": "Stationery",
+    "price": 7.32
+  },
+  {
+    "id": 233,
+    "name": "Peak Noise-Isolating Earbuds",
+    "category": "Accessories",
+    "price": 169.33
+  },
+  {
+    "id": 234,
+    "name": "Arcadia Laser Printer",
+    "category": "Electronics",
+    "price": 1018.34
+  },
+  {
+    "id": 235,
+    "name": "Hearth & Home Clamp-On Work Light",
+    "category": "Lighting",
+    "price": 34.35
+  },
+  {
+    "id": 236,
+    "name": "Meridian Height-Adjustable Stool",
+    "category": "Furniture",
+    "price": 777.36
+  },
+  {
+    "id": 237,
+    "name": "Margin Refillable Marker Set",
+    "category": "Stationery",
+    "price": 12.37
+  },
+  {
+    "id": 238,
+    "name": "Peak Bluetooth Mouse",
+    "category": "Accessories",
+    "price": 174.38
+  },
+  {
+    "id": 239,
+    "name": "Arcadia E-Reader",
+    "category": "Electronics",
+    "price": 103.39
+  },
+  {
+    "id": 240,
+    "name": "Hearth & Home Minimalist Wall Light",
+    "category": "Lighting",
+    "price": 219.4
+  },
+  {
+    "id": 241,
+    "name": "Meridian Floating Wall Shelf",
+    "category": "Furniture",
+    "price": 162.41
+  },
+  {
+    "id": 242,
+    "name": "Margin Document Folder",
+    "category": "Stationery",
+    "price": 17.42
+  },
+  {
+    "id": 243,
+    "name": "Peak Braided USB-C Cable",
+    "category": "Accessories",
+    "price": 179.43
+  },
+  {
+    "id": 244,
+    "name": "Arcadia Compact Projector",
+    "category": "Electronics",
+    "price": 288.44
+  },
+  {
+    "id": 245,
+    "name": "Aurelia LED Desk Lamp",
+    "category": "Lighting",
+    "price": 124.45
+  },
+  {
+    "id": 246,
+    "name": "Fieldhouse Ergonomic Task Chair",
+    "category": "Furniture",
+    "price": 347.46
+  },
+  {
+    "id": 247,
+    "name": "Atelier A5 Dotted Notebook",
+    "category": "Stationery",
+    "price": 22.47
+  },
+  {
+    "id": 248,
+    "name": "Monarch USB-C Hub",
+    "category": "Accessories",
+    "price": 184.48
+  },
+  {
+    "id": 249,
+    "name": "Bluebird 27-inch 4K Monitor",
+    "category": "Electronics",
+    "price": 473.49
+  },
+  {
+    "id": 250,
+    "name": "Aurelia Arc Floor Lamp",
+    "category": "Lighting",
+    "price": 29.5
+  },
+  {
+    "id": 251,
+    "name": "Fieldhouse Walnut Writing Desk",
+    "category": "Furniture",
+    "price": 532.51
+  },
+  {
+    "id": 252,
+    "name": "Atelier Hardcover Journal",
+    "category": "Stationery",
+    "price": 27.52
+  },
+  {
+    "id": 253,
+    "name": "Monarch Woven Desk Mat",
+    "category": "Accessories",
+    "price": 9.53
+  },
+  {
+    "id": 254,
+    "name": "Bluebird Wireless Mechanical Keyboard",
+    "category": "Electronics",
+    "price": 658.54
+  },
+  {
+    "id": 255,
+    "name": "Aurelia Linen Pendant Light",
+    "category": "Lighting",
+    "price": 214.55
+  },
+  {
+    "id": 256,
+    "name": "Fieldhouse Adjustable Standing Desk",
+    "category": "Furniture",
+    "price": 717.56
+  },
+  {
+    "id": 257,
+    "name": "Atelier Gel Pen Set",
+    "category": "Stationery",
+    "price": 32.57
+  },
+  {
+    "id": 258,
+    "name": "Monarch Wireless Charging Pad",
+    "category": "Accessories",
+    "price": 14.58
+  },
+  {
+    "id": 259,
+    "name": "Bluebird Noise-Cancelling Headphones",
+    "category": "Electronics",
+    "price": 843.59
+  },
+  {
+    "id": 260,
+    "name": "Aurelia Brass Wall Sconce",
+    "category": "Lighting",
+    "price": 119.6
+  },
+  {
+    "id": 261,
+    "name": "Fieldhouse Oak Monitor Stand",
+    "category": "Furniture",
+    "price": 102.61
+  },
+  {
+    "id": 262,
+    "name": "Atelier Mechanical Pencil",
+    "category": "Stationery",
+    "price": 37.62
+  },
+  {
+    "id": 263,
+    "name": "Monarch Laptop Sleeve",
+    "category": "Accessories",
+    "price": 19.63
+  },
+  {
+    "id": 264,
+    "name": "Bluebird Wi-Fi 6 Router",
+    "category": "Electronics",
+    "price": 1028.64
+  },
+  {
+    "id": 265,
+    "name": "Aurelia Dimmable Table Lamp",
+    "category": "Lighting",
+    "price": 24.65
+  },
+  {
+    "id": 266,
+    "name": "Fieldhouse Modular Bookshelf",
+    "category": "Furniture",
+    "price": 287.66
+  },
+  {
+    "id": 267,
+    "name": "Atelier Weekly Planner",
+    "category": "Stationery",
+    "price": 42.67
+  },
+  {
+    "id": 268,
+    "name": "Monarch Aluminum Monitor Riser",
+    "category": "Accessories",
+    "price": 24.68
+  },
+  {
+    "id": 269,
+    "name": "Bluebird Portable SSD 1 TB",
+    "category": "Electronics",
+    "price": 113.69
+  },
+  {
+    "id": 270,
+    "name": "Aurelia Smart Bulb Set",
+    "category": "Lighting",
+    "price": 209.7
+  },
+  {
+    "id": 271,
+    "name": "Fieldhouse Lounge Armchair",
+    "category": "Furniture",
+    "price": 472.71
+  },
+  {
+    "id": 272,
+    "name": "Atelier Index Card Box",
+    "category": "Stationery",
+    "price": 47.72
+  },
+  {
+    "id": 273,
+    "name": "Monarch Cable Management Kit",
+    "category": "Accessories",
+    "price": 29.73
+  },
+  {
+    "id": 274,
+    "name": "Bluebird Bluetooth Speaker",
+    "category": "Electronics",
+    "price": 298.74
+  },
+  {
+    "id": 275,
+    "name": "Aurelia Track Light Kit",
+    "category": "Lighting",
+    "price": 114.75
+  },
+  {
+    "id": 276,
+    "name": "Fieldhouse Two-Drawer Nightstand",
+    "category": "Furniture",
+    "price": 657.76
+  },
+  {
+    "id": 277,
+    "name": "Atelier Fountain Pen",
+    "category": "Stationery",
+    "price": 52.77
+  },
+  {
+    "id": 278,
+    "name": "Monarch Webcam Privacy Cover",
+    "category": "Accessories",
+    "price": 34.78
+  },
+  {
+    "id": 279,
+    "name": "Bluebird 1080p Webcam",
+    "category": "Electronics",
+    "price": 483.79
+  },
+  {
+    "id": 280,
+    "name": "Aurelia Opal Glass Ceiling Light",
+    "category": "Lighting",
+    "price": 19.8
+  },
+  {
+    "id": 281,
+    "name": "Fieldhouse Round Dining Table",
+    "category": "Furniture",
+    "price": 842.81
+  },
+  {
+    "id": 282,
+    "name": "Atelier Grid Paper Pad",
+    "category": "Stationery",
+    "price": 57.82
+  },
+  {
+    "id": 283,
+    "name": "Monarch Magnetic Phone Stand",
+    "category": "Accessories",
+    "price": 39.83
+  },
+  {
+    "id": 284,
+    "name": "Bluebird USB-C Docking Station",
+    "category": "Electronics",
+    "price": 668.84
+  },
+  {
+    "id": 285,
+    "name": "Aurelia Rechargeable Reading Lamp",
+    "category": "Lighting",
+    "price": 204.85
+  },
+  {
+    "id": 286,
+    "name": "Fieldhouse Compact Filing Cabinet",
+    "category": "Furniture",
+    "price": 227.86
+  },
+  {
+    "id": 287,
+    "name": "Atelier Desk Organizer",
+    "category": "Stationery",
+    "price": 62.87
+  },
+  {
+    "id": 288,
+    "name": "Monarch Compact Power Strip",
+    "category": "Accessories",
+    "price": 44.88
+  },
+  {
+    "id": 289,
+    "name": "Bluebird Smart Display 10-inch",
+    "category": "Electronics",
+    "price": 853.89
+  },
+  {
+    "id": 290,
+    "name": "Aurelia Outdoor Path Light",
+    "category": "Lighting",
+    "price": 109.9
+  },
+  {
+    "id": 291,
+    "name": "Fieldhouse Upholstered Bench",
+    "category": "Furniture",
+    "price": 412.91
+  },
+  {
+    "id": 292,
+    "name": "Atelier Letterpress Notecards",
+    "category": "Stationery",
+    "price": 7.92
+  },
+  {
+    "id": 293,
+    "name": "Monarch Noise-Isolating Earbuds",
+    "category": "Accessories",
+    "price": 49.93
+  },
+  {
+    "id": 294,
+    "name": "Bluebird Laser Printer",
+    "category": "Electronics",
+    "price": 1038.94
+  },
+  {
+    "id": 295,
+    "name": "Aurelia Clamp-On Work Light",
+    "category": "Lighting",
+    "price": 294.95
+  },
+  {
+    "id": 296,
+    "name": "Fieldhouse Height-Adjustable Stool",
+    "category": "Furniture",
+    "price": 597.96
+  },
+  {
+    "id": 297,
+    "name": "Atelier Refillable Marker Set",
+    "category": "Stationery",
+    "price": 12.97
+  },
+  {
+    "id": 298,
+    "name": "Monarch Bluetooth Mouse",
+    "category": "Accessories",
+    "price": 54.98
+  },
+  {
+    "id": 299,
+    "name": "Bluebird E-Reader",
+    "category": "Electronics",
+    "price": 123.99
+  },
+  {
+    "id": 300,
+    "name": "Aurelia Minimalist Wall Light",
+    "category": "Lighting",
+    "price": 199.0
+  },
+  {
+    "id": 301,
+    "name": "Fieldhouse Floating Wall Shelf",
+    "category": "Furniture",
+    "price": 782.01
+  },
+  {
+    "id": 302,
+    "name": "Atelier Document Folder",
+    "category": "Stationery",
+    "price": 17.02
+  },
+  {
+    "id": 303,
+    "name": "Monarch Braided USB-C Cable",
+    "category": "Accessories",
+    "price": 59.03
+  },
+  {
+    "id": 304,
+    "name": "Bluebird Compact Projector",
+    "category": "Electronics",
+    "price": 308.04
+  },
+  {
+    "id": 305,
+    "name": "Vela LED Desk Lamp",
+    "category": "Lighting",
+    "price": 104.05
+  },
+  {
+    "id": 306,
+    "name": "Cedar & Co. Ergonomic Task Chair",
+    "category": "Furniture",
+    "price": 167.06
+  },
+  {
+    "id": 307,
+    "name": "Archive A5 Dotted Notebook",
+    "category": "Stationery",
+    "price": 22.07
+  },
+  {
+    "id": 308,
+    "name": "Slate USB-C Hub",
+    "category": "Accessories",
+    "price": 64.08
+  },
+  {
+    "id": 309,
+    "name": "Nexa 27-inch 4K Monitor",
+    "category": "Electronics",
+    "price": 493.09
+  },
+  {
+    "id": 310,
+    "name": "Vela Arc Floor Lamp",
+    "category": "Lighting",
+    "price": 289.1
+  },
+  {
+    "id": 311,
+    "name": "Cedar & Co. Walnut Writing Desk",
+    "category": "Furniture",
+    "price": 352.11
+  },
+  {
+    "id": 312,
+    "name": "Archive Hardcover Journal",
+    "category": "Stationery",
+    "price": 27.12
+  },
+  {
+    "id": 313,
+    "name": "Slate Woven Desk Mat",
+    "category": "Accessories",
+    "price": 69.13
+  },
+  {
+    "id": 314,
+    "name": "Nexa Wireless Mechanical Keyboard",
+    "category": "Electronics",
+    "price": 678.14
+  },
+  {
+    "id": 315,
+    "name": "Vela Linen Pendant Light",
+    "category": "Lighting",
+    "price": 194.15
+  },
+  {
+    "id": 316,
+    "name": "Cedar & Co. Adjustable Standing Desk",
+    "category": "Furniture",
+    "price": 537.16
+  },
+  {
+    "id": 317,
+    "name": "Archive Gel Pen Set",
+    "category": "Stationery",
+    "price": 32.17
+  },
+  {
+    "id": 318,
+    "name": "Slate Wireless Charging Pad",
+    "category": "Accessories",
+    "price": 74.18
+  },
+  {
+    "id": 319,
+    "name": "Nexa Noise-Cancelling Headphones",
+    "category": "Electronics",
+    "price": 863.19
+  },
+  {
+    "id": 320,
+    "name": "Vela Brass Wall Sconce",
+    "category": "Lighting",
+    "price": 99.2
+  },
+  {
+    "id": 321,
+    "name": "Cedar & Co. Oak Monitor Stand",
+    "category": "Furniture",
+    "price": 722.21
+  },
+  {
+    "id": 322,
+    "name": "Archive Mechanical Pencil",
+    "category": "Stationery",
+    "price": 37.22
+  },
+  {
+    "id": 323,
+    "name": "Slate Laptop Sleeve",
+    "category": "Accessories",
+    "price": 79.23
+  },
+  {
+    "id": 324,
+    "name": "Nexa Wi-Fi 6 Router",
+    "category": "Electronics",
+    "price": 1048.24
+  },
+  {
+    "id": 325,
+    "name": "Vela Dimmable Table Lamp",
+    "category": "Lighting",
+    "price": 284.25
+  },
+  {
+    "id": 326,
+    "name": "Cedar & Co. Modular Bookshelf",
+    "category": "Furniture",
+    "price": 107.26
+  },
+  {
+    "id": 327,
+    "name": "Archive Weekly Planner",
+    "category": "Stationery",
+    "price": 42.27
+  },
+  {
+    "id": 328,
+    "name": "Slate Aluminum Monitor Riser",
+    "category": "Accessories",
+    "price": 84.28
+  },
+  {
+    "id": 329,
+    "name": "Nexa Portable SSD 1 TB",
+    "category": "Electronics",
+    "price": 133.29
+  },
+  {
+    "id": 330,
+    "name": "Vela Smart Bulb Set",
+    "category": "Lighting",
+    "price": 189.3
+  },
+  {
+    "id": 331,
+    "name": "Cedar & Co. Lounge Armchair",
+    "category": "Furniture",
+    "price": 292.31
+  },
+  {
+    "id": 332,
+    "name": "Archive Index Card Box",
+    "category": "Stationery",
+    "price": 47.32
+  },
+  {
+    "id": 333,
+    "name": "Slate Cable Management Kit",
+    "category": "Accessories",
+    "price": 89.33
+  },
+  {
+    "id": 334,
+    "name": "Nexa Bluetooth Speaker",
+    "category": "Electronics",
+    "price": 318.34
+  },
+  {
+    "id": 335,
+    "name": "Vela Track Light Kit",
+    "category": "Lighting",
+    "price": 94.35
+  },
+  {
+    "id": 336,
+    "name": "Cedar & Co. Two-Drawer Nightstand",
+    "category": "Furniture",
+    "price": 477.36
+  },
+  {
+    "id": 337,
+    "name": "Archive Fountain Pen",
+    "category": "Stationery",
+    "price": 52.37
+  },
+  {
+    "id": 338,
+    "name": "Slate Webcam Privacy Cover",
+    "category": "Accessories",
+    "price": 94.38
+  },
+  {
+    "id": 339,
+    "name": "Nexa 1080p Webcam",
+    "category": "Electronics",
+    "price": 503.39
+  },
+  {
+    "id": 340,
+    "name": "Vela Opal Glass Ceiling Light",
+    "category": "Lighting",
+    "price": 279.4
+  },
+  {
+    "id": 341,
+    "name": "Cedar & Co. Round Dining Table",
+    "category": "Furniture",
+    "price": 662.41
+  },
+  {
+    "id": 342,
+    "name": "Archive Grid Paper Pad",
+    "category": "Stationery",
+    "price": 57.42
+  },
+  {
+    "id": 343,
+    "name": "Slate Magnetic Phone Stand",
+    "category": "Accessories",
+    "price": 99.43
+  },
+  {
+    "id": 344,
+    "name": "Nexa USB-C Docking Station",
+    "category": "Electronics",
+    "price": 688.44
+  },
+  {
+    "id": 345,
+    "name": "Vela Rechargeable Reading Lamp",
+    "category": "Lighting",
+    "price": 184.45
+  },
+  {
+    "id": 346,
+    "name": "Cedar & Co. Compact Filing Cabinet",
+    "category": "Furniture",
+    "price": 47.46
+  },
+  {
+    "id": 347,
+    "name": "Archive Desk Organizer",
+    "category": "Stationery",
+    "price": 62.47
+  },
+  {
+    "id": 348,
+    "name": "Slate Compact Power Strip",
+    "category": "Accessories",
+    "price": 104.48
+  },
+  {
+    "id": 349,
+    "name": "Nexa Smart Display 10-inch",
+    "category": "Electronics",
+    "price": 873.49
+  },
+  {
+    "id": 350,
+    "name": "Vela Outdoor Path Light",
+    "category": "Lighting",
+    "price": 89.5
+  },
+  {
+    "id": 351,
+    "name": "Cedar & Co. Upholstered Bench",
+    "category": "Furniture",
+    "price": 232.51
+  },
+  {
+    "id": 352,
+    "name": "Archive Letterpress Notecards",
+    "category": "Stationery",
+    "price": 7.52
+  },
+  {
+    "id": 353,
+    "name": "Slate Noise-Isolating Earbuds",
+    "category": "Accessories",
+    "price": 109.53
+  },
+  {
+    "id": 354,
+    "name": "Nexa Laser Printer",
+    "category": "Electronics",
+    "price": 1058.54
+  },
+  {
+    "id": 355,
+    "name": "Vela Clamp-On Work Light",
+    "category": "Lighting",
+    "price": 274.55
+  },
+  {
+    "id": 356,
+    "name": "Cedar & Co. Height-Adjustable Stool",
+    "category": "Furniture",
+    "price": 417.56
+  },
+  {
+    "id": 357,
+    "name": "Archive Refillable Marker Set",
+    "category": "Stationery",
+    "price": 12.57
+  },
+  {
+    "id": 358,
+    "name": "Slate Bluetooth Mouse",
+    "category": "Accessories",
+    "price": 114.58
+  },
+  {
+    "id": 359,
+    "name": "Nexa E-Reader",
+    "category": "Electronics",
+    "price": 143.59
+  },
+  {
+    "id": 360,
+    "name": "Vela Minimalist Wall Light",
+    "category": "Lighting",
+    "price": 179.6
+  },
+  {
+    "id": 361,
+    "name": "Cedar & Co. Floating Wall Shelf",
+    "category": "Furniture",
+    "price": 602.61
+  },
+  {
+    "id": 362,
+    "name": "Archive Document Folder",
+    "category": "Stationery",
+    "price": 17.62
+  },
+  {
+    "id": 363,
+    "name": "Slate Braided USB-C Cable",
+    "category": "Accessories",
+    "price": 119.63
+  },
+  {
+    "id": 364,
+    "name": "Nexa Compact Projector",
+    "category": "Electronics",
+    "price": 328.64
+  },
+  {
+    "id": 365,
+    "name": "Crescent LED Desk Lamp",
+    "category": "Lighting",
+    "price": 84.65
+  },
+  {
+    "id": 366,
+    "name": "Norwood Ergonomic Task Chair",
+    "category": "Furniture",
+    "price": 787.66
+  },
+  {
+    "id": 367,
+    "name": "Inkwell A5 Dotted Notebook",
+    "category": "Stationery",
+    "price": 22.67
+  },
+  {
+    "id": 368,
+    "name": "Vertex USB-C Hub",
+    "category": "Accessories",
+    "price": 124.68
+  },
+  {
+    "id": 369,
+    "name": "Solara 27-inch 4K Monitor",
+    "category": "Electronics",
+    "price": 513.69
+  },
+  {
+    "id": 370,
+    "name": "Crescent Arc Floor Lamp",
+    "category": "Lighting",
+    "price": 269.7
+  },
+  {
+    "id": 371,
+    "name": "Norwood Walnut Writing Desk",
+    "category": "Furniture",
+    "price": 172.71
+  },
+  {
+    "id": 372,
+    "name": "Inkwell Hardcover Journal",
+    "category": "Stationery",
+    "price": 27.72
+  },
+  {
+    "id": 373,
+    "name": "Vertex Woven Desk Mat",
+    "category": "Accessories",
+    "price": 129.73
+  },
+  {
+    "id": 374,
+    "name": "Solara Wireless Mechanical Keyboard",
+    "category": "Electronics",
+    "price": 698.74
+  },
+  {
+    "id": 375,
+    "name": "Crescent Linen Pendant Light",
+    "category": "Lighting",
+    "price": 174.75
+  },
+  {
+    "id": 376,
+    "name": "Norwood Adjustable Standing Desk",
+    "category": "Furniture",
+    "price": 357.76
+  },
+  {
+    "id": 377,
+    "name": "Inkwell Gel Pen Set",
+    "category": "Stationery",
+    "price": 32.77
+  },
+  {
+    "id": 378,
+    "name": "Vertex Wireless Charging Pad",
+    "category": "Accessories",
+    "price": 134.78
+  },
+  {
+    "id": 379,
+    "name": "Solara Noise-Cancelling Headphones",
+    "category": "Electronics",
+    "price": 883.79
+  },
+  {
+    "id": 380,
+    "name": "Crescent Brass Wall Sconce",
+    "category": "Lighting",
+    "price": 79.8
+  },
+  {
+    "id": 381,
+    "name": "Norwood Oak Monitor Stand",
+    "category": "Furniture",
+    "price": 542.81
+  },
+  {
+    "id": 382,
+    "name": "Inkwell Mechanical Pencil",
+    "category": "Stationery",
+    "price": 37.82
+  },
+  {
+    "id": 383,
+    "name": "Vertex Laptop Sleeve",
+    "category": "Accessories",
+    "price": 139.83
+  },
+  {
+    "id": 384,
+    "name": "Solara Wi-Fi 6 Router",
+    "category": "Electronics",
+    "price": 1068.84
+  },
+  {
+    "id": 385,
+    "name": "Crescent Dimmable Table Lamp",
+    "category": "Lighting",
+    "price": 264.85
+  },
+  {
+    "id": 386,
+    "name": "Norwood Modular Bookshelf",
+    "category": "Furniture",
+    "price": 727.86
+  },
+  {
+    "id": 387,
+    "name": "Inkwell Weekly Planner",
+    "category": "Stationery",
+    "price": 42.87
+  },
+  {
+    "id": 388,
+    "name": "Vertex Aluminum Monitor Riser",
+    "category": "Accessories",
+    "price": 144.88
+  },
+  {
+    "id": 389,
+    "name": "Solara Portable SSD 1 TB",
+    "category": "Electronics",
+    "price": 153.89
+  },
+  {
+    "id": 390,
+    "name": "Crescent Smart Bulb Set",
+    "category": "Lighting",
+    "price": 169.9
+  },
+  {
+    "id": 391,
+    "name": "Norwood Lounge Armchair",
+    "category": "Furniture",
+    "price": 112.91
+  },
+  {
+    "id": 392,
+    "name": "Inkwell Index Card Box",
+    "category": "Stationery",
+    "price": 47.92
+  },
+  {
+    "id": 393,
+    "name": "Vertex Cable Management Kit",
+    "category": "Accessories",
+    "price": 149.93
+  },
+  {
+    "id": 394,
+    "name": "Solara Bluetooth Speaker",
+    "category": "Electronics",
+    "price": 338.94
+  },
+  {
+    "id": 395,
+    "name": "Crescent Track Light Kit",
+    "category": "Lighting",
+    "price": 74.95
+  },
+  {
+    "id": 396,
+    "name": "Norwood Two-Drawer Nightstand",
+    "category": "Furniture",
+    "price": 297.96
+  },
+  {
+    "id": 397,
+    "name": "Inkwell Fountain Pen",
+    "category": "Stationery",
+    "price": 52.97
+  },
+  {
+    "id": 398,
+    "name": "Vertex Webcam Privacy Cover",
+    "category": "Accessories",
+    "price": 154.98
+  },
+  {
+    "id": 399,
+    "name": "Solara 1080p Webcam",
+    "category": "Electronics",
+    "price": 523.99
+  },
+  {
+    "id": 400,
+    "name": "Crescent Opal Glass Ceiling Light",
+    "category": "Lighting",
+    "price": 259.0
+  },
+  {
+    "id": 401,
+    "name": "Norwood Round Dining Table",
+    "category": "Furniture",
+    "price": 482.01
+  },
+  {
+    "id": 402,
+    "name": "Inkwell Grid Paper Pad",
+    "category": "Stationery",
+    "price": 57.02
+  },
+  {
+    "id": 403,
+    "name": "Vertex Magnetic Phone Stand",
+    "category": "Accessories",
+    "price": 159.03
+  },
+  {
+    "id": 404,
+    "name": "Solara USB-C Docking Station",
+    "category": "Electronics",
+    "price": 708.04
+  },
+  {
+    "id": 405,
+    "name": "Crescent Rechargeable Reading Lamp",
+    "category": "Lighting",
+    "price": 164.05
+  },
+  {
+    "id": 406,
+    "name": "Norwood Compact Filing Cabinet",
+    "category": "Furniture",
+    "price": 667.06
+  },
+  {
+    "id": 407,
+    "name": "Inkwell Desk Organizer",
+    "category": "Stationery",
+    "price": 62.07
+  },
+  {
+    "id": 408,
+    "name": "Vertex Compact Power Strip",
+    "category": "Accessories",
+    "price": 164.08
+  },
+  {
+    "id": 409,
+    "name": "Solara Smart Display 10-inch",
+    "category": "Electronics",
+    "price": 893.09
+  },
+  {
+    "id": 410,
+    "name": "Crescent Outdoor Path Light",
+    "category": "Lighting",
+    "price": 69.1
+  },
+  {
+    "id": 411,
+    "name": "Norwood Upholstered Bench",
+    "category": "Furniture",
+    "price": 52.11
+  },
+  {
+    "id": 412,
+    "name": "Inkwell Letterpress Notecards",
+    "category": "Stationery",
+    "price": 7.12
+  },
+  {
+    "id": 413,
+    "name": "Vertex Noise-Isolating Earbuds",
+    "category": "Accessories",
+    "price": 169.13
+  },
+  {
+    "id": 414,
+    "name": "Solara Laser Printer",
+    "category": "Electronics",
+    "price": 1078.14
+  },
+  {
+    "id": 415,
+    "name": "Crescent Clamp-On Work Light",
+    "category": "Lighting",
+    "price": 254.15
+  },
+  {
+    "id": 416,
+    "name": "Norwood Height-Adjustable Stool",
+    "category": "Furniture",
+    "price": 237.16
+  },
+  {
+    "id": 417,
+    "name": "Inkwell Refillable Marker Set",
+    "category": "Stationery",
+    "price": 12.17
+  },
+  {
+    "id": 418,
+    "name": "Vertex Bluetooth Mouse",
+    "category": "Accessories",
+    "price": 174.18
+  },
+  {
+    "id": 419,
+    "name": "Solara E-Reader",
+    "category": "Electronics",
+    "price": 163.19
+  },
+  {
+    "id": 420,
+    "name": "Crescent Minimalist Wall Light",
+    "category": "Lighting",
+    "price": 159.2
+  },
+  {
+    "id": 421,
+    "name": "Norwood Floating Wall Shelf",
+    "category": "Furniture",
+    "price": 422.21
+  },
+  {
+    "id": 422,
+    "name": "Inkwell Document Folder",
+    "category": "Stationery",
+    "price": 17.22
+  },
+  {
+    "id": 423,
+    "name": "Vertex Braided USB-C Cable",
+    "category": "Accessories",
+    "price": 179.23
+  },
+  {
+    "id": 424,
+    "name": "Solara Compact Projector",
+    "category": "Electronics",
+    "price": 348.24
+  },
+  {
+    "id": 425,
+    "name": "Sunroom LED Desk Lamp",
+    "category": "Lighting",
+    "price": 64.25
+  },
+  {
+    "id": 426,
+    "name": "Foundry Ergonomic Task Chair",
+    "category": "Furniture",
+    "price": 607.26
+  },
+  {
+    "id": 427,
+    "name": "Commonplace A5 Dotted Notebook",
+    "category": "Stationery",
+    "price": 22.27
+  },
+  {
+    "id": 428,
+    "name": "Onyx USB-C Hub",
+    "category": "Accessories",
+    "price": 184.28
+  },
+  {
+    "id": 429,
+    "name": "Verity 27-inch 4K Monitor",
+    "category": "Electronics",
+    "price": 533.29
+  },
+  {
+    "id": 430,
+    "name": "Sunroom Arc Floor Lamp",
+    "category": "Lighting",
+    "price": 249.3
+  },
+  {
+    "id": 431,
+    "name": "Foundry Walnut Writing Desk",
+    "category": "Furniture",
+    "price": 792.31
+  },
+  {
+    "id": 432,
+    "name": "Commonplace Hardcover Journal",
+    "category": "Stationery",
+    "price": 27.32
+  },
+  {
+    "id": 433,
+    "name": "Onyx Woven Desk Mat",
+    "category": "Accessories",
+    "price": 9.33
+  },
+  {
+    "id": 434,
+    "name": "Verity Wireless Mechanical Keyboard",
+    "category": "Electronics",
+    "price": 718.34
+  },
+  {
+    "id": 435,
+    "name": "Sunroom Linen Pendant Light",
+    "category": "Lighting",
+    "price": 154.35
+  },
+  {
+    "id": 436,
+    "name": "Foundry Adjustable Standing Desk",
+    "category": "Furniture",
+    "price": 177.36
+  },
+  {
+    "id": 437,
+    "name": "Commonplace Gel Pen Set",
+    "category": "Stationery",
+    "price": 32.37
+  },
+  {
+    "id": 438,
+    "name": "Onyx Wireless Charging Pad",
+    "category": "Accessories",
+    "price": 14.38
+  },
+  {
+    "id": 439,
+    "name": "Verity Noise-Cancelling Headphones",
+    "category": "Electronics",
+    "price": 903.39
+  },
+  {
+    "id": 440,
+    "name": "Sunroom Brass Wall Sconce",
+    "category": "Lighting",
+    "price": 59.4
+  },
+  {
+    "id": 441,
+    "name": "Foundry Oak Monitor Stand",
+    "category": "Furniture",
+    "price": 362.41
+  },
+  {
+    "id": 442,
+    "name": "Commonplace Mechanical Pencil",
+    "category": "Stationery",
+    "price": 37.42
+  },
+  {
+    "id": 443,
+    "name": "Onyx Laptop Sleeve",
+    "category": "Accessories",
+    "price": 19.43
+  },
+  {
+    "id": 444,
+    "name": "Verity Wi-Fi 6 Router",
+    "category": "Electronics",
+    "price": 1088.44
+  },
+  {
+    "id": 445,
+    "name": "Sunroom Dimmable Table Lamp",
+    "category": "Lighting",
+    "price": 244.45
+  },
+  {
+    "id": 446,
+    "name": "Foundry Modular Bookshelf",
+    "category": "Furniture",
+    "price": 547.46
+  },
+  {
+    "id": 447,
+    "name": "Commonplace Weekly Planner",
+    "category": "Stationery",
+    "price": 42.47
+  },
+  {
+    "id": 448,
+    "name": "Onyx Aluminum Monitor Riser",
+    "category": "Accessories",
+    "price": 24.48
+  },
+  {
+    "id": 449,
+    "name": "Verity Portable SSD 1 TB",
+    "category": "Electronics",
+    "price": 173.49
+  },
+  {
+    "id": 450,
+    "name": "Sunroom Smart Bulb Set",
+    "category": "Lighting",
+    "price": 149.5
+  },
+  {
+    "id": 451,
+    "name": "Foundry Lounge Armchair",
+    "category": "Furniture",
+    "price": 732.51
+  },
+  {
+    "id": 452,
+    "name": "Commonplace Index Card Box",
+    "category": "Stationery",
+    "price": 47.52
+  },
+  {
+    "id": 453,
+    "name": "Onyx Cable Management Kit",
+    "category": "Accessories",
+    "price": 29.53
+  },
+  {
+    "id": 454,
+    "name": "Verity Bluetooth Speaker",
+    "category": "Electronics",
+    "price": 358.54
+  },
+  {
+    "id": 455,
+    "name": "Sunroom Track Light Kit",
+    "category": "Lighting",
+    "price": 54.55
+  },
+  {
+    "id": 456,
+    "name": "Foundry Two-Drawer Nightstand",
+    "category": "Furniture",
+    "price": 117.56
+  },
+  {
+    "id": 457,
+    "name": "Commonplace Fountain Pen",
+    "category": "Stationery",
+    "price": 52.57
+  },
+  {
+    "id": 458,
+    "name": "Onyx Webcam Privacy Cover",
+    "category": "Accessories",
+    "price": 34.58
+  },
+  {
+    "id": 459,
+    "name": "Verity 1080p Webcam",
+    "category": "Electronics",
+    "price": 543.59
+  },
+  {
+    "id": 460,
+    "name": "Sunroom Opal Glass Ceiling Light",
+    "category": "Lighting",
+    "price": 239.6
+  },
+  {
+    "id": 461,
+    "name": "Foundry Round Dining Table",
+    "category": "Furniture",
+    "price": 302.61
+  },
+  {
+    "id": 462,
+    "name": "Commonplace Grid Paper Pad",
+    "category": "Stationery",
+    "price": 57.62
+  },
+  {
+    "id": 463,
+    "name": "Onyx Magnetic Phone Stand",
+    "category": "Accessories",
+    "price": 39.63
+  },
+  {
+    "id": 464,
+    "name": "Verity USB-C Docking Station",
+    "category": "Electronics",
+    "price": 728.64
+  },
+  {
+    "id": 465,
+    "name": "Sunroom Rechargeable Reading Lamp",
+    "category": "Lighting",
+    "price": 144.65
+  },
+  {
+    "id": 466,
+    "name": "Foundry Compact Filing Cabinet",
+    "category": "Furniture",
+    "price": 487.66
+  },
+  {
+    "id": 467,
+    "name": "Commonplace Desk Organizer",
+    "category": "Stationery",
+    "price": 62.67
+  },
+  {
+    "id": 468,
+    "name": "Onyx Compact Power Strip",
+    "category": "Accessories",
+    "price": 44.68
+  },
+  {
+    "id": 469,
+    "name": "Verity Smart Display 10-inch",
+    "category": "Electronics",
+    "price": 913.69
+  },
+  {
+    "id": 470,
+    "name": "Sunroom Outdoor Path Light",
+    "category": "Lighting",
+    "price": 49.7
+  },
+  {
+    "id": 471,
+    "name": "Foundry Upholstered Bench",
+    "category": "Furniture",
+    "price": 672.71
+  },
+  {
+    "id": 472,
+    "name": "Commonplace Letterpress Notecards",
+    "category": "Stationery",
+    "price": 7.72
+  },
+  {
+    "id": 473,
+    "name": "Onyx Noise-Isolating Earbuds",
+    "category": "Accessories",
+    "price": 49.73
+  },
+  {
+    "id": 474,
+    "name": "Verity Laser Printer",
+    "category": "Electronics",
+    "price": 1098.74
+  },
+  {
+    "id": 475,
+    "name": "Sunroom Clamp-On Work Light",
+    "category": "Lighting",
+    "price": 234.75
+  },
+  {
+    "id": 476,
+    "name": "Foundry Height-Adjustable Stool",
+    "category": "Furniture",
+    "price": 57.76
+  },
+  {
+    "id": 477,
+    "name": "Commonplace Refillable Marker Set",
+    "category": "Stationery",
+    "price": 12.77
+  },
+  {
+    "id": 478,
+    "name": "Onyx Bluetooth Mouse",
+    "category": "Accessories",
+    "price": 54.78
+  },
+  {
+    "id": 479,
+    "name": "Verity E-Reader",
+    "category": "Electronics",
+    "price": 183.79
+  },
+  {
+    "id": 480,
+    "name": "Sunroom Minimalist Wall Light",
+    "category": "Lighting",
+    "price": 139.8
+  },
+  {
+    "id": 481,
+    "name": "Foundry Floating Wall Shelf",
+    "category": "Furniture",
+    "price": 242.81
+  },
+  {
+    "id": 482,
+    "name": "Commonplace Document Folder",
+    "category": "Stationery",
+    "price": 17.82
+  },
+  {
+    "id": 483,
+    "name": "Onyx Braided USB-C Cable",
+    "category": "Accessories",
+    "price": 59.83
+  },
+  {
+    "id": 484,
+    "name": "Verity Compact Projector",
+    "category": "Electronics",
+    "price": 368.84
+  },
+  {
+    "id": 485,
+    "name": "Aster LED Desk Lamp",
+    "category": "Lighting",
+    "price": 44.85
+  },
+  {
+    "id": 486,
+    "name": "Keystone Ergonomic Task Chair",
+    "category": "Furniture",
+    "price": 427.86
+  },
+  {
+    "id": 487,
+    "name": "Northbound A5 Dotted Notebook",
+    "category": "Stationery",
+    "price": 22.87
+  },
+  {
+    "id": 488,
+    "name": "Kindred USB-C Hub",
+    "category": "Accessories",
+    "price": 64.88
+  },
+  {
+    "id": 489,
+    "name": "Orion 27-inch 4K Monitor",
+    "category": "Electronics",
+    "price": 553.89
+  },
+  {
+    "id": 490,
+    "name": "Aster Arc Floor Lamp",
+    "category": "Lighting",
+    "price": 229.9
+  },
+  {
+    "id": 491,
+    "name": "Keystone Walnut Writing Desk",
+    "category": "Furniture",
+    "price": 612.91
+  },
+  {
+    "id": 492,
+    "name": "Northbound Hardcover Journal",
+    "category": "Stationery",
+    "price": 27.92
+  },
+  {
+    "id": 493,
+    "name": "Kindred Woven Desk Mat",
+    "category": "Accessories",
+    "price": 69.93
+  },
+  {
+    "id": 494,
+    "name": "Orion Wireless Mechanical Keyboard",
+    "category": "Electronics",
+    "price": 738.94
+  },
+  {
+    "id": 495,
+    "name": "Aster Linen Pendant Light",
+    "category": "Lighting",
+    "price": 134.95
+  },
+  {
+    "id": 496,
+    "name": "Keystone Adjustable Standing Desk",
+    "category": "Furniture",
+    "price": 797.96
+  },
+  {
+    "id": 497,
+    "name": "Northbound Gel Pen Set",
+    "category": "Stationery",
+    "price": 32.97
+  },
+  {
+    "id": 498,
+    "name": "Kindred Wireless Charging Pad",
+    "category": "Accessories",
+    "price": 74.98
+  },
+  {
+    "id": 499,
+    "name": "Orion Noise-Cancelling Headphones",
+    "category": "Electronics",
+    "price": 923.99
+  },
+  {
+    "id": 500,
+    "name": "Aster Brass Wall Sconce",
+    "category": "Lighting",
+    "price": 39.0
   }
 ]

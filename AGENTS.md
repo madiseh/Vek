@@ -15,6 +15,12 @@ Before carrying out work covered by a guide below, read and follow that guide. I
 | Creating or editing Git commit messages | [`docs/1.governance/git-commits.md`](docs/1.governance/git-commits.md) |
 | Project boundaries, dependency direction, or solution architecture | [`docs/1.governance/architecture.md`](docs/1.governance/architecture.md) |
 
+## Import Conventions
+
+- Put namespaces shared by Razor components in the nearest `_Imports.razor` file instead of repeating `@using` directives in individual `.razor` files.
+- Put namespaces shared by C# files in the project-level `GlobalUsings.cs` file with `global using` directives instead of repeating file-local `using` directives.
+- When a namespace is needed in both Razor markup and C# files, add it to both central import locations; Razor `@using` directives do not apply to standalone C# files.
+
 ## Code Discovery and Token Use
 
 - Always prefer Codebase Memory MCP graph tools over grep, glob, or file search for code discovery. This reduces unnecessary source reads and token use.

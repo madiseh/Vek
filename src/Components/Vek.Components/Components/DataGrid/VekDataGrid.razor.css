@@ -1,0 +1,104 @@
+.vek-data-grid {
+    color: #20242b;
+    border: 1px solid #d8dde5;
+    border-radius: 0.5rem;
+    background: #fff;
+    overflow: hidden;
+}
+
+.table-scroll-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+thead {
+    background: #f4f6f8;
+}
+
+th,
+td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e8ed;
+    white-space: nowrap;
+}
+
+th {
+    font-weight: 600;
+}
+
+.sort-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0;
+    border: 0;
+    color: inherit;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+}
+
+.sort-button:focus-visible,
+.pager button:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 3px;
+}
+
+.sort-indicator {
+    color: #475569;
+}
+
+tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+tbody tr:hover {
+    background: #f8fafc;
+}
+
+.empty-state {
+    color: #64748b;
+    text-align: center;
+}
+
+.pager {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid #e5e8ed;
+    color: #475569;
+}
+
+.pager button {
+    padding: 0.4rem 0.7rem;
+    border: 1px solid #cbd2dc;
+    border-radius: 0.375rem;
+    color: #20242b;
+    background: #fff;
+    cursor: pointer;
+}
+
+.pager button:disabled {
+    color: #94a3b8;
+    background: #f8fafc;
+    cursor: default;
+}
+
+@media (max-width: 480px) {
+    th,
+    td {
+        padding: 0.65rem 0.75rem;
+    }
+
+    .pager {
+        gap: 0.5rem;
+        padding-inline: 0.75rem;
+    }
+}

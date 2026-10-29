@@ -1,0 +1,65 @@
+@namespace Vek.Components.Components.DataGrid
+@typeparam TItem
+
+@{
+    var sortedItems = GetSortedItems();
+    var totalPages = GetTotalPages(sortedItems.Count);
+    _currentPage = Math.Clamp(_currentPage, 1, totalPages);
+    var pageItems = sortedItems
+        .Skip((_currentPage - 1) * EffectivePageSize)
+        .Take(EffectivePageSize)
+        .ToList();
+}
+
+<CascadingValue Value="this" IsFixed="true">
+    @ChildContent
+</CascadingValue>
+
+<div class="vek-data-grid @Class">
+    <div class="table-scroll-container">
+        <table>
+            <thead>
+                <tr>
+                    @foreach (var column in _columns)
+                    {
+                        <th scope="col" aria-sort="@GetAriaSort(column)">
+                            <button type="button" class="sort-button" @onclick="() => SortBy(column)">
+                                @column.Title
+                                @if (ReferenceEquals(_sortColumn, column))
+                                {
+                                    <span class="sort-indicator" aria-hidden="true">@(_sortAscending ? "↑" : "↓")</span>
+                                }
+                            </button>
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @if (pageItems.Count == 0)
+                {
+                    <tr>
+                        <td class="empty-state" colspan="@Math.Max(_columns.Count, 1)">No items to display.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in pageItems)
+                    {
+                        <tr>
+                            @foreach (var column in _columns)
+                            {
+                                <td>@column.CellTemplate(item)</td>
+                            }
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <nav class="pager" aria-label="Table pagination">
+        <button type="button" @onclick="PreviousPage" disabled="@(_currentPage <= 1)">Previous</button>
+        <span>Page @_currentPage of @totalPages</span>
+        <button type="button" @onclick="NextPage" disabled="@(_currentPage >= totalPages)">Next</button>
+    </nav>
+</div>

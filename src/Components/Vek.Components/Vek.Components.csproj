@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>Vek.Components</PackageId>
     <Version>0.1.0</Version>
     <Authors>AMIN SABAGHI</Authors>
