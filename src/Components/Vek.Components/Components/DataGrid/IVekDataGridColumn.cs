@@ -10,6 +10,8 @@ internal interface IVekDataGridColumn<TItem>
     /// Gets the stable identifier for this column.
     /// </summary>
     string Key { get; }
+    bool Visible { get; set; }
+    Task SetVisibleAsync(bool visible);
 
     /// <summary>
     /// Gets whether this column can be sorted.

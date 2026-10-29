@@ -211,12 +211,12 @@ Task 1 defines these Vek-owned contracts, then later tasks extend them only when
 
 **Interfaces:** Produces hide/show, visibility binding, column options, searchable/reorderable column panel, drag/drop reorder modes, and drop feedback classes.
 
-- [ ] Add tests `ColumnVisibilityCanBeToggled`, `ColumnPanelFiltersColumnsBySearch`, `PanelReorderingUsesInsertPosition`, `HeaderReorderingUsesConfiguredMode`, and `HiddenColumnsAreExcludedFromRendering`.
-- [ ] Run focused column-management tests and confirm failures.
-- [ ] Implement accessible column controls and drag/drop interactions; provide keyboard alternatives for reorder and visibility.
-- [ ] Run focused tests and component suite.
-- [ ] Add the live Column Management page and verify its route.
-- [ ] Commit as `feat: add data grid column management`.
+- [x] Add tests `ColumnVisibilityCanBeToggled`, `ColumnPanelFiltersColumnsBySearch`, `PanelReorderingUsesInsertPosition`, `HeaderReorderingUsesConfiguredMode`, and `HiddenColumnsAreExcludedFromRendering`.
+- [x] Run focused column-management tests and confirm failures.
+- [x] Implement accessible column controls and drag/drop interactions; provide keyboard alternatives for reorder and visibility.
+- [x] Run focused tests and component suite.
+- [x] Add the live Column Management page and verify its route.
+- [x] Commit as `feat: add data grid column management`.
 
 ### Task 13: Column sizing, styling, and responsive layout
 

@@ -1,0 +1,57 @@
+@page "/docs/components/vekdatagrid/column-management"
+@layout DocumentationLayout
+
+<PageTitle>VekDataGrid Column Management | Vek Components</PageTitle>
+
+<div class="docs-page-layout">
+    <article class="docs-article">
+        <h1>VekDataGrid: Column Management</h1>
+        <p class="docs-intro">Let readers choose which columns they need and rearrange their order with pointer or keyboard controls.</p>
+
+        <section id="live-example" class="docs-section-content" aria-labelledby="live-example-heading">
+            <h2 id="live-example-heading">Live example</h2>
+            <p>Open the column panel to search, hide, show, or move columns. Drag the headers to change their order, or use the panel arrows for keyboard-accessible reordering.</p>
+            @if (_products is null)
+            {
+                <p class="docs-loading" role="status">Loading sample products...</p>
+            }
+            else
+            {
+                <div class="docs-example-frame">
+                    <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="5"
+                                 ShowColumnPanel="true" ColumnReorderMode="VekDataGridColumnReorderMode.Both">
+                        <ChildContent>
+                            <PropertyColumn Property="product => product.Name" Title="Name" />
+                            <PropertyColumn Property="product => product.Category" Title="Category" />
+                            <PropertyColumn Property="product => product.Price" Title="Price" Format="C2" @bind-Visible="_showPrice" />
+                        </ChildContent>
+                    </VekDataGrid>
+                </div>
+            }
+        </section>
+
+        <section id="code" class="docs-section-content" aria-labelledby="code-heading">
+            <h2 id="code-heading">Code</h2>
+            <div class="code-sample">
+                <div class="code-tabs" role="group" aria-label="Code sample files">
+                    <button type="button" class="code-tab @(!_showCodeBehind ? "is-active" : null)" data-sample="razor" aria-pressed="@(!_showCodeBehind)" @onclick="ShowRazor">Sample.razor</button>
+                    <button type="button" class="code-tab @(_showCodeBehind ? "is-active" : null)" data-sample="code-behind" aria-pressed="@_showCodeBehind" @onclick="ShowCodeBehind">Sample.razor.cs</button>
+                </div>
+                <pre><code>@SelectedCode</code></pre>
+            </div>
+        </section>
+
+        <section id="column-options" class="docs-section-content" aria-labelledby="column-options-heading">
+            <h2 id="column-options-heading">Visibility and reordering</h2>
+            <p>Set <code>ShowColumnPanel</code> to expose the searchable options panel. A column can bind its <code>Visible</code> state with <code>@@bind-Visible</code>, and <code>ColumnReorderMode</code> selects panel controls, header drag and drop, both, or neither.</p>
+            <p>The panel includes up/down buttons for keyboard reordering. A <code>ColumnReordered</code> callback receives the new key order, while headers and panel rows expose drop feedback classes during dragging.</p>
+        </section>
+    </article>
+
+    <nav class="docs-toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <a href="/docs/components/vekdatagrid/column-management#live-example">Live example</a>
+        <a href="/docs/components/vekdatagrid/column-management#code">Code</a>
+        <a href="/docs/components/vekdatagrid/column-management#column-options">Visibility and reordering</a>
+    </nav>
+</div>

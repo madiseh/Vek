@@ -115,6 +115,19 @@ public enum VekDataGridGroupSortOrder
     Descending
 }
 
+/// <summary>Determines which surfaces can reorder grid columns.</summary>
+public enum VekDataGridColumnReorderMode
+{
+    /// <summary>Column order is fixed.</summary>
+    None,
+    /// <summary>Columns can be reordered in the column options panel.</summary>
+    Panel,
+    /// <summary>Columns can be reordered by dragging table headers.</summary>
+    Header,
+    /// <summary>Columns can be reordered in the panel and by dragging headers.</summary>
+    Both
+}
+
 /// <summary>Chooses the calculation performed for an aggregate definition.</summary>
 public enum VekDataGridAggregateType
 {

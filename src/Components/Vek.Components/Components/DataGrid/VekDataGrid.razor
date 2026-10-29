@@ -17,10 +17,50 @@
 
 <div class="vek-data-grid @Class">
     @{ var pagerContext = CreatePagerContext(totalItemCount, totalPages); }
-    @if (FilterMode == VekDataGridFilterMode.Simple && _columns.Any(column => column.Filterable))
+    @if (ShowColumnPanel)
+    {
+        <div class="column-toolbar">
+            <button type="button" aria-label="Manage columns" aria-expanded="@_columnPanelOpen" @onclick="ToggleColumnPanel">Columns</button>
+        </div>
+        @if (_columnPanelOpen)
+        {
+            <section class="column-panel" aria-label="Column options">
+                <label class="column-search-label">Search columns
+                    <input type="search" aria-label="Search columns" value="@_columnSearch"
+                           @oninput="args => _columnSearch = args.Value?.ToString() ?? string.Empty" />
+                </label>
+                @foreach (var column in SearchableColumns)
+                {
+                    var columnIndex = _columns.IndexOf(column);
+                    <div class="column-option @GetColumnDragClass(column.Key)" draggable="@(CanReorderInPanel ? "true" : "false")"
+                         @ondragstart="() => BeginColumnDrag(column.Key)"
+                         @ondragenter="() => SetColumnDropTarget(column.Key)"
+                         @ondragover:preventDefault="true"
+                         @ondrop="() => DropColumnAsync(column.Key, false)"
+                         @ondragend="EndColumnDrag">
+                        <label>
+                            <input type="checkbox" aria-label="Show @column.Title column" checked="@column.Visible"
+                                   @onchange="args => SetColumnVisibilityAsync(column.Key, args.Value is true)" />
+                            <span class="column-title">@column.Title</span>
+                        </label>
+                        @if (CanReorderInPanel)
+                        {
+                            <span class="column-move-controls" aria-label="Reorder @column.Title column">
+                                <button type="button" aria-label="Move @column.Title column up" disabled="@(columnIndex <= 0)"
+                                        @onclick="() => MoveColumnInPanelAsync(column.Key, -1)">↑</button>
+                                <button type="button" aria-label="Move @column.Title column down" disabled="@(columnIndex >= _columns.Count - 1)"
+                                        @onclick="() => MoveColumnInPanelAsync(column.Key, 1)">↓</button>
+                            </span>
+                        }
+                    </div>
+                }
+            </section>
+        }
+    }
+    @if (FilterMode == VekDataGridFilterMode.Simple && VisibleColumns.Any(column => column.Filterable))
     {
         <div class="filter-panel" aria-label="Filters">
-            @foreach (var column in _columns.Where(column => column.Filterable))
+            @foreach (var column in VisibleColumns.Where(column => column.Filterable))
             {
                 @RenderFilterControl(column)
             }
@@ -31,10 +71,19 @@
         <table>
             <thead>
                 <tr>
-                    @foreach (var column in _columns)
+                    @foreach (var column in VisibleColumns)
                     {
                         var sortPriority = GetSortPriority(column);
-                        <th scope="col" aria-sort="@GetAriaSort(column)">
+                        <th scope="col" data-column-key="@column.Key" draggable="@(CanReorderInHeader ? "true" : "false")"
+                            class="@GetColumnDragClass(column.Key)" aria-sort="@GetAriaSort(column)"
+                            tabindex="@(CanReorderInHeader ? 0 : null)"
+                            aria-description="@(CanReorderInHeader ? "Use the left and right arrow keys to move this column." : null)"
+                            @ondragstart="() => BeginColumnDrag(column.Key)"
+                            @ondragenter="() => SetColumnDropTarget(column.Key)"
+                            @ondragover:preventDefault="true"
+                            @ondrop="() => DropColumnAsync(column.Key, true)"
+                            @onkeydown="args => MoveColumnFromHeaderByKeyAsync(column.Key, args)"
+                            @ondragend="EndColumnDrag">
                             @if (column.IsHierarchyColumn)
                             {
                                 <button type="button" aria-label="Toggle all row details"
@@ -74,7 +123,7 @@
                 @if (FilterMode == VekDataGridFilterMode.ColumnRow)
                 {
                     <tr class="filter-row">
-                        @foreach (var column in _columns)
+                        @foreach (var column in VisibleColumns)
                         {
                             <th scope="col">@if (column.Filterable) { @RenderFilterControl(column) }</th>
                         }
@@ -84,11 +133,11 @@
             <tbody>
                 @if (ServerData is not null && _serverLoading)
                 {
-                    <tr><td class="loading-state" colspan="@Math.Max(_columns.Count, 1)">@(LoadingContent is null ? "Loading items..." : null) @LoadingContent</td></tr>
+                    <tr><td class="loading-state" colspan="@VisibleColumnCount">@(LoadingContent is null ? "Loading items..." : null) @LoadingContent</td></tr>
                 }
                 else if (ServerData is not null && _serverError is not null)
                 {
-                    <tr><td class="error-state" colspan="@Math.Max(_columns.Count, 1)">
+                    <tr><td class="error-state" colspan="@VisibleColumnCount">
                         @if (ErrorContent is null) { @_serverError.Message }
                         else { @ErrorContent(_serverError) }
                     </td></tr>
@@ -102,10 +151,10 @@
                                     SpacerElement="tr" Context="virtualItem" @ref="_virtualizer">
                             <ChildContent Context="virtualItem">@VirtualizedRowTemplate(virtualItem)</ChildContent>
                             <Placeholder Context="placeholder">
-                                <tr style="height: @(VirtualItemSize)px"><td class="loading-state" colspan="@Math.Max(_columns.Count, 1)">Loading rows…</td></tr>
+                                <tr style="height: @(VirtualItemSize)px"><td class="loading-state" colspan="@VisibleColumnCount">Loading rows…</td></tr>
                             </Placeholder>
                             <EmptyContent>
-                                <tr><td class="empty-state" colspan="@Math.Max(_columns.Count, 1)">No items to display.</td></tr>
+                                <tr><td class="empty-state" colspan="@VisibleColumnCount">No items to display.</td></tr>
                             </EmptyContent>
                         </Virtualize>
                     }
@@ -116,10 +165,10 @@
                                     SpacerElement="tr" Context="virtualItem" @ref="_virtualizer">
                             <ChildContent Context="virtualItem">@VirtualizedRowTemplate(virtualItem)</ChildContent>
                             <Placeholder Context="placeholder">
-                                <tr style="height: @(VirtualItemSize)px"><td class="loading-state" colspan="@Math.Max(_columns.Count, 1)">Loading rows…</td></tr>
+                                <tr style="height: @(VirtualItemSize)px"><td class="loading-state" colspan="@VisibleColumnCount">Loading rows…</td></tr>
                             </Placeholder>
                             <EmptyContent>
-                                <tr><td class="empty-state" colspan="@Math.Max(_columns.Count, 1)">No items to display.</td></tr>
+                                <tr><td class="empty-state" colspan="@VisibleColumnCount">No items to display.</td></tr>
                             </EmptyContent>
                         </Virtualize>
                     }
@@ -127,7 +176,7 @@
                 else if (pageItems.Count == 0)
                 {
                     <tr>
-                        <td class="empty-state" colspan="@Math.Max(_columns.Count, 1)">
+                        <td class="empty-state" colspan="@VisibleColumnCount">
                             @if (EmptyContent is null) { @("No items to display.") }
                             else { @EmptyContent }
                         </td>
@@ -150,7 +199,7 @@
                 var footerContext = CreateFooterContext();
                 <tfoot>
                     <tr class="aggregate-footer">
-                        <td colspan="@Math.Max(_columns.Count, 1)">
+                        <td colspan="@VisibleColumnCount">
                             @if (FooterTemplate is not null)
                             {
                                 @FooterTemplate(footerContext)

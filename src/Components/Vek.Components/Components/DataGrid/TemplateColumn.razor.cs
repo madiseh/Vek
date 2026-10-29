@@ -15,6 +15,14 @@ public partial class TemplateColumn<TItem>
     [Parameter]
     public string? Key { get; set; }
 
+    /// <summary>Gets or sets whether this column is included in the rendered table.</summary>
+    [Parameter]
+    public bool Visible { get; set; } = true;
+
+    /// <summary>Gets or sets the callback invoked when this column's visibility changes.</summary>
+    [Parameter]
+    public EventCallback<bool> VisibleChanged { get; set; }
+
     /// <summary>
     /// Gets or sets the column heading.
     /// </summary>
@@ -65,6 +73,14 @@ public partial class TemplateColumn<TItem>
     }
 
     string IVekDataGridColumn<TItem>.Key => Key ?? Title;
+
+    bool IVekDataGridColumn<TItem>.Visible { get => Visible; set => Visible = value; }
+
+    async Task IVekDataGridColumn<TItem>.SetVisibleAsync(bool visible)
+    {
+        Visible = visible;
+        await VisibleChanged.InvokeAsync(visible);
+    }
 
     bool IVekDataGridColumn<TItem>.Sortable => Sortable;
     bool IVekDataGridColumn<TItem>.Filterable => false;

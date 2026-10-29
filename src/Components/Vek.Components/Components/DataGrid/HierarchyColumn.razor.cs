@@ -13,6 +13,14 @@ public partial class HierarchyColumn<TItem> : IDisposable, IVekDataGridColumn<TI
 
     private VekDataGrid<TItem>? _registeredGrid;
 
+    /// <summary>Gets or sets whether this column is included in the rendered table.</summary>
+    [Parameter]
+    public bool Visible { get; set; } = true;
+
+    /// <summary>Gets or sets the callback invoked when this column's visibility changes.</summary>
+    [Parameter]
+    public EventCallback<bool> VisibleChanged { get; set; }
+
     /// <summary>Registers the hierarchy column with its parent grid.</summary>
     protected override void OnParametersSet()
     {
@@ -24,6 +32,12 @@ public partial class HierarchyColumn<TItem> : IDisposable, IVekDataGridColumn<TI
     }
 
     string IVekDataGridColumn<TItem>.Key => "__hierarchy";
+    bool IVekDataGridColumn<TItem>.Visible { get => Visible; set => Visible = value; }
+    async Task IVekDataGridColumn<TItem>.SetVisibleAsync(bool visible)
+    {
+        Visible = visible;
+        await VisibleChanged.InvokeAsync(visible);
+    }
     bool IVekDataGridColumn<TItem>.Sortable => false;
     bool IVekDataGridColumn<TItem>.Filterable => false;
     Func<TItem, object?>? IVekDataGridColumn<TItem>.FilterBy => null;

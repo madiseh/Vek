@@ -31,6 +31,10 @@ public partial class VekDataGrid<TItem>
     private bool _serverInitialized;
     private IReadOnlyList<TItem> _virtualServerItems = Array.Empty<TItem>();
     private Virtualize<TItem>? _virtualizer;
+    private bool _columnPanelOpen;
+    private string _columnSearch = string.Empty;
+    private string? _draggedColumnKey;
+    private string? _dropTargetColumnKey;
 
     private sealed record ActiveSort(IVekDataGridColumn<TItem> Column, VekSortDirection Direction);
     private sealed record GroupNode(
@@ -71,6 +75,18 @@ public partial class VekDataGrid<TItem>
     [Parameter]
     public RenderFragment? EmptyContent { get; set; }
 
+    /// <summary>Gets or sets whether the grid displays a column options panel.</summary>
+    [Parameter]
+    public bool ShowColumnPanel { get; set; }
+
+    /// <summary>Gets or sets the surfaces that can reorder columns.</summary>
+    [Parameter]
+    public VekDataGridColumnReorderMode ColumnReorderMode { get; set; }
+
+    /// <summary>Gets or sets a callback invoked after the column order changes.</summary>
+    [Parameter]
+    public EventCallback<IReadOnlyList<string>> ColumnReordered { get; set; }
+
     /// <summary>Gets or sets whether rows are rendered through the framework virtualizer.</summary>
     [Parameter]
     public bool VirtualizeRows { get; set; }
@@ -96,6 +112,89 @@ public partial class VekDataGrid<TItem>
 
     /// <summary>Gets the total number of matching items before paging.</summary>
     public int TotalItems => ServerData is null ? GetSortedItems().Count : _serverTotalItems;
+
+    private IReadOnlyList<IVekDataGridColumn<TItem>> VisibleColumns => _columns.Where(column => column.Visible).ToArray();
+    private IEnumerable<IVekDataGridColumn<TItem>> SearchableColumns => string.IsNullOrWhiteSpace(_columnSearch)
+        ? _columns
+        : _columns.Where(column => column.Title.Contains(_columnSearch.Trim(), StringComparison.OrdinalIgnoreCase));
+    private int VisibleColumnCount => Math.Max(VisibleColumns.Count, 1);
+    private bool CanReorderInPanel => ColumnReorderMode is VekDataGridColumnReorderMode.Panel or VekDataGridColumnReorderMode.Both;
+    private bool CanReorderInHeader => ColumnReorderMode is VekDataGridColumnReorderMode.Header or VekDataGridColumnReorderMode.Both;
+
+    /// <summary>Changes a column's visibility by its stable key.</summary>
+    public async Task SetColumnVisibilityAsync(string columnKey, bool visible)
+    {
+        var column = _columns.FirstOrDefault(candidate => candidate.Key == columnKey)
+            ?? throw new ArgumentException($"No column with key '{columnKey}' is registered.", nameof(columnKey));
+        if (column.Visible == visible) return;
+        await column.SetVisibleAsync(visible);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>Moves a column to a zero-based insert position in the current column list.</summary>
+    public async Task ReorderColumnAsync(string columnKey, int insertIndex)
+    {
+        var currentIndex = _columns.FindIndex(column => column.Key == columnKey);
+        if (currentIndex < 0) throw new ArgumentException($"No column with key '{columnKey}' is registered.", nameof(columnKey));
+        var column = _columns[currentIndex];
+        _columns.RemoveAt(currentIndex);
+        var targetIndex = Math.Clamp(insertIndex, 0, _columns.Count);
+        if (targetIndex == currentIndex)
+        {
+            _columns.Insert(currentIndex, column);
+            return;
+        }
+
+        _columns.Insert(targetIndex, column);
+        await ColumnReordered.InvokeAsync(_columns.Select(candidate => candidate.Key).ToArray());
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void ToggleColumnPanel() => _columnPanelOpen = !_columnPanelOpen;
+
+    private Task MoveColumnInPanelAsync(string key, int offset)
+    {
+        if (!CanReorderInPanel) return Task.CompletedTask;
+        var index = _columns.FindIndex(column => column.Key == key);
+        return ReorderColumnAsync(key, index + offset);
+    }
+
+    private Task MoveColumnFromHeaderByKeyAsync(string key, KeyboardEventArgs args)
+    {
+        if (!CanReorderInHeader || args.Key is not "ArrowLeft" and not "ArrowRight") return Task.CompletedTask;
+        var index = _columns.FindIndex(column => column.Key == key);
+        return ReorderColumnAsync(key, index + (args.Key == "ArrowLeft" ? -1 : 1));
+    }
+
+    private void BeginColumnDrag(string key)
+    {
+        _draggedColumnKey = key;
+        _dropTargetColumnKey = null;
+    }
+
+    private void SetColumnDropTarget(string key) => _dropTargetColumnKey = key;
+
+    private async Task DropColumnAsync(string targetKey, bool fromHeader)
+    {
+        if ((fromHeader && !CanReorderInHeader) || (!fromHeader && !CanReorderInPanel)) return;
+        var sourceIndex = _columns.FindIndex(column => column.Key == _draggedColumnKey);
+        var targetIndex = _columns.FindIndex(column => column.Key == targetKey);
+        if (sourceIndex >= 0 && targetIndex >= 0 && sourceIndex != targetIndex)
+        {
+            if (sourceIndex > targetIndex) targetIndex++;
+            await ReorderColumnAsync(_draggedColumnKey!, targetIndex);
+        }
+        EndColumnDrag();
+    }
+
+    private void EndColumnDrag()
+    {
+        _draggedColumnKey = null;
+        _dropTargetColumnKey = null;
+    }
+
+    private string GetColumnDragClass(string key)
+        => $"{(_draggedColumnKey == key ? "is-dragging" : string.Empty)} {(_dropTargetColumnKey == key ? "is-drop-target" : string.Empty)}".Trim();
 
     /// <summary>Reloads the current page from the configured server source.</summary>
     public Task RefreshServerDataAsync() => ServerData is null
@@ -409,7 +508,7 @@ public partial class VekDataGrid<TItem>
 
     /// <summary>Gets whether the row has any editable columns.</summary>
     public bool CanEditRow => EditMode != VekDataGridEditMode.None
-        && _columns.Any(column => column.Editable && column.EditTemplate is not null);
+        && VisibleColumns.Any(column => column.Editable && column.EditTemplate is not null);
 
     /// <summary>Gets whether the requested item and column are being edited.</summary>
     private bool IsEditing(TItem item, IVekDataGridColumn<TItem> column) => _isEditing
@@ -484,8 +583,8 @@ public partial class VekDataGrid<TItem>
         _isEditing = false;
     }
 
-    internal string GetRowLabel(TItem item) => _columns.FirstOrDefault(column => column.Editable)?.GetRowLabel(item)
-        ?? _columns.FirstOrDefault(column => !column.IsHierarchyColumn && !column.IsSelectionColumn)?.GetRowLabel(item)
+    internal string GetRowLabel(TItem item) => VisibleColumns.FirstOrDefault(column => column.Editable)?.GetRowLabel(item)
+        ?? VisibleColumns.FirstOrDefault(column => !column.IsHierarchyColumn && !column.IsSelectionColumn)?.GetRowLabel(item)
         ?? Convert.ToString(item, CultureInfo.CurrentCulture)
         ?? "row";
 
@@ -541,13 +640,13 @@ public partial class VekDataGrid<TItem>
 
     private RenderFragment RenderRowDetails(TItem item) => builder =>
     {
-        var detailTemplate = _columns.FirstOrDefault(column => column.IsHierarchyColumn)?.DetailTemplate;
+        var detailTemplate = VisibleColumns.FirstOrDefault(column => column.IsHierarchyColumn)?.DetailTemplate;
         if (detailTemplate is null || !IsRowExpanded(item)) return;
         builder.OpenElement(0, "tr");
         builder.AddAttribute(1, "class", "detail-row");
         builder.AddAttribute(2, "data-for-row", GetRowLabel(item));
         builder.OpenElement(3, "td");
-        builder.AddAttribute(4, "colspan", Math.Max(_columns.Count, 1));
+        builder.AddAttribute(4, "colspan", VisibleColumnCount);
         builder.AddContent(5, detailTemplate(CreateRowDetailContext(item)));
         builder.CloseElement();
         builder.CloseElement();
@@ -591,7 +690,7 @@ public partial class VekDataGrid<TItem>
 
     private RenderFragment<TItem> VirtualizedRowTemplate => item => builder =>
     {
-        if (VirtualizeRows && _columns.Any(column => column.IsHierarchyColumn))
+        if (VirtualizeRows && VisibleColumns.Any(column => column.IsHierarchyColumn))
             throw new InvalidOperationException("Virtualization cannot be combined with hierarchical row details because expanded rows have variable heights.");
 
         var sequence = 0;
@@ -602,7 +701,7 @@ public partial class VekDataGrid<TItem>
         builder.AddAttribute(sequence++, "aria-selected", selected);
         builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => SelectRowAsync(item)));
 
-        foreach (var column in _columns)
+        foreach (var column in VisibleColumns)
         {
             builder.OpenElement(sequence++, "td");
             if (IsEditing(item, column) && column.EditTemplate is not null)
@@ -629,7 +728,7 @@ public partial class VekDataGrid<TItem>
                 }
 
                 if ((EditMode is VekDataGridEditMode.Row or VekDataGridEditMode.Form)
-                    && CanEditRow && ReferenceEquals(column, _columns.FirstOrDefault()))
+                    && CanEditRow && ReferenceEquals(column, VisibleColumns.FirstOrDefault()))
                 {
                     builder.OpenElement(sequence++, "button");
                     builder.AddAttribute(sequence++, "type", "button");
@@ -780,7 +879,7 @@ public partial class VekDataGrid<TItem>
             builder.AddAttribute(sequence++, "data-group-level", group.Level);
             builder.AddAttribute(sequence++, "data-group-column", group.Column.Key);
             builder.OpenElement(sequence++, "td");
-            builder.AddAttribute(sequence++, "colspan", Math.Max(_columns.Count, 1));
+            builder.AddAttribute(sequence++, "colspan", VisibleColumnCount);
             builder.OpenElement(sequence++, "button");
             builder.AddAttribute(sequence++, "type", "button");
             builder.AddAttribute(sequence++, "aria-expanded", context.Expanded ? "true" : "false");
@@ -816,7 +915,7 @@ public partial class VekDataGrid<TItem>
             builder.AddAttribute(sequence++, "class", IsItemSelected(item) ? "is-selected" : null);
             builder.AddAttribute(sequence++, "aria-selected", IsItemSelected(item));
             builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => SelectRowAsync(item)));
-            foreach (var column in _columns)
+            foreach (var column in VisibleColumns)
             {
                 builder.OpenElement(sequence++, "td");
                 var editContext = GetEditContext(item, column);
@@ -841,7 +940,7 @@ public partial class VekDataGrid<TItem>
                         builder.CloseElement();
                     }
                     if ((EditMode is VekDataGridEditMode.Row or VekDataGridEditMode.Form)
-                        && CanEditRow && ReferenceEquals(column, _columns.FirstOrDefault()))
+                        && CanEditRow && ReferenceEquals(column, VisibleColumns.FirstOrDefault()))
                     {
                         builder.OpenElement(sequence++, "button");
                         builder.AddAttribute(sequence++, "type", "button");
@@ -882,7 +981,7 @@ public partial class VekDataGrid<TItem>
                 throw new InvalidOperationException("Virtualization requires a positive item size and max count, and a non-negative overscan count.");
             if (GroupBy.Count > 0)
                 throw new InvalidOperationException("Virtualization cannot be combined with grouping because group rows do not have a fixed height.");
-            if (_columns.Any(column => column.IsHierarchyColumn))
+            if (VisibleColumns.Any(column => column.IsHierarchyColumn))
                 throw new InvalidOperationException("Virtualization cannot be combined with hierarchical row details because expanded rows have variable heights.");
             if (ServerData is not null)
                 throw new InvalidOperationException("Virtualization cannot be combined with paged ServerData. Use ServerVirtualData instead.");

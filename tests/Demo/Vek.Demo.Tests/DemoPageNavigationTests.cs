@@ -308,6 +308,24 @@ public sealed class DemoPageNavigationTests : BunitContext
     }
 
     /// <summary>
+    /// Verifies the column management guide demonstrates visibility, search, and reorder configuration.
+    /// </summary>
+    [Fact]
+    public void DataGridColumnManagementRouteShowsColumnOptionsAndExample()
+    {
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo("/docs/components/vekdatagrid/column-management");
+
+        var cut = Render<Routes>();
+
+        Assert.Equal("VekDataGrid: Column Management", cut.Find("main h1").TextContent.Trim());
+        Assert.Contains("Manage columns", cut.Markup);
+        Assert.Contains("ShowColumnPanel=\"true\"", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("VekDataGridColumnReorderMode.Both", cut.Find(".code-sample pre code").TextContent);
+        Assert.Equal("/docs/components/vekdatagrid/column-management", cut.Find(".docs-sidebar a.active").GetAttribute("href"));
+    }
+
+    /// <summary>
     /// Verifies that the code sample switches from Razor markup to its C# code-behind.
     /// </summary>
     [Fact]
