@@ -1,0 +1,51 @@
+name: Publish NuGet package
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Install .NET 10 SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Validate version tag
+        shell: pwsh
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          if ($tag -notmatch '^v\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$') {
+            throw "Tag '$tag' must be a version such as v1.2.3 or v1.2.3-preview.1."
+          }
+          "PACKAGE_VERSION=$($tag.Substring(1))" >> $env:GITHUB_ENV
+
+      - name: Restore
+        run: dotnet restore Vek.slnx
+
+      - name: Build
+        run: dotnet build Vek.slnx --configuration Release --no-restore
+
+      - name: Pack Vek.Components
+        run: dotnet pack src/Components/Vek.Components/Vek.Components.csproj --configuration Release --no-build --no-restore -p:PackageVersion=$env:PACKAGE_VERSION
+
+      - name: Push package to NuGet
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          $packagePath = Join-Path $env:GITHUB_WORKSPACE "VekNugetPackage\Vek.Components.$env:PACKAGE_VERSION.nupkg"
+          if (-not (Test-Path -LiteralPath $packagePath)) {
+            throw "Expected package was not found at '$packagePath'."
+          }
+          dotnet nuget push $packagePath --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate

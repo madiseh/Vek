@@ -1,0 +1,18 @@
+# .NET build output
+**/bin/
+**/obj/
+**/TestResults/
+*.nupkg
+*.snupkg
+VekNugetPackage/
+artifacts/
+
+# Visual Studio and user-specific files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local workbench data
+.superpowers/

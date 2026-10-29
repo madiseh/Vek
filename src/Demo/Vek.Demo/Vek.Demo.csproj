@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../Components/Vek.Components/Vek.Components.csproj" />
+    <ProjectReference Include="../../Ports/Vek.Demo.Abstractions/Vek.Demo.Abstractions.csproj" />
+    <ProjectReference Include="../../Adapters/Vek.SimulatedData/Vek.SimulatedData.csproj" />
+  </ItemGroup>
+</Project>

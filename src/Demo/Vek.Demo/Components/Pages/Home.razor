@@ -1,0 +1,51 @@
+@page "/"
+@inject IDemoProductProvider ProductProvider
+
+<PageTitle>Vek Components Demo</PageTitle>
+
+<h1>Vek Components Demo</h1>
+
+<p>This app is the showcase host for reusable Blazor components in <code>Vek.Components</code>.</p>
+
+<h2>Simulated sample data</h2>
+<p>The sample products are loaded through the demo data port from the JSON adapter.</p>
+
+@if (_products is null)
+{
+    <p>Loading sample products…</p>
+}
+else if (_products.Count == 0)
+{
+    <p>No sample products were found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Category</th>
+                <th scope="col">Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in _products)
+            {
+                <tr>
+                    <td>@product.Name</td>
+                    <td>@product.Category</td>
+                    <td>@product.Price.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IReadOnlyList<DemoProduct>? _products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _products = await ProductProvider.GetProductsAsync();
+    }
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "Desk Lamp",
+    "category": "Lighting",
+    "price": 39.95
+  },
+  {
+    "id": 2,
+    "name": "Task Chair",
+    "category": "Furniture",
+    "price": 189.00
+  },
+  {
+    "id": 3,
+    "name": "Notebook Set",
+    "category": "Stationery",
+    "price": 12.50
+  },
+  {
+    "id": 4,
+    "name": "Monitor Stand",
+    "category": "Accessories",
+    "price": 54.00
+  }
+]
