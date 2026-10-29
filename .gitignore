@@ -1,6 +1,7 @@
 # .NET build output
 **/bin/
 **/obj/
+**/node_modules/
 **/TestResults/
 *.nupkg
 *.snupkg

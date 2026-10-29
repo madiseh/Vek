@@ -15,6 +15,15 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" />
   </ItemGroup>
 
+  <Target Name="BuildTailwindCss" BeforeTargets="PrepareForBuild" Condition="Exists('$(MSBuildProjectDirectory)/node_modules/@tailwindcss/cli')" Inputs="Styles/tailwind.css;Components/**/*.razor" Outputs="wwwroot/vek-components.css">
+    <Exec Command="npm run build:css" WorkingDirectory="$(MSBuildProjectDirectory)" />
+  </Target>
+
+  <ItemGroup>
+    <Content Update="package.json;package-lock.json" Pack="false" />
+    <None Update="package.json;package-lock.json" Pack="false" />
+  </ItemGroup>
+
   <ItemGroup>
     <None Include="../../../README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
