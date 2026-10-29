@@ -242,7 +242,7 @@ public partial class PropertyColumn<TItem, TValue>
         object? content = value;
         if (Format is not null && value is IFormattable formattable)
         {
-            content = formattable.ToString(Format, CultureInfo.CurrentCulture);
+            content = formattable.ToString(Format, Grid?.Culture ?? CultureInfo.CurrentCulture);
         }
 
         builder.AddContent(0, content);

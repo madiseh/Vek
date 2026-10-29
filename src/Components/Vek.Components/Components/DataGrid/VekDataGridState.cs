@@ -296,13 +296,22 @@ public sealed class VekDataGridEditContext<TItem>
     private readonly Func<Task<bool>> _commit;
     private readonly Func<Task> _cancel;
 
-    internal VekDataGridEditContext(TItem item, EditContext editContext, Action<TItem> updateItem, Func<Task<bool>> commit, Func<Task> cancel)
-        => (Item, EditContext, _updateItem, _commit, _cancel) = (item, editContext, updateItem, commit, cancel);
+    internal VekDataGridEditContext(
+        TItem item,
+        EditContext editContext,
+        Action<TItem> updateItem,
+        Func<Task<bool>> commit,
+        Func<Task> cancel,
+        CultureInfo culture)
+        => (Item, EditContext, _updateItem, _commit, _cancel, Culture) =
+            (item, editContext, updateItem, commit, cancel, culture);
 
     /// <summary>Gets the current editable draft item.</summary>
     public TItem Item { get; }
     /// <summary>Gets the validation context associated with the draft.</summary>
     public EditContext EditContext { get; }
+    /// <summary>Gets the culture configured for the grid that owns this edit session.</summary>
+    public CultureInfo Culture { get; }
     /// <summary>Replaces the current draft item.</summary>
     public void UpdateItem(TItem item) => _updateItem(item);
     /// <summary>Validates and attempts to commit the draft.</summary>

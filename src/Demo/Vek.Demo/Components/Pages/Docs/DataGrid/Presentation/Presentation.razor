@@ -1,0 +1,81 @@
+@page "/docs/components/vekdatagrid/presentation"
+@layout DocumentationLayout
+
+<PageTitle>VekDataGrid Presentation | Vek Components</PageTitle>
+
+<div class="docs-page-layout">
+    <article class="docs-article">
+        <h1>VekDataGrid: Presentation</h1>
+        <p class="docs-intro">Shape the grid around your product language with templates, culture-aware values, and accessible table semantics.</p>
+
+        <section id="live-example" class="docs-section-content" aria-labelledby="live-example-heading">
+            <h2 id="live-example-heading">Live example</h2>
+            <p>The toolbar and extra heading row are supplied by the page. Use the Edit action on a price cell to see the grid culture in its edit context.</p>
+            @if (_products is null)
+            {
+                <p class="docs-loading" role="status">Loading sample products...</p>
+            }
+            else
+            {
+                <div class="docs-example-frame">
+                    <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="5"
+                                 Culture="_culture" EditMode="VekDataGridEditMode.Cell"
+                                 AriaLabel="Product inventory" data-testid="presentation-grid">
+                        <ToolbarTemplate>
+                            <span class="presentation-toolbar-label">Product inventory</span>
+                            <span>@_products.Count products</span>
+                        </ToolbarTemplate>
+                        <HeaderTemplate>
+                            <tr class="presentation-header-row">
+                                <th colspan="3">DEMO INVENTORY · VALUES FORMATTED IN @_culture.Name</th>
+                            </tr>
+                        </HeaderTemplate>
+                        <ChildContent>
+                            <PropertyColumn Property="product => product.Name" Title="Name" Key="Name">
+                                <CellTemplate Context="product"><strong>@product.Name</strong></CellTemplate>
+                            </PropertyColumn>
+                            <PropertyColumn Property="product => product.Category" Title="Category" Key="Category" />
+                            <PropertyColumn Property="product => product.Price" Title="Price" Key="Price"
+                                            Format="C2" Editable="true">
+                                <EditTemplate Context="edit">
+                                    <output aria-label="Edit culture">@edit.Item.Price.ToString("C2", edit.Culture)</output>
+                                </EditTemplate>
+                            </PropertyColumn>
+                        </ChildContent>
+                    </VekDataGrid>
+                </div>
+            }
+        </section>
+
+        <section id="code" class="docs-section-content" aria-labelledby="code-heading">
+            <h2 id="code-heading">Code</h2>
+            <div class="code-sample">
+                <div class="code-tabs" role="group" aria-label="Code sample files">
+                    <button type="button" class="code-tab @(!_showCodeBehind ? "is-active" : null)" data-sample="razor" aria-pressed="@(!_showCodeBehind)" @onclick="ShowRazor">Sample.razor</button>
+                    <button type="button" class="code-tab @(_showCodeBehind ? "is-active" : null)" data-sample="code-behind" aria-pressed="@_showCodeBehind" @onclick="ShowCodeBehind">Sample.razor.cs</button>
+                </div>
+                <pre><code>@SelectedCode</code></pre>
+            </div>
+        </section>
+
+        <section id="templates" class="docs-section-content" aria-labelledby="templates-heading">
+            <h2 id="templates-heading">Templates</h2>
+            <p>Use <code>ToolbarTemplate</code> for content above the table and <code>HeaderTemplate</code> for extra semantic rows in the table heading. Column cells, row content, group headings, and footer content can also use templates.</p>
+            <p>For a <code>RowTemplate</code>, render valid table cells for each item. It replaces the grid's default cell rendering for those rows while preserving the row's selection, click, and style behavior.</p>
+        </section>
+
+        <section id="culture-accessibility" class="docs-section-content" aria-labelledby="culture-accessibility-heading">
+            <h2 id="culture-accessibility-heading">Culture and accessibility</h2>
+            <p>Set <code>Culture</code> to control numeric and aggregate formatting. Edit templates receive that value through <code>VekDataGridEditContext.Culture</code>.</p>
+            <p>Set <code>AriaLabel</code> to name the table for assistive technology. Unmatched attributes such as <code>data-testid</code> are applied directly to the native table. Built-in actions use labeled native controls that remain in the keyboard tab order.</p>
+        </section>
+    </article>
+
+    <nav class="docs-toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <a href="/docs/components/vekdatagrid/presentation#live-example">Live example</a>
+        <a href="/docs/components/vekdatagrid/presentation#code">Code</a>
+        <a href="/docs/components/vekdatagrid/presentation#templates">Templates</a>
+        <a href="/docs/components/vekdatagrid/presentation#culture-accessibility">Culture and accessibility</a>
+    </nav>
+</div>

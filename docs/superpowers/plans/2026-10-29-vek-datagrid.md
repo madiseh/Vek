@@ -229,7 +229,7 @@ Task 1 defines these Vek-owned contracts, then later tasks extend them only when
 - [x] Implement sizing/resize/layout behavior with visible keyboard focus and pointer/touch affordances; preserve sensible horizontal overflow for genuinely wide data.
 - [x] Run focused tests and component suite.
 - [x] Add the live Column Layout page and verify navigation.
-- [ ] Commit as `feat: add data grid column layout controls`.
+- [x] Commit as `feat: add data grid column layout controls`.
 
 ### Task 14: Templates, presentation, culture, and accessibility
 
@@ -237,12 +237,12 @@ Task 1 defines these Vek-owned contracts, then later tasks extend them only when
 
 **Interfaces:** Produces toolbar/header/cell/footer/row/group templates, custom no-record/loading content, culture-aware formats, table attributes, accessible names, labels, and keyboard-operable controls.
 
-- [ ] Add tests `ToolbarAndHeaderTemplatesRender`, `LoadingAndEmptyTemplatesRenderForTheirStates`, `CultureFormatsValuesAndEditors`, `TableHasAccessibleNameAndSortState`, and `AllGridActionsAreKeyboardReachable`.
-- [ ] Run focused presentation tests and confirm failures.
-- [ ] Implement templating and accessible semantics. Keep labels, focus, and state feedback visible and preserve clear overflow behavior on narrow widths.
-- [ ] Run focused tests and component suite.
-- [ ] Add the live Presentation page and verify route/navigation.
-- [ ] Commit as `feat: add data grid presentation and accessibility`.
+- [x] Add tests `ToolbarAndHeaderTemplatesRender`, `LoadingAndEmptyTemplatesRenderForTheirStates`, `CultureFormatsValuesAndEditors`, `TableHasAccessibleNameAndSortState`, and `AllGridActionsAreKeyboardReachable`.
+- [x] Run focused presentation tests and confirm failures.
+- [x] Implement templating and accessible semantics. Keep labels, focus, and state feedback visible and preserve clear overflow behavior on narrow widths.
+- [x] Run focused tests and component suite.
+- [x] Add the live Presentation page and verify route/navigation.
+- [x] Commit as `feat: add data grid presentation and accessibility`.
 
 ### Task 15: Context actions and collection observability
 

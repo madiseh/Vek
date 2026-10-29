@@ -343,6 +343,30 @@ public sealed class DemoPageNavigationTests : BunitContext
     }
 
     /// <summary>
+    /// Verifies the presentation guide demonstrates templates, culture, and accessible table attributes.
+    /// </summary>
+    [Fact]
+    public void DataGridPresentationRouteShowsTemplatesAndAccessibilityOptions()
+    {
+        Services.AddSingleton<IDemoProductProvider>(new TestProductProvider(
+        [
+            new DemoProduct(1, "Desk Lamp", "Lighting", 49.99m),
+            new DemoProduct(2, "Task Chair", "Furniture", 199.00m)
+        ]));
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo("/docs/components/vekdatagrid/presentation");
+
+        var cut = Render<Routes>();
+
+        Assert.Equal("VekDataGrid: Presentation", cut.Find("main h1").TextContent.Trim());
+        Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
+        var sample = cut.Find(".code-sample pre code").TextContent;
+        Assert.Contains("ToolbarTemplate", sample);
+        Assert.Contains("AriaLabel", sample);
+        Assert.Equal("/docs/components/vekdatagrid/presentation", cut.Find(".docs-sidebar a.active").GetAttribute("href"));
+    }
+
+    /// <summary>
     /// Verifies that the code sample switches from Razor markup to its C# code-behind.
     /// </summary>
     [Fact]

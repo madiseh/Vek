@@ -77,6 +77,30 @@ public partial class VekDataGrid<TItem>
     [Parameter]
     public RenderFragment? EmptyContent { get; set; }
 
+    /// <summary>Gets or sets custom actions displayed above the table.</summary>
+    [Parameter]
+    public RenderFragment? ToolbarTemplate { get; set; }
+
+    /// <summary>Gets or sets additional rows or content rendered inside the table header.</summary>
+    [Parameter]
+    public RenderFragment? HeaderTemplate { get; set; }
+
+    /// <summary>Gets or sets custom cell content for each row. The template must render valid table cells.</summary>
+    [Parameter]
+    public RenderFragment<TItem>? RowTemplate { get; set; }
+
+    /// <summary>Gets or sets the culture used to format values, aggregates, and edit contexts.</summary>
+    [Parameter]
+    public CultureInfo? Culture { get; set; }
+
+    /// <summary>Gets or sets the accessible name announced for the table.</summary>
+    [Parameter]
+    public string? AriaLabel { get; set; } = "Data grid";
+
+    /// <summary>Gets or sets additional attributes applied to the table element.</summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
     /// <summary>Gets or sets whether the grid displays a column options panel.</summary>
     [Parameter]
     public bool ShowColumnPanel { get; set; }
@@ -691,7 +715,8 @@ public partial class VekDataGrid<TItem>
         _isEditing = true;
         _editContext = new EditContext(_editingDraft!);
         _activeEditContext = new VekDataGridEditContext<TItem>(
-            _editingDraft!, _editContext, UpdateEditDraft, CommitActiveEditAsync, CancelActiveEditAsync);
+            _editingDraft!, _editContext, UpdateEditDraft, CommitActiveEditAsync, CancelActiveEditAsync,
+            Culture ?? CultureInfo.CurrentCulture);
         await EditStarted.InvokeAsync(_editingOriginal);
         await InvokeAsync(StateHasChanged);
     }
@@ -703,7 +728,8 @@ public partial class VekDataGrid<TItem>
         _editingDraft = item;
         _editContext = new EditContext(item!);
         _activeEditContext = new VekDataGridEditContext<TItem>(
-            item, _editContext, UpdateEditDraft, CommitActiveEditAsync, CancelActiveEditAsync);
+            item, _editContext, UpdateEditDraft, CommitActiveEditAsync, CancelActiveEditAsync,
+            Culture ?? CultureInfo.CurrentCulture);
         _ = InvokeAsync(StateHasChanged);
     }
 
@@ -745,7 +771,7 @@ public partial class VekDataGrid<TItem>
 
     internal string GetRowLabel(TItem item) => VisibleColumns.FirstOrDefault(column => column.Editable)?.GetRowLabel(item)
         ?? VisibleColumns.FirstOrDefault(column => !column.IsHierarchyColumn && !column.IsSelectionColumn)?.GetRowLabel(item)
-        ?? Convert.ToString(item, CultureInfo.CurrentCulture)
+        ?? Convert.ToString(item, Culture ?? CultureInfo.CurrentCulture)
         ?? "row";
 
     internal bool IsRowExpanded(TItem item) => _expandedRows.Any(expanded => DetailsComparer.Equals(expanded, item));
@@ -863,48 +889,55 @@ public partial class VekDataGrid<TItem>
         builder.AddAttribute(sequence++, "aria-selected", IsItemSelected(item));
         builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => SelectRowAsync(item)));
 
-        foreach (var column in VisibleColumns)
+        if (RowTemplate is not null)
         {
-            builder.OpenElement(sequence++, "td");
-            builder.AddAttribute(sequence++, "class", CellClass?.Invoke(item, column.Key, rowIndex));
-            builder.AddAttribute(sequence++, "style", GetCellStyle(item, column, rowIndex));
-            if (IsEditing(item, column) && column.EditTemplate is not null)
+            builder.AddContent(sequence++, RowTemplate(item));
+        }
+        else
+        {
+            foreach (var column in VisibleColumns)
             {
-                builder.OpenComponent<CascadingValue<EditContext>>(sequence++);
-                builder.AddAttribute(sequence++, nameof(CascadingValue<EditContext>.Value), _editContext);
-                builder.AddAttribute(sequence++, nameof(CascadingValue<EditContext>.ChildContent),
-                    column.EditTemplate(GetEditContext(item, column)!));
-                builder.CloseComponent();
-            }
-            else
-            {
-                builder.AddContent(sequence++, column.CellTemplate(item));
-                if (EditMode == VekDataGridEditMode.Cell && column.Editable && column.EditTemplate is not null)
+                builder.OpenElement(sequence++, "td");
+                builder.AddAttribute(sequence++, "class", CellClass?.Invoke(item, column.Key, rowIndex));
+                builder.AddAttribute(sequence++, "style", GetCellStyle(item, column, rowIndex));
+                if (IsEditing(item, column) && column.EditTemplate is not null)
                 {
-                    builder.OpenElement(sequence++, "button");
-                    builder.AddAttribute(sequence++, "type", "button");
-                    builder.AddAttribute(sequence++, "class", "edit-cell-button");
-                    builder.AddAttribute(sequence++, "aria-label", $"Edit {column.Title}");
-                    builder.AddEventStopPropagationAttribute(sequence++, "onclick", true);
-                    builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => StartEditAsync(item, column)));
-                    builder.AddContent(sequence++, "Edit");
-                    builder.CloseElement();
+                    builder.OpenComponent<CascadingValue<EditContext>>(sequence++);
+                    builder.AddAttribute(sequence++, nameof(CascadingValue<EditContext>.Value), _editContext);
+                    builder.AddAttribute(sequence++, nameof(CascadingValue<EditContext>.ChildContent),
+                        column.EditTemplate(GetEditContext(item, column)!));
+                    builder.CloseComponent();
                 }
+                else
+                {
+                    builder.AddContent(sequence++, column.CellTemplate(item));
+                    if (EditMode == VekDataGridEditMode.Cell && column.Editable && column.EditTemplate is not null)
+                    {
+                        builder.OpenElement(sequence++, "button");
+                        builder.AddAttribute(sequence++, "type", "button");
+                        builder.AddAttribute(sequence++, "class", "edit-cell-button");
+                        builder.AddAttribute(sequence++, "aria-label", $"Edit {column.Title}");
+                        builder.AddEventStopPropagationAttribute(sequence++, "onclick", true);
+                        builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => StartEditAsync(item, column)));
+                        builder.AddContent(sequence++, "Edit");
+                        builder.CloseElement();
+                    }
 
-                if ((EditMode is VekDataGridEditMode.Row or VekDataGridEditMode.Form)
-                    && CanEditRow && ReferenceEquals(column, VisibleColumns.FirstOrDefault()))
-                {
-                    builder.OpenElement(sequence++, "button");
-                    builder.AddAttribute(sequence++, "type", "button");
-                    builder.AddAttribute(sequence++, "class", "edit-row-button");
-                    builder.AddAttribute(sequence++, "aria-label", $"Edit row {GetRowLabel(item)}");
-                    builder.AddEventStopPropagationAttribute(sequence++, "onclick", true);
-                    builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => StartEditAsync(item)));
-                    builder.AddContent(sequence++, "Edit");
-                    builder.CloseElement();
+                    if ((EditMode is VekDataGridEditMode.Row or VekDataGridEditMode.Form)
+                        && CanEditRow && ReferenceEquals(column, VisibleColumns.FirstOrDefault()))
+                    {
+                        builder.OpenElement(sequence++, "button");
+                        builder.AddAttribute(sequence++, "type", "button");
+                        builder.AddAttribute(sequence++, "class", "edit-row-button");
+                        builder.AddAttribute(sequence++, "aria-label", $"Edit row {GetRowLabel(item)}");
+                        builder.AddEventStopPropagationAttribute(sequence++, "onclick", true);
+                        builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => StartEditAsync(item)));
+                        builder.AddContent(sequence++, "Edit");
+                        builder.CloseElement();
+                    }
                 }
+                builder.CloseElement();
             }
-            builder.CloseElement();
         }
 
         builder.CloseElement();
@@ -936,15 +969,15 @@ public partial class VekDataGrid<TItem>
             .ToList();
     }
 
-    private static int CompareGroupValues(object? left, object? right)
+    private int CompareGroupValues(object? left, object? right)
     {
         if (ReferenceEquals(left, right)) return 0;
         if (left is null) return -1;
         if (right is null) return 1;
         if (left is string leftText && right is string rightText)
-            return StringComparer.CurrentCulture.Compare(leftText, rightText);
+            return StringComparer.Create(Culture ?? CultureInfo.CurrentCulture, ignoreCase: false).Compare(leftText, rightText);
         return left is IComparable comparable ? comparable.CompareTo(right) :
-            StringComparer.CurrentCulture.Compare(left.ToString(), right.ToString());
+            StringComparer.Create(Culture ?? CultureInfo.CurrentCulture, ignoreCase: false).Compare(left.ToString(), right.ToString());
     }
 
     private bool IsGroupExpanded(string path) => !_collapsedGroups.Contains(path);
@@ -1000,16 +1033,16 @@ public partial class VekDataGrid<TItem>
         };
 
         var formatted = result is IFormattable formattable && definition.Format is not null
-            ? formattable.ToString(definition.Format, CultureInfo.CurrentCulture) ?? string.Empty
-            : Convert.ToString(result, CultureInfo.CurrentCulture) ?? string.Empty;
+            ? formattable.ToString(definition.Format, Culture ?? CultureInfo.CurrentCulture) ?? string.Empty
+            : Convert.ToString(result, Culture ?? CultureInfo.CurrentCulture) ?? string.Empty;
         return new VekDataGridAggregateResult(definition.Key, definition.Key, result, formatted);
     }
 
-    private static decimal[] NumericValues(IEnumerable<object?> values)
+    private decimal[] NumericValues(IEnumerable<object?> values)
     {
         try
         {
-            return values.Select(value => Convert.ToDecimal(value, CultureInfo.CurrentCulture)).ToArray();
+            return values.Select(value => Convert.ToDecimal(value, Culture ?? CultureInfo.CurrentCulture)).ToArray();
         }
         catch (Exception exception) when (exception is FormatException or InvalidCastException or OverflowException)
         {
@@ -1081,45 +1114,52 @@ public partial class VekDataGrid<TItem>
             builder.AddAttribute(sequence++, "style", RowStyle?.Invoke(item, rowIndex));
             builder.AddAttribute(sequence++, "aria-selected", IsItemSelected(item));
             builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => SelectRowAsync(item)));
-            foreach (var column in VisibleColumns)
+            if (RowTemplate is not null)
             {
-                builder.OpenElement(sequence++, "td");
-                builder.AddAttribute(sequence++, "class", CellClass?.Invoke(item, column.Key, rowIndex));
-                builder.AddAttribute(sequence++, "style", GetCellStyle(item, column, rowIndex));
-                var editContext = GetEditContext(item, column);
-                if (editContext is not null && column.EditTemplate is not null)
+                builder.AddContent(sequence++, RowTemplate(item));
+            }
+            else
+            {
+                foreach (var column in VisibleColumns)
                 {
-                    builder.OpenComponent<CascadingValue<EditContext>>(sequence++);
-                    builder.AddAttribute(sequence++, nameof(CascadingValue<EditContext>.Value), _editContext);
-                    builder.AddAttribute(sequence++, nameof(CascadingValue<EditContext>.ChildContent), column.EditTemplate(editContext));
-                    builder.CloseComponent();
-                }
-                else
-                {
-                    builder.AddContent(sequence++, column.CellTemplate(item));
-                    if (EditMode == VekDataGridEditMode.Cell && column.Editable && column.EditTemplate is not null)
+                    builder.OpenElement(sequence++, "td");
+                    builder.AddAttribute(sequence++, "class", CellClass?.Invoke(item, column.Key, rowIndex));
+                    builder.AddAttribute(sequence++, "style", GetCellStyle(item, column, rowIndex));
+                    var editContext = GetEditContext(item, column);
+                    if (editContext is not null && column.EditTemplate is not null)
                     {
-                        builder.OpenElement(sequence++, "button");
-                        builder.AddAttribute(sequence++, "type", "button");
-                        builder.AddAttribute(sequence++, "aria-label", $"Edit {column.Title}");
-                        builder.AddAttribute(sequence++, "onclick:stopPropagation", true);
-                        builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => StartEditAsync(item, column)));
-                        builder.AddContent(sequence++, "Edit");
-                        builder.CloseElement();
+                        builder.OpenComponent<CascadingValue<EditContext>>(sequence++);
+                        builder.AddAttribute(sequence++, nameof(CascadingValue<EditContext>.Value), _editContext);
+                        builder.AddAttribute(sequence++, nameof(CascadingValue<EditContext>.ChildContent), column.EditTemplate(editContext));
+                        builder.CloseComponent();
                     }
-                    if ((EditMode is VekDataGridEditMode.Row or VekDataGridEditMode.Form)
-                        && CanEditRow && ReferenceEquals(column, VisibleColumns.FirstOrDefault()))
+                    else
                     {
-                        builder.OpenElement(sequence++, "button");
-                        builder.AddAttribute(sequence++, "type", "button");
-                        builder.AddAttribute(sequence++, "aria-label", $"Edit row {GetRowLabel(item)}");
-                        builder.AddAttribute(sequence++, "onclick:stopPropagation", true);
-                        builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => StartEditAsync(item)));
-                        builder.AddContent(sequence++, "Edit");
-                        builder.CloseElement();
+                        builder.AddContent(sequence++, column.CellTemplate(item));
+                        if (EditMode == VekDataGridEditMode.Cell && column.Editable && column.EditTemplate is not null)
+                        {
+                            builder.OpenElement(sequence++, "button");
+                            builder.AddAttribute(sequence++, "type", "button");
+                            builder.AddAttribute(sequence++, "aria-label", $"Edit {column.Title}");
+                            builder.AddAttribute(sequence++, "onclick:stopPropagation", true);
+                            builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => StartEditAsync(item, column)));
+                            builder.AddContent(sequence++, "Edit");
+                            builder.CloseElement();
+                        }
+                        if ((EditMode is VekDataGridEditMode.Row or VekDataGridEditMode.Form)
+                            && CanEditRow && ReferenceEquals(column, VisibleColumns.FirstOrDefault()))
+                        {
+                            builder.OpenElement(sequence++, "button");
+                            builder.AddAttribute(sequence++, "type", "button");
+                            builder.AddAttribute(sequence++, "aria-label", $"Edit row {GetRowLabel(item)}");
+                            builder.AddAttribute(sequence++, "onclick:stopPropagation", true);
+                            builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => StartEditAsync(item)));
+                            builder.AddContent(sequence++, "Edit");
+                            builder.CloseElement();
+                        }
                     }
+                    builder.CloseElement();
                 }
-                builder.CloseElement();
             }
             builder.CloseElement();
             builder.AddContent(sequence++, RenderRowDetails(item));
@@ -1305,7 +1345,7 @@ public partial class VekDataGrid<TItem>
         return true;
     }
 
-    private static bool MatchesValue(object? source, VekDataGridFilter filter)
+    private bool MatchesValue(object? source, VekDataGridFilter filter)
     {
         if (filter.Operator == VekDataGridFilterOperator.IsNull) return source is null;
         if (filter.Operator == VekDataGridFilterOperator.IsNotNull) return source is not null;
@@ -1314,15 +1354,16 @@ public partial class VekDataGrid<TItem>
         if (source is null || filter.Value is null) return filter.Operator == VekDataGridFilterOperator.NotEquals && source != filter.Value;
         if (source is string sourceText)
         {
-            var value = Convert.ToString(filter.Value, System.Globalization.CultureInfo.CurrentCulture) ?? string.Empty;
-            var comparison = filter.CaseSensitive ? StringComparison.CurrentCulture : StringComparison.CurrentCultureIgnoreCase;
+            var value = Convert.ToString(filter.Value, Culture ?? CultureInfo.CurrentCulture) ?? string.Empty;
+            var compareOptions = filter.CaseSensitive ? CompareOptions.None : CompareOptions.IgnoreCase;
+            var compareInfo = (Culture ?? CultureInfo.CurrentCulture).CompareInfo;
             return filter.Operator switch
             {
-                VekDataGridFilterOperator.Equals => string.Equals(sourceText, value, comparison),
-                VekDataGridFilterOperator.NotEquals => !string.Equals(sourceText, value, comparison),
-                VekDataGridFilterOperator.StartsWith => sourceText.StartsWith(value, comparison),
-                VekDataGridFilterOperator.EndsWith => sourceText.EndsWith(value, comparison),
-                _ => sourceText.Contains(value, comparison)
+                VekDataGridFilterOperator.Equals => compareInfo.Compare(sourceText, value, compareOptions) == 0,
+                VekDataGridFilterOperator.NotEquals => compareInfo.Compare(sourceText, value, compareOptions) != 0,
+                VekDataGridFilterOperator.StartsWith => compareInfo.IsPrefix(sourceText, value, compareOptions),
+                VekDataGridFilterOperator.EndsWith => compareInfo.IsSuffix(sourceText, value, compareOptions),
+                _ => compareInfo.IndexOf(sourceText, value, compareOptions) >= 0
             };
         }
 
@@ -1330,7 +1371,7 @@ public partial class VekDataGrid<TItem>
         try
         {
             result = source is IComparable comparable
-                ? comparable.CompareTo(Convert.ChangeType(filter.Value, source.GetType(), System.Globalization.CultureInfo.CurrentCulture))
+                ? comparable.CompareTo(Convert.ChangeType(filter.Value, source.GetType(), Culture ?? CultureInfo.CurrentCulture))
                 : Equals(source, filter.Value) ? 0 : -1;
         }
         catch (Exception exception) when (exception is FormatException or InvalidCastException or OverflowException or ArgumentException)
