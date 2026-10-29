@@ -172,12 +172,12 @@ Task 1 defines these Vek-owned contracts, then later tasks extend them only when
 
 **Interfaces:** Produces expandable row details, custom detail renderer/template, initial expansion predicate, single-expanded-row behavior, and header expand/collapse controls.
 
-- [ ] Add tests `RowDetailExpandsAndCollapses`, `InitialExpansionPredicateIsApplied`, `SingleExpansionClosesPreviousRow`, and `HeaderToggleControlsAllRows`.
-- [ ] Run focused hierarchy tests and confirm failures.
-- [ ] Implement hierarchy state using the configured comparer and preserve expanded state correctly across data refresh.
-- [ ] Run focused hierarchy tests and component suite.
-- [ ] Add the live Hierarchy page and verify route/navigation.
-- [ ] Commit as `feat: add hierarchical row details`.
+- [x] Add tests `RowDetailExpandsAndCollapses`, `InitialExpansionPredicateIsApplied`, `SingleExpansionClosesPreviousRow`, and `HeaderToggleControlsAllRows`.
+- [x] Run focused hierarchy tests and confirm failures.
+- [x] Implement hierarchy state using the configured comparer and preserve expanded state correctly across data refresh.
+- [x] Run focused hierarchy tests and component suite.
+- [x] Add the live Hierarchy page and verify route/navigation.
+- [x] Commit as `feat: add hierarchical row details`.
 
 ### Task 10: Server data
 

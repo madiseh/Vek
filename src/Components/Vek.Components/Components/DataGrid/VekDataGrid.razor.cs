@@ -10,6 +10,7 @@ public partial class VekDataGrid<TItem>
     private readonly List<IVekDataGridColumn<TItem>> _columns = [];
     private readonly List<ActiveSort> _sorts = [];
     private readonly List<VekDataGridFilter> _filters = [];
+    private List<TItem> _expandedRows = [];
     private readonly HashSet<string> _collapsedGroups = new(StringComparer.Ordinal);
     private int _currentPage = 1;
     private TItem? _editingOriginal;
@@ -18,6 +19,7 @@ public partial class VekDataGrid<TItem>
     private EditContext? _editContext;
     private VekDataGridEditContext<TItem>? _activeEditContext;
     private bool _isEditing;
+    private bool _initialExpansionApplied;
 
     private sealed record ActiveSort(IVekDataGridColumn<TItem> Column, VekSortDirection Direction);
     private sealed record GroupNode(
@@ -139,6 +141,22 @@ public partial class VekDataGrid<TItem>
     /// <summary>Gets or sets custom content for the aggregate footer.</summary>
     [Parameter]
     public RenderFragment<VekDataGridFooterContext<TItem>>? FooterTemplate { get; set; }
+
+    /// <summary>Gets or sets a predicate that marks rows initially expanded.</summary>
+    [Parameter]
+    public Func<TItem, bool>? InitiallyExpanded { get; set; }
+
+    /// <summary>Gets or sets whether only one row can be expanded at a time.</summary>
+    [Parameter]
+    public bool SingleExpandedRow { get; set; }
+
+    /// <summary>Gets or sets the comparer used to preserve expanded rows across refreshes.</summary>
+    [Parameter]
+    public IEqualityComparer<TItem>? RowDetailsComparer { get; set; }
+
+    /// <summary>Gets or sets a callback invoked when the expanded row set changes.</summary>
+    [Parameter]
+    public EventCallback<IReadOnlyList<TItem>> RowDetailsExpandedChanged { get; set; }
 
     /// <summary>
     /// Gets or sets whether sorting is disabled, limited to one column, or applied to multiple columns.
@@ -362,9 +380,74 @@ public partial class VekDataGrid<TItem>
         _isEditing = false;
     }
 
-    private string GetEditLabel(TItem item) => _columns.FirstOrDefault(column => column.Editable)?.GetRowLabel(item)
+    internal string GetRowLabel(TItem item) => _columns.FirstOrDefault(column => column.Editable)?.GetRowLabel(item)
+        ?? _columns.FirstOrDefault(column => !column.IsHierarchyColumn && !column.IsSelectionColumn)?.GetRowLabel(item)
         ?? Convert.ToString(item, CultureInfo.CurrentCulture)
         ?? "row";
+
+    internal bool IsRowExpanded(TItem item) => _expandedRows.Any(expanded => DetailsComparer.Equals(expanded, item));
+
+    internal async Task ToggleRowDetailsAsync(TItem item)
+    {
+        var index = _expandedRows.FindIndex(expanded => DetailsComparer.Equals(expanded, item));
+        if (index >= 0)
+        {
+            _expandedRows.RemoveAt(index);
+        }
+        else
+        {
+            if (SingleExpandedRow) _expandedRows.Clear();
+            _expandedRows.Add(item);
+        }
+        await RowDetailsExpandedChanged.InvokeAsync(_expandedRows.ToArray());
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private IEqualityComparer<TItem> DetailsComparer => RowDetailsComparer ?? SelectionComparer ?? EqualityComparer<TItem>.Default;
+
+    private bool AreAllRowsExpanded()
+    {
+        var rows = GetSortedItems();
+        return rows.Count > 0 && rows.All(IsRowExpanded);
+    }
+
+    private async Task ToggleAllRowDetailsAsync()
+    {
+        var rows = GetSortedItems();
+        if (AreAllRowsExpanded())
+        {
+            _expandedRows.Clear();
+        }
+        else if (SingleExpandedRow)
+        {
+            _expandedRows = rows.Take(1).ToList();
+        }
+        else
+        {
+            _expandedRows = rows;
+        }
+        await RowDetailsExpandedChanged.InvokeAsync(_expandedRows.ToArray());
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private VekDataGridRowDetailContext<TItem> CreateRowDetailContext(TItem item) => new(
+        item,
+        IsRowExpanded(item),
+        () => ToggleRowDetailsAsync(item));
+
+    private RenderFragment RenderRowDetails(TItem item) => builder =>
+    {
+        var detailTemplate = _columns.FirstOrDefault(column => column.IsHierarchyColumn)?.DetailTemplate;
+        if (detailTemplate is null || !IsRowExpanded(item)) return;
+        builder.OpenElement(0, "tr");
+        builder.AddAttribute(1, "class", "detail-row");
+        builder.AddAttribute(2, "data-for-row", GetRowLabel(item));
+        builder.OpenElement(3, "td");
+        builder.AddAttribute(4, "colspan", Math.Max(_columns.Count, 1));
+        builder.AddContent(5, detailTemplate(CreateRowDetailContext(item)));
+        builder.CloseElement();
+        builder.CloseElement();
+    };
 
     private List<TItem> GetPageItems() => GetSortedItems()
         .Skip((_currentPage - 1) * EffectivePageSize)
@@ -568,7 +651,7 @@ public partial class VekDataGrid<TItem>
                     {
                         builder.OpenElement(sequence++, "button");
                         builder.AddAttribute(sequence++, "type", "button");
-                        builder.AddAttribute(sequence++, "aria-label", $"Edit row {GetEditLabel(item)}");
+                        builder.AddAttribute(sequence++, "aria-label", $"Edit row {GetRowLabel(item)}");
                         builder.AddAttribute(sequence++, "onclick:stopPropagation", true);
                         builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => StartEditAsync(item)));
                         builder.AddContent(sequence++, "Edit");
@@ -578,6 +661,7 @@ public partial class VekDataGrid<TItem>
                 builder.CloseElement();
             }
             builder.CloseElement();
+            builder.AddContent(sequence++, RenderRowDetails(item));
         }
     };
 
@@ -611,6 +695,23 @@ public partial class VekDataGrid<TItem>
             await SelectedItemsChanged.InvokeAsync(SelectedItems);
             await SelectedItemChanged.InvokeAsync(SelectedItem);
         }
+
+        var rows = Items?.ToList() ?? [];
+        if (!_initialExpansionApplied)
+        {
+            _expandedRows = InitiallyExpanded is null ? [] : rows.Where(InitiallyExpanded).ToList();
+            _initialExpansionApplied = true;
+        }
+        else
+        {
+            _expandedRows = _expandedRows
+                .Select(expanded => rows.FirstOrDefault(row => DetailsComparer.Equals(row, expanded)))
+                .Where(row => row is not null)
+                .Cast<TItem>()
+                .Distinct(DetailsComparer)
+                .ToList();
+        }
+        if (SingleExpandedRow && _expandedRows.Count > 1) _expandedRows = _expandedRows.Take(1).ToList();
     }
 
     private bool ReconcileSelection()

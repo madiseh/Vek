@@ -1,0 +1,67 @@
+@page "/docs/components/vekdatagrid/hierarchy"
+@layout DocumentationLayout
+
+<PageTitle>VekDataGrid Hierarchy | Vek Components</PageTitle>
+
+<div class="docs-page-layout">
+    <article class="docs-article">
+        <h1>VekDataGrid: Hierarchical Rows</h1>
+        <p class="docs-intro">Expand a product row to reveal related information without leaving the table.</p>
+
+        <section id="live-example" class="docs-section-content" aria-labelledby="live-example-heading">
+            <h2 id="live-example-heading">Live example</h2>
+            <p>Use the row controls for individual details or the column header to toggle the current results.</p>
+            @if (_products is null)
+            {
+                <p class="docs-loading" role="status">Loading sample products...</p>
+            }
+            else
+            {
+                <div class="docs-example-frame">
+                    <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="10"
+                                 InitiallyExpanded="InitiallyExpanded" SingleExpandedRow="_singleExpanded">
+                        <ChildContent>
+                            <HierarchyColumn TItem="DemoProduct">
+                                <DetailTemplate Context="detail">
+                                    <div class="product-details">
+                                        <strong>@detail.Item.Name</strong>
+                                        <span>Category: @detail.Item.Category</span>
+                                        <span>Product ID: @detail.Item.Id</span>
+                                        <span>Unit price: @detail.Item.Price.ToString("C2")</span>
+                                    </div>
+                                </DetailTemplate>
+                            </HierarchyColumn>
+                            <PropertyColumn Property="product => product.Name" Title="Name" />
+                            <PropertyColumn Property="product => product.Category" Title="Category" />
+                            <PropertyColumn Property="product => product.Price" Title="Price" Format="C2" />
+                        </ChildContent>
+                    </VekDataGrid>
+                </div>
+            }
+        </section>
+
+        <section id="code" class="docs-section-content" aria-labelledby="code-heading">
+            <h2 id="code-heading">Code</h2>
+            <div class="code-sample">
+                <div class="code-tabs" role="group" aria-label="Code sample files">
+                    <button type="button" class="code-tab @(!_showCodeBehind ? "is-active" : null)" data-sample="razor" aria-pressed="@(!_showCodeBehind)" @onclick="ShowRazor">Sample.razor</button>
+                    <button type="button" class="code-tab @(_showCodeBehind ? "is-active" : null)" data-sample="code-behind" aria-pressed="@_showCodeBehind" @onclick="ShowCodeBehind">Sample.razor.cs</button>
+                </div>
+                <pre><code>@SelectedCode</code></pre>
+            </div>
+        </section>
+
+        <section id="hierarchy-options" class="docs-section-content" aria-labelledby="hierarchy-options-heading">
+            <h2 id="hierarchy-options-heading">Hierarchy options</h2>
+            <p>Provide a <code>HierarchyColumn</code> with a detail template. Use <code>InitiallyExpanded</code> to open matching rows on first load and <code>SingleExpandedRow</code> to keep at most one detail visible.</p>
+            <p>The header toggle expands or collapses the current result set. <code>RowDetailsComparer</code> preserves expanded state across item refreshes, and <code>RowDetailsExpandedChanged</code> reports the current expanded items.</p>
+        </section>
+    </article>
+
+    <nav class="docs-toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <a href="/docs/components/vekdatagrid/hierarchy#live-example">Live example</a>
+        <a href="/docs/components/vekdatagrid/hierarchy#code">Code</a>
+        <a href="/docs/components/vekdatagrid/hierarchy#hierarchy-options">Hierarchy options</a>
+    </nav>
+</div>

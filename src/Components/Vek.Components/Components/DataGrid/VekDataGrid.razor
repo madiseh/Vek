@@ -35,7 +35,13 @@
                     {
                         var sortPriority = GetSortPriority(column);
                         <th scope="col" aria-sort="@GetAriaSort(column)">
-                            @if (column.IsSelectionColumn)
+                            @if (column.IsHierarchyColumn)
+                            {
+                                <button type="button" aria-label="Toggle all row details"
+                                        aria-expanded="@(AreAllRowsExpanded() ? "true" : "false")"
+                                        @onclick="ToggleAllRowDetailsAsync">@(AreAllRowsExpanded() ? "−" : "+")</button>
+                            }
+                            else if (column.IsSelectionColumn)
                             {
                                 @if (SelectionMode == VekDataGridSelectionMode.Multiple)
                                 {
@@ -113,13 +119,14 @@
                                         @if ((EditMode is VekDataGridEditMode.Row or VekDataGridEditMode.Form)
                                             && CanEditRow && ReferenceEquals(column, _columns.FirstOrDefault()))
                                         {
-                                            <button type="button" class="edit-row-button" aria-label="Edit row @GetEditLabel(item)"
+                                            <button type="button" class="edit-row-button" aria-label="Edit row @GetRowLabel(item)"
                                                     @onclick:stopPropagation="true" @onclick="() => StartEditAsync(item)">Edit</button>
                                         }
                                     }
                                 </td>
                             }
                         </tr>
+                        @RenderRowDetails(item)
                     }
                 }
             </tbody>

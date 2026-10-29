@@ -200,6 +200,21 @@ public sealed class VekDataGridFooterContext<TItem>
     public IReadOnlyList<VekDataGridAggregateResult> Aggregates { get; }
 }
 
+/// <summary>Provides a row and its expand/collapse action to a detail template.</summary>
+/// <typeparam name="TItem">The type of item represented by the grid.</typeparam>
+public sealed class VekDataGridRowDetailContext<TItem>
+{
+    internal VekDataGridRowDetailContext(TItem item, bool expanded, Func<Task> toggleAsync)
+        => (Item, Expanded, ToggleAsync) = (item, expanded, toggleAsync);
+
+    /// <summary>Gets the item whose detail content is displayed.</summary>
+    public TItem Item { get; }
+    /// <summary>Gets whether this row's details are expanded.</summary>
+    public bool Expanded { get; }
+    /// <summary>Toggles the detail content for this row.</summary>
+    public Func<Task> ToggleAsync { get; }
+}
+
 /// <summary>Describes one level in the grid's nested grouping order.</summary>
 /// <param name="ColumnKey">The stable key of the column used to group rows.</param>
 /// <param name="SortOrder">The order in which distinct group values appear.</param>

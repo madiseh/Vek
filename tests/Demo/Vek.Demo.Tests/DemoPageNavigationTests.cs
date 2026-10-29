@@ -249,6 +249,28 @@ public sealed class DemoPageNavigationTests : BunitContext
     }
 
     /// <summary>
+    /// Verifies the hierarchy guide renders expandable product details and its detail template.
+    /// </summary>
+    [Fact]
+    public void DataGridHierarchyRouteShowsLiveGridAndExample()
+    {
+        Services.AddSingleton<IDemoProductProvider>(new TestProductProvider(
+        [
+            new DemoProduct(1, "Desk Lamp", "Furniture", 49.99m),
+            new DemoProduct(2, "Task Chair", "Furniture", 199.00m)
+        ]));
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo("/docs/components/vekdatagrid/hierarchy");
+
+        var cut = Render<Routes>();
+
+        Assert.Equal("VekDataGrid: Hierarchical Rows", cut.Find("main h1").TextContent.Trim());
+        Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
+        Assert.Contains("<HierarchyColumn", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("aria-label=\"Toggle all row details\"", cut.Markup);
+    }
+
+    /// <summary>
     /// Verifies that the code sample switches from Razor markup to its C# code-behind.
     /// </summary>
     [Fact]

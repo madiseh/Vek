@@ -186,6 +186,8 @@ public partial class PropertyColumn<TItem, TValue>
     Func<TItem, object?>? IVekDataGridColumn<TItem>.GroupBy => Groupable ? GroupBy ?? (item => _propertyGetter!(item)) : null;
     RenderFragment<VekDataGridGroupContext<TItem>>? IVekDataGridColumn<TItem>.GroupTemplate => GroupTemplate;
     Func<TItem, object?>? IVekDataGridColumn<TItem>.AggregateBy => AggregateBy ?? (item => _propertyGetter!(item));
+    bool IVekDataGridColumn<TItem>.IsHierarchyColumn => false;
+    RenderFragment<VekDataGridRowDetailContext<TItem>>? IVekDataGridColumn<TItem>.DetailTemplate => null;
 
     RenderFragment<TItem> IVekDataGridColumn<TItem>.CellTemplate => item => builder =>
     {

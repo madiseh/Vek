@@ -27,6 +27,8 @@ internal interface IVekDataGridColumn<TItem>
     Func<TItem, object?>? GroupBy { get; }
     RenderFragment<VekDataGridGroupContext<TItem>>? GroupTemplate { get; }
     Func<TItem, object?>? AggregateBy { get; }
+    bool IsHierarchyColumn { get; }
+    RenderFragment<VekDataGridRowDetailContext<TItem>>? DetailTemplate { get; }
 
     /// <summary>
     /// Gets the heading displayed for the column.
