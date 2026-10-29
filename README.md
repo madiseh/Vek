@@ -15,9 +15,6 @@ Vek is a reusable Blazor component library targeting .NET 10. The library is bei
 | `src/Ports/Vek.Demo.Abstractions` | Demo data contracts and sample models. |
 | `src/Adapters/Vek.SimulatedData` | JSON-backed sample data provider. |
 | `tests/Components/Vek.Components.Tests` | xUnit and bUnit project for future component tests. |
-| `docs/1.governance` | Commit and architecture guidance. |
-
-Architecture details are in [`docs/1.governance/architecture.md`](docs/1.governance/architecture.md), and commit message rules are in [`docs/1.governance/git-commits.md`](docs/1.governance/git-commits.md).
 
 ## Build
 
@@ -29,10 +26,6 @@ dotnet build Vek.slnx -c Release
 ```
 
 To build an explicit platform configuration, use `-p:Platform=x86` or `-p:Platform=x64`. The default configuration is `AnyCPU`.
-
-## Publishing
-
-The GitHub Actions workflow publishes `Vek.Components` when a version tag such as `v1.0.0` is pushed. Configure the repository secret `NUGET_API_KEY` before using the workflow.
 
 ## License
 
