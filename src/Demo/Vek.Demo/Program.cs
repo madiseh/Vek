@@ -1,11 +1,11 @@
 using Vek.Demo.Components;
-using Vek.Demo.Abstractions;
-using Vek.SimulatedData;
+using Vek.Demo.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddSingleton<IDemoProductProvider, JsonDemoProductProvider>();
+builder.Services.AddDemoServices();
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
