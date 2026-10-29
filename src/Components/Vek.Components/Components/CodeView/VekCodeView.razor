@@ -1,0 +1,12 @@
+<section class="vek-code-view" aria-label="@($"{LanguageLabel} code sample")">
+    <header class="code-header">
+        <span class="language-label">@LanguageLabel</span>
+        <button class="copy-button" type="button" @onclick="CopyAsync" aria-label="@($"Copy {LanguageLabel} code")">
+            @(_copySucceeded ? "Copied" : "Copy")
+        </button>
+    </header>
+
+    <pre class="code-content"><code>@foreach (var token in Tokens)
+    {<span class="token token-@token.Kind.ToString().ToLowerInvariant()">@token.Text</span>}</code></pre>
+    <span class="visually-hidden" aria-live="polite">@_copyStatus</span>
+</section>

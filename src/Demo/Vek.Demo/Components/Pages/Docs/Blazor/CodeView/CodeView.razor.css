@@ -1,0 +1,15 @@
+.docs-code-view {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.docs-code-view section {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.docs-code-view h2 {
+    margin: 0;
+    color: #f0eefb;
+    font-size: 1.2rem;
+}

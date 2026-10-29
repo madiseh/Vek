@@ -1,0 +1,29 @@
+@page "/docs/components/vekcodeview"
+@layout DocumentationLayout
+
+<PageTitle>VekCodeView | Vek Components</PageTitle>
+
+<article class="docs-article docs-code-view">
+    <h1>VekCodeView</h1>
+    <p class="docs-intro">Display read-only code with syntax highlighting and a copy action.</p>
+
+    <section aria-labelledby="html-heading">
+        <h2 id="html-heading">HTML</h2>
+        <VekCodeView Language="VekCodeLanguage.Html" Code="@HtmlSample" />
+    </section>
+
+    <section aria-labelledby="java-heading">
+        <h2 id="java-heading">Java</h2>
+        <VekCodeView Language="VekCodeLanguage.Java" Code="@JavaSample" />
+    </section>
+
+    <section aria-labelledby="csharp-heading">
+        <h2 id="csharp-heading">C#</h2>
+        <VekCodeView Language="VekCodeLanguage.CSharp" Code="@CSharpSample" />
+    </section>
+
+    <section aria-labelledby="sql-heading">
+        <h2 id="sql-heading">SQL</h2>
+        <VekCodeView Language="VekCodeLanguage.Sql" Code="@SqlSample" />
+    </section>
+</article>
