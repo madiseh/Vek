@@ -82,6 +82,10 @@
                         <td class="empty-state" colspan="@Math.Max(_columns.Count, 1)">No items to display.</td>
                     </tr>
                 }
+                else if (EffectiveGroups.Count > 0)
+                {
+                    @RenderGroupRows(BuildGroupNodes(pageItems, 0, string.Empty))
+                }
                 else
                 {
                     @foreach (var item in pageItems)

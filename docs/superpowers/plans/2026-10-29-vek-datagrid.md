@@ -146,12 +146,12 @@ Task 1 defines these Vek-owned contracts, then later tasks extend them only when
 
 **Interfaces:** Produces multi-level grouping, per-column groupability/default order, group templates, expand/collapse state, and group callbacks.
 
-- [ ] Add tests `RowsGroupBySelectedColumn`, `GroupsCanBeNestedAndOrdered`, `GroupTemplateReceivesDefinition`, and `GroupsCanExpandAndCollapse`.
-- [ ] Run focused grouping tests and confirm expected failures.
-- [ ] Implement grouping over the current filtered/sorted dataset; define and test its interaction with paging and virtualization.
-- [ ] Run focused grouping tests and component suite.
-- [ ] Add the live Grouping page and verify route/navigation.
-- [ ] Commit as `feat: add data grid grouping`.
+- [x] Add tests `RowsGroupBySelectedColumn`, `GroupsCanBeNestedAndOrdered`, `GroupTemplateReceivesDefinition`, and `GroupsCanExpandAndCollapse`.
+- [x] Run focused grouping tests and confirm expected failures.
+- [x] Implement grouping over the current filtered/sorted dataset; define and test its interaction with paging and virtualization.
+- [x] Run focused grouping tests and component suite.
+- [x] Add the live Grouping page and verify route/navigation.
+- [x] Commit as `feat: add data grid grouping`.
 
 ### Task 8: Aggregation
 

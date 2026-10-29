@@ -1,0 +1,59 @@
+@page "/docs/components/vekdatagrid/grouping"
+@layout DocumentationLayout
+
+<PageTitle>VekDataGrid Grouping | Vek Components</PageTitle>
+
+<div class="docs-page-layout">
+    <article class="docs-article">
+        <h1>VekDataGrid: Grouping</h1>
+        <p class="docs-intro">Organize products by one or more columns, customize group headers, and collapse groups as needed.</p>
+
+        <section id="live-example" class="docs-section-content" aria-labelledby="live-example-heading">
+            <h2 id="live-example-heading">Live example</h2>
+            <p>Groups are built from the rows on the current page. A group can appear on more than one page when its rows span pages.</p>
+            @if (_products is null)
+            {
+                <p class="docs-loading" role="status">Loading sample products...</p>
+            }
+            else
+            {
+                <div class="docs-example-frame">
+                    <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="10" GroupBy="_groups" GroupChanged="OnGroupChanged">
+                        <PropertyColumn Property="product => product.Name" Title="Name" Key="Name">
+                            <GroupTemplate Context="group">
+                                <strong>@group.Title: @group.Value</strong>
+                                <span class="group-count">(@group.Count products)</span>
+                            </GroupTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="product => product.Category" Title="Category" Key="Category" />
+                        <PropertyColumn Property="product => product.Price" Title="Price" Format="C2" />
+                    </VekDataGrid>
+                </div>
+            }
+        </section>
+
+        <section id="code" class="docs-section-content" aria-labelledby="code-heading">
+            <h2 id="code-heading">Code</h2>
+            <div class="code-sample">
+                <div class="code-tabs" role="group" aria-label="Code sample files">
+                    <button type="button" class="code-tab @(!_showCodeBehind ? "is-active" : null)" data-sample="razor" aria-pressed="@(!_showCodeBehind)" @onclick="ShowRazor">Sample.razor</button>
+                    <button type="button" class="code-tab @(_showCodeBehind ? "is-active" : null)" data-sample="code-behind" aria-pressed="@_showCodeBehind" @onclick="ShowCodeBehind">Sample.razor.cs</button>
+                </div>
+                <pre><code>@SelectedCode</code></pre>
+            </div>
+        </section>
+
+        <section id="group-state" class="docs-section-content" aria-labelledby="group-state-heading">
+            <h2 id="group-state-heading">Group state</h2>
+            <p>Provide an ordered list of <code>VekDataGridGroupDefinition</code> values. Columns can use custom group selectors and group templates. Group headers start expanded; their controls expose <code>aria-expanded</code>, and <code>GroupChanged</code> reports expand/collapse interactions.</p>
+            <p>Grouping runs after filtering, sorting, and paging. This keeps paging based on data rows, while a group header can repeat when that group crosses a page boundary.</p>
+        </section>
+    </article>
+
+    <nav class="docs-toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <a href="/docs/components/vekdatagrid/grouping#live-example">Live example</a>
+        <a href="/docs/components/vekdatagrid/grouping#code">Code</a>
+        <a href="/docs/components/vekdatagrid/grouping#group-state">Group state</a>
+    </nav>
+</div>

@@ -201,6 +201,31 @@ public sealed class DemoPageNavigationTests : BunitContext
     }
 
     /// <summary>
+    /// Verifies the grouping guide shows nested group headers and its grouping definitions.
+    /// </summary>
+    [Fact]
+    public void DataGridGroupingRouteShowsLiveGridAndExample()
+    {
+        Services.AddSingleton<IDemoProductProvider>(new TestProductProvider(
+        [
+            new DemoProduct(1, "Desk Lamp", "Furniture", 49.99m),
+            new DemoProduct(2, "Task Chair", "Furniture", 199.00m),
+            new DemoProduct(3, "Notebook Set", "Stationery", 12.90m)
+        ]));
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo("/docs/components/vekdatagrid/grouping");
+
+        var cut = Render<Routes>();
+
+        Assert.Equal("VekDataGrid: Grouping", cut.Find("main h1").TextContent.Trim());
+        Assert.Contains("Furniture", cut.Find("tbody").TextContent);
+        Assert.Contains("<GroupTemplate Context=\"group\">", cut.Find(".code-sample pre code").TextContent);
+        Assert.Equal(
+            "/docs/components/vekdatagrid/grouping",
+            cut.Find(".docs-sidebar a.active").GetAttribute("href"));
+    }
+
+    /// <summary>
     /// Verifies that the code sample switches from Razor markup to its C# code-behind.
     /// </summary>
     [Fact]

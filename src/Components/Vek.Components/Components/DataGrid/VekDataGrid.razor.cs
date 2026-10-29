@@ -10,6 +10,7 @@ public partial class VekDataGrid<TItem>
     private readonly List<IVekDataGridColumn<TItem>> _columns = [];
     private readonly List<ActiveSort> _sorts = [];
     private readonly List<VekDataGridFilter> _filters = [];
+    private readonly HashSet<string> _collapsedGroups = new(StringComparer.Ordinal);
     private int _currentPage = 1;
     private TItem? _editingOriginal;
     private TItem? _editingDraft;
@@ -19,6 +20,13 @@ public partial class VekDataGrid<TItem>
     private bool _isEditing;
 
     private sealed record ActiveSort(IVekDataGridColumn<TItem> Column, VekSortDirection Direction);
+    private sealed record GroupNode(
+        VekDataGridGroupDefinition Definition,
+        IVekDataGridColumn<TItem> Column,
+        object? Value,
+        IReadOnlyList<TItem> Items,
+        int Level,
+        string Path);
 
     /// <summary>
     /// Gets or sets the complete collection of items displayed by the grid.
@@ -115,6 +123,14 @@ public partial class VekDataGrid<TItem>
     /// <summary>Gets or sets a callback invoked after an edit draft is canceled.</summary>
     [Parameter]
     public EventCallback<TItem> EditCancelled { get; set; }
+
+    /// <summary>Gets or sets the ordered grouping columns.</summary>
+    [Parameter]
+    public IReadOnlyList<VekDataGridGroupDefinition> GroupBy { get; set; } = Array.Empty<VekDataGridGroupDefinition>();
+
+    /// <summary>Gets or sets a callback invoked when a group is expanded or collapsed.</summary>
+    [Parameter]
+    public EventCallback<IReadOnlyList<VekDataGridGroupDefinition>> GroupChanged { get; set; }
 
     /// <summary>
     /// Gets or sets whether sorting is disabled, limited to one column, or applied to multiple columns.
@@ -346,6 +362,145 @@ public partial class VekDataGrid<TItem>
         .Skip((_currentPage - 1) * EffectivePageSize)
         .Take(EffectivePageSize)
         .ToList();
+
+    private IReadOnlyList<(VekDataGridGroupDefinition Definition, IVekDataGridColumn<TItem> Column, Func<TItem, object?> Selector)> EffectiveGroups => GroupBy
+        .Select(definition => (Definition: definition, Column: _columns.FirstOrDefault(column => column.Key == definition.ColumnKey)))
+        .Where(pair => pair.Column?.Groupable == true && pair.Column.GroupBy is not null)
+        .Select(pair => (pair.Definition, pair.Column!, pair.Column!.GroupBy!))
+        .ToArray();
+
+    private List<GroupNode> BuildGroupNodes(IEnumerable<TItem> items, int level, string parentPath)
+    {
+        var definitions = EffectiveGroups;
+        if (level >= definitions.Count) return [];
+        var (definition, column, selector) = definitions[level];
+        var groups = items.GroupBy(selector)
+            .OrderBy(group => group.Key, Comparer<object?>.Create(CompareGroupValues))
+            .ToList();
+        if (definition.SortOrder == VekDataGridGroupSortOrder.Descending) groups.Reverse();
+        return groups.Select(group => new GroupNode(
+            definition,
+            column,
+            group.Key,
+            group.ToArray(),
+            level,
+            $"{parentPath}/{column.Key}:{group.Key?.ToString()?.Length ?? 0}:{group.Key}"))
+            .ToList();
+    }
+
+    private static int CompareGroupValues(object? left, object? right)
+    {
+        if (ReferenceEquals(left, right)) return 0;
+        if (left is null) return -1;
+        if (right is null) return 1;
+        if (left is string leftText && right is string rightText)
+            return StringComparer.CurrentCulture.Compare(leftText, rightText);
+        return left is IComparable comparable ? comparable.CompareTo(right) :
+            StringComparer.CurrentCulture.Compare(left.ToString(), right.ToString());
+    }
+
+    private bool IsGroupExpanded(string path) => !_collapsedGroups.Contains(path);
+
+    private async Task ToggleGroupAsync(string path)
+    {
+        if (!_collapsedGroups.Add(path)) _collapsedGroups.Remove(path);
+        await GroupChanged.InvokeAsync(GroupBy);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private VekDataGridGroupContext<TItem> CreateGroupContext(GroupNode node) => new(
+        node.Column.Key,
+        node.Column.Title,
+        node.Value,
+        node.Level,
+        node.Items,
+        IsGroupExpanded(node.Path),
+        () => ToggleGroupAsync(node.Path));
+
+    private RenderFragment RenderGroupRows(IReadOnlyList<GroupNode> groups) => builder =>
+    {
+        var sequence = 0;
+        foreach (var group in groups)
+        {
+            var context = CreateGroupContext(group);
+            builder.OpenElement(sequence++, "tr");
+            builder.AddAttribute(sequence++, "class", "group-header");
+            builder.AddAttribute(sequence++, "data-group-level", group.Level);
+            builder.AddAttribute(sequence++, "data-group-column", group.Column.Key);
+            builder.OpenElement(sequence++, "td");
+            builder.AddAttribute(sequence++, "colspan", Math.Max(_columns.Count, 1));
+            builder.OpenElement(sequence++, "button");
+            builder.AddAttribute(sequence++, "type", "button");
+            builder.AddAttribute(sequence++, "aria-expanded", context.Expanded ? "true" : "false");
+            builder.AddAttribute(sequence++, "aria-label", $"Toggle {group.Column.Title} group {group.Value}");
+            builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, context.ToggleAsync));
+            builder.AddContent(sequence++, context.Expanded ? "−" : "+");
+            builder.CloseElement();
+            if (group.Column.GroupTemplate is not null)
+                builder.AddContent(sequence++, group.Column.GroupTemplate(context));
+            else
+                builder.AddContent(sequence++, $"{group.Column.Title}: {group.Value ?? "(empty)"} ({group.Items.Count})");
+            builder.CloseElement();
+            builder.CloseElement();
+
+            if (context.Expanded)
+            {
+                var nested = BuildGroupNodes(group.Items, group.Level + 1, group.Path);
+                builder.AddContent(sequence++, nested.Count > 0 ? RenderGroupRows(nested) : RenderDataRows(group.Items));
+            }
+        }
+    };
+
+    private RenderFragment RenderDataRows(IEnumerable<TItem> items) => builder =>
+    {
+        var sequence = 0;
+        foreach (var item in items)
+        {
+            builder.OpenElement(sequence++, "tr");
+            builder.AddAttribute(sequence++, "class", IsItemSelected(item) ? "is-selected" : null);
+            builder.AddAttribute(sequence++, "aria-selected", IsItemSelected(item));
+            builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => SelectRowAsync(item)));
+            foreach (var column in _columns)
+            {
+                builder.OpenElement(sequence++, "td");
+                var editContext = GetEditContext(item, column);
+                if (editContext is not null && column.EditTemplate is not null)
+                {
+                    builder.OpenComponent<CascadingValue<EditContext>>(sequence++);
+                    builder.AddAttribute(sequence++, nameof(CascadingValue<EditContext>.Value), _editContext);
+                    builder.AddAttribute(sequence++, nameof(CascadingValue<EditContext>.ChildContent), column.EditTemplate(editContext));
+                    builder.CloseComponent();
+                }
+                else
+                {
+                    builder.AddContent(sequence++, column.CellTemplate(item));
+                    if (EditMode == VekDataGridEditMode.Cell && column.Editable && column.EditTemplate is not null)
+                    {
+                        builder.OpenElement(sequence++, "button");
+                        builder.AddAttribute(sequence++, "type", "button");
+                        builder.AddAttribute(sequence++, "aria-label", $"Edit {column.Title}");
+                        builder.AddAttribute(sequence++, "onclick:stopPropagation", true);
+                        builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => StartEditAsync(item, column)));
+                        builder.AddContent(sequence++, "Edit");
+                        builder.CloseElement();
+                    }
+                    if ((EditMode is VekDataGridEditMode.Row or VekDataGridEditMode.Form)
+                        && CanEditRow && ReferenceEquals(column, _columns.FirstOrDefault()))
+                    {
+                        builder.OpenElement(sequence++, "button");
+                        builder.AddAttribute(sequence++, "type", "button");
+                        builder.AddAttribute(sequence++, "aria-label", $"Edit row {GetEditLabel(item)}");
+                        builder.AddAttribute(sequence++, "onclick:stopPropagation", true);
+                        builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => StartEditAsync(item)));
+                        builder.AddContent(sequence++, "Edit");
+                        builder.CloseElement();
+                    }
+                }
+                builder.CloseElement();
+            }
+            builder.CloseElement();
+        }
+    };
 
     /// <summary>
     /// Gets or sets an additional CSS class applied to the grid container.

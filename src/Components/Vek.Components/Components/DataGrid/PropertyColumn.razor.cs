@@ -82,6 +82,18 @@ public partial class PropertyColumn<TItem, TValue>
     [Parameter]
     public RenderFragment<VekDataGridEditContext<TItem>>? EditTemplate { get; set; }
 
+    /// <summary>Gets or sets whether this column can group the grid rows.</summary>
+    [Parameter]
+    public bool Groupable { get; set; } = true;
+
+    /// <summary>Gets or sets an optional value selector used to create groups.</summary>
+    [Parameter]
+    public Func<TItem, object?>? GroupBy { get; set; }
+
+    /// <summary>Gets or sets a custom group header template.</summary>
+    [Parameter]
+    public RenderFragment<VekDataGridGroupContext<TItem>>? GroupTemplate { get; set; }
+
     private Func<TItem, TValue>? _propertyGetter;
     private VekDataGrid<TItem>? _registeredGrid;
     private string? _lastPropertyExpression;
@@ -166,6 +178,9 @@ public partial class PropertyColumn<TItem, TValue>
     bool IVekDataGridColumn<TItem>.Editable => Editable;
     RenderFragment<VekDataGridEditContext<TItem>>? IVekDataGridColumn<TItem>.EditTemplate => EditTemplate;
     string IVekDataGridColumn<TItem>.GetRowLabel(TItem item) => Convert.ToString(_propertyGetter!(item)) ?? string.Empty;
+    bool IVekDataGridColumn<TItem>.Groupable => Groupable;
+    Func<TItem, object?>? IVekDataGridColumn<TItem>.GroupBy => Groupable ? GroupBy ?? (item => _propertyGetter!(item)) : null;
+    RenderFragment<VekDataGridGroupContext<TItem>>? IVekDataGridColumn<TItem>.GroupTemplate => GroupTemplate;
 
     RenderFragment<TItem> IVekDataGridColumn<TItem>.CellTemplate => item => builder =>
     {

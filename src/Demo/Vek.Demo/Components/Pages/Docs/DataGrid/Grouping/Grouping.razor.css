@@ -1,0 +1,4 @@
+.group-count {
+    color: var(--docs-muted, #5d6675);
+    margin-inline-start: 0.35rem;
+}

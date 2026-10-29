@@ -23,6 +23,9 @@ internal interface IVekDataGridColumn<TItem>
     bool Editable { get; }
     RenderFragment<VekDataGridEditContext<TItem>>? EditTemplate { get; }
     string GetRowLabel(TItem item);
+    bool Groupable { get; }
+    Func<TItem, object?>? GroupBy { get; }
+    RenderFragment<VekDataGridGroupContext<TItem>>? GroupTemplate { get; }
 
     /// <summary>
     /// Gets the heading displayed for the column.

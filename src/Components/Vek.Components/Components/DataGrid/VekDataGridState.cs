@@ -106,6 +106,48 @@ public enum VekDataGridEditMode
     Form
 }
 
+/// <summary>Defines the ordering applied to the values in a grouped column.</summary>
+public enum VekDataGridGroupSortOrder
+{
+    /// <summary>Orders group values from lowest to highest.</summary>
+    Ascending,
+    /// <summary>Orders group values from highest to lowest.</summary>
+    Descending
+}
+
+/// <summary>Describes one level in the grid's nested grouping order.</summary>
+/// <param name="ColumnKey">The stable key of the column used to group rows.</param>
+/// <param name="SortOrder">The order in which distinct group values appear.</param>
+public sealed record VekDataGridGroupDefinition(
+    string ColumnKey,
+    VekDataGridGroupSortOrder SortOrder = VekDataGridGroupSortOrder.Ascending);
+
+/// <summary>Provides a group definition, its rows, and its expand/collapse action to a template.</summary>
+/// <typeparam name="TItem">The type of item represented by the grid.</typeparam>
+public sealed class VekDataGridGroupContext<TItem>
+{
+    internal VekDataGridGroupContext(string columnKey, string title, object? value, int level, IReadOnlyList<TItem> items, bool expanded, Func<Task> toggleAsync)
+        => (ColumnKey, Title, Value, Level, Items, Count, Expanded, ToggleAsync) =
+            (columnKey, title, value, level, items, items.Count, expanded, toggleAsync);
+
+    /// <summary>Gets the stable key of the grouping column.</summary>
+    public string ColumnKey { get; }
+    /// <summary>Gets the title of the grouping column.</summary>
+    public string Title { get; }
+    /// <summary>Gets the distinct value represented by this group.</summary>
+    public object? Value { get; }
+    /// <summary>Gets the zero-based nesting level of this group.</summary>
+    public int Level { get; }
+    /// <summary>Gets the items contained by this group.</summary>
+    public IReadOnlyList<TItem> Items { get; }
+    /// <summary>Gets the number of items contained by this group.</summary>
+    public int Count { get; }
+    /// <summary>Gets whether the group is currently expanded.</summary>
+    public bool Expanded { get; }
+    /// <summary>Toggles whether the group's children are visible.</summary>
+    public Func<Task> ToggleAsync { get; }
+}
+
 /// <summary>Provides a draft item, validation context, and lifecycle actions to an edit template.</summary>
 /// <typeparam name="TItem">The type of item represented by the grid.</typeparam>
 public sealed class VekDataGridEditContext<TItem>

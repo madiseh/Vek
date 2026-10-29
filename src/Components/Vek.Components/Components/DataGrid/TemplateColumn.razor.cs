@@ -75,6 +75,9 @@ public partial class TemplateColumn<TItem>
     bool IVekDataGridColumn<TItem>.Editable => false;
     RenderFragment<VekDataGridEditContext<TItem>>? IVekDataGridColumn<TItem>.EditTemplate => null;
     string IVekDataGridColumn<TItem>.GetRowLabel(TItem item) => Title;
+    bool IVekDataGridColumn<TItem>.Groupable => false;
+    Func<TItem, object?>? IVekDataGridColumn<TItem>.GroupBy => null;
+    RenderFragment<VekDataGridGroupContext<TItem>>? IVekDataGridColumn<TItem>.GroupTemplate => null;
 
     string IVekDataGridColumn<TItem>.Title => Title;
 

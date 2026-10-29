@@ -29,6 +29,9 @@ public partial class SelectionColumn<TItem> : IDisposable, IVekDataGridColumn<TI
     bool IVekDataGridColumn<TItem>.Editable => false;
     RenderFragment<VekDataGridEditContext<TItem>>? IVekDataGridColumn<TItem>.EditTemplate => null;
     string IVekDataGridColumn<TItem>.GetRowLabel(TItem item) => "Select";
+    bool IVekDataGridColumn<TItem>.Groupable => false;
+    Func<TItem, object?>? IVekDataGridColumn<TItem>.GroupBy => null;
+    RenderFragment<VekDataGridGroupContext<TItem>>? IVekDataGridColumn<TItem>.GroupTemplate => null;
     string IVekDataGridColumn<TItem>.Title => "Select";
     Comparison<TItem> IVekDataGridColumn<TItem>.CompareItems => static (_, _) => 0;
     RenderFragment<TItem> IVekDataGridColumn<TItem>.CellTemplate => item => builder =>
