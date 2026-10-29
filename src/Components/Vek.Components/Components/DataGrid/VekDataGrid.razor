@@ -16,6 +16,16 @@
 </CascadingValue>
 
 <div class="vek-data-grid @Class">
+    @if (FilterMode == VekDataGridFilterMode.Simple && _columns.Any(column => column.Filterable))
+    {
+        <div class="filter-panel" aria-label="Filters">
+            @foreach (var column in _columns.Where(column => column.Filterable))
+            {
+                @RenderFilterControl(column)
+            }
+            <button type="button" @onclick="() => ClearFilterAsync()">Clear filters</button>
+        </div>
+    }
     <div class="table-scroll-container">
         <table>
             <thead>
@@ -35,9 +45,22 @@
                                     <span class="sort-indicator" aria-hidden="true">@GetSortIndicator(column)</span>
                                 }
                             </button>
+                            @if (FilterMode == VekDataGridFilterMode.ColumnMenu && column.Filterable)
+                            {
+                                @RenderFilterControl(column)
+                            }
                         </th>
                     }
                 </tr>
+                @if (FilterMode == VekDataGridFilterMode.ColumnRow)
+                {
+                    <tr class="filter-row">
+                        @foreach (var column in _columns)
+                        {
+                            <th scope="col">@if (column.Filterable) { @RenderFilterControl(column) }</th>
+                        }
+                    </tr>
+                }
             </thead>
             <tbody>
                 @if (pageItems.Count == 0)
@@ -68,3 +91,36 @@
         <button type="button" @onclick="NextPage" disabled="@(_currentPage >= totalPages)">Next</button>
     </nav>
 </div>
+
+@code {
+    private RenderFragment RenderFilterControl(IVekDataGridColumn<TItem> column) => builder =>
+    {
+        if (column.FilterTemplate is not null)
+        {
+            builder.AddContent(0, column.FilterTemplate(new VekDataGridFilterContext(
+                GetFilterValue(column.Key),
+                value => _ = ApplyTextFilter(column, value),
+                () => _ = ClearColumnFilter(column))));
+            return;
+        }
+
+        var sequence = 0;
+        if (FilterMode == VekDataGridFilterMode.ColumnMenu)
+        {
+            builder.OpenElement(sequence++, "details");
+            builder.OpenElement(sequence++, "summary");
+            builder.AddContent(sequence++, "Filter");
+            builder.CloseElement();
+        }
+        builder.OpenElement(sequence++, "label");
+        builder.AddContent(sequence++, column.Title);
+        builder.OpenElement(sequence++, "input");
+        builder.AddAttribute(sequence++, "aria-label", $"Filter {column.Title}");
+        builder.AddAttribute(sequence++, "value", GetFilterValue(column.Key) ?? string.Empty);
+        builder.AddAttribute(sequence++, "onchange", EventCallback.Factory.Create<ChangeEventArgs>(this,
+            args => ApplyTextFilter(column, args.Value?.ToString())));
+        builder.CloseElement();
+        builder.CloseElement();
+        if (FilterMode == VekDataGridFilterMode.ColumnMenu) builder.CloseElement();
+    };
+}

@@ -9,6 +9,7 @@ public partial class VekDataGrid<TItem>
 {
     private readonly List<IVekDataGridColumn<TItem>> _columns = [];
     private readonly List<ActiveSort> _sorts = [];
+    private readonly List<VekDataGridFilter> _filters = [];
     private int _currentPage = 1;
 
     private sealed record ActiveSort(IVekDataGridColumn<TItem> Column, VekSortDirection Direction);
@@ -37,6 +38,22 @@ public partial class VekDataGrid<TItem>
     [Parameter]
     public bool AllowUnsorted { get; set; }
 
+    /// <summary>Gets or sets an optional predicate applied before column filters.</summary>
+    [Parameter]
+    public Func<TItem, bool>? QuickFilter { get; set; }
+
+    /// <summary>Gets or sets where the grid displays column filter controls.</summary>
+    [Parameter]
+    public VekDataGridFilterMode FilterMode { get; set; } = VekDataGridFilterMode.Simple;
+
+    /// <summary>Gets or sets whether string comparisons distinguish letter case.</summary>
+    [Parameter]
+    public bool FilterCaseSensitive { get; set; }
+
+    /// <summary>Gets or sets a callback invoked after filters are applied or cleared.</summary>
+    [Parameter]
+    public EventCallback<IReadOnlyList<VekDataGridFilter>> FilterChanged { get; set; }
+
     /// <summary>
     /// Gets or sets a callback invoked after the active sort definitions change.
     /// </summary>
@@ -50,7 +67,44 @@ public partial class VekDataGrid<TItem>
         _currentPage,
         EffectivePageSize,
         GetSortState(),
-        Array.Empty<VekDataGridFilter>());
+        _filters.ToArray());
+
+    /// <summary>Applies or replaces the filter for a column and resets the current page.</summary>
+    public async Task ApplyFilterAsync(string columnKey, VekDataGridFilterOperator op, object? value, bool? caseSensitive = null)
+    {
+        _filters.RemoveAll(filter => filter.ColumnKey == columnKey);
+        if (op is not VekDataGridFilterOperator.IsNull and not VekDataGridFilterOperator.IsNotNull
+            and not VekDataGridFilterOperator.IsEmpty and not VekDataGridFilterOperator.IsNotEmpty
+            && value is null or "")
+        {
+            _currentPage = 1;
+            await FilterChanged.InvokeAsync(_filters.ToArray());
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        _filters.Add(new VekDataGridFilter(columnKey, op, value, caseSensitive ?? FilterCaseSensitive));
+        _currentPage = 1;
+        await FilterChanged.InvokeAsync(_filters.ToArray());
+        await InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>Clears one column filter or all filters when no key is supplied.</summary>
+    public async Task ClearFilterAsync(string? columnKey = null)
+    {
+        if (columnKey is null) _filters.Clear();
+        else _filters.RemoveAll(filter => filter.ColumnKey == columnKey);
+        _currentPage = 1;
+        await FilterChanged.InvokeAsync(_filters.ToArray());
+        await InvokeAsync(StateHasChanged);
+    }
+
+    internal string? GetFilterValue(string key) => _filters.FirstOrDefault(filter => filter.ColumnKey == key)?.Value?.ToString();
+
+    internal Task ApplyTextFilter(IVekDataGridColumn<TItem> column, string? value) =>
+        ApplyFilterAsync(column.Key, column.FilterOperator, value);
+
+    internal Task ClearColumnFilter(IVekDataGridColumn<TItem> column) => ClearFilterAsync(column.Key);
 
     /// <summary>
     /// Gets or sets an additional CSS class applied to the grid container.
@@ -95,7 +149,8 @@ public partial class VekDataGrid<TItem>
 
     private List<TItem> GetSortedItems()
     {
-        var items = Items?.ToList() ?? [];
+        var items = Items?.Where(item => QuickFilter?.Invoke(item) ?? true)
+            .Where(MatchesFilters).ToList() ?? [];
         if (_sorts.Count == 0)
         {
             return items;
@@ -103,6 +158,61 @@ public partial class VekDataGrid<TItem>
 
         var comparer = Comparer<TItem>.Create(CompareByActiveSorts);
         return items.OrderBy(item => item, comparer).ToList();
+    }
+
+    private bool MatchesFilters(TItem item)
+    {
+        foreach (var filter in _filters)
+        {
+            var column = _columns.FirstOrDefault(candidate => candidate.Key == filter.ColumnKey);
+            var selector = column?.FilterBy;
+            if (selector is null || !MatchesValue(selector(item), filter)) return false;
+        }
+        return true;
+    }
+
+    private static bool MatchesValue(object? source, VekDataGridFilter filter)
+    {
+        if (filter.Operator == VekDataGridFilterOperator.IsNull) return source is null;
+        if (filter.Operator == VekDataGridFilterOperator.IsNotNull) return source is not null;
+        if (filter.Operator == VekDataGridFilterOperator.IsEmpty) return source is null || source is string { Length: 0 };
+        if (filter.Operator == VekDataGridFilterOperator.IsNotEmpty) return source is not null && source is not string { Length: 0 };
+        if (source is null || filter.Value is null) return filter.Operator == VekDataGridFilterOperator.NotEquals && source != filter.Value;
+        if (source is string sourceText)
+        {
+            var value = Convert.ToString(filter.Value, System.Globalization.CultureInfo.CurrentCulture) ?? string.Empty;
+            var comparison = filter.CaseSensitive ? StringComparison.CurrentCulture : StringComparison.CurrentCultureIgnoreCase;
+            return filter.Operator switch
+            {
+                VekDataGridFilterOperator.Equals => string.Equals(sourceText, value, comparison),
+                VekDataGridFilterOperator.NotEquals => !string.Equals(sourceText, value, comparison),
+                VekDataGridFilterOperator.StartsWith => sourceText.StartsWith(value, comparison),
+                VekDataGridFilterOperator.EndsWith => sourceText.EndsWith(value, comparison),
+                _ => sourceText.Contains(value, comparison)
+            };
+        }
+
+        int result;
+        try
+        {
+            result = source is IComparable comparable
+                ? comparable.CompareTo(Convert.ChangeType(filter.Value, source.GetType(), System.Globalization.CultureInfo.CurrentCulture))
+                : Equals(source, filter.Value) ? 0 : -1;
+        }
+        catch (Exception exception) when (exception is FormatException or InvalidCastException or OverflowException or ArgumentException)
+        {
+            return false;
+        }
+        return filter.Operator switch
+        {
+            VekDataGridFilterOperator.Equals => result == 0,
+            VekDataGridFilterOperator.NotEquals => result != 0,
+            VekDataGridFilterOperator.GreaterThan => result > 0,
+            VekDataGridFilterOperator.GreaterThanOrEqual => result >= 0,
+            VekDataGridFilterOperator.LessThan => result < 0,
+            VekDataGridFilterOperator.LessThanOrEqual => result <= 0,
+            _ => false
+        };
     }
 
     private int GetTotalPages(int itemCount) => itemCount == 0

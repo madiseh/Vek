@@ -58,6 +58,22 @@ public partial class PropertyColumn<TItem, TValue>
     [Parameter]
     public IComparer<object?>? SortComparer { get; set; }
 
+    /// <summary>Gets or sets whether the column can be filtered.</summary>
+    [Parameter]
+    public bool Filterable { get; set; } = true;
+
+    /// <summary>Gets or sets an optional value selector for filtering.</summary>
+    [Parameter]
+    public Func<TItem, object?>? FilterBy { get; set; }
+
+    /// <summary>Gets or sets the default comparison used by the column filter.</summary>
+    [Parameter]
+    public VekDataGridFilterOperator FilterOperator { get; set; } = VekDataGridFilterOperator.Contains;
+
+    /// <summary>Gets or sets a custom filter control template.</summary>
+    [Parameter]
+    public RenderFragment<VekDataGridFilterContext>? FilterTemplate { get; set; }
+
     private Func<TItem, TValue>? _propertyGetter;
     private VekDataGrid<TItem>? _registeredGrid;
     private string? _lastPropertyExpression;
@@ -65,6 +81,8 @@ public partial class PropertyColumn<TItem, TValue>
     private string? _lastTitle;
     private string? _lastFormat;
     private bool _lastSortable;
+    private bool _lastFilterable;
+    private VekDataGridFilterOperator _lastFilterOperator;
 
     /// <summary>
     /// Updates the compiled property accessor and registers this column with its grid.
@@ -82,7 +100,9 @@ public partial class PropertyColumn<TItem, TValue>
             || Key != _lastKey
             || Title != _lastTitle
             || Format != _lastFormat
-            || Sortable != _lastSortable;
+            || Sortable != _lastSortable
+            || Filterable != _lastFilterable
+            || FilterOperator != _lastFilterOperator;
 
         if (_propertyGetter is null || propertyExpression != _lastPropertyExpression)
         {
@@ -106,6 +126,8 @@ public partial class PropertyColumn<TItem, TValue>
         _lastTitle = Title;
         _lastFormat = Format;
         _lastSortable = Sortable;
+        _lastFilterable = Filterable;
+        _lastFilterOperator = FilterOperator;
     }
 
     string IVekDataGridColumn<TItem>.Title => string.IsNullOrWhiteSpace(Title)
@@ -117,6 +139,16 @@ public partial class PropertyColumn<TItem, TValue>
         : Key;
 
     bool IVekDataGridColumn<TItem>.Sortable => Sortable;
+
+    bool IVekDataGridColumn<TItem>.Filterable => Filterable;
+
+    Func<TItem, object?>? IVekDataGridColumn<TItem>.FilterBy => !Filterable
+        ? null
+        : FilterBy ?? (item => _propertyGetter!(item));
+
+    VekDataGridFilterOperator IVekDataGridColumn<TItem>.FilterOperator => FilterOperator;
+
+    RenderFragment<VekDataGridFilterContext>? IVekDataGridColumn<TItem>.FilterTemplate => FilterTemplate;
 
     RenderFragment<TItem> IVekDataGridColumn<TItem>.CellTemplate => item => builder =>
     {

@@ -37,6 +37,14 @@ internal static class DataGridTestHelpers
             .Add(grid => grid.PageSize, 3)
             .AddChildContent(CustomSortColumn()));
 
+    internal static IRenderedComponent<VekDataGrid<TestProduct>> RenderQuickFilterGrid(
+        BunitContext context,
+        Func<TestProduct, bool> quickFilter) => context.Render<VekDataGrid<TestProduct>>(parameters => parameters
+            .Add(grid => grid.Items, Products)
+            .Add(grid => grid.PageSize, 3)
+            .Add(grid => grid.QuickFilter, quickFilter)
+            .AddChildContent(NameColumn()));
+
     internal static IRenderedComponent<VekDataGrid<TestProduct>> RenderPriceGrid(
         BunitContext context) => context.Render<VekDataGrid<TestProduct>>(parameters => parameters
             .Add(grid => grid.Items, Products)

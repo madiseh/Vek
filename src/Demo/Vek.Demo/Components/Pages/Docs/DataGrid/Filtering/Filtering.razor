@@ -1,0 +1,60 @@
+@page "/docs/components/vekdatagrid/filtering"
+@layout DocumentationLayout
+
+<PageTitle>VekDataGrid Filtering | Vek Components</PageTitle>
+
+<div class="docs-page-layout">
+    <article class="docs-article">
+        <h1>VekDataGrid: Filtering</h1>
+        <p class="docs-intro">Combine quick predicates with per-column filters, choose a filter surface, and control string matching.</p>
+
+        <section id="live-example" class="docs-section-content" aria-labelledby="live-example-heading">
+            <h2 id="live-example-heading">Live example</h2>
+            <p>Choose a filter layout, then enter a value to narrow the products.</p>
+            <div class="filter-mode-picker" role="group" aria-label="Filter layout">
+                <button type="button" class="@ModeClass(VekDataGridFilterMode.Simple)" @onclick="() => SetMode(VekDataGridFilterMode.Simple)">Panel</button>
+                <button type="button" class="@ModeClass(VekDataGridFilterMode.ColumnMenu)" @onclick="() => SetMode(VekDataGridFilterMode.ColumnMenu)">Column menu</button>
+                <button type="button" class="@ModeClass(VekDataGridFilterMode.ColumnRow)" @onclick="() => SetMode(VekDataGridFilterMode.ColumnRow)">Filter row</button>
+            </div>
+            @if (_products is null)
+            {
+                <p class="docs-loading" role="status">Loading sample products...</p>
+            }
+            else
+            {
+                <div class="docs-example-frame">
+                    <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="10" FilterMode="_filterMode">
+                        <PropertyColumn Property="product => product.Name" Title="Name" FilterOperator="VekDataGridFilterOperator.Contains" />
+                        <PropertyColumn Property="product => product.Category" Title="Category" FilterOperator="VekDataGridFilterOperator.Contains" />
+                        <PropertyColumn Property="product => product.Price" Title="Price" Format="C2" FilterOperator="VekDataGridFilterOperator.GreaterThanOrEqual" />
+                    </VekDataGrid>
+                </div>
+            }
+        </section>
+
+        <section id="code" class="docs-section-content" aria-labelledby="code-heading">
+            <h2 id="code-heading">Code</h2>
+            <p>Columns can select their comparison operator, and the grid applies filters before sorting and paging.</p>
+            <div class="code-sample">
+                <div class="code-tabs" role="group" aria-label="Code sample files">
+                    <button type="button" class="code-tab @(!_showCodeBehind ? "is-active" : null)" data-sample="razor" aria-pressed="@(!_showCodeBehind)" @onclick="ShowRazor">Sample.razor</button>
+                    <button type="button" class="code-tab @(_showCodeBehind ? "is-active" : null)" data-sample="code-behind" aria-pressed="@_showCodeBehind" @onclick="ShowCodeBehind">Sample.razor.cs</button>
+                </div>
+                <pre><code>@SelectedCode</code></pre>
+            </div>
+        </section>
+
+        <section id="filter-modes" class="docs-section-content" aria-labelledby="filter-modes-heading">
+            <h2 id="filter-modes-heading">Filter modes and operators</h2>
+            <p><code>Simple</code> places controls above the grid, <code>ColumnMenu</code> groups each control in a menu, and <code>ColumnRow</code> places controls below the headings. Use <code>FilterBy</code> for a custom selector, <code>FilterTemplate</code> for a custom editor, and <code>FilterCaseSensitive</code> to set string matching behavior.</p>
+            <p>Available operators include equality, text matching, numeric comparisons, and null or empty checks. Filter changes reset the page and are exposed through <code>CurrentState</code> and <code>FilterChanged</code>.</p>
+        </section>
+    </article>
+
+    <nav class="docs-toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <a href="/docs/components/vekdatagrid/filtering#live-example">Live example</a>
+        <a href="/docs/components/vekdatagrid/filtering#code">Code</a>
+        <a href="/docs/components/vekdatagrid/filtering#filter-modes">Filter modes</a>
+    </nav>
+</div>

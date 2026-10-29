@@ -62,6 +62,31 @@ public enum VekDataGridFilterOperator
     IsNotNull
 }
 
+/// <summary>Chooses where a grid displays column filter controls.</summary>
+public enum VekDataGridFilterMode
+{
+    /// <summary>Displays a compact filter panel above the table.</summary>
+    Simple,
+    /// <summary>Displays filter controls in each column menu.</summary>
+    ColumnMenu,
+    /// <summary>Displays filter controls in a row below the headings.</summary>
+    ColumnRow
+}
+
+/// <summary>Provides a custom filter template with apply and clear actions.</summary>
+public sealed class VekDataGridFilterContext
+{
+    internal VekDataGridFilterContext(string? value, Action<string?> apply, Action clear)
+        => (Value, Apply, Clear) = (value, apply, clear);
+
+    /// <summary>Gets the currently applied text value.</summary>
+    public string? Value { get; }
+    /// <summary>Applies a value using the column's configured filter operator.</summary>
+    public Action<string?> Apply { get; }
+    /// <summary>Removes the active filter.</summary>
+    public Action Clear { get; }
+}
+
 /// <summary>
 /// Describes one ordered sort operation in a grid state.
 /// </summary>

@@ -15,6 +15,10 @@ internal interface IVekDataGridColumn<TItem>
     /// Gets whether this column can be sorted.
     /// </summary>
     bool Sortable { get; }
+    bool Filterable { get; }
+    Func<TItem, object?>? FilterBy { get; }
+    VekDataGridFilterOperator FilterOperator { get; }
+    RenderFragment<VekDataGridFilterContext>? FilterTemplate { get; }
 
     /// <summary>
     /// Gets the heading displayed for the column.

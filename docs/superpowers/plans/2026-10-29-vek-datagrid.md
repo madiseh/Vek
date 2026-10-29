@@ -94,12 +94,12 @@ Task 1 defines these Vek-owned contracts, then later tasks extend them only when
 
 **Interfaces:** Consumes columns with filter selectors. Produces quick filtering, per-column filter definitions/operators, simple panel, per-column menu and inline-row modes, case sensitivity, custom filter templates, and filter state callbacks.
 
-- [ ] Add tests `QuickFilterMatchesAcrossRows`, `ColumnFilterModesApplyPredicates`, `StringCaseSensitivityIsConfigurable`, `FilterTemplateAppliesAndClearsDefinition`, and `ApplyingFilterResetsPage`.
-- [ ] Run focused filtering tests; confirm failures represent missing behavior.
-- [ ] Implement filter state, client evaluation, filter UI variants, custom filter surfaces, and clearing/apply behavior.
-- [ ] Rerun focused filtering tests and component suite.
-- [ ] Add the live Filtering page with examples for each mode and a tested route.
-- [ ] Commit as `feat: add data grid filtering`.
+- [x] Add tests `QuickFilterMatchesAcrossRows`, `ColumnFilterModesApplyPredicates`, `StringCaseSensitivityIsConfigurable`, `FilterTemplateAppliesAndClearsDefinition`, and `ApplyingFilterResetsPage`.
+- [x] Run focused filtering tests; confirm failures represent missing behavior.
+- [x] Implement filter state, client evaluation, filter UI variants, custom filter surfaces, and clearing/apply behavior.
+- [x] Rerun focused filtering tests and component suite.
+- [x] Add the live Filtering page with examples for each mode and a tested route.
+- [x] Commit as `feat: add data grid filtering`.
 
 ### Task 4: Paging
 

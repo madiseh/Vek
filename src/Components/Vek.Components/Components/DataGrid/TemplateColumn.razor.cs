@@ -67,6 +67,10 @@ public partial class TemplateColumn<TItem>
     string IVekDataGridColumn<TItem>.Key => Key ?? Title;
 
     bool IVekDataGridColumn<TItem>.Sortable => Sortable;
+    bool IVekDataGridColumn<TItem>.Filterable => false;
+    Func<TItem, object?>? IVekDataGridColumn<TItem>.FilterBy => null;
+    VekDataGridFilterOperator IVekDataGridColumn<TItem>.FilterOperator => VekDataGridFilterOperator.Contains;
+    RenderFragment<VekDataGridFilterContext>? IVekDataGridColumn<TItem>.FilterTemplate => null;
 
     string IVekDataGridColumn<TItem>.Title => Title;
 
