@@ -73,6 +73,26 @@ public enum VekDataGridFilterMode
     ColumnRow
 }
 
+/// <summary>Controls whether the grid permits no, one, or multiple selected rows.</summary>
+public enum VekDataGridSelectionMode
+{
+    /// <summary>Row selection is disabled.</summary>
+    None,
+    /// <summary>Only one row can be selected at a time.</summary>
+    Single,
+    /// <summary>Multiple rows can be selected at a time.</summary>
+    Multiple
+}
+
+/// <summary>Controls selection retention when an active filter hides selected rows.</summary>
+public enum VekDataGridFilteredSelectionMode
+{
+    /// <summary>Keep selected items while they are filtered out.</summary>
+    Keep,
+    /// <summary>Remove selected items when a filter hides them.</summary>
+    Clear
+}
+
 /// <summary>Provides a custom filter template with apply and clear actions.</summary>
 public sealed class VekDataGridFilterContext
 {

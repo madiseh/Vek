@@ -120,12 +120,12 @@ Task 1 defines these Vek-owned contracts, then later tasks extend them only when
 
 **Interfaces:** Produces single/multiple selected item state, row-click/explicit-checkbox selection, select-column capability, disabled-row predicate, stable comparer, and selection callbacks.
 
-- [ ] Add tests `RowClickSelectsSingleItem`, `CheckboxSelectsMultipleItems`, `DisabledRowsCannotBeSelected`, `ComparerKeepsSelectionAfterItemsRefresh`, and `FilteredOutSelectionFollowsConfiguredPolicy`.
-- [ ] Run focused selection tests and confirm failures.
-- [ ] Implement selection semantics and accessible checkbox labels without coupling them to visual styling.
-- [ ] Run focused selection tests and component suite.
-- [ ] Add the live Selection page using `DemoProduct` and verify its route.
-- [ ] Commit as `feat: add data grid row selection`.
+- [x] Add tests `RowClickSelectsSingleItem`, `CheckboxSelectsMultipleItems`, `DisabledRowsCannotBeSelected`, `ComparerKeepsSelectionAfterItemsRefresh`, and `FilteredOutSelectionFollowsConfiguredPolicy`.
+- [x] Run focused selection tests and confirm failures.
+- [x] Implement selection semantics and accessible checkbox labels without coupling them to visual styling.
+- [x] Run focused selection tests and component suite.
+- [x] Add the live Selection page using `DemoProduct` and verify its route.
+- [x] Commit as `feat: add data grid row selection`.
 
 ### Task 6: Editing and validation
 

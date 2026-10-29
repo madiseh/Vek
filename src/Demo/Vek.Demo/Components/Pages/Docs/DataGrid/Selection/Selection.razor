@@ -1,0 +1,60 @@
+@page "/docs/components/vekdatagrid/selection"
+@layout DocumentationLayout
+
+<PageTitle>VekDataGrid Row Selection | Vek Components</PageTitle>
+
+<div class="docs-page-layout">
+    <article class="docs-article">
+        <h1>VekDataGrid: Row Selection</h1>
+        <p class="docs-intro">Bind one or many selected products, select from the row or checkbox, and control which rows can be selected.</p>
+
+        <section id="live-example" class="docs-section-content" aria-labelledby="live-example-heading">
+            <h2 id="live-example-heading">Live example</h2>
+            <p>Select products with the row checkboxes or click a row. The header checkbox selects the current page.</p>
+            @if (_products is null)
+            {
+                <p class="docs-loading" role="status">Loading sample products...</p>
+            }
+            else
+            {
+                <div class="docs-example-frame">
+                    <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="10"
+                                 SelectionMode="VekDataGridSelectionMode.Multiple"
+                                 @bind-SelectedItems="_selectedProducts"
+                                 RowClickSelection="true"
+                                 IsRowSelectable="CanSelectProduct">
+                        <SelectionColumn TItem="DemoProduct" />
+                        <PropertyColumn Property="product => product.Name" Title="Name" />
+                        <PropertyColumn Property="product => product.Category" Title="Category" />
+                        <PropertyColumn Property="product => product.Price" Title="Price" Format="C2" />
+                    </VekDataGrid>
+                    <p class="selection-summary" aria-live="polite">@_selectedProducts.Count selected: @string.Join(", ", _selectedProducts.Select(product => product.Name))</p>
+                </div>
+            }
+        </section>
+
+        <section id="code" class="docs-section-content" aria-labelledby="code-heading">
+            <h2 id="code-heading">Code</h2>
+            <div class="code-sample">
+                <div class="code-tabs" role="group" aria-label="Code sample files">
+                    <button type="button" class="code-tab @(!_showCodeBehind ? "is-active" : null)" data-sample="razor" aria-pressed="@(!_showCodeBehind)" @onclick="ShowRazor">Sample.razor</button>
+                    <button type="button" class="code-tab @(_showCodeBehind ? "is-active" : null)" data-sample="code-behind" aria-pressed="@_showCodeBehind" @onclick="ShowCodeBehind">Sample.razor.cs</button>
+                </div>
+                <pre><code>@SelectedCode</code></pre>
+            </div>
+        </section>
+
+        <section id="selection-options" class="docs-section-content" aria-labelledby="selection-options-heading">
+            <h2 id="selection-options-heading">Selection options</h2>
+            <p>Choose <code>None</code>, <code>Single</code>, or <code>Multiple</code>. Bind <code>SelectedItem</code> or <code>SelectedItems</code>, add a <code>SelectionColumn</code> for checkbox selection, and provide an <code>IsRowSelectable</code> predicate for disabled rows.</p>
+            <p><code>SelectionComparer</code> matches selected rows when data refreshes. <code>FilteredSelectionMode</code> chooses whether filtered rows remain selected or are cleared.</p>
+        </section>
+    </article>
+
+    <nav class="docs-toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <a href="/docs/components/vekdatagrid/selection#live-example">Live example</a>
+        <a href="/docs/components/vekdatagrid/selection#code">Code</a>
+        <a href="/docs/components/vekdatagrid/selection#selection-options">Selection options</a>
+    </nav>
+</div>

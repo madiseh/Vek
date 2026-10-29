@@ -19,6 +19,7 @@ internal interface IVekDataGridColumn<TItem>
     Func<TItem, object?>? FilterBy { get; }
     VekDataGridFilterOperator FilterOperator { get; }
     RenderFragment<VekDataGridFilterContext>? FilterTemplate { get; }
+    bool IsSelectionColumn { get; }
 
     /// <summary>
     /// Gets the heading displayed for the column.

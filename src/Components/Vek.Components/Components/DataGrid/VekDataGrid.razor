@@ -35,17 +35,29 @@
                     {
                         var sortPriority = GetSortPriority(column);
                         <th scope="col" aria-sort="@GetAriaSort(column)">
-                            <button type="button"
-                                    class="sort-button"
-                                    disabled="@(SortMode == VekDataGridSortMode.None || !column.Sortable)"
-                                    aria-label="Sort by @column.Title"
-                                    @onclick="args => SortBy(column, args)">
-                                @column.Title
-                                @if (sortPriority.HasValue)
+                            @if (column.IsSelectionColumn)
+                            {
+                                @if (SelectionMode == VekDataGridSelectionMode.Multiple)
                                 {
-                                    <span class="sort-indicator" aria-hidden="true">@GetSortIndicator(column)</span>
+                                    <input type="checkbox" aria-label="Select all visible rows"
+                                           checked="@AreAllVisibleItemsSelected()"
+                                           @onchange="args => ToggleAllVisibleItemsAsync(args.Value is true)" />
                                 }
-                            </button>
+                            }
+                            else
+                            {
+                                <button type="button"
+                                        class="sort-button"
+                                        disabled="@(SortMode == VekDataGridSortMode.None || !column.Sortable)"
+                                        aria-label="Sort by @column.Title"
+                                        @onclick="args => SortBy(column, args)">
+                                    @column.Title
+                                    @if (sortPriority.HasValue)
+                                    {
+                                        <span class="sort-indicator" aria-hidden="true">@GetSortIndicator(column)</span>
+                                    }
+                                </button>
+                            }
                             @if (FilterMode == VekDataGridFilterMode.ColumnMenu && column.Filterable)
                             {
                                 @RenderFilterControl(column)
@@ -74,7 +86,9 @@
                 {
                     @foreach (var item in pageItems)
                     {
-                        <tr>
+                        <tr class="@(IsItemSelected(item) ? "is-selected" : null)"
+                            aria-selected="@IsItemSelected(item)"
+                            @onclick="() => SelectRowAsync(item)">
                             @foreach (var column in _columns)
                             {
                                 <td>@column.CellTemplate(item)</td>

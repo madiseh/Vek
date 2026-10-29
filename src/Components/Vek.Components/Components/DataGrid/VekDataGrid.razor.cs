@@ -50,6 +50,42 @@ public partial class VekDataGrid<TItem>
     [Parameter]
     public RenderFragment<VekDataGridPagerContext<TItem>>? PagerContent { get; set; }
 
+    /// <summary>Gets or sets the row selection mode.</summary>
+    [Parameter]
+    public VekDataGridSelectionMode SelectionMode { get; set; }
+
+    /// <summary>Gets or sets the selected item in single-selection mode.</summary>
+    [Parameter]
+    public TItem? SelectedItem { get; set; }
+
+    /// <summary>Gets or sets the callback invoked when the selected item changes.</summary>
+    [Parameter]
+    public EventCallback<TItem?> SelectedItemChanged { get; set; }
+
+    /// <summary>Gets or sets the selected items in multiple-selection mode.</summary>
+    [Parameter]
+    public IReadOnlyList<TItem> SelectedItems { get; set; } = Array.Empty<TItem>();
+
+    /// <summary>Gets or sets the callback invoked when the selected item collection changes.</summary>
+    [Parameter]
+    public EventCallback<IReadOnlyList<TItem>> SelectedItemsChanged { get; set; }
+
+    /// <summary>Gets or sets whether clicking a row toggles its selection.</summary>
+    [Parameter]
+    public bool RowClickSelection { get; set; }
+
+    /// <summary>Gets or sets a predicate that disables selection for matching rows.</summary>
+    [Parameter]
+    public Func<TItem, bool>? IsRowSelectable { get; set; }
+
+    /// <summary>Gets or sets the comparer used to identify selected rows across data refreshes.</summary>
+    [Parameter]
+    public IEqualityComparer<TItem>? SelectionComparer { get; set; }
+
+    /// <summary>Gets or sets the policy used when filters hide selected rows.</summary>
+    [Parameter]
+    public VekDataGridFilteredSelectionMode FilteredSelectionMode { get; set; }
+
     /// <summary>
     /// Gets or sets whether sorting is disabled, limited to one column, or applied to multiple columns.
     /// </summary>
@@ -103,6 +139,7 @@ public partial class VekDataGrid<TItem>
         {
             _currentPage = 1;
             await FilterChanged.InvokeAsync(_filters.ToArray());
+            await NotifySelectionAfterFilteringAsync();
             await InvokeAsync(StateHasChanged);
             return;
         }
@@ -110,6 +147,7 @@ public partial class VekDataGrid<TItem>
         _filters.Add(new VekDataGridFilter(columnKey, op, value, caseSensitive ?? FilterCaseSensitive));
         _currentPage = 1;
         await FilterChanged.InvokeAsync(_filters.ToArray());
+        await NotifySelectionAfterFilteringAsync();
         await InvokeAsync(StateHasChanged);
     }
 
@@ -120,6 +158,7 @@ public partial class VekDataGrid<TItem>
         else _filters.RemoveAll(filter => filter.ColumnKey == columnKey);
         _currentPage = 1;
         await FilterChanged.InvokeAsync(_filters.ToArray());
+        await NotifySelectionAfterFilteringAsync();
         await InvokeAsync(StateHasChanged);
     }
 
@@ -129,6 +168,73 @@ public partial class VekDataGrid<TItem>
         ApplyFilterAsync(column.Key, column.FilterOperator, value);
 
     internal Task ClearColumnFilter(IVekDataGridColumn<TItem> column) => ClearFilterAsync(column.Key);
+
+    /// <summary>Gets whether an item can currently be selected.</summary>
+    public bool CanSelectItem(TItem item) => SelectionMode != VekDataGridSelectionMode.None
+        && (IsRowSelectable?.Invoke(item) ?? true);
+
+    /// <summary>Gets whether an item is selected using the configured comparer.</summary>
+    public bool IsItemSelected(TItem item) => SelectedItems.Any(selected => ItemComparer.Equals(selected, item));
+
+    /// <summary>Toggles selection for one row and invokes the appropriate binding callbacks.</summary>
+    public async Task ToggleSelectionAsync(TItem item, bool selected)
+    {
+        if (!CanSelectItem(item)) return;
+
+        if (SelectionMode == VekDataGridSelectionMode.Single)
+        {
+            SelectedItem = selected ? item : default;
+            SelectedItems = selected ? new[] { item } : Array.Empty<TItem>();
+            await SelectedItemChanged.InvokeAsync(SelectedItem);
+        }
+        else if (SelectionMode == VekDataGridSelectionMode.Multiple)
+        {
+            var selectedItems = SelectedItems.ToList();
+            selectedItems.RemoveAll(existing => ItemComparer.Equals(existing, item));
+            if (selected) selectedItems.Add(item);
+            SelectedItems = selectedItems;
+            SelectedItem = selectedItems.FirstOrDefault();
+            await SelectedItemsChanged.InvokeAsync(SelectedItems);
+            await SelectedItemChanged.InvokeAsync(SelectedItem);
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>Selects a row from its click interaction when row-click selection is enabled.</summary>
+    public Task SelectRowAsync(TItem item) => RowClickSelection && CanSelectItem(item)
+        ? ToggleSelectionAsync(item, SelectionMode == VekDataGridSelectionMode.Single || !IsItemSelected(item))
+        : Task.CompletedTask;
+
+    /// <summary>Gets whether every row on the current page is selected.</summary>
+    public bool AreAllVisibleItemsSelected()
+    {
+        var visibleItems = GetPageItems().Where(CanSelectItem).ToList();
+        return visibleItems.Count > 0 && visibleItems.All(IsItemSelected);
+    }
+
+    /// <summary>Selects or clears all selectable rows on the current page.</summary>
+    public async Task ToggleAllVisibleItemsAsync(bool selected)
+    {
+        foreach (var item in GetPageItems().Where(CanSelectItem))
+        {
+            var selectedItems = SelectedItems.ToList();
+            selectedItems.RemoveAll(existing => ItemComparer.Equals(existing, item));
+            if (selected) selectedItems.Add(item);
+            SelectedItems = selectedItems;
+        }
+        SelectedItem = SelectedItems.FirstOrDefault();
+        await SelectedItemsChanged.InvokeAsync(SelectedItems);
+        await SelectedItemChanged.InvokeAsync(SelectedItem);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private IEqualityComparer<TItem> ItemComparer => SelectionComparer ?? EqualityComparer<TItem>.Default;
+
+    private List<TItem> GetPageItems() => GetSortedItems()
+        .Skip((_currentPage - 1) * EffectivePageSize)
+        .Take(EffectivePageSize)
+        .ToList();
 
     /// <summary>
     /// Gets or sets an additional CSS class applied to the grid container.
@@ -152,6 +258,48 @@ public partial class VekDataGrid<TItem>
         {
             _currentPage = lastPage;
             await CurrentPageChanged.InvokeAsync(_currentPage);
+        }
+
+        var selectionChanged = ReconcileSelection();
+        if (selectionChanged)
+        {
+            await SelectedItemsChanged.InvokeAsync(SelectedItems);
+            await SelectedItemChanged.InvokeAsync(SelectedItem);
+        }
+    }
+
+    private bool ReconcileSelection()
+    {
+        if (SelectedItems.Count == 0 && SelectedItem is null) return false;
+        var currentItems = Items?.ToList() ?? [];
+        var reconciled = SelectedItems.Select(selected =>
+                currentItems.FirstOrDefault(current => ItemComparer.Equals(current, selected)) ?? selected)
+            .ToList();
+        var selectedItem = SelectedItem is null
+            ? reconciled.FirstOrDefault()
+            : currentItems.FirstOrDefault(current => ItemComparer.Equals(current, SelectedItem)) ?? SelectedItem;
+
+        if (FilteredSelectionMode == VekDataGridFilteredSelectionMode.Clear)
+        {
+            reconciled.RemoveAll(item => !MatchesCurrentFilters(item));
+            if (selectedItem is not null && !MatchesCurrentFilters(selectedItem)) selectedItem = default;
+        }
+
+        var changed = !reconciled.SequenceEqual(SelectedItems, ItemComparer)
+            || (SelectedItem is not null && selectedItem is not null && !ReferenceEquals(SelectedItem, selectedItem));
+        SelectedItems = reconciled;
+        SelectedItem = selectedItem;
+        return changed;
+    }
+
+    private bool MatchesCurrentFilters(TItem item) => (QuickFilter?.Invoke(item) ?? true) && MatchesFilters(item);
+
+    private async Task NotifySelectionAfterFilteringAsync()
+    {
+        if (FilteredSelectionMode == VekDataGridFilteredSelectionMode.Clear && ReconcileSelection())
+        {
+            await SelectedItemsChanged.InvokeAsync(SelectedItems);
+            await SelectedItemChanged.InvokeAsync(SelectedItem);
         }
     }
 

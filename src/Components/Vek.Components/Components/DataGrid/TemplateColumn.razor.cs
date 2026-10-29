@@ -71,6 +71,7 @@ public partial class TemplateColumn<TItem>
     Func<TItem, object?>? IVekDataGridColumn<TItem>.FilterBy => null;
     VekDataGridFilterOperator IVekDataGridColumn<TItem>.FilterOperator => VekDataGridFilterOperator.Contains;
     RenderFragment<VekDataGridFilterContext>? IVekDataGridColumn<TItem>.FilterTemplate => null;
+    bool IVekDataGridColumn<TItem>.IsSelectionColumn => false;
 
     string IVekDataGridColumn<TItem>.Title => Title;
 

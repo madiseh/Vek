@@ -153,6 +153,30 @@ public sealed class DemoPageNavigationTests : BunitContext
     }
 
     /// <summary>
+    /// Verifies the selection guide renders a live selection column and its binding example.
+    /// </summary>
+    [Fact]
+    public void DataGridSelectionRouteShowsLiveGridAndExample()
+    {
+        Services.AddSingleton<IDemoProductProvider>(new TestProductProvider(
+        [
+            new DemoProduct(1, "Desk Lamp", "Furniture", 49.99m),
+            new DemoProduct(2, "Task Chair", "Furniture", 199.00m)
+        ]));
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo("/docs/components/vekdatagrid/selection");
+
+        var cut = Render<Routes>();
+
+        Assert.Equal("VekDataGrid: Row Selection", cut.Find("main h1").TextContent.Trim());
+        Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
+        Assert.Contains("SelectionColumn", cut.Find(".code-sample pre code").TextContent);
+        Assert.Equal(
+            "/docs/components/vekdatagrid/selection",
+            cut.Find(".docs-sidebar a.active").GetAttribute("href"));
+    }
+
+    /// <summary>
     /// Verifies that the code sample switches from Razor markup to its C# code-behind.
     /// </summary>
     [Fact]

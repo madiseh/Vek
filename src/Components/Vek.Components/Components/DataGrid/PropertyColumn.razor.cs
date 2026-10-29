@@ -150,6 +150,8 @@ public partial class PropertyColumn<TItem, TValue>
 
     RenderFragment<VekDataGridFilterContext>? IVekDataGridColumn<TItem>.FilterTemplate => FilterTemplate;
 
+    bool IVekDataGridColumn<TItem>.IsSelectionColumn => false;
+
     RenderFragment<TItem> IVekDataGridColumn<TItem>.CellTemplate => item => builder =>
     {
         if (CellTemplate is not null)
