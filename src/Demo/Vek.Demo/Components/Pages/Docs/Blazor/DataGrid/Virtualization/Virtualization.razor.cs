@@ -39,8 +39,11 @@ public partial class Virtualization
         .ToArray();
 
     private IReadOnlyList<DemoProduct> _products => Products;
-    private bool _showCodeBehind;
-    private string SelectedCode => _showCodeBehind ? CodeBehindExample : RazorExample;
+    private readonly IReadOnlyList<VekCodeViewTab> _codeSamples =
+    [
+        new("Sample.razor", VekCodeLanguage.Html, RazorExample),
+        new("Sample.razor.cs", VekCodeLanguage.CSharp, CodeBehindExample)
+    ];
 
     private Task<VekDataGridData<DemoProduct>> LoadVirtualRangeAsync(
         VekDataGridState<DemoProduct> state,
@@ -85,6 +88,4 @@ public partial class Virtualization
         return Task.FromResult(new VekDataGridData<DemoProduct>(items, results.Length));
     }
 
-    private void ShowRazor() => _showCodeBehind = false;
-    private void ShowCodeBehind() => _showCodeBehind = true;
 }

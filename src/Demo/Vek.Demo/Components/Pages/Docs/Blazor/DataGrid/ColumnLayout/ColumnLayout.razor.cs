@@ -39,8 +39,11 @@ public partial class ColumnLayout
         new("Product", ["Name", "Category"]),
         new("Pricing", ["Price"])
     ];
-    private bool _showCodeBehind;
-    private string SelectedCode => _showCodeBehind ? CodeBehindExample : RazorExample;
+    private readonly IReadOnlyList<VekCodeViewTab> _codeSamples =
+    [
+        new("Sample.razor", VekCodeLanguage.Html, RazorExample),
+        new("Sample.razor.cs", VekCodeLanguage.CSharp, CodeBehindExample)
+    ];
 
     protected override async Task OnInitializedAsync() => _products = await ProductProvider.GetProductsAsync();
 
@@ -50,6 +53,4 @@ public partial class ColumnLayout
     private string? GetCellClass(DemoProduct product, string columnKey, int index)
         => columnKey == "Price" ? "price-cell" : null;
 
-    private void ShowRazor() => _showCodeBehind = false;
-    private void ShowCodeBehind() => _showCodeBehind = true;
 }

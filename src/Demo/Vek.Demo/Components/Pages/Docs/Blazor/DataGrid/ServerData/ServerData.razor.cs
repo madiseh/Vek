@@ -31,8 +31,11 @@ public partial class ServerData
     [Inject]
     private IDemoProductProvider ProductProvider { get; set; } = default!;
 
-    private bool _showCodeBehind;
-    private string SelectedCode => _showCodeBehind ? CodeBehindExample : RazorExample;
+    private readonly IReadOnlyList<VekCodeViewTab> _codeSamples =
+    [
+        new("Sample.razor", VekCodeLanguage.Html, RazorExample),
+        new("Sample.razor.cs", VekCodeLanguage.CSharp, CodeBehindExample)
+    ];
 
     private async Task<VekDataGridData<DemoProduct>> LoadServerPageAsync(
         VekDataGridState<DemoProduct> state,
@@ -112,6 +115,4 @@ public partial class ServerData
         return ordered ?? products.OrderBy(product => product.Id);
     }
 
-    private void ShowRazor() => _showCodeBehind = false;
-    private void ShowCodeBehind() => _showCodeBehind = true;
 }

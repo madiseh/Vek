@@ -46,11 +46,12 @@ public partial class Pagination
     private readonly int[] _pageSizeOptions = [3, 5, 10];
     private int _pageSize = 3;
     private int _currentPage = 1;
-    private bool _showCodeBehind;
+    private readonly IReadOnlyList<VekCodeViewTab> _codeSamples =
+    [
+        new("Sample.razor", VekCodeLanguage.Html, RazorExample),
+        new("Sample.razor.cs", VekCodeLanguage.CSharp, CodeBehindExample)
+    ];
 
-    private string SelectedCode => _showCodeBehind ? CodeBehindExample : RazorExample;
 
     protected override async Task OnInitializedAsync() => _products = await ProductProvider.GetProductsAsync();
-    private void ShowRazor() => _showCodeBehind = false;
-    private void ShowCodeBehind() => _showCodeBehind = true;
 }

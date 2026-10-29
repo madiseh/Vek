@@ -36,16 +36,17 @@ public partial class Sorting
     private IDemoProductProvider ProductProvider { get; set; } = default!;
 
     private IReadOnlyList<DemoProduct>? _products;
-    private bool _showCodeBehind;
+    private readonly IReadOnlyList<VekCodeViewTab> _codeSamples =
+    [
+        new("Sample.razor", VekCodeLanguage.Html, RazorExample),
+        new("Sample.razor.cs", VekCodeLanguage.CSharp, CodeBehindExample)
+    ];
 
-    private string SelectedCode => _showCodeBehind ? CodeBehindExample : RazorExample;
 
     protected override async Task OnInitializedAsync()
     {
         _products = await ProductProvider.GetProductsAsync();
     }
 
-    private void ShowRazor() => _showCodeBehind = false;
 
-    private void ShowCodeBehind() => _showCodeBehind = true;
 }

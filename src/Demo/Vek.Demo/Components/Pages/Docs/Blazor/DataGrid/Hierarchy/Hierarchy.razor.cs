@@ -38,12 +38,13 @@ public partial class Hierarchy
 
     private IReadOnlyList<DemoProduct>? _products;
     private bool _singleExpanded = true;
-    private bool _showCodeBehind;
+    private readonly IReadOnlyList<VekCodeViewTab> _codeSamples =
+    [
+        new("Sample.razor", VekCodeLanguage.Html, RazorExample),
+        new("Sample.razor.cs", VekCodeLanguage.CSharp, CodeBehindExample)
+    ];
 
-    private string SelectedCode => _showCodeBehind ? CodeBehindExample : RazorExample;
     private static bool InitiallyExpanded(DemoProduct product) => product.Category == "Furniture";
 
     protected override async Task OnInitializedAsync() => _products = await ProductProvider.GetProductsAsync();
-    private void ShowRazor() => _showCodeBehind = false;
-    private void ShowCodeBehind() => _showCodeBehind = true;
 }

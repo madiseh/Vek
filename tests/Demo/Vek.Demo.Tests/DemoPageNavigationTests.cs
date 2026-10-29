@@ -148,7 +148,7 @@ public sealed class DemoPageNavigationTests : BunitContext
 
         Assert.Equal("VekDataGrid: Sorting", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
-        Assert.Contains("SortMode=\"VekDataGridSortMode.Multiple\"", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("SortMode=\"VekDataGridSortMode.Multiple\"", cut.Find(".vek-code-view pre code").TextContent);
         Assert.Equal(
             "/docs/components/vekdatagrid/sorting",
             cut.Find(".docs-sidebar a.active").GetAttribute("href"));
@@ -172,7 +172,7 @@ public sealed class DemoPageNavigationTests : BunitContext
 
         Assert.Equal("VekDataGrid: Filtering", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
-        Assert.Contains("FilterMode=\"VekDataGridFilterMode.ColumnRow\"", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("FilterMode=\"VekDataGridFilterMode.ColumnRow\"", cut.Find(".vek-code-view pre code").TextContent);
         Assert.Contains("Filterable", cut.Find("#filter-options").TextContent);
         Assert.Contains("FilterBy", cut.Find("#filter-options").TextContent);
         var filterModeButtons = cut.FindAll(".filter-mode-picker button");
@@ -203,7 +203,7 @@ public sealed class DemoPageNavigationTests : BunitContext
 
         Assert.Equal("VekDataGrid: Pagination", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
-        Assert.Contains("<PagerContent Context=\"pager\">", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("<PagerContent Context=\"pager\">", cut.Find(".vek-code-view pre code").TextContent);
         Assert.Equal(
             "/docs/components/vekdatagrid/pagination",
             cut.Find(".docs-sidebar a.active").GetAttribute("href"));
@@ -227,7 +227,7 @@ public sealed class DemoPageNavigationTests : BunitContext
 
         Assert.Equal("VekDataGrid: Row Selection", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
-        Assert.Contains("SelectionColumn", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("SelectionColumn", cut.Find(".vek-code-view pre code").TextContent);
         Assert.Equal(
             "/docs/components/vekdatagrid/selection",
             cut.Find(".docs-sidebar a.active").GetAttribute("href"));
@@ -251,7 +251,7 @@ public sealed class DemoPageNavigationTests : BunitContext
 
         Assert.Equal("VekDataGrid: Editing and Validation", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
-        Assert.Contains("EditTemplate", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("EditTemplate", cut.Find(".vek-code-view pre code").TextContent);
         Assert.Equal(
             "/docs/components/vekdatagrid/editing",
             cut.Find(".docs-sidebar a.active").GetAttribute("href"));
@@ -276,7 +276,7 @@ public sealed class DemoPageNavigationTests : BunitContext
 
         Assert.Equal("VekDataGrid: Grouping", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Furniture", cut.Find("tbody").TextContent);
-        Assert.Contains("<GroupTemplate Context=\"group\">", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("<GroupTemplate Context=\"group\">", cut.Find(".vek-code-view pre code").TextContent);
         Assert.Equal(
             "/docs/components/vekdatagrid/grouping",
             cut.Find(".docs-sidebar a.active").GetAttribute("href"));
@@ -302,7 +302,7 @@ public sealed class DemoPageNavigationTests : BunitContext
         Assert.Equal("VekDataGrid: Aggregation", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Furniture", cut.Find("tbody").TextContent);
         Assert.Equal(1, cut.Find(".group-header").TextContent.Split("$248.99").Length - 1);
-        Assert.Contains("Aggregates=\"_aggregates\"", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("Aggregates=\"_aggregates\"", cut.Find(".vek-code-view pre code").TextContent);
         Assert.Contains("Sum:", cut.Find("tfoot").TextContent);
     }
 
@@ -324,7 +324,7 @@ public sealed class DemoPageNavigationTests : BunitContext
 
         Assert.Equal("VekDataGrid: Hierarchical Rows", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
-        Assert.Contains("<HierarchyColumn", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("<HierarchyColumn", cut.Find(".vek-code-view pre code").TextContent);
         Assert.Contains("aria-label=\"Toggle all row details\"", cut.Markup);
     }
 
@@ -346,7 +346,7 @@ public sealed class DemoPageNavigationTests : BunitContext
 
         Assert.Equal("VekDataGrid: Server Data", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
-        Assert.Contains("ServerData=\"LoadServerPageAsync\"", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("ServerData=\"LoadServerPageAsync\"", cut.Find(".vek-code-view pre code").TextContent);
     }
 
     /// <summary>
@@ -361,8 +361,8 @@ public sealed class DemoPageNavigationTests : BunitContext
         var cut = Render<Routes>();
 
         Assert.Equal("VekDataGrid: Virtualization", cut.Find("main h1").TextContent.Trim());
-        Assert.Contains("VirtualizeRows=\"true\"", cut.Find(".code-sample pre code").TextContent);
-        Assert.Contains("ServerVirtualData=\"LoadVirtualRangeAsync\"", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("VirtualizeRows=\"true\"", cut.Find(".vek-code-view pre code").TextContent);
+        Assert.Contains("ServerVirtualData=\"LoadVirtualRangeAsync\"", cut.Find(".vek-code-view pre code").TextContent);
     }
 
     /// <summary>
@@ -378,8 +378,8 @@ public sealed class DemoPageNavigationTests : BunitContext
 
         Assert.Equal("VekDataGrid: Column Management", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Manage columns", cut.Markup);
-        Assert.Contains("ShowColumnPanel=\"true\"", cut.Find(".code-sample pre code").TextContent);
-        Assert.Contains("VekDataGridColumnReorderMode.Both", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("ShowColumnPanel=\"true\"", cut.Find(".vek-code-view pre code").TextContent);
+        Assert.Contains("VekDataGridColumnReorderMode.Both", cut.Find(".vek-code-view pre code").TextContent);
         Assert.Equal("/docs/components/vekdatagrid/column-management", cut.Find(".docs-sidebar a.active").GetAttribute("href"));
     }
 
@@ -395,8 +395,8 @@ public sealed class DemoPageNavigationTests : BunitContext
         var cut = Render<Routes>();
 
         Assert.Equal("VekDataGrid: Column Layout", cut.Find("main h1").TextContent.Trim());
-        Assert.Contains("ColumnResizeMode", cut.Find(".code-sample pre code").TextContent);
-        Assert.Contains("FixedHeader=\"true\"", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("ColumnResizeMode", cut.Find(".vek-code-view pre code").TextContent);
+        Assert.Contains("FixedHeader=\"true\"", cut.Find(".vek-code-view pre code").TextContent);
         Assert.Equal("/docs/components/vekdatagrid/column-layout", cut.Find(".docs-sidebar a.active").GetAttribute("href"));
     }
 
@@ -418,7 +418,7 @@ public sealed class DemoPageNavigationTests : BunitContext
 
         Assert.Equal("VekDataGrid: Presentation", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
-        var sample = cut.Find(".code-sample pre code").TextContent;
+        var sample = cut.Find(".vek-code-view pre code").TextContent;
         Assert.Contains("ToolbarTemplate", sample);
         Assert.Contains("AriaLabel", sample);
         Assert.Equal("/docs/components/vekdatagrid/presentation", cut.Find(".docs-sidebar a.active").GetAttribute("href"));
@@ -443,7 +443,7 @@ public sealed class DemoPageNavigationTests : BunitContext
         Assert.Equal("VekDataGrid: Context Actions", cut.Find("main h1").TextContent.Trim());
         cut.Find("button[aria-label='Show actions for Desk Lamp']").Click();
         Assert.Contains("Selected product: Desk Lamp", cut.Find(".action-feedback").TextContent);
-        Assert.Contains("RowActionsTemplate", cut.Find(".code-sample pre code").TextContent);
+        Assert.Contains("RowActionsTemplate", cut.Find(".vek-code-view pre code").TextContent);
     }
 
     /// <summary>
@@ -462,8 +462,8 @@ public sealed class DemoPageNavigationTests : BunitContext
         Assert.Equal("VekDataGrid: Collection Observability", cut.Find("main h1").TextContent.Trim());
         cut.Find("button[aria-label='Add sample product']").Click();
         cut.WaitForAssertion(() => Assert.Contains("Observable Product 2", cut.Find("tbody").TextContent));
-        cut.Find("button[data-sample='code-behind']").Click();
-        Assert.Contains("ObservableCollection", cut.Find(".code-sample pre code").TextContent);
+        cut.FindAll("[role='tab']")[1].Click();
+        Assert.Contains("ObservableCollection", cut.Find(".vek-code-view pre code").TextContent);
     }
 
     /// <summary>
@@ -489,6 +489,40 @@ public sealed class DemoPageNavigationTests : BunitContext
         Assert.Contains("IDemoProductProvider", codeBehindExample);
         Assert.Contains("GetProductsAsync", codeBehindExample);
         Assert.DoesNotContain("<VekDataGrid", codeBehindExample);
+    }
+
+    /// <summary>Verifies every DataGrid guide uses the shared multi-sample code viewer.</summary>
+    [Theory]
+    [InlineData("/docs/components/vekdatagrid/aggregation")]
+    [InlineData("/docs/components/vekdatagrid/column-management")]
+    [InlineData("/docs/components/vekdatagrid/column-layout")]
+    [InlineData("/docs/components/vekdatagrid/context-actions")]
+    [InlineData("/docs/components/vekdatagrid/editing")]
+    [InlineData("/docs/components/vekdatagrid/filtering")]
+    [InlineData("/docs/components/vekdatagrid/grouping")]
+    [InlineData("/docs/components/vekdatagrid/hierarchy")]
+    [InlineData("/docs/components/vekdatagrid/observability")]
+    [InlineData("/docs/components/vekdatagrid/pagination")]
+    [InlineData("/docs/components/vekdatagrid/presentation")]
+    [InlineData("/docs/components/vekdatagrid/selection")]
+    [InlineData("/docs/components/vekdatagrid/server-data")]
+    [InlineData("/docs/components/vekdatagrid/sorting")]
+    [InlineData("/docs/components/vekdatagrid/virtualization")]
+    public void DataGridGuidesRenderSamplesWithVekCodeViewMulti(string route)
+    {
+        Services.AddSingleton<IDemoProductProvider>(new TestProductProvider([]));
+        Services.GetRequiredService<NavigationManager>().NavigateTo(route);
+
+        var cut = Render<Routes>();
+
+        var tabs = cut.FindAll("[role='tab']");
+        Assert.Equal(2, tabs.Count);
+        Assert.Single(cut.FindAll(".vek-code-view"));
+        var firstSample = cut.Find(".vek-code-view pre code").TextContent;
+        tabs[1].Click();
+        Assert.Equal("true", cut.FindAll("[role='tab']")[1].GetAttribute("aria-selected"));
+        Assert.NotEqual(firstSample, cut.Find(".vek-code-view pre code").TextContent);
+        Assert.Empty(cut.FindAll(".code-sample"));
     }
 
     private sealed class TestProductProvider(IReadOnlyList<DemoProduct> products) : IDemoProductProvider

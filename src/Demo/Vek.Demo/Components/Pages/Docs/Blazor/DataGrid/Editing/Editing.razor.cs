@@ -44,9 +44,12 @@ public partial class Editing
 
     private IReadOnlyList<DemoProduct>? _products;
     private string? _editMessage;
-    private bool _showCodeBehind;
+    private readonly IReadOnlyList<VekCodeViewTab> _codeSamples =
+    [
+        new("Sample.razor", VekCodeLanguage.Html, RazorExample),
+        new("Sample.razor.cs", VekCodeLanguage.CSharp, CodeBehindExample)
+    ];
 
-    private string SelectedCode => _showCodeBehind ? CodeBehindExample : RazorExample;
 
     protected override async Task OnInitializedAsync() => _products = await ProductProvider.GetProductsAsync();
     private DemoProduct CloneProduct(DemoProduct product) => product with { };
@@ -62,6 +65,4 @@ public partial class Editing
         _editMessage = "Product saved.";
     }
 
-    private void ShowRazor() => _showCodeBehind = false;
-    private void ShowCodeBehind() => _showCodeBehind = true;
 }

@@ -39,12 +39,13 @@ public partial class Selection
 
     private IReadOnlyList<DemoProduct>? _products;
     private IReadOnlyList<DemoProduct> _selectedProducts = [];
-    private bool _showCodeBehind;
+    private readonly IReadOnlyList<VekCodeViewTab> _codeSamples =
+    [
+        new("Sample.razor", VekCodeLanguage.Html, RazorExample),
+        new("Sample.razor.cs", VekCodeLanguage.CSharp, CodeBehindExample)
+    ];
 
-    private string SelectedCode => _showCodeBehind ? CodeBehindExample : RazorExample;
 
     protected override async Task OnInitializedAsync() => _products = await ProductProvider.GetProductsAsync();
     private bool CanSelectProduct(DemoProduct product) => product.Category != "Discontinued";
-    private void ShowRazor() => _showCodeBehind = false;
-    private void ShowCodeBehind() => _showCodeBehind = true;
 }

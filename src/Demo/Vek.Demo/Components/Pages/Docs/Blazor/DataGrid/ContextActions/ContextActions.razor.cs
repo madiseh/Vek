@@ -30,8 +30,11 @@ public partial class ContextActions
 
     private IReadOnlyList<DemoProduct>? _products;
     private string _feedback = "Choose a row action to inspect a product.";
-    private bool _showCodeBehind;
-    private string SelectedCode => _showCodeBehind ? CodeBehindExample : RazorExample;
+    private readonly IReadOnlyList<VekCodeViewTab> _codeSamples =
+    [
+        new("Sample.razor", VekCodeLanguage.Html, RazorExample),
+        new("Sample.razor.cs", VekCodeLanguage.CSharp, CodeBehindExample)
+    ];
 
     protected override async Task OnInitializedAsync() => _products = await ProductProvider.GetProductsAsync();
 
@@ -58,6 +61,4 @@ public partial class ContextActions
     };
 
     private void ShowProduct(DemoProduct product) => _feedback = $"Selected product: {product.Name}";
-    private void ShowRazor() => _showCodeBehind = false;
-    private void ShowCodeBehind() => _showCodeBehind = true;
 }

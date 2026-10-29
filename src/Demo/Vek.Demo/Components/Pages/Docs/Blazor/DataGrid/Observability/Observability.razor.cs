@@ -36,8 +36,11 @@ public partial class Observability
 
     private ObservableCollection<DemoProduct>? _products;
     private int _nextId;
-    private bool _showCodeBehind;
-    private string SelectedCode => _showCodeBehind ? CodeBehindExample : RazorExample;
+    private readonly IReadOnlyList<VekCodeViewTab> _codeSamples =
+    [
+        new("Sample.razor", VekCodeLanguage.Html, RazorExample),
+        new("Sample.razor.cs", VekCodeLanguage.CSharp, CodeBehindExample)
+    ];
 
     protected override async Task OnInitializedAsync()
     {
@@ -51,6 +54,4 @@ public partial class Observability
         _nextId++;
     }
 
-    private void ShowRazor() => _showCodeBehind = false;
-    private void ShowCodeBehind() => _showCodeBehind = true;
 }

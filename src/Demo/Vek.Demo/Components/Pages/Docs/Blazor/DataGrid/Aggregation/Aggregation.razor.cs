@@ -51,10 +51,11 @@ public partial class Aggregation
         new("Average", "Price", VekDataGridAggregateType.Average, Format: "C2"),
         new("Count", "Price", VekDataGridAggregateType.Count)
     ];
-    private bool _showCodeBehind;
+    private readonly IReadOnlyList<VekCodeViewTab> _codeSamples =
+    [
+        new("Sample.razor", VekCodeLanguage.Html, RazorExample),
+        new("Sample.razor.cs", VekCodeLanguage.CSharp, CodeBehindExample)
+    ];
 
-    private string SelectedCode => _showCodeBehind ? CodeBehindExample : RazorExample;
     protected override async Task OnInitializedAsync() => _products = await ProductProvider.GetProductsAsync();
-    private void ShowRazor() => _showCodeBehind = false;
-    private void ShowCodeBehind() => _showCodeBehind = true;
 }

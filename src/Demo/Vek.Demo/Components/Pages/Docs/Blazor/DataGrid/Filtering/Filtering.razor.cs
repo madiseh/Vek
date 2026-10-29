@@ -40,14 +40,15 @@ public partial class Filtering
 
     private IReadOnlyList<DemoProduct>? _products;
     private VekDataGridFilterMode _filterMode = VekDataGridFilterMode.Simple;
-    private bool _showCodeBehind;
+    private readonly IReadOnlyList<VekCodeViewTab> _codeSamples =
+    [
+        new("Sample.razor", VekCodeLanguage.Html, RazorExample),
+        new("Sample.razor.cs", VekCodeLanguage.CSharp, CodeBehindExample)
+    ];
 
-    private string SelectedCode => _showCodeBehind ? CodeBehindExample : RazorExample;
 
     protected override async Task OnInitializedAsync() => _products = await ProductProvider.GetProductsAsync();
 
     private void SetMode(VekDataGridFilterMode mode) => _filterMode = mode;
     private string ModeClass(VekDataGridFilterMode mode) => _filterMode == mode ? "is-active" : string.Empty;
-    private void ShowRazor() => _showCodeBehind = false;
-    private void ShowCodeBehind() => _showCodeBehind = true;
 }
