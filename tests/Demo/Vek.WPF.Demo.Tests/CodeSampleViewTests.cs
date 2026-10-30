@@ -3,12 +3,12 @@ namespace Vek.WPF.Demo.Tests;
 public sealed class CodeSampleViewTests
 {
     /// <summary>
-    /// CodeView Basic Usage contains one native code sample while Multi-Sample owns the selectable sample set.
+    /// Basic Usage renders HTML, Java, C#, and SQL as distinct sections in the same order as Blazor.
     /// </summary>
     [Fact]
-    public async Task CodeViewBasicUsageDisplaysOneSample()
+    public async Task CodeViewBasicUsageRendersFourSeparateSectionsInBlazorOrder()
     {
-        var sampleCount = await RunOnStaThreadAsync(() =>
+        await RunOnStaThreadAsync(() =>
         {
             var page = DemoPageCatalog.All.Single(page => page.Id == "vekcodeview/basic-usage");
             var view = new DocumentationPageView { Page = page, DataContext = page };
@@ -18,17 +18,17 @@ public sealed class CodeSampleViewTests
                 window.Show();
                 window.UpdateLayout();
                 window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
-                var tabs = Descendants<TabControl>(window).ToArray();
-                Assert.True(tabs.Length > 0, DescribeWindowState(window));
-                return tabs[0].Items.Count;
+                var samples = Descendants<CodeSampleView>(window).Where(sample => sample.IsVisible).ToArray();
+                Assert.Equal(4, samples.Length);
+                Assert.Equal(new[] { "HTML", "Java", "C#", "SQL" }, samples.Select(sample => Assert.Single(sample.Samples).Title));
+                Assert.All(Descendants<TextBox>(window), editor => Assert.True(editor.IsReadOnly));
+                return true;
             }
             finally
             {
                 window.Close();
             }
         });
-
-        Assert.Equal(1, sampleCount);
     }
 
     /// <summary>

@@ -2,17 +2,57 @@ namespace Vek.WPF.Demo.Views;
 
 public partial class DocumentationView : UserControl
 {
+    private MainWindowViewModel? _model;
+
     public DocumentationView()
     {
         InitializeComponent();
+        DocumentationNavigation.Items.Add(Destination(DemoPageCatalog.Documentation.Single(page => page.Id == "getting-started")));
+        var components = new TreeViewItem { Header = "Components", IsExpanded = false };
+        foreach (var name in new[] { "VekDataGrid", "VekCodeView" })
+        {
+            var group = new TreeViewItem { Header = name, IsExpanded = true };
+            foreach (var page in DemoPageCatalog.Documentation.Where(page => page.Section == name)) group.Items.Add(Destination(page));
+            components.Items.Add(group);
+        }
+        DocumentationNavigation.Items.Add(components);
+        DataContextChanged += (_, args) =>
+        {
+            if (_model is not null) PropertyChangedEventManager.RemoveHandler(_model, SelectedPageChanged, nameof(MainWindowViewModel.SelectedPage));
+            _model = args.NewValue as MainWindowViewModel;
+            if (_model is not null) PropertyChangedEventManager.AddHandler(_model, SelectedPageChanged, nameof(MainWindowViewModel.SelectedPage));
+            UpdateSelection();
+        };
     }
 
-    private void NavigationSelectionChanged(object sender, SelectionChangedEventArgs e)
+    private static TreeViewItem Destination(DemoPageDefinition page) => new() { Header = page.Title, Tag = page };
+
+    private void NavigationSelectionChanged(object sender, RoutedPropertyChangedEventArgs<object> args)
     {
-        // A navigation destination stays active when Ctrl+click/Space clears ListBox selection.
-        if (sender is ListBox { SelectedItem: null } navigation && DataContext is MainWindowViewModel model)
+        if (args.NewValue is TreeViewItem { Tag: DemoPageDefinition page }) _model?.SelectPage(page);
+        else if (args.NewValue is null) Dispatcher.BeginInvoke(new Action(UpdateSelection));
+    }
+
+    private void NavigateHome(object sender, RoutedEventArgs args) =>
+        _model?.SelectPage(DemoPageCatalog.All.Single(page => page.Id == "home"));
+
+    private void SelectedPageChanged(object? sender, PropertyChangedEventArgs args)
+    {
+        if (args.PropertyName == nameof(MainWindowViewModel.SelectedPage)) UpdateSelection();
+    }
+
+    private void UpdateSelection()
+    {
+        foreach (var destination in Destinations(DocumentationNavigation))
+            destination.IsSelected = destination.Tag is DemoPageDefinition page && page == _model?.SelectedPage;
+    }
+
+    private static IEnumerable<TreeViewItem> Destinations(ItemsControl parent)
+    {
+        foreach (TreeViewItem item in parent.Items)
         {
-            navigation.SetCurrentValue(ListBox.SelectedItemProperty, model.SelectedPage);
+            if (item.Tag is DemoPageDefinition) yield return item;
+            foreach (var child in Destinations(item)) yield return child;
         }
     }
 }

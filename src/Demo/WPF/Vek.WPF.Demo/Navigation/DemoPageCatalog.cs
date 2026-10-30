@@ -46,4 +46,7 @@ public static class DemoPageCatalog
         new("vekcodeview/multi-sample", "Multi-Sample", "VekCodeView",
             "Switch between titled code samples in one viewer.", DemoPageImplementationStatus.Implemented)
     ]);
+
+    public static IReadOnlyList<DemoPageDefinition> Documentation { get; } =
+        Array.AsReadOnly(All.Where(page => page.Id != "home").ToArray());
 }

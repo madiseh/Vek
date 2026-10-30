@@ -7,6 +7,46 @@
                 Foreground="{DynamicResource TextBrush}"
                 BorderBrush="{DynamicResource BorderBrush}"
                 AutomationProperties.Name="Code samples">
+        <TabControl.Template>
+            <ControlTemplate TargetType="TabControl">
+                <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="6" Background="{DynamicResource SidebarBrush}">
+                    <DockPanel>
+                        <TabPanel x:Name="SampleTabs" IsItemsHost="True" DockPanel.Dock="Top" Background="{DynamicResource SelectedBrush}" />
+                        <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent" />
+                    </DockPanel>
+                </Border>
+                <ControlTemplate.Triggers>
+                    <DataTrigger Binding="{Binding Items.Count, RelativeSource={RelativeSource TemplatedParent}}" Value="1">
+                        <Setter TargetName="SampleTabs" Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </TabControl.Template>
+        <TabControl.ItemContainerStyle>
+            <Style TargetType="TabItem">
+                <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+                <Setter Property="FocusVisualStyle" Value="{DynamicResource FocusStyle}" />
+                <Setter Property="Padding" Value="16,10" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TabItem">
+                            <Border x:Name="TabSurface" Padding="{TemplateBinding Padding}" BorderThickness="0,0,0,2" BorderBrush="Transparent" Background="Transparent">
+                                <ContentPresenter ContentSource="Header" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="TabSurface" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="TabSurface" Property="Background" Value="{DynamicResource HoverBrush}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </TabControl.ItemContainerStyle>
         <TabControl.ItemTemplate>
             <DataTemplate>
                 <TextBlock Text="{Binding Title}" />
@@ -16,6 +56,7 @@
             <DataTemplate>
                 <TextBox Text="{Binding Code}"
                          IsReadOnly="True"
+                         FocusVisualStyle="{DynamicResource FocusStyle}"
                          AcceptsReturn="True"
                          AcceptsTab="True"
                          TextWrapping="NoWrap"

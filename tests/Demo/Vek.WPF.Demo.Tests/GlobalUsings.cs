@@ -8,3 +8,8 @@ global using Vek.WPF.Demo.Views;
 global using Vek.Demo.Abstractions;
 global using Vek.WPF.Demo.ViewModels;
 global using Xunit;
+global using System.IO;
+global using System.Text.RegularExpressions;
+global using System.Windows.Automation;
+global using Vek.WPF.DataGrid.Components;
+global using Vek.SimulatedData;

@@ -3,13 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:navigation="clr-namespace:Vek.WPF.Demo.Navigation"
              xmlns:views="clr-namespace:Vek.WPF.Demo.Views">
-    <UserControl.Resources>
-        <CollectionViewSource x:Key="NavigationPages" Source="{Binding Pages}">
-            <CollectionViewSource.GroupDescriptions>
-                <PropertyGroupDescription PropertyName="Section" />
-            </CollectionViewSource.GroupDescriptions>
-        </CollectionViewSource>
-    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="260" />
@@ -18,45 +11,29 @@
         <Border Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="0,0,1,0" Padding="12,24">
             <DockPanel>
-                <TextBlock DockPanel.Dock="Top" Text="VEK / DOCUMENTATION" FontWeight="SemiBold" Margin="16,0,0,20" />
-                <ListBox ItemsSource="{Binding Source={StaticResource NavigationPages}}"
-                         SelectedItem="{Binding SelectedPage, Mode=TwoWay}"
-                         SelectionChanged="NavigationSelectionChanged"
-                         AutomationProperties.Name="Documentation navigation"
-                         Background="Transparent" BorderThickness="0"
-                         ItemContainerStyle="{DynamicResource NavigationItemStyle}"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                         ScrollViewer.VerticalScrollBarVisibility="Auto"
-                         KeyboardNavigation.TabNavigation="Once">
-                    <ListBox.GroupStyle>
-                        <GroupStyle>
-                            <GroupStyle.HeaderTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Name}" Foreground="{DynamicResource MutedBrush}"
-                                               FontSize="13" FontWeight="SemiBold" Margin="20,20,0,8" />
-                                </DataTemplate>
-                            </GroupStyle.HeaderTemplate>
-                        </GroupStyle>
-                    </ListBox.GroupStyle>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Title}" TextWrapping="Wrap" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                <StackPanel DockPanel.Dock="Top">
+                    <TextBlock Text="VEK / DOCUMENTATION" FontWeight="SemiBold" Margin="16,0,0,16" />
+                    <Button Content="Home" Click="NavigateHome" HorizontalAlignment="Left" Padding="16,8" Margin="4,0,0,20"
+                            AutomationProperties.Name="Return to Home" />
+                </StackPanel>
+                <TreeView x:Name="DocumentationNavigation" SelectedItemChanged="NavigationSelectionChanged"
+                          AutomationProperties.Name="Documentation navigation"
+                          Background="Transparent" BorderThickness="0"
+                          Foreground="{DynamicResource MutedBrush}"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          KeyboardNavigation.TabNavigation="Continue" />
             </DockPanel>
         </Border>
-        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-            <ContentControl Content="{Binding SelectedPage}" Margin="48,48,48,64"
-                            HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top"
-                            AutomationProperties.Name="Documentation content">
-                <ContentControl.ContentTemplate>
-                    <DataTemplate DataType="{x:Type navigation:DemoPageDefinition}">
-                        <views:DocumentationPageView Page="{Binding}"
-                            BasicUsage="{Binding DataContext.BasicUsage, RelativeSource={RelativeSource AncestorType={x:Type views:DocumentationView}}}" />
-                    </DataTemplate>
-                </ContentControl.ContentTemplate>
-            </ContentControl>
-        </ScrollViewer>
+        <ContentControl Grid.Column="1" Content="{Binding SelectedPage}"
+                        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                        AutomationProperties.Name="Documentation content">
+            <ContentControl.ContentTemplate>
+                <DataTemplate DataType="{x:Type navigation:DemoPageDefinition}">
+                    <views:DocumentationPageView Page="{Binding}"
+                        BasicUsage="{Binding DataContext.BasicUsage, RelativeSource={RelativeSource AncestorType={x:Type views:DocumentationView}}}" />
+                </DataTemplate>
+            </ContentControl.ContentTemplate>
+        </ContentControl>
     </Grid>
 </UserControl>

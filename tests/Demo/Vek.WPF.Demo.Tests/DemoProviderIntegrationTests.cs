@@ -1,6 +1,3 @@
-using Vek.WPF.DataGrid.Components;
-using Vek.SimulatedData;
-
 namespace Vek.WPF.Demo.Tests;
 
 public sealed class DemoProviderIntegrationTests
@@ -26,17 +23,21 @@ public sealed class DemoProviderIntegrationTests
                 model.GetStartedCommand.Execute(null);
                 window.UpdateLayout();
                 window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
-                var navigation = Assert.Single(Descendants<ListBox>(window));
+                var navigation = Assert.Single(Descendants<TreeView>(window));
                 var selectedPage = model.SelectedPage;
 
-                navigation.SelectedItem = null;
+                Assert.IsType<TreeViewItem>(navigation.SelectedItem).IsSelected = false;
                 window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
                 window.UpdateLayout();
 
                 Assert.Same(selectedPage, model.SelectedPage);
-                Assert.Same(selectedPage, navigation.SelectedItem);
+                Assert.Same(selectedPage, Assert.IsType<TreeViewItem>(navigation.SelectedItem).Tag);
                 var sorting = model.Pages.Single(page => page.Id == "vekdatagrid/sorting");
-                navigation.SelectedItem = sorting;
+                var components = Assert.IsType<TreeViewItem>(navigation.Items[1]);
+                components.IsExpanded = true;
+                window.UpdateLayout();
+                var group = Assert.IsType<TreeViewItem>(components.Items[0]);
+                group.Items.Cast<TreeViewItem>().Single(item => Equals(item.Tag, sorting)).IsSelected = true;
                 Assert.Same(sorting, model.SelectedPage);
                 Assert.Empty(errors.ToString());
                 return true;
@@ -113,12 +114,13 @@ public sealed class DemoProviderIntegrationTests
                 window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
 
                 Assert.Single(Descendants<DocumentationView>(window));
-                var navigation = Assert.Single(Descendants<ListBox>(window));
-                Assert.NotNull(navigation.ItemContainerStyle);
-                Assert.Equal("getting-started", Assert.IsType<DemoPageDefinition>(navigation.SelectedItem).Id);
+                var navigation = Assert.Single(Descendants<TreeView>(window));
+                var selected = Assert.IsType<TreeViewItem>(navigation.SelectedItem);
+                Assert.NotNull(selected.Style);
+                Assert.Equal("getting-started", Assert.IsType<DemoPageDefinition>(selected.Tag).Id);
                 Assert.Equal(DemoPageImplementationStatus.Implemented,
-                    Assert.IsType<DemoPageDefinition>(navigation.SelectedItem).ImplementationStatus);
-                Assert.Contains(Descendants<TextBox>(window), text => text.Text.Contains("<UseWPF>true</UseWPF>"));
+                    Assert.IsType<DemoPageDefinition>(selected.Tag).ImplementationStatus);
+                Assert.Contains(Descendants<TextBlock>(window), text => text.Text == "This guide is being prepared.");
                 return true;
             }
             finally

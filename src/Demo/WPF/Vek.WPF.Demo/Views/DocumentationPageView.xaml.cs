@@ -17,12 +17,21 @@ public partial class DocumentationPageView : UserControl
             </components:VekDataGrid>
             """),
         new("BasicUsageViewModel.cs", """
-            public async Task LoadProductsAsync(CancellationToken cancellationToken = default)
+            using System.Collections.ObjectModel;
+            using Vek.Demo.Abstractions;
+
+            public sealed class BasicUsageViewModel(IDemoProductProvider productProvider)
             {
-                var products = await ProductProvider.GetProductsAsync(cancellationToken);
-                foreach (var product in products.Take(5))
+                public ObservableCollection<DemoProduct> Products { get; } = [];
+
+                public async Task LoadProductsAsync(CancellationToken cancellationToken = default)
                 {
-                    Products.Add(product);
+                    var products = await productProvider.GetProductsAsync(cancellationToken);
+                    Products.Clear();
+                    foreach (var product in products.Take(5))
+                    {
+                        Products.Add(product);
+                    }
                 }
             }
             """)
@@ -30,12 +39,10 @@ public partial class DocumentationPageView : UserControl
 
     private static readonly IReadOnlyList<CodeSample> CodeViewBasicSamplesData =
     [
-        new("Greeting.cs", """
-            public static class Greeting
-            {
-                public static string Create(string name) => $"Hello, {name}!";
-            }
-            """)
+        new("HTML", "<article class=\"card\">\n    <h2>Welcome</h2>\n    <p>Browse the latest updates.</p>\n</article>"),
+        new("Java", "public class Greeting {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, Vek!\");\n    }\n}"),
+        new("C#", "public static class Greeting\n{\n    public static string Create(string name) => $\"Hello, {name}!\";\n}"),
+        new("SQL", "SELECT name, created_at\nFROM users\nWHERE is_active = 1\nORDER BY created_at DESC;"),
     ];
 
     private static readonly IReadOnlyList<CodeSample> CodeViewMultiSamplesData =
@@ -57,31 +64,6 @@ public partial class DocumentationPageView : UserControl
             FROM users
             WHERE is_active = 1
             ORDER BY created_at DESC;
-            """)
-    ];
-
-    private static readonly IReadOnlyList<CodeSample> GettingStartedCodeSamplesData =
-    [
-        new("WpfApp.csproj", """
-            <PropertyGroup>
-                <TargetFramework>net10.0-windows</TargetFramework>
-                <UseWPF>true</UseWPF>
-            </PropertyGroup>
-
-            <ItemGroup>
-                <!-- Replace x.y.z with the package version you want to use. -->
-                <PackageReference Include="Vek.WPF.DataGrid" Version="x.y.z" />
-            </ItemGroup>
-            """),
-        new("MainWindow.xaml", """
-            <Window x:Class="MyApp.MainWindow"
-                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:components="clr-namespace:Vek.WPF.DataGrid.Components;assembly=Vek.WPF.DataGrid">
-                <components:VekDataGrid ItemsSource="{Binding Products}"
-                                        AutoGenerateColumns="True"
-                                        IsReadOnly="True" />
-            </Window>
             """)
     ];
 
@@ -119,17 +101,92 @@ public partial class DocumentationPageView : UserControl
 
     public IReadOnlyList<CodeSample> CodeViewMultiSamples => CodeViewMultiSamplesData;
 
-    public IReadOnlyList<CodeSample> GettingStartedCodeSamples => GettingStartedCodeSamplesData;
-
     private static void OnPageContextChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args) =>
-        ((DocumentationPageView)dependencyObject).LoadBasicUsageForCurrentPage();
+        ((DocumentationPageView)dependencyObject).RefreshPage();
 
-    private void OnLoaded(object sender, RoutedEventArgs args) => LoadBasicUsageForCurrentPage();
+    private void OnLoaded(object sender, RoutedEventArgs args) => RefreshPage();
 
     private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs args) =>
-        LoadBasicUsageForPage(args.NewValue as DemoPageDefinition);
+        RefreshPage();
 
-    private void LoadBasicUsageForCurrentPage() => LoadBasicUsageForPage(Page ?? DataContext as DemoPageDefinition);
+    private void RefreshPage()
+    {
+        if (Article is null || (Page ?? DataContext as DemoPageDefinition) is not { } page || page.Id == "home") return;
+        Article.Children.Clear();
+        TableOfContents.Children.Clear();
+        ArticleScroll.ScrollToTop();
+        var content = DocumentationPageContent.For(page);
+        Article.Children.Add(new TextBlock { Text = content.Title, FontSize = 36, FontWeight = FontWeights.Bold, TextWrapping = TextWrapping.Wrap });
+        Article.Children.Add(Paragraph(content.Introduction));
+        if (page.Section == "VekDataGrid")
+        {
+            Article.Children.Add(Notice("Blazor reference — the explanations below describe the Blazor component. " +
+                (page.ImplementationStatus == DemoPageImplementationStatus.InDevelopment
+                    ? "This topic's native WPF examples and APIs are in development."
+                    : "The native WPF sample supports column sorting through ItemsSource. Pagination and the Blazor filter APIs are in development.")));
+        }
+        else if (page.Section == "VekCodeView")
+        {
+            Article.Children.Add(Notice("Native WPF samples use selectable, read-only text. Copy selected text with Ctrl+C. Syntax highlighting and a dedicated copy action are in development."));
+        }
+
+        if (content.Sections.Count > 0)
+            TableOfContents.Children.Add(new TextBlock { Text = "On this page", FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 12) });
+        foreach (var section in content.Sections)
+        {
+            var panel = new StackPanel { Margin = new Thickness(0, 36, 0, 0), Focusable = true };
+            panel.SetResourceReference(FocusVisualStyleProperty, "FocusStyle");
+            AutomationProperties.SetAutomationId(panel, "section:" + section.Id);
+            AutomationProperties.SetName(panel, section.Title);
+            panel.Children.Add(new TextBlock { Text = section.Title, FontSize = 25, FontWeight = FontWeights.SemiBold, TextWrapping = TextWrapping.Wrap });
+            if (section.Role == DocumentationContentRole.InDevelopment)
+                panel.Children.Add(Notice("In development — this native WPF example is being prepared. The following explanation describes the Blazor reference."));
+            foreach (var paragraph in section.Paragraphs) panel.Children.Add(Paragraph(paragraph));
+            switch (section.Role)
+            {
+                case DocumentationContentRole.NativeGrid:
+                    panel.Children.Add(new ContentControl { ContentTemplate = (DataTemplate)Resources["NativeGridTemplate"] });
+                    break;
+                case DocumentationContentRole.NativeGridCode:
+                    panel.Children.Add(Paragraph("WPF equivalent: bind ItemsSource in Sample.xaml and load products in BasicUsageViewModel.cs."));
+                    panel.Children.Add(Sample(BasicUsageCodeSamples));
+                    break;
+                case DocumentationContentRole.CodeSample:
+                    panel.Children.Add(Sample([CodeViewBasicSamples.Single(sample => sample.Title == section.Title)]));
+                    break;
+                case DocumentationContentRole.MultiSample:
+                    panel.Children.Add(Sample(CodeViewMultiSamples));
+                    break;
+            }
+            Article.Children.Add(panel);
+            var link = new Button { Content = section.TocTitle ?? section.Title, HorizontalContentAlignment = HorizontalAlignment.Left, Tag = panel };
+            link.SetResourceReference(StyleProperty, "TocLinkStyle");
+            AutomationProperties.SetAutomationId(link, "toc:" + section.Id);
+            link.Click += (_, _) =>
+            {
+                panel.Focus();
+                ArticleScroll.ScrollToVerticalOffset(panel.TranslatePoint(new Point(), Article).Y);
+            };
+            TableOfContents.Children.Add(link);
+        }
+        LoadBasicUsageForPage(page);
+    }
+
+    private static CodeSampleView Sample(IReadOnlyList<CodeSample> samples) => new() { Samples = samples, Height = 300, Margin = new Thickness(0, 16, 0, 0) };
+
+    private static TextBlock Paragraph(string text)
+    {
+        var block = new TextBlock { Text = text, TextWrapping = TextWrapping.Wrap, FontSize = 15, Margin = new Thickness(0, 16, 0, 0) };
+        block.SetResourceReference(StyleProperty, "DescriptionStyle");
+        return block;
+    }
+
+    private static Border Notice(string text)
+    {
+        var notice = new Border { Child = Paragraph(text), Padding = new Thickness(16, 0, 16, 16), Margin = new Thickness(0, 20, 0, 0), CornerRadius = new CornerRadius(6) };
+        notice.SetResourceReference(BackgroundProperty, "SelectedBrush");
+        return notice;
+    }
 
     private void LoadBasicUsageForPage(DemoPageDefinition? page)
     {
