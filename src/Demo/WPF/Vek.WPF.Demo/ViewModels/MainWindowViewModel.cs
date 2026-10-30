@@ -7,6 +7,13 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
 {
     private DemoPageDefinition _selectedPage = DemoPageCatalog.All[0];
 
+    public MainWindowViewModel()
+    {
+        GetStartedCommand = new GetStartedNavigationCommand(this);
+    }
+
+    public ICommand GetStartedCommand { get; }
+
     public IReadOnlyList<DemoPageDefinition> Pages => DemoPageCatalog.All;
 
     public DemoPageDefinition SelectedPage
@@ -27,4 +34,14 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public void SelectPage(DemoPageDefinition page) => SelectedPage = page;
+
+    private sealed class GetStartedNavigationCommand(MainWindowViewModel owner) : ICommand
+    {
+        public event EventHandler? CanExecuteChanged { add { } remove { } }
+
+        public bool CanExecute(object? parameter) => true;
+
+        public void Execute(object? parameter) =>
+            owner.SelectPage(owner.Pages.Single(page => page.Id == "getting-started"));
+    }
 }

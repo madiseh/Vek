@@ -6,6 +6,20 @@ namespace Vek.WPF.Demo.Tests;
 public sealed class DemoPageCatalogTests
 {
     /// <summary>
+    /// Home's Get Started command opens Getting Started in the existing navigation state.
+    /// </summary>
+    [Fact]
+    public void GetStartedNavigatesToGettingStarted()
+    {
+        var viewModel = new MainWindowViewModel();
+
+        Assert.True(viewModel.GetStartedCommand.CanExecute(null));
+        viewModel.GetStartedCommand.Execute(null);
+
+        Assert.Equal("getting-started", viewModel.SelectedPage.Id);
+    }
+
+    /// <summary>
     /// Navigation exposes every current documentation topic once, in the shared documentation order.
     /// </summary>
     [Fact]
