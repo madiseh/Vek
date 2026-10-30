@@ -40,5 +40,6 @@
   </Folder>
   <Folder Name="/tests/Demo/">
     <Project Path="tests/Demo/Vek.Demo.Tests/Vek.Demo.Tests.csproj" />
+    <Project Path="tests/Demo/Vek.WPF.Demo.Tests/Vek.WPF.Demo.Tests.csproj" />
   </Folder>
 </Solution>
