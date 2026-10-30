@@ -10,9 +10,12 @@ Add a native WPF counterpart to the current Blazor demo so the existing componen
 - Open on a Home view, then navigate to documentation views in the same window.
 - Include the current 20 screens: Home, Getting Started, 16 VekDataGrid topics, and two VekCodeView topics.
 - Reuse `IDemoProductProvider`, `DemoProduct`, and the JSON-backed sample-data adapter.
-- Match the existing Blazor demo's dark palette, page hierarchy, labels, and left navigation as closely as WPF allows.
+- Match the existing Blazor demo's dark palette, page hierarchy, navigation tree, article section order, headings, explanatory copy, and local table of contents as closely as WPF allows.
 - Use native WPF controls in samples. Keep all topics visible while each DataGrid feature is implemented incrementally; preserve each topic's explanation and clearly identify behaviors that are not implemented yet.
 - Keep the two CodeView topics and show read-only native WPF code samples; a reusable WPF CodeView library is outside this change.
+- In the documentation sidebar, show Getting Started first, then an initially collapsed Components group containing nested VekDataGrid and VekCodeView sections and their links in the same order as Blazor. Keep Home separate from the documentation navigation.
+- Mirror each Blazor article's heading, introduction, section order, and “On this page” links. Place in-development notices in the corresponding live-example/code section without removing later explanation sections.
+- VekCodeView Basic Usage has separate HTML, Java, C#, and SQL sections in that order; Multi-Sample has one “Choose a sample” section with selectable samples.
 
 ## Non-goals
 
