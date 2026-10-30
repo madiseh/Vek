@@ -1,6 +1,3 @@
-using System.ComponentModel;
-using Vek.WPF.Demo.Navigation;
-
 namespace Vek.WPF.Demo.ViewModels;
 
 public sealed class MainWindowViewModel : INotifyPropertyChanged
@@ -24,6 +21,11 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         get => _selectedPage;
         set
         {
+            if (value is null)
+            {
+                return;
+            }
+
             if (_selectedPage == value)
             {
                 return;

@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Windows.Threading;
 
 namespace Vek.WPF.Demo.ViewModels;

@@ -1,5 +1,3 @@
-using System.Windows;
-
 namespace Vek.WPF.Demo.Views;
 
 public partial class CodeSampleView : UserControl

@@ -21,6 +21,7 @@
                 <TextBlock DockPanel.Dock="Top" Text="VEK / DOCUMENTATION" FontWeight="SemiBold" Margin="16,0,0,20" />
                 <ListBox ItemsSource="{Binding Source={StaticResource NavigationPages}}"
                          SelectedItem="{Binding SelectedPage, Mode=TwoWay}"
+                         SelectionChanged="NavigationSelectionChanged"
                          AutomationProperties.Name="Documentation navigation"
                          Background="Transparent" BorderThickness="0"
                          ItemContainerStyle="{DynamicResource NavigationItemStyle}"

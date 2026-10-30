@@ -1,6 +1,3 @@
-using Vek.WPF.Demo.Navigation;
-using Vek.WPF.Demo.ViewModels;
-
 namespace Vek.WPF.Demo.Tests;
 
 public sealed class DemoPageCatalogTests

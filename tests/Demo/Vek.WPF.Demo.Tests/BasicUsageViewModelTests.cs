@@ -1,6 +1,3 @@
-using Vek.Demo.Abstractions;
-using Vek.WPF.Demo.ViewModels;
-
 namespace Vek.WPF.Demo.Tests;
 
 public sealed class BasicUsageViewModelTests

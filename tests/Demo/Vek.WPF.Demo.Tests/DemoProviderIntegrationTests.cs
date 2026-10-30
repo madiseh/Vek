@@ -1,12 +1,95 @@
-using Vek.Demo.Abstractions;
 using Vek.WPF.DataGrid.Components;
-using Vek.WPF.Demo.ViewModels;
 using Vek.SimulatedData;
 
 namespace Vek.WPF.Demo.Tests;
 
 public sealed class DemoProviderIntegrationTests
 {
+    /// <summary>
+    /// Deselecting a sidebar item preserves the active page and restores the visible selection without binding errors.
+    /// </summary>
+    [Fact]
+    public async Task ClearingDocumentationSelectionPreservesTheActivePageWithoutBindingErrors()
+    {
+        await RunOnStaThreadAsync(() =>
+        {
+            using var errors = new System.IO.StringWriter();
+            using var listener = new System.Diagnostics.TextWriterTraceListener(errors);
+            var previousLevel = System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level;
+            System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Error;
+            System.Diagnostics.PresentationTraceSources.DataBindingSource.Listeners.Add(listener);
+            var window = new MainWindow();
+            try
+            {
+                window.Show();
+                var model = Assert.IsType<MainWindowViewModel>(window.DataContext);
+                model.GetStartedCommand.Execute(null);
+                window.UpdateLayout();
+                window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+                var navigation = Assert.Single(Descendants<ListBox>(window));
+                var selectedPage = model.SelectedPage;
+
+                navigation.SelectedItem = null;
+                window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+                window.UpdateLayout();
+
+                Assert.Same(selectedPage, model.SelectedPage);
+                Assert.Same(selectedPage, navigation.SelectedItem);
+                var sorting = model.Pages.Single(page => page.Id == "vekdatagrid/sorting");
+                navigation.SelectedItem = sorting;
+                Assert.Same(sorting, model.SelectedPage);
+                Assert.Empty(errors.ToString());
+                return true;
+            }
+            finally
+            {
+                window.Close();
+                System.Diagnostics.PresentationTraceSources.DataBindingSource.Listeners.Remove(listener);
+                System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = previousLevel;
+            }
+        });
+    }
+
+    /// <summary>
+    /// Home exposes working documentation navigation, the repository action, and the reference's gradient visual hierarchy.
+    /// </summary>
+    [Fact]
+    public async Task HomeOffersDocumentationAndGitHubActionsWithReferenceVisuals()
+    {
+        await RunOnStaThreadAsync(() =>
+        {
+            var window = new MainWindow();
+            try
+            {
+                window.Show();
+                window.UpdateLayout();
+                var home = Assert.Single(Descendants<HomeView>(window));
+                var repositoryText = Assert.Single(Descendants<TextBlock>(home)
+                    .Where(text => text.Inlines.OfType<System.Windows.Documents.Hyperlink>().Any()));
+                var repository = Assert.Single(repositoryText.Inlines.OfType<System.Windows.Documents.Hyperlink>());
+                Assert.Equal("Star on GitHub", new System.Windows.Documents.TextRange(repository.ContentStart, repository.ContentEnd).Text);
+                Assert.Equal("https://github.com/madiseh/Vek", repository.NavigateUri.AbsoluteUri);
+                Assert.True(repository.Focusable);
+                Assert.True(repository.IsEnabled);
+                Assert.Contains(Descendants<Grid>(home), grid => grid.Background is RadialGradientBrush);
+                Assert.Contains(Descendants<TextBlock>(home), text => text.Text == "Built for WPF." && text.Foreground is LinearGradientBrush);
+                Assert.Contains(Descendants<System.Windows.Shapes.Path>(home), path => path.Fill is LinearGradientBrush && !path.Data.IsEmpty());
+
+                var start = Assert.Single(Descendants<Button>(home));
+                Assert.NotNull(start.Command);
+                start.Command.Execute(null);
+                window.UpdateLayout();
+                Assert.Equal("getting-started", Assert.IsType<MainWindowViewModel>(window.DataContext).SelectedPage.Id);
+                Assert.Single(Descendants<DocumentationView>(window));
+                return true;
+            }
+            finally
+            {
+                window.Close();
+            }
+        });
+    }
+
     /// <summary>
     /// The real window loads Home and documentation with theme resources available during view creation.
     /// </summary>

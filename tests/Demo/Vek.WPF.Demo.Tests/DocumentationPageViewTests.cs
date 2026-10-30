@@ -1,7 +1,3 @@
-using Vek.Demo.Abstractions;
-using Vek.WPF.Demo.ViewModels;
-using Vek.WPF.Demo.Views;
-
 namespace Vek.WPF.Demo.Tests;
 
 public sealed class DocumentationPageViewTests
