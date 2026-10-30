@@ -13,6 +13,12 @@
     <Project Path="src/Components/Blazor/Vek.Blazor.CodeView/Vek.Blazor.CodeView.csproj" />
     <Project Path="src/Components/Blazor/Vek.Blazor.DataGrid/Vek.Blazor.DataGrid.csproj" />
   </Folder>
+  <Folder Name="/src/Components/Core/">
+    <Project Path="src/Components/Core/Vek.Core.DataGrid/Vek.Core.DataGrid.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|x86" Project="x86" />
+    </Project>
+  </Folder>
   <Folder Name="/src/Components/WPF/">
     <Project Path="src/Components/WPF/Vek.WPF.DataGrid/Vek.WPF.DataGrid.csproj">
       <Platform Solution="*|x64" Project="x64" />
