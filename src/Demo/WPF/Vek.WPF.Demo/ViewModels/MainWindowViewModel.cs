@@ -7,12 +7,15 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
 {
     private DemoPageDefinition _selectedPage = DemoPageCatalog.All[0];
 
-    public MainWindowViewModel()
+    public MainWindowViewModel(IDemoProductProvider? productProvider = null)
     {
         GetStartedCommand = new GetStartedNavigationCommand(this);
+        BasicUsage = productProvider is null ? null : new BasicUsageViewModel(productProvider);
     }
 
     public ICommand GetStartedCommand { get; }
+
+    public BasicUsageViewModel? BasicUsage { get; }
 
     public IReadOnlyList<DemoPageDefinition> Pages => DemoPageCatalog.All;
 

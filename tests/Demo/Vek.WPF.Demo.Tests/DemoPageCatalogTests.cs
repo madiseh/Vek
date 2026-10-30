@@ -85,14 +85,42 @@ public sealed class DemoPageCatalogTests
     }
 
     /// <summary>
-    /// DataGrid topics do not claim implemented native demonstrations before those samples exist.
+    /// DataGrid topics without a native behavior sample remain clearly marked in development.
     /// </summary>
     [Fact]
     public void UnimplementedDataGridTopicsAreMarkedInDevelopment()
     {
+        var pages = DemoPageCatalog.All
+            .Where(page => page.Section == "VekDataGrid" && page.Id != "vekdatagrid/basic-usage")
+            .ToArray();
+
+        Assert.Equal(15, pages.Length);
+        Assert.All(pages, page => Assert.Equal(DemoPageImplementationStatus.InDevelopment, page.ImplementationStatus));
+    }
+
+    /// <summary>
+    /// Basic Usage is the only DataGrid topic advertised as implemented while native features are added incrementally.
+    /// </summary>
+    [Fact]
+    public void BasicUsageIsTheOnlyImplementedDataGridTopic()
+    {
         var pages = DemoPageCatalog.All.Where(page => page.Section == "VekDataGrid").ToArray();
 
-        Assert.Equal(16, pages.Length);
-        Assert.All(pages, page => Assert.Equal(DemoPageImplementationStatus.InDevelopment, page.ImplementationStatus));
+        Assert.Equal(DemoPageImplementationStatus.Implemented,
+            pages.Single(page => page.Id == "vekdatagrid/basic-usage").ImplementationStatus);
+        Assert.All(pages.Where(page => page.Id != "vekdatagrid/basic-usage"), page =>
+            Assert.Equal(DemoPageImplementationStatus.InDevelopment, page.ImplementationStatus));
+    }
+
+    /// <summary>
+    /// CodeView topics are marked implemented because the native read-only sample views are available.
+    /// </summary>
+    [Fact]
+    public void CodeViewTopicsAreMarkedImplemented()
+    {
+        var pages = DemoPageCatalog.All.Where(page => page.Section == "VekCodeView").ToArray();
+
+        Assert.Equal(2, pages.Length);
+        Assert.All(pages, page => Assert.Equal(DemoPageImplementationStatus.Implemented, page.ImplementationStatus));
     }
 }

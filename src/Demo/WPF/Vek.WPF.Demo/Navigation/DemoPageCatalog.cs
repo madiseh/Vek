@@ -10,7 +10,7 @@ public static class DemoPageCatalog
         new("getting-started", "Getting Started", "Overview",
             "This guide is being prepared.", DemoPageImplementationStatus.InDevelopment),
         new("vekdatagrid/basic-usage", "Basic Usage", "VekDataGrid",
-            "Display supplied products in a native WPF data grid with sortable columns.", DemoPageImplementationStatus.InDevelopment),
+            "Display the first five shared products in a sortable native WPF data grid.", DemoPageImplementationStatus.Implemented),
         new("vekdatagrid/sorting", "Sorting", "VekDataGrid",
             "Sort by one column or combine columns to create a prioritized order.", DemoPageImplementationStatus.InDevelopment),
         new("vekdatagrid/filtering", "Filtering", "VekDataGrid",
@@ -42,8 +42,8 @@ public static class DemoPageCatalog
         new("vekdatagrid/observability", "Collection Observability", "VekDataGrid",
             "Keep the visible rows in sync when an observable collection changes.", DemoPageImplementationStatus.InDevelopment),
         new("vekcodeview/basic-usage", "Basic Usage", "VekCodeView",
-            "Display read-only code with syntax highlighting and a copy action.", DemoPageImplementationStatus.InDevelopment),
+            "Display titled read-only code samples in a native WPF text viewer.", DemoPageImplementationStatus.Implemented),
         new("vekcodeview/multi-sample", "Multi-Sample", "VekCodeView",
-            "Switch between titled code samples in one viewer.", DemoPageImplementationStatus.InDevelopment)
+            "Switch between titled code samples in one viewer.", DemoPageImplementationStatus.Implemented)
     ]);
 }

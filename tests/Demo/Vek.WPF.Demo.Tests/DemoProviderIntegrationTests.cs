@@ -1,3 +1,8 @@
+using Vek.Demo.Abstractions;
+using Vek.WPF.DataGrid.Components;
+using Vek.WPF.Demo.ViewModels;
+using Vek.SimulatedData;
+
 namespace Vek.WPF.Demo.Tests;
 
 public sealed class DemoProviderIntegrationTests
@@ -35,6 +40,58 @@ public sealed class DemoProviderIntegrationTests
                 window.Close();
             }
         });
+    }
+
+    /// <summary>
+    /// The native Basic Usage grid displays the first five shared JSON products from the application provider.
+    /// </summary>
+    [Fact]
+    public async Task MainWindowBasicUsageDisplaysFiveSharedProductsInTheNativeGrid()
+    {
+        var productNames = await RunOnStaThreadAsync(() =>
+        {
+            var window = new MainWindow(new JsonDemoProductProvider());
+            try
+            {
+                var viewModel = Assert.IsType<MainWindowViewModel>(window.DataContext);
+                viewModel.SelectPage(DemoPageCatalog.All.Single(page => page.Id == "vekdatagrid/basic-usage"));
+                window.Show();
+                window.UpdateLayout();
+
+                var grid = Assert.Single(Descendants<VekDataGrid>(window));
+                var frame = new DispatcherFrame();
+                var loadedProbe = new DispatcherTimer(DispatcherPriority.Background, window.Dispatcher)
+                {
+                    Interval = TimeSpan.FromMilliseconds(25)
+                };
+                loadedProbe.Tick += (_, _) =>
+                {
+                    if (grid.Items.Count >= 5)
+                    {
+                        frame.Continue = false;
+                    }
+                };
+
+                var timeout = new DispatcherTimer(DispatcherPriority.Background, window.Dispatcher)
+                {
+                    Interval = TimeSpan.FromSeconds(5)
+                };
+                timeout.Tick += (_, _) => frame.Continue = false;
+                loadedProbe.Start();
+                timeout.Start();
+                Dispatcher.PushFrame(frame);
+                loadedProbe.Stop();
+                timeout.Stop();
+
+                return grid.Items.OfType<DemoProduct>().Select(product => product.Name).ToArray();
+            }
+            finally
+            {
+                window.Close();
+            }
+        });
+
+        Assert.Equal(new[] { "Desk Lamp", "Task Chair", "Notebook Set", "Monitor Stand", "Northstar LED Desk Lamp" }, productNames);
     }
 
     private static IEnumerable<T> Descendants<T>(DependencyObject parent) where T : DependencyObject
