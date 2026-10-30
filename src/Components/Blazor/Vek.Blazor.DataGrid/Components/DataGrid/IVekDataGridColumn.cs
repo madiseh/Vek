@@ -1,4 +1,4 @@
-namespace Vek.Components.Components.DataGrid;
+namespace Vek.Blazor.DataGrid.Components.DataGrid;
 
 /// <summary>
 /// Describes the rendering and comparison behavior required by a grid column.

@@ -1,3 +1,5 @@
+using Vek.Blazor.DataGrid.Components.DataGrid;
+
 namespace Vek.Components.Components.DataGrid;
 
 /// <summary>

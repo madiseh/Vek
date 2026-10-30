@@ -1,4 +1,4 @@
-namespace Vek.Components.Components.DataGrid;
+namespace Vek.Blazor.DataGrid.Components.DataGrid;
 
 /// <summary>
 /// Describes the direction applied to a grid sort definition.

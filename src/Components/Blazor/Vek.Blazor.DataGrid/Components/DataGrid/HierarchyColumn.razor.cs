@@ -1,3 +1,5 @@
+using Vek.Blazor.DataGrid.Components.DataGrid;
+
 namespace Vek.Components.Components.DataGrid;
 
 /// <summary>Adds row controls and detail templates to a data grid.</summary>

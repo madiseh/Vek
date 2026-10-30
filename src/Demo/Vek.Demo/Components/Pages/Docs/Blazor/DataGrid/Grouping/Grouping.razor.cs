@@ -1,5 +1,5 @@
 using Vek.Demo.Abstractions;
-using Vek.Components.Components.DataGrid;
+using Vek.Blazor.DataGrid.Components.DataGrid;
 
 namespace Vek.Demo.Components.Pages.Docs.Blazor.DataGrid.Grouping;
 
