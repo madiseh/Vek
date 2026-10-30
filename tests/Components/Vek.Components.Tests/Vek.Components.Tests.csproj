@@ -17,7 +17,8 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
-    <ProjectReference Include="../../../src/Components/Vek.Components/Vek.Components.csproj" />
-    <EmbeddedResource Include="../../../src/Components/Vek.Components/Components/CodeView/VekCodeViewMulti.razor.css" Link="CodeView/VekCodeViewMulti.razor.css" />
+    <ProjectReference Include="../../../src/Components/Blazor/Vek.Blazor.DataGrid/Vek.Blazor.DataGrid.csproj" />
+    <ProjectReference Include="../../../src/Components/Blazor/Vek.Blazor.CodeView/Vek.Blazor.CodeView.csproj" />
+    <EmbeddedResource Include="../../../src/Components/Blazor/Vek.Blazor.CodeView/Components/CodeView/VekCodeViewMulti.razor.css" Link="CodeView/VekCodeViewMulti.razor.css" />
   </ItemGroup>
 </Project>

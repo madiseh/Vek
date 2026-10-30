@@ -3,7 +3,7 @@
 ## Technology and Architecture
 
 - This project explicitly targets **.NET 10**. Project files must target `net10.0` unless a documented project-specific reason requires otherwise.
-- The solution uses **hexagonal architecture**. Keep ports/contracts independent of adapters and keep the reusable `Vek.Components` library independent of Demo and sample-data projects.
+- The solution uses **hexagonal architecture**. Keep ports/contracts independent of adapters and keep reusable `Vek.Blazor.*` packages independent of Demo and sample-data projects.
 - `Vek.Demo.Abstractions` contains the demo-facing ports and models. `Vek.SimulatedData` implements those ports with sample JSON data. `Vek.Demo` is the composition root.
 
 ## Repository Guidance Routing
@@ -20,6 +20,13 @@ Before carrying out work covered by a guide below, read and follow that guide. I
 - Put namespaces shared by Razor components in the nearest `_Imports.razor` file instead of repeating `@using` directives in individual `.razor` files.
 - Put namespaces shared by C# files in the project-level `GlobalUsings.cs` file with `global using` directives instead of repeating file-local `using` directives.
 - When a namespace is needed in both Razor markup and C# files, add it to both central import locations; Razor `@using` directives do not apply to standalone C# files.
+
+## Blazor Component Packages
+
+- Put each independently packaged Blazor component category under `src/Components/Blazor/<PackageProject>/`.
+- Every project under `src/Components/Blazor/` must contain a `Components/` directory. The shared `src/Components/Blazor/Directory.Build.targets` enforces this during builds.
+- Keep each package focused on its component category, keep it independent of Demo and sample-data projects, and make its NuGet package ID match the project name.
+- Keep a component's Razor markup and isolated CSS together under that package's `Components/` directory.
 
 ## Testing and TDD
 

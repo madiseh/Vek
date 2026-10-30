@@ -6,7 +6,7 @@ namespace Vek.Components.Components.CodeView;
 /// <summary>Displays read-only code with syntax highlighting and a copy action.</summary>
 public partial class VekCodeView : IAsyncDisposable
 {
-    private const string ClipboardModulePath = "./_content/Vek.Components/Components/CodeView/VekCodeView.razor.js";
+    private const string ClipboardModulePath = "./_content/Vek.Blazor.CodeView/Components/CodeView/VekCodeView.razor.js";
     private IJSObjectReference? _clipboardModule;
     private bool _copySucceeded;
     private string _copyStatus = string.Empty;

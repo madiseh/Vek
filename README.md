@@ -2,19 +2,22 @@
 
 ![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet&logoColor=white)
 ![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)
-![NuGet package](https://img.shields.io/badge/Package-Vek.Components-004880?logo=nuget&logoColor=white)
+![NuGet packages](https://img.shields.io/badge/Packages-Vek.Blazor-004880?logo=nuget&logoColor=white)
 
-Vek is a reusable Blazor component library targeting .NET 10. The library is being prepared for NuGet distribution. Its components will be organized by feature, with each component's markup and isolated styles kept together.
+Vek is a collection of reusable Blazor component packages targeting .NET 10. Each feature package is a separate Razor Class Library and NuGet package.
 
 ## Repository Structure
 
 | Path | Purpose |
 | --- | --- |
-| `src/Components/Vek.Components` | Reusable Blazor components and the NuGet package. |
+| `src/Components/Blazor/Vek.Blazor.DataGrid` | Data grid components and the `Vek.Blazor.DataGrid` NuGet package. |
+| `src/Components/Blazor/Vek.Blazor.CodeView` | Code viewer components and the `Vek.Blazor.CodeView` NuGet package. |
 | `src/Demo/Vek.Demo` | Interactive app for demonstrating components. |
 | `src/Ports/Vek.Demo.Abstractions` | Demo data contracts and sample models. |
 | `src/Adapters/Vek.SimulatedData` | JSON-backed sample data provider. |
-| `tests/Components/Vek.Components.Tests` | xUnit and bUnit project for future component tests. |
+| `tests/Components/Vek.Components.Tests` | xUnit and bUnit tests for the Blazor component packages. |
+
+Every component package under `src/Components/Blazor` must contain a `Components/` folder. Put each feature's Razor markup and isolated CSS together under that folder. This layout is checked during builds.
 
 ## Build
 

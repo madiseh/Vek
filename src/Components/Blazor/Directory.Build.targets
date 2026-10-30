@@ -1,0 +1,6 @@
+<Project>
+  <Target Name="RequireComponentsFolderForBlazorPackage" BeforeTargets="PrepareForBuild">
+    <Error Condition="!Exists('$(MSBuildProjectDirectory)/Components')"
+           Text="Every Blazor package project under src/Components/Blazor must contain a Components folder." />
+  </Target>
+</Project>

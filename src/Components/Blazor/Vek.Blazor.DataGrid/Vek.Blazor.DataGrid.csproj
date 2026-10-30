@@ -2,13 +2,13 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageId>Vek.Components</PackageId>
+    <PackageId>Vek.Blazor.DataGrid</PackageId>
     <Version>0.1.0</Version>
     <Authors>AMIN SABAGHI</Authors>
-    <Description>Reusable Blazor UI components for .NET 10.</Description>
+    <Description>Data grid components for Blazor and .NET 10.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags>blazor;components;ui</PackageTags>
+    <PackageTags>blazor;components;ui;data-grid;datagrid</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,6 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="../../../README.md" Pack="true" PackagePath="/" />
+    <None Include="../../../../README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 </Project>

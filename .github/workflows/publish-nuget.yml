@@ -36,16 +36,24 @@ jobs:
       - name: Build
         run: dotnet build Vek.slnx --configuration Release --no-restore
 
-      - name: Pack Vek.Components
-        run: dotnet pack src/Components/Vek.Components/Vek.Components.csproj --configuration Release --no-build --no-restore -p:PackageVersion=$env:PACKAGE_VERSION
+      - name: Pack Blazor packages
+        run: |
+          dotnet pack src/Components/Blazor/Vek.Blazor.DataGrid/Vek.Blazor.DataGrid.csproj --configuration Release --no-build --no-restore -p:PackageVersion=$env:PACKAGE_VERSION
+          dotnet pack src/Components/Blazor/Vek.Blazor.CodeView/Vek.Blazor.CodeView.csproj --configuration Release --no-build --no-restore -p:PackageVersion=$env:PACKAGE_VERSION
 
       - name: Push package to NuGet
         shell: pwsh
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
         run: |
-          $packagePath = Join-Path $env:GITHUB_WORKSPACE "VekNugetPackage\Vek.Components.$env:PACKAGE_VERSION.nupkg"
-          if (-not (Test-Path -LiteralPath $packagePath)) {
-            throw "Expected package was not found at '$packagePath'."
+          $packageDirectory = Join-Path $env:GITHUB_WORKSPACE "VekNugetPackage"
+          $packagePaths = @(
+            (Join-Path $packageDirectory "Vek.Blazor.DataGrid.$env:PACKAGE_VERSION.nupkg"),
+            (Join-Path $packageDirectory "Vek.Blazor.CodeView.$env:PACKAGE_VERSION.nupkg")
+          )
+          foreach ($packagePath in $packagePaths) {
+            if (-not (Test-Path -LiteralPath $packagePath)) {
+              throw "Expected package was not found at '$packagePath'."
+            }
+            dotnet nuget push $packagePath --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
           }
-          dotnet nuget push $packagePath --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate

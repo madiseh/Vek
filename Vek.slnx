@@ -10,8 +10,9 @@
   <Folder Name="/src/Adapters/">
     <Project Path="src/Adapters/Vek.SimulatedData/Vek.SimulatedData.csproj" />
   </Folder>
-  <Folder Name="/src/Components/">
-    <Project Path="src/Components/Vek.Components/Vek.Components.csproj" />
+  <Folder Name="/src/Components/Blazor/">
+    <Project Path="src/Components/Blazor/Vek.Blazor.CodeView/Vek.Blazor.CodeView.csproj" />
+    <Project Path="src/Components/Blazor/Vek.Blazor.DataGrid/Vek.Blazor.DataGrid.csproj" />
   </Folder>
   <Folder Name="/src/Demo/">
     <Project Path="src/Demo/Vek.Demo/Vek.Demo.csproj" />
