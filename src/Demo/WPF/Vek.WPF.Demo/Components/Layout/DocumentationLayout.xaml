@@ -1,8 +1,6 @@
-<UserControl x:Class="Vek.WPF.Demo.Views.DocumentationView"
+<UserControl x:Class="Vek.WPF.Demo.Components.Layout.DocumentationLayout"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:navigation="clr-namespace:Vek.WPF.Demo.Navigation"
-             xmlns:views="clr-namespace:Vek.WPF.Demo.Views">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="260" />
@@ -25,15 +23,9 @@
                           KeyboardNavigation.TabNavigation="Continue" />
             </DockPanel>
         </Border>
-        <ContentControl Grid.Column="1" Content="{Binding SelectedPage}"
+        <ContentControl x:Name="SelectedPageHost" Grid.Column="1"
                         HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
                         AutomationProperties.Name="Documentation content">
-            <ContentControl.ContentTemplate>
-                <DataTemplate DataType="{x:Type navigation:DemoPageDefinition}">
-                    <views:DocumentationPageView Page="{Binding}"
-                        BasicUsage="{Binding DataContext.BasicUsage, RelativeSource={RelativeSource AncestorType={x:Type views:DocumentationView}}}" />
-                </DataTemplate>
-            </ContentControl.ContentTemplate>
         </ContentControl>
     </Grid>
 </UserControl>

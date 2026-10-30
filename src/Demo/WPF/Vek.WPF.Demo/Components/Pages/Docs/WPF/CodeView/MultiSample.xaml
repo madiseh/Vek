@@ -1,0 +1,25 @@
+<UserControl x:Class="Vek.WPF.Demo.Components.Pages.Docs.WPF.CodeView.MultiSample" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="Root">
+    <Grid AutomationProperties.AutomationId="docs-page-layout">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="220"/></Grid.ColumnDefinitions>
+        <ScrollViewer x:Name="ArticleScroll" Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="40,40,32,64">
+            <StackPanel MaxWidth="900" AutomationProperties.AutomationId="docs-article">
+                <TextBlock Text="VekCodeView: Multi-Sample" FontSize="36" FontWeight="Bold" TextWrapping="Wrap" AutomationProperties.AutomationId="article-title"/>
+                <TextBlock Text="Switch between titled code samples in one viewer." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0" AutomationProperties.AutomationId="article-intro"/>
+                <StackPanel x:Name="Section_multi_sample_heading" Margin="0,36,0,0" Focusable="True" AutomationProperties.AutomationId="section:multi-sample-heading" AutomationProperties.Name="Choose a sample">
+                    <TextBlock Text="Choose a sample" FontSize="25" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <TabControl Margin="0,16,0,0">
+                        <TabItem Header="HTML"><TextBox Text="&lt;article class=&quot;card&quot;&gt;&#10;    &lt;h2&gt;Welcome&lt;/h2&gt;&#10;    &lt;p&gt;Browse the latest updates.&lt;/p&gt;&#10;&lt;/article&gt;" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" FontFamily="Consolas"/></TabItem>
+                        <TabItem Header="C#"><TextBox Text="public static class Greeting&#10;{&#10;    public static string Create(string name) =&gt; $&quot;Hello, {name}!&quot;;&#10;}" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" FontFamily="Consolas"/></TabItem>
+                        <TabItem Header="SQL"><TextBox Text="SELECT name, created_at&#10;FROM users&#10;WHERE is_active = 1&#10;ORDER BY created_at DESC;" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" FontFamily="Consolas"/></TabItem>
+                    </TabControl>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+        <Border Grid.Column="1" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1,0,0,0" Margin="0,48,16,32" Padding="20,0,0,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel AutomationProperties.AutomationId="docs-toc">
+                <TextBlock Text="On this page" FontWeight="SemiBold" Margin="0,0,0,12"/>
+                <Button Content="Choose a sample" Tag="{Binding ElementName=Section_multi_sample_heading}" Click="NavigateToSection" Style="{DynamicResource TocLinkStyle}" AutomationProperties.AutomationId="toc:multi-sample-heading"/>
+            </StackPanel></ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

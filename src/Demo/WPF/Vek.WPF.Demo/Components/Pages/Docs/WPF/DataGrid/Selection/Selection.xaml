@@ -1,0 +1,35 @@
+<UserControl x:Class="Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.Selection.Selection" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="Root">
+    <Grid AutomationProperties.AutomationId="docs-page-layout">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="220"/></Grid.ColumnDefinitions>
+        <ScrollViewer x:Name="ArticleScroll" Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="40,40,32,64">
+            <StackPanel MaxWidth="900" AutomationProperties.AutomationId="docs-article">
+                <TextBlock Text="VekDataGrid: Row Selection" FontSize="36" FontWeight="Bold" TextWrapping="Wrap" AutomationProperties.AutomationId="article-title"/>
+                <TextBlock Text="Bind one or many selected products, select from the row or checkbox, and control which rows can be selected." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0" AutomationProperties.AutomationId="article-intro"/>
+                <StackPanel x:Name="Section_live_example" Margin="0,36,0,0" Focusable="True" AutomationProperties.AutomationId="section:live-example" AutomationProperties.Name="Live example">
+                    <TextBlock Text="Live example" FontSize="25" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <TextBlock Text="Select products with the row checkboxes or click a row. The header checkbox selects the current page." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0"/>
+                    <TextBlock Text="Loading sample products..." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0"/>
+                    <TextBlock Text="@_selectedProducts.Count selected: @string.Join(&quot;, &quot;, _selectedProducts.Select(product =&gt; product.Name))" Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0"/>
+                    <Border Background="{DynamicResource SelectedBrush}" CornerRadius="6" Padding="16" Margin="0,18,0,0"><TextBlock Text="Native WPF example is in development." Style="{DynamicResource DescriptionStyle}"/></Border>
+                </StackPanel>
+                <StackPanel x:Name="Section_code" Margin="0,36,0,0" Focusable="True" AutomationProperties.AutomationId="section:code" AutomationProperties.Name="Code">
+                    <TextBlock Text="Code" FontSize="25" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <Border Background="{DynamicResource SelectedBrush}" CornerRadius="6" Padding="16" Margin="0,18,0,0"><TextBlock Text="Native WPF code sample is in development." Style="{DynamicResource DescriptionStyle}"/></Border>
+                </StackPanel>
+                <StackPanel x:Name="Section_selection_options" Margin="0,36,0,0" Focusable="True" AutomationProperties.AutomationId="section:selection-options" AutomationProperties.Name="Selection options">
+                    <TextBlock Text="Selection options" FontSize="25" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <TextBlock Text="Choose None , Single , or Multiple . Bind SelectedItem or SelectedItems , add a SelectionColumn for checkbox selection, and provide an IsRowSelectable predicate for disabled rows." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0"/>
+                    <TextBlock Text="SelectionComparer matches selected rows when data refreshes. FilteredSelectionMode chooses whether filtered rows remain selected or are cleared." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0"/>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+        <Border Grid.Column="1" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1,0,0,0" Margin="0,48,16,32" Padding="20,0,0,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel AutomationProperties.AutomationId="docs-toc">
+                <TextBlock Text="On this page" FontWeight="SemiBold" Margin="0,0,0,12"/>
+                <Button Content="Live example" Tag="{Binding ElementName=Section_live_example}" Click="NavigateToSection" Style="{DynamicResource TocLinkStyle}" AutomationProperties.AutomationId="toc:live-example"/>
+                <Button Content="Code" Tag="{Binding ElementName=Section_code}" Click="NavigateToSection" Style="{DynamicResource TocLinkStyle}" AutomationProperties.AutomationId="toc:code"/>
+                <Button Content="Selection options" Tag="{Binding ElementName=Section_selection_options}" Click="NavigateToSection" Style="{DynamicResource TocLinkStyle}" AutomationProperties.AutomationId="toc:selection-options"/>
+            </StackPanel></ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

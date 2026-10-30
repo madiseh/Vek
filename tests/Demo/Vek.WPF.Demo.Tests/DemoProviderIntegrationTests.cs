@@ -3,6 +3,60 @@ namespace Vek.WPF.Demo.Tests;
 public sealed class DemoProviderIntegrationTests
 {
     /// <summary>
+    /// The documentation shell keeps the sidebar instance while loading each destination's own article UserControl on the right.
+    /// </summary>
+    [Fact]
+    public async Task SelectingDocumentationPagesKeepsSidebarAndLoadsStandalonePageControls()
+    {
+        await RunOnStaThreadAsync(() =>
+        {
+            var window = new MainWindow(new JsonDemoProductProvider());
+            try
+            {
+                window.Show();
+                window.UpdateLayout();
+                var model = Assert.IsType<MainWindowViewModel>(window.DataContext);
+                model.GetStartedCommand.Execute(null);
+                window.UpdateLayout();
+                window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+
+                var layout = Assert.Single(Descendants<DocumentationLayout>(window));
+                var sidebar = Assert.Single(Descendants<TreeView>(layout));
+                var pageHost = Descendants<ContentControl>(layout).Single(control => control.Name == "SelectedPageHost");
+
+                foreach (var id in new[] { "vekdatagrid/basic-usage", "vekdatagrid/sorting" })
+                {
+                    var page = DemoPageCatalog.Documentation.Single(item => item.Id == id);
+                    model.SelectPage(page);
+                    window.UpdateLayout();
+                    window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+
+                    Assert.Equal(page.PageType, pageHost.Content.GetType());
+                    var pageControl = Assert.IsAssignableFrom<UserControl>(pageHost.Content);
+                    Assert.Contains(Descendants<Grid>(pageControl), grid => AutomationProperties.GetAutomationId(grid) == "docs-page-layout");
+                    Assert.Contains(Descendants<StackPanel>(pageControl), panel => AutomationProperties.GetAutomationId(panel) == "docs-article");
+                    Assert.Contains(Descendants<StackPanel>(pageControl), panel => AutomationProperties.GetAutomationId(panel) == "docs-toc");
+                    Assert.Same(layout, Assert.Single(Descendants<DocumentationLayout>(window)));
+                    Assert.Same(sidebar, Assert.Single(Descendants<TreeView>(layout)));
+                }
+
+                model.SelectPage(DemoPageCatalog.Documentation.Single(item => item.Id == "vekdatagrid/basic-usage"));
+                window.UpdateLayout();
+                window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+                var basicUsage = Assert.IsAssignableFrom<UserControl>(pageHost.Content);
+                var grid = Assert.Single(Descendants<VekDataGrid>(basicUsage));
+                Assert.Equal(new[] { "Name", "Category", "Price", "Product ID" },
+                    grid.Columns.Cast<DataGridColumn>().Select(column => column.Header?.ToString()));
+                return true;
+            }
+            finally
+            {
+                window.Close();
+            }
+        });
+    }
+
+    /// <summary>
     /// Deselecting a sidebar item preserves the active page and restores the visible selection without binding errors.
     /// </summary>
     [Fact]
@@ -64,7 +118,7 @@ public sealed class DemoProviderIntegrationTests
             {
                 window.Show();
                 window.UpdateLayout();
-                var home = Assert.Single(Descendants<HomeView>(window));
+                var home = Assert.Single(Descendants<Home>(window));
                 var repositoryText = Assert.Single(Descendants<TextBlock>(home)
                     .Where(text => text.Inlines.OfType<System.Windows.Documents.Hyperlink>().Any()));
                 var repository = Assert.Single(repositoryText.Inlines.OfType<System.Windows.Documents.Hyperlink>());
@@ -81,7 +135,7 @@ public sealed class DemoProviderIntegrationTests
                 start.Command.Execute(null);
                 window.UpdateLayout();
                 Assert.Equal("getting-started", Assert.IsType<MainWindowViewModel>(window.DataContext).SelectedPage.Id);
-                Assert.Single(Descendants<DocumentationView>(window));
+                Assert.Single(Descendants<DocumentationLayout>(window));
                 return true;
             }
             finally
@@ -105,7 +159,7 @@ public sealed class DemoProviderIntegrationTests
                 window.Show();
                 window.UpdateLayout();
                 window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
-                Assert.Single(Descendants<HomeView>(window));
+                Assert.Single(Descendants<Home>(window));
 
                 var button = Assert.Single(Descendants<Button>(window));
                 Assert.NotNull(button.Command);
@@ -113,7 +167,7 @@ public sealed class DemoProviderIntegrationTests
                 window.UpdateLayout();
                 window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
 
-                Assert.Single(Descendants<DocumentationView>(window));
+                Assert.Single(Descendants<DocumentationLayout>(window));
                 var navigation = Assert.Single(Descendants<TreeView>(window));
                 var selected = Assert.IsType<TreeViewItem>(navigation.SelectedItem);
                 Assert.NotNull(selected.Style);
@@ -152,10 +206,10 @@ public sealed class DemoProviderIntegrationTests
                 window.UpdateLayout();
                 window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
 
-                var pageView = Assert.Single(Descendants<DocumentationPageView>(window));
-                Assert.Equal("vekdatagrid/basic-usage", pageView.Page?.Id);
-                Assert.NotNull(pageView.BasicUsage);
-                var grid = Assert.Single(Descendants<VekDataGrid>(window));
+                var pageView = Descendants<UserControl>(window).Single(control => control.GetType() ==
+                    DemoPageCatalog.Documentation.Single(page => page.Id == "vekdatagrid/basic-usage").PageType);
+                Assert.NotNull(viewModel.BasicUsage);
+                var grid = Assert.Single(Descendants<VekDataGrid>(pageView));
                 var frame = new DispatcherFrame();
                 var loadedProbe = new DispatcherTimer(DispatcherPriority.Background, window.Dispatcher)
                 {

@@ -11,17 +11,22 @@ public sealed class CodeSampleViewTests
         await RunOnStaThreadAsync(() =>
         {
             var page = DemoPageCatalog.All.Single(page => page.Id == "vekcodeview/basic-usage");
-            var view = new DocumentationPageView { Page = page, DataContext = page };
+            var view = Assert.IsAssignableFrom<UserControl>(Activator.CreateInstance(page.PageType));
+            view.DataContext = page;
             var window = new Window { Content = view };
             try
             {
                 window.Show();
                 window.UpdateLayout();
                 window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
-                var samples = Descendants<CodeSampleView>(window).Where(sample => sample.IsVisible).ToArray();
-                Assert.Equal(4, samples.Length);
-                Assert.Equal(new[] { "HTML", "Java", "C#", "SQL" }, samples.Select(sample => Assert.Single(sample.Samples).Title));
-                Assert.All(Descendants<TextBox>(window), editor => Assert.True(editor.IsReadOnly));
+                var sections = Descendants<StackPanel>(window)
+                    .Where(panel => AutomationProperties.GetAutomationId(panel).StartsWith("section:"))
+                    .ToArray();
+                Assert.Equal(new[] { "HTML", "Java", "C#", "SQL" },
+                    sections.Select(panel => panel.Children.OfType<TextBlock>().First().Text));
+                var editors = Descendants<TextBox>(window).ToArray();
+                Assert.Equal(4, editors.Length);
+                Assert.All(editors, editor => Assert.True(editor.IsReadOnly));
                 return true;
             }
             finally

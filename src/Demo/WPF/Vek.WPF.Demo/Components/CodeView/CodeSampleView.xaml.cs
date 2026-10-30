@@ -1,4 +1,4 @@
-namespace Vek.WPF.Demo.Views;
+namespace Vek.WPF.Demo.Components.CodeView;
 
 public partial class CodeSampleView : UserControl
 {

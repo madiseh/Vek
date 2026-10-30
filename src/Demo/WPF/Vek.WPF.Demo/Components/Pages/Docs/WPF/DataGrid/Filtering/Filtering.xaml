@@ -1,0 +1,40 @@
+<UserControl x:Class="Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.Filtering.Filtering" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="Root">
+    <Grid AutomationProperties.AutomationId="docs-page-layout">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="220"/></Grid.ColumnDefinitions>
+        <ScrollViewer x:Name="ArticleScroll" Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="40,40,32,64">
+            <StackPanel MaxWidth="900" AutomationProperties.AutomationId="docs-article">
+                <TextBlock Text="VekDataGrid: Filtering" FontSize="36" FontWeight="Bold" TextWrapping="Wrap" AutomationProperties.AutomationId="article-title"/>
+                <TextBlock Text="Combine quick predicates with per-column filters, choose a filter surface, and control string matching." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0" AutomationProperties.AutomationId="article-intro"/>
+                <StackPanel x:Name="Section_live_example" Margin="0,36,0,0" Focusable="True" AutomationProperties.AutomationId="section:live-example" AutomationProperties.Name="Live example">
+                    <TextBlock Text="Live example" FontSize="25" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <TextBlock Text="Choose a filter layout, then enter a value to narrow the products." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0"/>
+                    <TextBlock Text="Loading sample products..." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0"/>
+                    <Border Background="{DynamicResource SelectedBrush}" CornerRadius="6" Padding="16" Margin="0,18,0,0"><TextBlock Text="Native WPF example is in development." Style="{DynamicResource DescriptionStyle}"/></Border>
+                </StackPanel>
+                <StackPanel x:Name="Section_code" Margin="0,36,0,0" Focusable="True" AutomationProperties.AutomationId="section:code" AutomationProperties.Name="Code">
+                    <TextBlock Text="Code" FontSize="25" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <TextBlock Text="Columns can select their comparison operator, and the grid applies filters before sorting and paging." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0"/>
+                    <Border Background="{DynamicResource SelectedBrush}" CornerRadius="6" Padding="16" Margin="0,18,0,0"><TextBlock Text="Native WPF code sample is in development." Style="{DynamicResource DescriptionStyle}"/></Border>
+                </StackPanel>
+                <StackPanel x:Name="Section_filter_modes" Margin="0,36,0,0" Focusable="True" AutomationProperties.AutomationId="section:filter-modes" AutomationProperties.Name="Filter modes and operators">
+                    <TextBlock Text="Filter modes and operators" FontSize="25" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <TextBlock Text="Simple places controls above the grid, ColumnMenu groups each control in a menu, and ColumnRow places controls below the headings. Use FilterBy for a custom selector, FilterTemplate for a custom editor, and FilterCaseSensitive to set string matching behavior." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0"/>
+                    <TextBlock Text="Available operators include equality, text matching, numeric comparisons, and null or empty checks. Filter changes reset the page and are exposed through CurrentState and FilterChanged ." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0"/>
+                </StackPanel>
+                <StackPanel x:Name="Section_filter_options" Margin="0,36,0,0" Focusable="True" AutomationProperties.AutomationId="section:filter-options" AutomationProperties.Name="Filter properties">
+                    <TextBlock Text="Filter properties" FontSize="25" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <TextBlock Text="Filtering is opt-in per column. Set Filterable=&quot;true&quot; on the columns users can filter, then choose where their controls appear with FilterMode ." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0"/>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+        <Border Grid.Column="1" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1,0,0,0" Margin="0,48,16,32" Padding="20,0,0,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel AutomationProperties.AutomationId="docs-toc">
+                <TextBlock Text="On this page" FontWeight="SemiBold" Margin="0,0,0,12"/>
+                <Button Content="Live example" Tag="{Binding ElementName=Section_live_example}" Click="NavigateToSection" Style="{DynamicResource TocLinkStyle}" AutomationProperties.AutomationId="toc:live-example"/>
+                <Button Content="Code" Tag="{Binding ElementName=Section_code}" Click="NavigateToSection" Style="{DynamicResource TocLinkStyle}" AutomationProperties.AutomationId="toc:code"/>
+                <Button Content="Filter modes" Tag="{Binding ElementName=Section_filter_modes}" Click="NavigateToSection" Style="{DynamicResource TocLinkStyle}" AutomationProperties.AutomationId="toc:filter-modes"/>
+                <Button Content="Filter properties" Tag="{Binding ElementName=Section_filter_options}" Click="NavigateToSection" Style="{DynamicResource TocLinkStyle}" AutomationProperties.AutomationId="toc:filter-options"/>
+            </StackPanel></ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,10 +1,10 @@
-namespace Vek.WPF.Demo.Views;
+namespace Vek.WPF.Demo.Components.Layout;
 
-public partial class DocumentationView : UserControl
+public partial class DocumentationLayout : UserControl
 {
     private MainWindowViewModel? _model;
 
-    public DocumentationView()
+    public DocumentationLayout()
     {
         InitializeComponent();
         DocumentationNavigation.Items.Add(Destination(DemoPageCatalog.Documentation.Single(page => page.Id == "getting-started")));
@@ -43,6 +43,13 @@ public partial class DocumentationView : UserControl
 
     private void UpdateSelection()
     {
+        if (_model?.SelectedPage is { } currentPage)
+        {
+            var pageView = (UserControl)Activator.CreateInstance(currentPage.PageType)!;
+            pageView.DataContext = currentPage;
+            SelectedPageHost.Content = pageView;
+        }
+
         foreach (var destination in Destinations(DocumentationNavigation))
             destination.IsSelected = destination.Tag is DemoPageDefinition page && page == _model?.SelectedPage;
     }

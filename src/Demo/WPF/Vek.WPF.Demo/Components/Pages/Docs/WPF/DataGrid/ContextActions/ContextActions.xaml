@@ -1,0 +1,40 @@
+<UserControl x:Class="Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.ContextActions.ContextActions" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="Root">
+    <Grid AutomationProperties.AutomationId="docs-page-layout">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="220"/></Grid.ColumnDefinitions>
+        <ScrollViewer x:Name="ArticleScroll" Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="40,40,32,64">
+            <StackPanel MaxWidth="900" AutomationProperties.AutomationId="docs-article">
+                <TextBlock Text="VekDataGrid: Context Actions" FontSize="36" FontWeight="Bold" TextWrapping="Wrap" AutomationProperties.AutomationId="article-title"/>
+                <TextBlock Text="Add row and cell actions with access to the item's stable column and current result index." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0" AutomationProperties.AutomationId="article-intro"/>
+                <StackPanel x:Name="Section_live_example" Margin="0,36,0,0" Focusable="True" AutomationProperties.AutomationId="section:live-example" AutomationProperties.Name="Live example">
+                    <TextBlock Text="Live example" FontSize="25" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <TextBlock Text="Use the row action to inspect a product. Cell actions can be limited to a column and receive an edit command in their context." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0"/>
+                    <TextBlock Text="Loading sample products..." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0"/>
+                    <TextBlock Text="@_feedback" Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0"/>
+                    <Border Background="{DynamicResource SelectedBrush}" CornerRadius="6" Padding="16" Margin="0,18,0,0"><TextBlock Text="Native WPF example is in development." Style="{DynamicResource DescriptionStyle}"/></Border>
+                </StackPanel>
+                <StackPanel x:Name="Section_code" Margin="0,36,0,0" Focusable="True" AutomationProperties.AutomationId="section:code" AutomationProperties.Name="Code">
+                    <TextBlock Text="Code" FontSize="25" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <Border Background="{DynamicResource SelectedBrush}" CornerRadius="6" Padding="16" Margin="0,18,0,0"><TextBlock Text="Native WPF code sample is in development." Style="{DynamicResource DescriptionStyle}"/></Border>
+                </StackPanel>
+                <StackPanel x:Name="Section_actions" Margin="0,36,0,0" Focusable="True" AutomationProperties.AutomationId="section:actions" AutomationProperties.Name="Action contexts">
+                    <TextBlock Text="Action contexts" FontSize="25" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <TextBlock Text="RowActionsTemplate adds an action cell and provides the row item, index, selection state, and commands to select, toggle details, or edit." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0"/>
+                    <TextBlock Text="CellActionsTemplate adds actions inside each cell with the item, stable column key, title, row index, and an edit command. Actions stop row-click propagation." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0"/>
+                </StackPanel>
+                <StackPanel x:Name="Section_commands" Margin="0,36,0,0" Focusable="True" AutomationProperties.AutomationId="section:commands" AutomationProperties.Name="Programmatic commands">
+                    <TextBlock Text="Programmatic commands" FontSize="25" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <TextBlock Text="The grid exposes commands for clearing filters and sorting, reloading data, selecting rows, expanding or collapsing details, and starting or finishing edits." Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0"/>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+        <Border Grid.Column="1" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1,0,0,0" Margin="0,48,16,32" Padding="20,0,0,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel AutomationProperties.AutomationId="docs-toc">
+                <TextBlock Text="On this page" FontWeight="SemiBold" Margin="0,0,0,12"/>
+                <Button Content="Live example" Tag="{Binding ElementName=Section_live_example}" Click="NavigateToSection" Style="{DynamicResource TocLinkStyle}" AutomationProperties.AutomationId="toc:live-example"/>
+                <Button Content="Code" Tag="{Binding ElementName=Section_code}" Click="NavigateToSection" Style="{DynamicResource TocLinkStyle}" AutomationProperties.AutomationId="toc:code"/>
+                <Button Content="Action contexts" Tag="{Binding ElementName=Section_actions}" Click="NavigateToSection" Style="{DynamicResource TocLinkStyle}" AutomationProperties.AutomationId="toc:actions"/>
+                <Button Content="Programmatic commands" Tag="{Binding ElementName=Section_commands}" Click="NavigateToSection" Style="{DynamicResource TocLinkStyle}" AutomationProperties.AutomationId="toc:commands"/>
+            </StackPanel></ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

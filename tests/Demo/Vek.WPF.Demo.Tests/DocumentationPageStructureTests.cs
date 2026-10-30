@@ -3,6 +3,62 @@ namespace Vek.WPF.Demo.Tests;
 public sealed class DocumentationPageStructureTests
 {
     /// <summary>
+    /// Every WPF destination maps to a separately named page under the WPF Docs component tree.
+    /// </summary>
+    [Fact]
+    public void PageComponentsMirrorBlazorNamesUnderWpfDocsFolder()
+    {
+        var repositoryRoot = RepositoryRoot();
+        var demoRoot = Path.Combine(repositoryRoot, "src/Demo/WPF/Vek.WPF.Demo");
+        var blazorRoot = Path.Combine(repositoryRoot, "src/Demo/Vek.Demo/Components/Pages/Docs/Blazor");
+        var wpfPagesRoot = Path.Combine(demoRoot, "Components/Pages/Docs/WPF");
+        var home = DemoPageCatalog.All.Single(page => page.Id == "home");
+        Assert.Equal("Home", home.PageType.Name);
+        Assert.Equal("Vek.WPF.Demo.Components.Pages", home.PageType.Namespace);
+        Assert.True(File.Exists(Path.Combine(demoRoot, "Components/Pages/Home.xaml")));
+
+        var pages = DemoPageCatalog.Documentation;
+        Assert.Equal(19, pages.Count);
+        var blazorPages = Directory.GetFiles(blazorRoot, "*.razor", SearchOption.AllDirectories);
+        Assert.Equal(pages.Count, blazorPages.Length);
+        foreach (var page in pages)
+        {
+            var route = page.Id == "getting-started" ? "/docs/getting-started" : "/docs/components/" + page.Id;
+            var sourcePath = blazorPages.Single(path => File.ReadAllText(path).Contains("@page \"" + route + "\""));
+            var relativeSourcePath = Path.GetRelativePath(blazorRoot, sourcePath);
+            var relativePagePath = Path.ChangeExtension(relativeSourcePath, ".xaml");
+            Assert.Equal(Path.GetFileNameWithoutExtension(sourcePath), page.PageType.Name);
+            Assert.StartsWith("Vek.WPF.Demo.Components.Pages.Docs.WPF", page.PageType.Namespace);
+            Assert.True(File.Exists(Path.Combine(wpfPagesRoot, relativePagePath)), relativePagePath);
+        }
+    }
+
+    /// <summary>
+    /// Navigating to each documentation destination displays its corresponding page component type.
+    /// </summary>
+    [Fact]
+    public async Task DocumentationNavigationLoadsTheMappedPageComponent()
+    {
+        await WpfTestDispatcher.RunAsync(() =>
+        {
+            var model = new MainWindowViewModel();
+            model.GetStartedCommand.Execute(null);
+            WithWindow(new DocumentationLayout { DataContext = model }, window =>
+            {
+                foreach (var page in DemoPageCatalog.Documentation)
+                {
+                    model.SelectPage(page);
+                    window.UpdateLayout();
+                    window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+
+                    Assert.Single(Descendants<UserControl>(window).Where(control => control.GetType() == page.PageType));
+                }
+            });
+            return true;
+        });
+    }
+
+    /// <summary>
     /// Documentation retains Blazor's collapsed component hierarchy, route order, and a separate Home action.
     /// </summary>
     [Fact]
@@ -12,7 +68,7 @@ public sealed class DocumentationPageStructureTests
         {
             var model = new MainWindowViewModel();
             model.GetStartedCommand.Execute(null);
-            WithWindow(new DocumentationView { DataContext = model }, window =>
+            WithWindow(new DocumentationLayout { DataContext = model }, window =>
             {
                 var tree = Assert.Single(Descendants<TreeView>(window));
                 Assert.Equal(2, tree.Items.Count);
@@ -53,10 +109,19 @@ public sealed class DocumentationPageStructureTests
                     .Select(match => (Id: SectionId(match.Groups[1].Value), Title: Plain(match.Groups[2].Value))).ToArray();
                 var sourceToc = Regex.Matches(source, "<a href=\"[^\"]+#([^\"]+)\">(.*?)</a>", RegexOptions.Singleline)
                     .Select(match => (Id: match.Groups[1].Value, Title: Plain(match.Groups[2].Value))).ToArray();
-                WithWindow(new DocumentationPageView { Page = page }, window =>
+                var pageView = Assert.IsAssignableFrom<UserControl>(Activator.CreateInstance(page.PageType));
+                pageView.DataContext = page;
+                WithWindow(pageView, window =>
                 {
                     Assert.Contains(Descendants<TextBlock>(window), block => block.Text == title);
-                    Assert.Contains(Descendants<TextBlock>(window), block => block.Text == introduction);
+                    Assert.True(Descendants<TextBlock>(window).Any(block => Plain(new System.Windows.Documents.TextRange(block.ContentStart, block.ContentEnd).Text) == introduction),
+                        $"Page '{page.Id}' did not render its introduction '{introduction}'.");
+                    Assert.Contains(Descendants<StackPanel>(window), panel => AutomationProperties.GetAutomationId(panel) == "docs-article");
+                    if (sections.Length > 0)
+                    {
+                        Assert.Contains(Descendants<Grid>(window), grid => AutomationProperties.GetAutomationId(grid) == "docs-page-layout");
+                        Assert.Contains(Descendants<StackPanel>(window), panel => AutomationProperties.GetAutomationId(panel) == "docs-toc");
+                    }
                     var rendered = Descendants<StackPanel>(window).Where(panel => AutomationProperties.GetAutomationId(panel).StartsWith("section:")).ToArray();
                     Assert.Equal(sections.Select(section => "section:" + section.Id), rendered.Select(AutomationProperties.GetAutomationId));
                     Assert.Equal(sections.Select(section => section.Title), rendered.Select(panel => panel.Children.OfType<TextBlock>().First().Text));
@@ -68,7 +133,7 @@ public sealed class DocumentationPageStructureTests
                         Assert.Empty(Descendants<VekDataGrid>(window));
                         Assert.Empty(Descendants<CodeSampleView>(window));
                         foreach (var slot in rendered.Where(panel => AutomationProperties.GetAutomationId(panel) is "section:live-example" or "section:code" or "section:client-virtualization" or "section:server-virtualization"))
-                            Assert.Contains(Descendants<TextBlock>(slot), block => block.Text.StartsWith("In development"));
+                            Assert.Contains(Descendants<TextBlock>(slot), block => block.Text.Contains("in development", StringComparison.OrdinalIgnoreCase));
                     }
                 });
             }
@@ -85,7 +150,9 @@ public sealed class DocumentationPageStructureTests
         await WpfTestDispatcher.RunAsync(() =>
         {
             var page = DemoPageCatalog.All.Single(page => page.Id == "vekdatagrid/filtering");
-            WithWindow(new DocumentationPageView { Page = page }, window =>
+            var pageView = Assert.IsAssignableFrom<UserControl>(Activator.CreateInstance(page.PageType));
+            pageView.DataContext = page;
+            WithWindow(pageView, window =>
             {
                 var scroll = Descendants<ScrollViewer>(window).Single(view => view.Name == "ArticleScroll");
                 var link = Descendants<Button>(window).Single(button => AutomationProperties.GetAutomationId(button) == "toc:filter-options");

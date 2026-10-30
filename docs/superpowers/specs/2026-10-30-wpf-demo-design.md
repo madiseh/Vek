@@ -15,7 +15,11 @@ Add a native WPF counterpart to the current Blazor demo so the existing componen
 - Keep the two CodeView topics and show read-only native WPF code samples; a reusable WPF CodeView library is outside this change.
 - In the documentation sidebar, show Getting Started first, then an initially collapsed Components group containing nested VekDataGrid and VekCodeView sections and their links in the same order as Blazor. Keep Home separate from the documentation navigation.
 - Mirror each Blazor article's heading, introduction, section order, and “On this page” links. Place in-development notices in the corresponding live-example/code section without removing later explanation sections.
+- Keep the documentation sidebar in a persistent WPF shell. Selecting a destination replaces only the right-side content with that destination's complete, independent WPF `UserControl`.
+- Each WPF documentation page owns its article and local TOC layout in its own XAML file; do not render page content through one generic page renderer.
+- Render Basic Usage's live example with the native WPF `VekDataGrid`, `ItemsSource`, and `DataGridTextColumn` definitions matching Name, Category, Price, and Product ID.
 - VekCodeView Basic Usage has separate HTML, Java, C#, and SQL sections in that order; Multi-Sample has one “Choose a sample” section with selectable samples.
+- Mirror Blazor's page file structure under `src/Demo/WPF/Vek.WPF.Demo/Components/Pages/Docs/WPF/`: every `.razor` page under `Components/Pages/Docs/Blazor/` has a same-named `.xaml` page at the matching relative path under `WPF/`. Put Home at `Components/Pages/Home.xaml` and the shared docs shell under `Components/Layout/`.
 
 ## Non-goals
 
@@ -33,13 +37,14 @@ Add a native WPF counterpart to the current Blazor demo so the existing componen
 
 ## Approaches
 
-1. **Separate WPF demo app with a data-driven page catalog (selected).** One window hosts Home and documentation content. A catalog provides the 20 screens and the left navigation; WPF controls render each sample. This preserves a single-window flow and keeps the initial documentation scaffold compact while features arrive incrementally.
-2. **One WPF `Page` and view per Blazor route.** This mirrors route files directly but creates many mostly identical files before the WPF features exist.
+1. **Separate WPF demo app with a page component per Blazor route (selected).** One window hosts Home and a persistent documentation shell. Every WPF page has its own same-named XAML component under the mirrored `Components/Pages` tree and owns its article/TOC layout; the page catalog maps destinations to those components. Selecting a page loads that component into the right pane and leaves the sidebar in place.
+2. **One generic WPF page for every destination.** A catalog chooses copy and samples but there are no route-specific page files. This is compact but does not meet the required Blazor-like folder and page naming structure.
 3. **Embed the Blazor demo in a WebView.** This reuses pages but does not provide the requested native WPF samples or standalone desktop interaction.
 
 ## Decisions
 
 - Use `src/Demo/WPF/Vek.WPF.Demo` for the WPF composition root.
+- Mirror the Blazor `Components/Pages/Docs/Blazor` paths and filenames under the WPF demo's `Components/Pages/Docs/WPF`; keep Home at `Components/Pages/Home.xaml`.
 - Convert `Vek.WPF.DataGrid` from its generated WPF app scaffold into a WPF class library so the demo can consume `VekDataGrid` as a component.
 - Keep one main window. Home is the startup screen; Get Started opens the documentation shell in the same window.
 - Preserve the current navigation grouping and page titles. Display the VekDataGrid and VekCodeView topics as native WPF documentation views.

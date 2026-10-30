@@ -1,8 +1,8 @@
-namespace Vek.WPF.Demo.Views;
+namespace Vek.WPF.Demo.Components.Pages;
 
-public partial class HomeView : UserControl
+public partial class Home : UserControl
 {
-    public HomeView()
+    public Home()
     {
         InitializeComponent();
     }
