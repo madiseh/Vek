@@ -1,7 +1,5 @@
 <Solution>
   <Configurations>
-    <BuildType Name="Debug" />
-    <BuildType Name="Release" />
     <Platform Name="AnyCPU" />
     <Platform Name="x86" />
     <Platform Name="x64" />
@@ -10,9 +8,16 @@
   <Folder Name="/src/Adapters/">
     <Project Path="src/Adapters/Vek.SimulatedData/Vek.SimulatedData.csproj" />
   </Folder>
+  <Folder Name="/src/Components/" />
   <Folder Name="/src/Components/Blazor/">
     <Project Path="src/Components/Blazor/Vek.Blazor.CodeView/Vek.Blazor.CodeView.csproj" />
     <Project Path="src/Components/Blazor/Vek.Blazor.DataGrid/Vek.Blazor.DataGrid.csproj" />
+  </Folder>
+  <Folder Name="/src/Components/WPF/">
+    <Project Path="src/Components/WPF/Vek.WPF.DataGrid/Vek.WPF.DataGrid.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|x86" Project="x86" />
+    </Project>
   </Folder>
   <Folder Name="/src/Demo/">
     <Project Path="src/Demo/Vek.Demo/Vek.Demo.csproj" />
