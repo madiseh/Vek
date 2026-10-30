@@ -28,6 +28,9 @@
   <Folder Name="/src/Demo/">
     <Project Path="src/Demo/Vek.Demo/Vek.Demo.csproj" />
   </Folder>
+  <Folder Name="/src/Demo/WPF/">
+    <Project Path="src/Demo/WPF/Vek.WPF.Demo/Vek.WPF.Demo.csproj" />
+  </Folder>
   <Folder Name="/src/Ports/">
     <Project Path="src/Ports/Vek.Demo.Abstractions/Vek.Demo.Abstractions.csproj" />
   </Folder>

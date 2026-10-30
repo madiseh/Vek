@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../../Components/WPF/Vek.WPF.DataGrid/Vek.WPF.DataGrid.csproj" />
+    <ProjectReference Include="../../../Ports/Vek.Demo.Abstractions/Vek.Demo.Abstractions.csproj" />
+    <ProjectReference Include="../../../Adapters/Vek.SimulatedData/Vek.SimulatedData.csproj" />
+  </ItemGroup>
+
+</Project>
