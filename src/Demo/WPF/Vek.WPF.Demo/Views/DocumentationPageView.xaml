@@ -23,9 +23,29 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="In development — native WPF behavior for this topic is being prepared."
+                <TextBlock Text="In development — additional guidance or native WPF behavior for this topic is being prepared."
                            TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" />
             </Border>
+
+            <StackPanel Margin="0,40,0,0">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Id}" Value="getting-started">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock Text="Create a WPF project" FontSize="25" FontWeight="SemiBold" Margin="0,0,0,8" />
+                <TextBlock Text="Target .NET 10 for Windows and enable WPF in your project file. Add the Vek.WPF.DataGrid package, then bind VekDataGrid to your view model's product collection."
+                           Style="{DynamicResource DescriptionStyle}" FontSize="15" Margin="0,0,0,16" />
+                <views:CodeSampleView Samples="{Binding GettingStartedCodeSamples, ElementName=Root}" Height="330" />
+                <TextBlock Text="Bind your data" FontSize="25" FontWeight="SemiBold" Margin="0,34,0,8" />
+                <TextBlock Text="Provide an IEnumerable&lt;T&gt; through ItemsSource. Define explicit DataGrid columns when you need control over ordering, formatting, or sort behavior."
+                           Style="{DynamicResource DescriptionStyle}" FontSize="15" />
+            </StackPanel>
 
             <StackPanel Margin="0,40,0,0">
                 <StackPanel.Style>
@@ -98,8 +118,20 @@
                         <DataGridTextColumn Header="Product ID" Binding="{Binding Id}" SortMemberPath="Id" Width="*" />
                     </DataGrid.Columns>
                 </components:VekDataGrid>
-                <TextBlock x:Name="LoadErrorText" Visibility="Collapsed" Foreground="Tomato"
-                           TextWrapping="Wrap" Margin="0,12,0,0" AutomationProperties.LiveSetting="Assertive" />
+                <TextBlock Text="{Binding BasicUsage.LoadErrorMessage, ElementName=Root}"
+                           Foreground="Tomato" TextWrapping="Wrap" Margin="0,12,0,0"
+                           AutomationProperties.LiveSetting="Assertive">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding BasicUsage.LoadErrorMessage, ElementName=Root}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
 
                 <TextBlock Text="Code" FontSize="25" FontWeight="SemiBold" Margin="0,34,0,14" />
                 <TextBlock Text="Keep the native grid markup in Sample.xaml and its data loading logic in BasicUsageViewModel.cs."

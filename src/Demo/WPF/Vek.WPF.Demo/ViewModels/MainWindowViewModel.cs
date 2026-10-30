@@ -30,6 +30,11 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             }
 
             _selectedPage = value;
+            if (value.Id == "vekdatagrid/basic-usage")
+            {
+                _ = BasicUsage?.LoadProductsAsync();
+            }
+
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedPage)));
         }
     }

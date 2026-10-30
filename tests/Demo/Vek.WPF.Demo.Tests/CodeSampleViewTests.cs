@@ -6,6 +6,35 @@ namespace Vek.WPF.Demo.Tests;
 public sealed class CodeSampleViewTests
 {
     /// <summary>
+    /// CodeView Basic Usage contains one native code sample while Multi-Sample owns the selectable sample set.
+    /// </summary>
+    [Fact]
+    public async Task CodeViewBasicUsageDisplaysOneSample()
+    {
+        var sampleCount = await RunOnStaThreadAsync(() =>
+        {
+            var page = DemoPageCatalog.All.Single(page => page.Id == "vekcodeview/basic-usage");
+            var view = new DocumentationPageView { Page = page, DataContext = page };
+            var window = new Window { Content = view };
+            try
+            {
+                window.Show();
+                window.UpdateLayout();
+                window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+                var tabs = Descendants<TabControl>(window).ToArray();
+                Assert.True(tabs.Length > 0, DescribeWindowState(window));
+                return tabs[0].Items.Count;
+            }
+            finally
+            {
+                window.Close();
+            }
+        });
+
+        Assert.Equal(1, sampleCount);
+    }
+
+    /// <summary>
     /// Selecting another sample displays its source in the native read-only code surface.
     /// </summary>
     [Fact]
@@ -26,8 +55,10 @@ public sealed class CodeSampleViewTests
             {
                 window.Show();
                 window.UpdateLayout();
-                var tabs = Descendants<TabControl>(window).Single();
-                tabs.SelectedIndex = 1;
+                window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+                var tabs = Descendants<TabControl>(window).ToArray();
+                Assert.True(tabs.Length > 0, DescribeWindowState(window));
+                tabs[0].SelectedIndex = 1;
                 window.UpdateLayout();
                 window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
 
@@ -61,22 +92,12 @@ public sealed class CodeSampleViewTests
         }
     }
 
+    private static string DescribeWindowState(Window window) =>
+        $"No TabControl. Content={window.Content?.GetType().FullName}; IsLoaded={window.IsLoaded}; " +
+        $"App={Application.Current?.GetType().FullName ?? "<null>"}; " +
+        $"AppDispatcherShutdown={Application.Current?.Dispatcher.HasShutdownStarted}; " +
+        $"WindowDispatcherShutdown={window.Dispatcher.HasShutdownStarted}; Thread={Environment.CurrentManagedThreadId}.";
+
     private static Task<T> RunOnStaThreadAsync<T>(Func<T> action)
-    {
-        var completion = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
-        var thread = new Thread(() =>
-        {
-            try
-            {
-                completion.SetResult(action());
-            }
-            catch (Exception exception)
-            {
-                completion.SetException(exception);
-            }
-        });
-        thread.SetApartmentState(ApartmentState.STA);
-        thread.Start();
-        return completion.Task;
-    }
+        => WpfTestDispatcher.RunAsync(action);
 }

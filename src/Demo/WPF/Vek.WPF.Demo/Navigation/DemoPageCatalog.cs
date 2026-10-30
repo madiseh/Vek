@@ -8,7 +8,7 @@ public static class DemoPageCatalog
         new("home", "Home", "Overview",
             "Explore native WPF component examples and documentation.", DemoPageImplementationStatus.Implemented),
         new("getting-started", "Getting Started", "Overview",
-            "This guide is being prepared.", DemoPageImplementationStatus.InDevelopment),
+            "Create a .NET 10 WPF app, add Vek.WPF.DataGrid, and bind the native grid to your product collection.", DemoPageImplementationStatus.Implemented),
         new("vekdatagrid/basic-usage", "Basic Usage", "VekDataGrid",
             "Display the first five shared products in a sortable native WPF data grid.", DemoPageImplementationStatus.Implemented),
         new("vekdatagrid/sorting", "Sorting", "VekDataGrid",

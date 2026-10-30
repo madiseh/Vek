@@ -20,6 +20,7 @@ public sealed class DemoProviderIntegrationTests
             {
                 window.Show();
                 window.UpdateLayout();
+                window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
                 Assert.Single(Descendants<HomeView>(window));
 
                 var button = Assert.Single(Descendants<Button>(window));
@@ -32,7 +33,9 @@ public sealed class DemoProviderIntegrationTests
                 var navigation = Assert.Single(Descendants<ListBox>(window));
                 Assert.NotNull(navigation.ItemContainerStyle);
                 Assert.Equal("getting-started", Assert.IsType<DemoPageDefinition>(navigation.SelectedItem).Id);
-                Assert.Contains(Descendants<TextBlock>(window), text => text.Text == "This guide is being prepared." && text.Style is not null);
+                Assert.Equal(DemoPageImplementationStatus.Implemented,
+                    Assert.IsType<DemoPageDefinition>(navigation.SelectedItem).ImplementationStatus);
+                Assert.Contains(Descendants<TextBox>(window), text => text.Text.Contains("<UseWPF>true</UseWPF>"));
                 return true;
             }
             finally
@@ -48,16 +51,25 @@ public sealed class DemoProviderIntegrationTests
     [Fact]
     public async Task MainWindowBasicUsageDisplaysFiveSharedProductsInTheNativeGrid()
     {
-        var productNames = await RunOnStaThreadAsync(() =>
+        var loadedProducts = await RunOnStaThreadAsync(() =>
         {
             var window = new MainWindow(new JsonDemoProductProvider());
             try
             {
                 var viewModel = Assert.IsType<MainWindowViewModel>(window.DataContext);
-                viewModel.SelectPage(DemoPageCatalog.All.Single(page => page.Id == "vekdatagrid/basic-usage"));
                 window.Show();
                 window.UpdateLayout();
+                viewModel.GetStartedCommand.Execute(null);
+                window.UpdateLayout();
 
+                Assert.Equal("getting-started", viewModel.SelectedPage.Id);
+                viewModel.SelectPage(DemoPageCatalog.All.Single(page => page.Id == "vekdatagrid/basic-usage"));
+                window.UpdateLayout();
+                window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+
+                var pageView = Assert.Single(Descendants<DocumentationPageView>(window));
+                Assert.Equal("vekdatagrid/basic-usage", pageView.Page?.Id);
+                Assert.NotNull(pageView.BasicUsage);
                 var grid = Assert.Single(Descendants<VekDataGrid>(window));
                 var frame = new DispatcherFrame();
                 var loadedProbe = new DispatcherTimer(DispatcherPriority.Background, window.Dispatcher)
@@ -83,7 +95,9 @@ public sealed class DemoProviderIntegrationTests
                 loadedProbe.Stop();
                 timeout.Stop();
 
-                return grid.Items.OfType<DemoProduct>().Select(product => product.Name).ToArray();
+                return (Names: grid.Items.OfType<DemoProduct>().Select(product => product.Name).ToArray(),
+                    Count: viewModel.BasicUsage!.Products.Count,
+                    Error: viewModel.BasicUsage.LoadErrorMessage);
             }
             finally
             {
@@ -91,7 +105,8 @@ public sealed class DemoProviderIntegrationTests
             }
         });
 
-        Assert.Equal(new[] { "Desk Lamp", "Task Chair", "Notebook Set", "Monitor Stand", "Northstar LED Desk Lamp" }, productNames);
+        Assert.True(loadedProducts.Count == 5, loadedProducts.Error ?? "The Basic Usage product collection did not load.");
+        Assert.Equal(new[] { "Desk Lamp", "Task Chair", "Notebook Set", "Monitor Stand", "Northstar LED Desk Lamp" }, loadedProducts.Names);
     }
 
     private static IEnumerable<T> Descendants<T>(DependencyObject parent) where T : DependencyObject
@@ -120,14 +135,8 @@ public sealed class DemoProviderIntegrationTests
         var provider = await RunOnStaThreadAsync(() =>
         {
             var app = new App();
-            try
-            {
-                return app.ProductProvider;
-            }
-            finally
-            {
-                app.Shutdown();
-            }
+            app.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            return app.ProductProvider;
         });
 
         Assert.NotNull(provider);
@@ -137,21 +146,5 @@ public sealed class DemoProviderIntegrationTests
     }
 
     private static Task<T> RunOnStaThreadAsync<T>(Func<T> action)
-    {
-        var completion = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
-        var thread = new Thread(() =>
-        {
-            try
-            {
-                completion.SetResult(action());
-            }
-            catch (Exception exception)
-            {
-                completion.SetException(exception);
-            }
-        });
-        thread.SetApartmentState(ApartmentState.STA);
-        thread.Start();
-        return completion.Task;
-    }
+        => WpfTestDispatcher.RunAsync(action);
 }

@@ -30,18 +30,21 @@ public partial class DocumentationPageView : UserControl
 
     private static readonly IReadOnlyList<CodeSample> CodeViewBasicSamplesData =
     [
+        new("Greeting.cs", """
+            public static class Greeting
+            {
+                public static string Create(string name) => $"Hello, {name}!";
+            }
+            """)
+    ];
+
+    private static readonly IReadOnlyList<CodeSample> CodeViewMultiSamplesData =
+    [
         new("HTML", """
             <article class="card">
                 <h2>Welcome</h2>
                 <p>Browse the latest updates.</p>
             </article>
-            """),
-        new("Java", """
-            public class Greeting {
-                public static void main(String[] args) {
-                    System.out.println("Hello, Vek!");
-                }
-            }
             """),
         new("C#", """
             public static class Greeting
@@ -57,24 +60,45 @@ public partial class DocumentationPageView : UserControl
             """)
     ];
 
-    private static readonly IReadOnlyList<CodeSample> CodeViewMultiSamplesData =
+    private static readonly IReadOnlyList<CodeSample> GettingStartedCodeSamplesData =
     [
-        CodeViewBasicSamplesData[0],
-        CodeViewBasicSamplesData[2],
-        CodeViewBasicSamplesData[3]
+        new("WpfApp.csproj", """
+            <PropertyGroup>
+                <TargetFramework>net10.0-windows</TargetFramework>
+                <UseWPF>true</UseWPF>
+            </PropertyGroup>
+
+            <ItemGroup>
+                <!-- Replace x.y.z with the package version you want to use. -->
+                <PackageReference Include="Vek.WPF.DataGrid" Version="x.y.z" />
+            </ItemGroup>
+            """),
+        new("MainWindow.xaml", """
+            <Window x:Class="MyApp.MainWindow"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:components="clr-namespace:Vek.WPF.DataGrid.Components;assembly=Vek.WPF.DataGrid">
+                <components:VekDataGrid ItemsSource="{Binding Products}"
+                                        AutoGenerateColumns="True"
+                                        IsReadOnly="True" />
+            </Window>
+            """)
     ];
 
     public static readonly DependencyProperty PageProperty = DependencyProperty.Register(
-        nameof(Page), typeof(DemoPageDefinition), typeof(DocumentationPageView));
+        nameof(Page), typeof(DemoPageDefinition), typeof(DocumentationPageView),
+        new PropertyMetadata(null, OnPageContextChanged));
 
     public static readonly DependencyProperty BasicUsageProperty = DependencyProperty.Register(
-        nameof(BasicUsage), typeof(BasicUsageViewModel), typeof(DocumentationPageView));
+        nameof(BasicUsage), typeof(BasicUsageViewModel), typeof(DocumentationPageView),
+        new PropertyMetadata(null, OnPageContextChanged));
 
-    private bool _hasRequestedProducts;
+    private BasicUsageViewModel? _requestedBasicUsage;
 
     public DocumentationPageView()
     {
         InitializeComponent();
+        DataContextChanged += OnDataContextChanged;
     }
 
     public DemoPageDefinition? Page
@@ -95,22 +119,27 @@ public partial class DocumentationPageView : UserControl
 
     public IReadOnlyList<CodeSample> CodeViewMultiSamples => CodeViewMultiSamplesData;
 
-    private async void OnLoaded(object sender, RoutedEventArgs args)
+    public IReadOnlyList<CodeSample> GettingStartedCodeSamples => GettingStartedCodeSamplesData;
+
+    private static void OnPageContextChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args) =>
+        ((DocumentationPageView)dependencyObject).LoadBasicUsageForCurrentPage();
+
+    private void OnLoaded(object sender, RoutedEventArgs args) => LoadBasicUsageForCurrentPage();
+
+    private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs args) =>
+        LoadBasicUsageForPage(args.NewValue as DemoPageDefinition);
+
+    private void LoadBasicUsageForCurrentPage() => LoadBasicUsageForPage(Page ?? DataContext as DemoPageDefinition);
+
+    private void LoadBasicUsageForPage(DemoPageDefinition? page)
     {
-        if (_hasRequestedProducts || Page?.Id != "vekdatagrid/basic-usage" || BasicUsage is null)
+        if (page?.Id != "vekdatagrid/basic-usage" || BasicUsage is not { } basicUsage ||
+            ReferenceEquals(_requestedBasicUsage, basicUsage))
         {
             return;
         }
 
-        _hasRequestedProducts = true;
-        try
-        {
-            await BasicUsage.LoadProductsAsync();
-        }
-        catch (Exception exception)
-        {
-            LoadErrorText.Text = $"Sample products could not be loaded: {exception.Message}";
-            LoadErrorText.Visibility = Visibility.Visible;
-        }
+        _requestedBasicUsage = basicUsage;
+        _ = basicUsage.LoadProductsAsync();
     }
 }
