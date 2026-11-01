@@ -3,10 +3,10 @@ namespace Vek.WPF.DataGrid.Components;
 /// <summary>
 /// The base WPF data grid component.
 /// </summary>
-public partial class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGridHost<object, System.Windows.DataTemplate>
+public partial class VekDataGrid : WpfDataGrid, IVekDataGridHost<object, WpfDataTemplate>
 {
     private IEnumerable? _sourceItems;
-    private readonly VekDataGridEngine<object, System.Windows.DataTemplate> _engine = new();
+    private readonly VekDataGridEngine<object, WpfDataTemplate> _engine = new();
     private readonly Dictionary<string, object> _columnDefinitions = new(StringComparer.OrdinalIgnoreCase);
     private Func<object, string>? _itemKeySelector;
 
@@ -59,7 +59,7 @@ public partial class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGri
     }
 
     /// <summary>Gets the shared platform-neutral state and behavior for this grid instance.</summary>
-    public VekDataGridEngine<object, System.Windows.DataTemplate> Engine
+    public VekDataGridEngine<object, WpfDataTemplate> Engine
     {
         get
         {
@@ -73,7 +73,7 @@ public partial class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGri
     /// <typeparam name="TItem">The row item type declared by the shared column.</typeparam>
     /// <param name="column">The platform-neutral column definition and its WPF templates.</param>
     /// <returns>The native WPF column created for the definition.</returns>
-    public System.Windows.Controls.DataGridTemplateColumn AddColumn<TItem>(IVekDataGridColumn<TItem, System.Windows.DataTemplate> column)
+    public WpfDataGridTemplateColumn AddColumn<TItem>(IVekDataGridColumn<TItem, WpfDataTemplate> column)
     {
         ArgumentNullException.ThrowIfNull(column);
         if (_columnDefinitions.ContainsKey(column.Key))
@@ -85,13 +85,13 @@ public partial class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGri
         _engine.AddOrUpdateColumn(adapter);
         _columnDefinitions.Add(column.Key, column);
 
-        var nativeColumn = new System.Windows.Controls.DataGridTemplateColumn
+        var nativeColumn = new WpfDataGridTemplateColumn
         {
             Header = column.Title,
             SortMemberPath = column.Key,
             CanUserSort = column.Sortable,
             IsReadOnly = !column.Editable,
-            Visibility = column.Visible ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed,
+            Visibility = column.Visible ? Visibility.Visible : Visibility.Collapsed,
             MinWidth = column.MinWidth,
             MaxWidth = column.MaxWidth,
             CellTemplateSelector = new WpfTemplateSelector(item => item is TItem typedItem
@@ -103,7 +103,7 @@ public partial class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGri
                     ? column.EditTemplate(CreateEditTemplateContext(typedItem))
                     : null)
         };
-        if (column.Width is int width) nativeColumn.Width = new System.Windows.Controls.DataGridLength(width);
+        if (column.Width is int width) nativeColumn.Width = new WpfDataGridLength(width);
         Columns.Add(nativeColumn);
         return nativeColumn;
     }
@@ -112,9 +112,9 @@ public partial class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGri
     /// <typeparam name="TItem">The row item type declared by the shared column.</typeparam>
     /// <param name="key">The stable column key.</param>
     /// <returns>The shared column definition, or null when the key or item type does not match.</returns>
-    public IVekDataGridColumn<TItem, System.Windows.DataTemplate>? GetColumn<TItem>(string key) =>
+    public IVekDataGridColumn<TItem, WpfDataTemplate>? GetColumn<TItem>(string key) =>
         _columnDefinitions.TryGetValue(key, out var definition)
-        ? definition as IVekDataGridColumn<TItem, System.Windows.DataTemplate>
+        ? definition as IVekDataGridColumn<TItem, WpfDataTemplate>
         : null;
 
     /// <summary>Refreshes native rows after a shared filtering operation on the control's dispatcher.</summary>
@@ -154,13 +154,13 @@ public partial class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGri
     }
 
     /// <summary>Synchronizes the native WPF sort gesture with the shared DataGrid engine.</summary>
-    protected override async void OnSorting(System.Windows.Controls.DataGridSortingEventArgs e)
+    protected override async void OnSorting(WpfDataGridSortingEventArgs e)
     {
         ArgumentNullException.ThrowIfNull(e);
         e.Handled = true;
 
         var columnKey = string.IsNullOrWhiteSpace(e.Column.SortMemberPath)
-            ? Convert.ToString(e.Column.Header, System.Globalization.CultureInfo.InvariantCulture)
+            ? Convert.ToString(e.Column.Header, CultureInfo.InvariantCulture)
             : e.Column.SortMemberPath;
         if (string.IsNullOrWhiteSpace(columnKey)) return;
 
@@ -168,10 +168,10 @@ public partial class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGri
         PropertyInfo? GetProperty(object item) => item.GetType().GetProperty(columnKey, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
         if (!_engine.Columns.Any(column => string.Equals(column.Key, columnKey, StringComparison.OrdinalIgnoreCase)))
         {
-            _engine.AddOrUpdateColumn(new VekDataGridColumn<object, System.Windows.DataTemplate>(
+            _engine.AddOrUpdateColumn(new VekDataGridColumn<object, WpfDataTemplate>(
                 columnKey,
                 item => GetProperty(item)?.GetValue(item),
-                title: Convert.ToString(e.Column.Header, System.Globalization.CultureInfo.InvariantCulture) ?? columnKey,
+                title: Convert.ToString(e.Column.Header, CultureInfo.InvariantCulture) ?? columnKey,
                 comparer: (left, right) => CompareByProperty(left, right, GetProperty(left))));
         }
 
@@ -182,12 +182,12 @@ public partial class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGri
         var activeSort = _engine.Sorts.FirstOrDefault(sort =>
             string.Equals(sort.ColumnKey, columnKey, StringComparison.OrdinalIgnoreCase));
         e.Column.SortDirection = activeSort?.Direction == VekSortDirection.Descending
-            ? System.ComponentModel.ListSortDirection.Descending
-            : activeSort is null ? null : System.ComponentModel.ListSortDirection.Ascending;
+            ? ListSortDirection.Descending
+            : activeSort is null ? null : ListSortDirection.Ascending;
     }
 
     /// <summary>Copies native WPF selection state into the shared selected-key state.</summary>
-    protected override void OnSelectionChanged(System.Windows.Controls.SelectionChangedEventArgs e)
+    protected override void OnSelectionChanged(WpfSelectionChangedEventArgs e)
     {
         if (_projecting) { base.OnSelectionChanged(e); return; }
         if (_suppressRowActivationSelection) { ApplyNativeSelection(); return; }
@@ -276,21 +276,21 @@ public partial class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGri
             && _engine.DraftEditItem is TItem current ? current : item;
         return new VekDataGridEditTemplateContext<TItem>(
             draft,
-            System.Globalization.CultureInfo.CurrentCulture,
+            CultureInfo.CurrentCulture,
             updatedItem => this.UpdateEditDraft(updatedItem!),
             () => this.CommitEditAsync(),
             () => this.CancelEditAsync());
     }
 
-    private sealed class WpfTemplateSelector(Func<object?, System.Windows.DataTemplate?> selectTemplate)
-        : System.Windows.Controls.DataTemplateSelector
+    private sealed class WpfTemplateSelector(Func<object?, WpfDataTemplate?> selectTemplate)
+        : WpfDataTemplateSelector
     {
-        public override System.Windows.DataTemplate? SelectTemplate(object item, System.Windows.DependencyObject container) =>
+        public override WpfDataTemplate? SelectTemplate(object item, WpfDependencyObject container) =>
             selectTemplate(item) ?? base.SelectTemplate(item, container);
     }
 
-    private sealed class WpfColumnAdapter<TItem>(IVekDataGridColumn<TItem, System.Windows.DataTemplate> column)
-        : IVekDataGridColumn<object, System.Windows.DataTemplate>
+    private sealed class WpfColumnAdapter<TItem>(IVekDataGridColumn<TItem, WpfDataTemplate> column)
+        : IVekDataGridColumn<object, WpfDataTemplate>
     {
         public string Key => column.Key;
         public string Title => column.Title;
@@ -308,10 +308,10 @@ public partial class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGri
         public Func<object, object?>? GroupBy => column.GroupBy is null ? null : item => column.GroupBy((TItem)item);
         public Func<object, object?>? AggregateBy => column.AggregateBy is null ? null : item => column.AggregateBy((TItem)item);
         public VekDataGridFilterOperator FilterOperator => column.FilterOperator;
-        public VekDataGridTemplate<VekDataGridFilterContext, System.Windows.DataTemplate>? FilterTemplate => column.FilterTemplate;
+        public VekDataGridTemplate<VekDataGridFilterContext, WpfDataTemplate>? FilterTemplate => column.FilterTemplate;
         public bool IsSelectionColumn => column.IsSelectionColumn;
         public bool Editable => column.Editable;
-        public VekDataGridTemplate<VekDataGridEditTemplateContext<object>, System.Windows.DataTemplate>? EditTemplate =>
+        public VekDataGridTemplate<VekDataGridEditTemplateContext<object>, WpfDataTemplate>? EditTemplate =>
             column.EditTemplate is null ? null : context => column.EditTemplate(new VekDataGridEditTemplateContext<TItem>(
                 (TItem)context.Item,
                 context.Culture,
@@ -319,15 +319,15 @@ public partial class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGri
                 context.CommitAsync,
                 context.CancelAsync));
         public string GetRowLabel(object item) => column.GetRowLabel((TItem)item);
-        public VekDataGridTemplate<VekDataGridGroupContext<object>, System.Windows.DataTemplate>? GroupTemplate =>
+        public VekDataGridTemplate<VekDataGridGroupContext<object>, WpfDataTemplate>? GroupTemplate =>
             column.GroupTemplate is null ? null : context => column.GroupTemplate(new VekDataGridGroupContext<TItem>(
                 context.ColumnKey, context.Title, context.Value, context.Level, context.Items.Cast<TItem>().ToArray(),
                 context.Expanded, context.ToggleAsync, context.Aggregates));
         public bool IsHierarchyColumn => column.IsHierarchyColumn;
-        public VekDataGridTemplate<VekDataGridRowDetailContext<object>, System.Windows.DataTemplate>? DetailTemplate =>
+        public VekDataGridTemplate<VekDataGridRowDetailContext<object>, WpfDataTemplate>? DetailTemplate =>
             column.DetailTemplate is null ? null : context => column.DetailTemplate(new VekDataGridRowDetailContext<TItem>(
                 (TItem)context.Item, context.Expanded, context.ToggleAsync));
-        public VekDataGridTemplate<object, System.Windows.DataTemplate>? CellTemplate =>
+        public VekDataGridTemplate<object, WpfDataTemplate>? CellTemplate =>
             column.CellTemplate is null ? null : item => column.CellTemplate((TItem)item);
         public Comparison<object> CompareItems => (left, right) => column.CompareItems((TItem)left, (TItem)right);
     }

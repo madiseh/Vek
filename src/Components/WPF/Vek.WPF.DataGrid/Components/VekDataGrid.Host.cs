@@ -45,7 +45,7 @@ public partial class VekDataGrid
         state.FilteredItemsProvider = () => _engine.GetFilteredAndSortedItems(state.Items);
         state.VisibleItemsProvider = () => _engine.GetLocalData(state.Items).Items;
         state.TotalItemsProvider = () => state.FilteredItems.Count;
-        state.SelectionMode = SelectionMode == System.Windows.Controls.DataGridSelectionMode.Single ? VekDataGridSelectionMode.Single : VekDataGridSelectionMode.Multiple;
+        state.SelectionMode = SelectionMode == WpfDataGridSelectionMode.Single ? VekDataGridSelectionMode.Single : VekDataGridSelectionMode.Multiple;
         state.RowClickSelection = RowClickSelection;
         state.IsRowSelectable = IsRowSelectable;
         state.SelectionComparer = SelectionComparer ?? EqualityComparer<object>.Default;
@@ -77,7 +77,7 @@ public partial class VekDataGrid
             var column = Columns.FirstOrDefault(candidate => candidate.SortMemberPath == definition.Key);
             if (column is null) continue;
             column.Visibility = definition.Visible ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
-            if (definition.Width is int width) column.Width = new System.Windows.Controls.DataGridLength(width);
+            if (definition.Width is int width) column.Width = new WpfDataGridLength(width);
             if (orderChanged) column.DisplayIndex = index;
             index++;
         }
@@ -91,7 +91,7 @@ public partial class VekDataGrid
         _projecting = true;
         try
         {
-            if (SelectionMode == System.Windows.Controls.DataGridSelectionMode.Single)
+            if (SelectionMode == WpfDataGridSelectionMode.Single)
                 SelectedItem = _engine.Interaction.SelectedItem is { } selected && Items.Contains(selected) ? selected : null;
             else
             {
@@ -111,7 +111,7 @@ public partial class VekDataGrid
             RowDetailsTemplateSelector = new WpfTemplateSelector(item => item is null ? null : column.DetailTemplate!(
                 new VekDataGridRowDetailContext<object>(item, this.IsRowExpanded(item), () => this.ToggleRowDetailsAsync(item))));
         foreach (var item in Items)
-            if (ItemContainerGenerator.ContainerFromItem(item) is System.Windows.Controls.DataGridRow row)
+            if (ItemContainerGenerator.ContainerFromItem(item) is WpfDataGridRow row)
                 row.DetailsVisibility = this.IsRowExpanded(item) ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
     });
 
@@ -127,7 +127,7 @@ public partial class VekDataGrid
             ?? Columns.FirstOrDefault(candidate => !candidate.IsReadOnly);
         if (column is not null && Items.Contains(item))
         {
-            CurrentCell = new System.Windows.Controls.DataGridCellInfo(item, column);
+            CurrentCell = new WpfDataGridCellInfo(item, column);
             BeginEdit();
         }
     });
@@ -170,7 +170,7 @@ public partial class VekDataGrid
     });
 
     /// <summary>Starts a shared draft when the editor for a registered shared column is activated.</summary>
-    protected override async void OnBeginningEdit(System.Windows.Controls.DataGridBeginningEditEventArgs e)
+    protected override async void OnBeginningEdit(WpfDataGridBeginningEditEventArgs e)
     {
         base.OnBeginningEdit(e);
         if (e.Cancel) return;
@@ -187,7 +187,7 @@ public partial class VekDataGrid
     }
 
     /// <summary>Routes native row completion and cancellation through the shared edit lifecycle.</summary>
-    protected override async void OnRowEditEnding(System.Windows.Controls.DataGridRowEditEndingEventArgs e)
+    protected override async void OnRowEditEnding(WpfDataGridRowEditEndingEventArgs e)
     {
         base.OnRowEditEnding(e);
         if (e.Cancel || _completingNativeEdit || !_engine.IsEditing) return;
@@ -197,7 +197,7 @@ public partial class VekDataGrid
     }
 
     /// <summary>Routes native cell completion through Core when the shared editing policy is cell based.</summary>
-    protected override async void OnCellEditEnding(System.Windows.Controls.DataGridCellEditEndingEventArgs e)
+    protected override async void OnCellEditEnding(WpfDataGridCellEditEndingEventArgs e)
     {
         base.OnCellEditEnding(e);
         if (e.Cancel || _completingNativeEdit || !_engine.IsEditing || EditMode != VekDataGridEditMode.Cell) return;
@@ -207,9 +207,9 @@ public partial class VekDataGrid
     }
 
     /// <summary>Marks plain row activation so selection changes can honor the shared activation policy.</summary>
-    protected override void OnPreviewMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
+    protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
     {
-        if (!RowClickSelection && IsRowSurface(e.OriginalSource as System.Windows.DependencyObject))
+        if (!RowClickSelection && IsRowSurface(e.OriginalSource as WpfDependencyObject))
         {
             PrepareHostState();
             _suppressRowActivationSelection = true;
@@ -219,13 +219,13 @@ public partial class VekDataGrid
         base.OnPreviewMouseLeftButtonDown(e);
     }
 
-    private static bool IsRowSurface(System.Windows.DependencyObject? source)
+    private static bool IsRowSurface(WpfDependencyObject? source)
     {
         while (source is not null)
         {
             if (source is System.Windows.Controls.Primitives.ButtonBase or System.Windows.Controls.Primitives.TextBoxBase
                 or System.Windows.Controls.ComboBox) return false;
-            if (source is System.Windows.Controls.DataGridRow) return true;
+            if (source is WpfDataGridRow) return true;
             source = source is System.Windows.Media.Visual or System.Windows.Media.Media3D.Visual3D
                 ? System.Windows.Media.VisualTreeHelper.GetParent(source)
                 : System.Windows.LogicalTreeHelper.GetParent(source);
@@ -234,7 +234,7 @@ public partial class VekDataGrid
     }
 
     /// <summary>Applies shared expansion to a newly realized native row.</summary>
-    protected override void OnLoadingRow(System.Windows.Controls.DataGridRowEventArgs e)
+    protected override void OnLoadingRow(WpfDataGridRowEventArgs e)
     {
         base.OnLoadingRow(e);
         e.Row.DetailsVisibility = this.IsRowExpanded(e.Row.Item) ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;

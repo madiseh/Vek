@@ -9,6 +9,6 @@ public partial class MainWindow : Window
     public MainWindow(IDemoProductProvider? productProvider)
     {
         InitializeComponent();
-        DataContext = new ViewModels.MainWindowViewModel(productProvider);
+        DataContext = new MainWindowViewModel(productProvider);
     }
 }

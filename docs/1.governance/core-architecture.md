@@ -147,12 +147,12 @@ For these continuations, the state mutation completes before the callback is inv
 The WPF adapter retains its native base and supplies the engine. It has no required hook and no per-operation forwarding methods:
 
 ```csharp
-// In the WPF adapter project; imports omitted for brevity.
+// In the WPF adapter project; imports and using aliases (WpfDataGrid, WpfDataTemplate) defined in GlobalUsings.cs.
 public class VekDataGrid
-    : System.Windows.Controls.DataGrid,
-      IVekDataGridHost<object, System.Windows.DataTemplate>
+    : WpfDataGrid,
+      IVekDataGridHost<object, WpfDataTemplate>
 {
-    public VekDataGridEngine<object, System.Windows.DataTemplate> Engine { get; }
+    public VekDataGridEngine<object, WpfDataTemplate> Engine { get; }
         = new();
 }
 ```
