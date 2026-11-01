@@ -2,6 +2,61 @@ namespace Vek.Core.DataGrid.Tests;
 
 public sealed class HostOperationsTests
 {
+    /// <summary>Sorting resets paging and preserves filters without invoking the filtering continuation.</summary>
+    [Fact]
+    public async Task SortResetsPageAndPreservesFilters()
+    {
+        var host = new Host { AfterChange = () => throw new InvalidOperationException("Unexpected filtering notification") };
+        host.Engine.ApplyFilter("name", VekDataGridFilterOperator.Contains, "a");
+        host.Engine.SetPage(3, 1);
+
+        await host.SortAsync("name", VekDataGridSortMode.Single);
+
+        Assert.Equal(1, host.Engine.Page);
+        Assert.Equal(1, host.Engine.PageSize);
+        Assert.Equal("a", Assert.Single(host.Engine.Filters).Value);
+        Assert.Equal(VekSortDirection.Ascending, Assert.Single(host.Engine.Sorts).Direction);
+        Assert.Equal("Ada", Assert.Single(host.Engine.GetLocalData(["Grace", "Ada"]).Items));
+    }
+
+    /// <summary>Disabled, non-sortable, and unknown columns leave the query unchanged and do not notify the host.</summary>
+    [Theory]
+    [InlineData(VekDataGridSortMode.None, "name", true)]
+    [InlineData(VekDataGridSortMode.Single, "missing", true)]
+    [InlineData(VekDataGridSortMode.Single, "name", false)]
+    public async Task RejectedSortDoesNotResetPageOrNotify(VekDataGridSortMode mode, string key, bool sortable)
+    {
+        var host = new SortHost { AfterSortChange = () => throw new InvalidOperationException("Unexpected sorting notification") };
+        host.Engine.AddOrUpdateColumn(new VekDataGridColumn<string, string>("name", value => value, sortable: sortable));
+        host.Engine.SetPage(3, 1);
+        await host.SortAsync(key, mode);
+        Assert.Equal(3, host.Engine.Page);
+        Assert.Empty(host.Engine.Sorts);
+    }
+
+    /// <summary>The sorting operation awaits its host continuation after descriptors and page state have changed.</summary>
+    [Fact]
+    public async Task SortAwaitsTheSortingContinuation()
+    {
+        var host = new SortHost();
+        host.Engine.AddOrUpdateColumn(new VekDataGridColumn<string, string>("name", value => value));
+        host.Engine.Page = 3;
+        var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var calls = 0;
+        host.AfterSortChange = () =>
+        {
+            Assert.Equal(1, host.Engine.Page);
+            Assert.Equal(VekSortDirection.Ascending, Assert.Single(host.Engine.Sorts).Direction);
+            calls++;
+            return new ValueTask(completion.Task);
+        };
+        var operation = host.SortAsync("name", VekDataGridSortMode.Single);
+        Assert.False(operation.IsCompleted);
+        completion.SetResult();
+        await operation;
+        Assert.Equal(1, calls);
+    }
+
     /// <summary>Clears sorting without changing filters, paging, or invoking the filtering continuation.</summary>
     [Fact]
     public async Task ClearSortPreservesTheOtherQueryState()

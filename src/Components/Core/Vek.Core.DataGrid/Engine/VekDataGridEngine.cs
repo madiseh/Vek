@@ -157,7 +157,8 @@ public class VekDataGridEngine<TItem, TTemplate>
     /// <param name="allowUnsorted">Whether a descending sort can be removed by the next activation.</param>
     /// <param name="removeSort">Whether this interaction explicitly removes the column sort.</param>
     /// <param name="preserveExistingSorts">Whether adding a new sort preserves other active sorts.</param>
-    public void ApplySortInteraction(
+    /// <returns>True when the interaction is accepted; false when sorting is disabled or the column cannot be sorted.</returns>
+    public bool ApplySortInteraction(
         string columnKey,
         VekDataGridSortMode mode,
         bool allowUnsorted = false,
@@ -168,7 +169,7 @@ public class VekDataGridEngine<TItem, TTemplate>
             || !_columns.TryGetValue(columnKey, out var column)
             || !column.Sortable)
         {
-            return;
+            return false;
         }
 
         var sorts = _sorts.ToList();
@@ -201,6 +202,7 @@ public class VekDataGridEngine<TItem, TTemplate>
         }
 
         SetSorts(sorts.Select((sort, sortIndex) => sort with { Priority = sortIndex + 1 }));
+        return true;
     }
 
     /// <summary>

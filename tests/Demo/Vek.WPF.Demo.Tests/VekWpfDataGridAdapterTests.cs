@@ -8,6 +8,29 @@ namespace Vek.WPF.Demo.Tests;
 
 public sealed class VekWpfDataGridAdapterTests
 {
+    /// <summary>Shared sorting resets the page and refreshes the native rows and direction indicator.</summary>
+    [Fact]
+    public async Task SharedSortResetsPageAndRefreshesNativeProjection()
+    {
+        await await WpfTestDispatcher.RunAsync(async () =>
+        {
+            var rows = new[] { new TestRow("row-3"), new TestRow("row-1"), new TestRow("row-2") };
+            var grid = new VekDataGrid { ItemsSource = rows, PageSize = 1, CurrentPage = 2 };
+            var column = grid.AddColumn(new VekDataGridColumn<TestRow, DataTemplate>("Key", item => item.Key));
+
+            await grid.SortAsync("Key", VekDataGridSortMode.Single);
+
+            Assert.Equal(1, grid.CurrentPage);
+            Assert.Same(rows[1], Assert.Single(grid.Items.Cast<TestRow>()));
+            Assert.Equal(ListSortDirection.Ascending, column.SortDirection);
+
+            await grid.SortAsync("Key", VekDataGridSortMode.Single);
+
+            Assert.Same(rows[0], Assert.Single(grid.Items.Cast<TestRow>()));
+            Assert.Equal(ListSortDirection.Descending, column.SortDirection);
+        });
+    }
+
     /// <summary>Clearing shared sorts restores native rows to source order and removes the native sort indicator.</summary>
     [Fact]
     public async Task ClearSortRestoresNativeRowsAndSortIndicator()

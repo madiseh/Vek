@@ -1613,22 +1613,12 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
 
     private async Task SortBy(IVekDataGridColumn<TItem, RenderFragment> column, MouseEventArgs args)
     {
-        if (SortMode == VekDataGridSortMode.None || !column.Sortable)
-        {
-            return;
-        }
-
-        _engine.ApplySortInteraction(
+        await this.SortAsync(
             column.Key,
             SortMode,
             AllowUnsorted,
             removeSort: args.AltKey,
             preserveExistingSorts: args.CtrlKey);
-        _engine.Page = 1;
-        await SortChanged.InvokeAsync(GetSortState());
-        await ReloadAfterStateChangeAsync();
     }
-
-    private IReadOnlyList<VekDataGridSort> GetSortState() => _engine.Sorts;
 
 }

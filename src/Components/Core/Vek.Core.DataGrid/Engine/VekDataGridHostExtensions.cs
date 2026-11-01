@@ -7,6 +7,32 @@ namespace Vek.Core.DataGrid;
 /// </remarks>
 public static class VekDataGridHostExtensions
 {
+    /// <summary>Applies a sort interaction, returns to the first page, and awaits the optional sorting continuation.</summary>
+    /// <typeparam name="TItem">The row item type.</typeparam>
+    /// <typeparam name="TTemplate">An opaque template value supplied by the host.</typeparam>
+    /// <param name="grid">The host supplying shared state and any sorting continuation.</param>
+    /// <param name="columnKey">The stable column key.</param>
+    /// <param name="mode">The sorting policy.</param>
+    /// <param name="allowUnsorted">Whether cycling past descending removes the sort.</param>
+    /// <param name="removeSort">Whether the interaction explicitly removes a sort in multiple-sort mode.</param>
+    /// <param name="preserveExistingSorts">Whether adding a sort retains other active sorts.</param>
+    /// <returns>Completion of the accepted interaction and its host continuation; rejected interactions leave state unchanged.</returns>
+    public static async ValueTask SortAsync<TItem, TTemplate>(
+        this IVekDataGridHost<TItem, TTemplate> grid,
+        string columnKey,
+        VekDataGridSortMode mode,
+        bool allowUnsorted = false,
+        bool removeSort = false,
+        bool preserveExistingSorts = false)
+    {
+        ArgumentNullException.ThrowIfNull(grid);
+        ArgumentException.ThrowIfNullOrWhiteSpace(columnKey);
+        if (!grid.Engine.ApplySortInteraction(columnKey, mode, allowUnsorted, removeSort, preserveExistingSorts))
+            return;
+        grid.Engine.Page = 1;
+        await grid.AfterSortChangeAsync();
+    }
+
     /// <summary>Clears active sorts, preserves other query state, and awaits the optional sorting continuation.</summary>
     /// <typeparam name="TItem">The row item type.</typeparam>
     /// <typeparam name="TTemplate">An opaque template value supplied by the host.</typeparam>

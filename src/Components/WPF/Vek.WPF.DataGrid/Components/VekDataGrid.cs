@@ -139,12 +139,20 @@ public class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGridHost<ob
 
     private void RefreshSortProjection()
     {
-        foreach (var column in Columns) column.SortDirection = null;
         RefreshLocalItems();
+        foreach (var column in Columns)
+        {
+            var sort = _engine.Sorts.FirstOrDefault(candidate =>
+                string.Equals(candidate.ColumnKey, column.SortMemberPath, StringComparison.OrdinalIgnoreCase));
+            column.SortDirection = sort is null ? null
+                : sort.Direction == VekSortDirection.Descending
+                    ? ListSortDirection.Descending
+                    : ListSortDirection.Ascending;
+        }
     }
 
     /// <summary>Synchronizes the native WPF sort gesture with the shared DataGrid engine.</summary>
-    protected override void OnSorting(System.Windows.Controls.DataGridSortingEventArgs e)
+    protected override async void OnSorting(System.Windows.Controls.DataGridSortingEventArgs e)
     {
         ArgumentNullException.ThrowIfNull(e);
         e.Handled = true;
@@ -165,7 +173,7 @@ public class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGridHost<ob
                 comparer: (left, right) => CompareByProperty(left, right, GetProperty(left))));
         }
 
-        _engine.ApplySortInteraction(
+        await this.SortAsync(
             columnKey,
             SortMode,
             preserveExistingSorts: SortMode == VekDataGridSortMode.Multiple);
@@ -174,8 +182,6 @@ public class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGridHost<ob
         e.Column.SortDirection = activeSort?.Direction == VekSortDirection.Descending
             ? System.ComponentModel.ListSortDirection.Descending
             : activeSort is null ? null : System.ComponentModel.ListSortDirection.Ascending;
-
-        RefreshLocalItems();
     }
 
     /// <summary>Copies native WPF selection state into the shared selected-key state.</summary>
