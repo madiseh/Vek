@@ -38,7 +38,7 @@ Created: 2026-11-02
 - Modify: `src/Components/Blazor/Vek.Blazor.DataGrid/Vek.Blazor.DataGrid.csproj` — package metadata, Core bundling, readme inclusion.
 - Create: `src/Components/Blazor/Vek.Blazor.DataGrid/README.md` — install and basic usage instructions.
 - Modify: `src/Components/WPF/Vek.WPF.DataGrid/Vek.WPF.DataGrid.csproj` — complete NuGet metadata and Core bundling.
-- Modify: `src/Demo/Vek.Demo/Vek.Demo.csproj` and `tests/Components/Vek.Components.Tests/Vek.Components.Tests.csproj` — declare direct Core source-project usage after adapter Core references become private to package consumers.
+- Modify: `src/Demo/Vek.Demo/Vek.Demo.csproj`, `src/Demo/WPF/Vek.WPF.Demo/Vek.WPF.Demo.csproj`, and `tests/Components/Vek.Components.Tests/Vek.Components.Tests.csproj` — declare direct Core source-project usage after adapter Core references become private to package consumers.
 - Create: `src/Components/WPF/Vek.WPF.DataGrid/README.md` — Windows install and basic usage instructions.
 - Modify: `.github/workflows/publish-nuget.yml` — build/pack/push the two packages with OIDC.
 
@@ -51,7 +51,7 @@ Created: 2026-11-02
 - [x] Create the WPF package readme with Windows-specific installation and usage guidance; include the required header.
 - [x] Add complete WPF package metadata matching project/package ID and MIT author conventions.
 - [x] Make the Core project reference private to package consumers while adding `Vek.Core.DataGrid.dll` to each adapter package's `lib/<target-framework>` output.
-- [x] Add explicit Core project references to the Blazor demo and component tests, which directly use Core contracts exposed by the adapter.
+- [x] Add explicit Core project references to the Blazor and WPF demos and component tests, which directly use Core contracts exposed by the adapters.
 - [x] Build and pack both projects at version `1.0.0`.
 - [x] Inspect both `.nupkg` archives and nuspec files; confirm IDs, versions, target-framework assets, README, Core assembly, and no Core package dependency.
 
