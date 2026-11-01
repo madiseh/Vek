@@ -73,7 +73,7 @@
             {
                 @RenderFilterControl(column)
             }
-            <button type="button" @onclick="() => ClearFilterAsync()">Clear filters</button>
+            <button type="button" @onclick="() => this.ClearFilterAsync()">Clear filters</button>
         </div>
     }
     <div class="table-scroll-container @(Responsive ? "is-responsive" : null) @(FixedHeader ? "has-fixed-header" : null)"
@@ -263,16 +263,16 @@
     {
         <nav class="pager" aria-label="Table pagination">
             <label>Rows per page
-                <select aria-label="Rows per page" value="@EffectivePageSize" @onchange="SetPageSizeAsync">
+                <select aria-label="Rows per page" value="@EffectivePageSize" @onchange="ChangePageSizeAsync">
                     @foreach (var option in PageSizeOptions.Where(option => option > 0).Append(EffectivePageSize).Distinct().Order())
                     {
                         <option value="@option">@option</option>
                     }
                 </select>
             </label>
-            <button type="button" aria-label="Previous page" @onclick="() => SetCurrentPageAsync(Engine.Page - 1)" disabled="@(Engine.Page <= 1)">Previous</button>
+            <button type="button" aria-label="Previous page" @onclick="() => this.SetPageAsync(Engine.Page - 1, totalItemCount)" disabled="@(Engine.Page <= 1)">Previous</button>
             <span>Page @Engine.Page of @totalPages</span>
-            <button type="button" aria-label="Next page" @onclick="() => SetCurrentPageAsync(Engine.Page + 1)" disabled="@(Engine.Page >= totalPages)">Next</button>
+            <button type="button" aria-label="Next page" @onclick="() => this.SetPageAsync(Engine.Page + 1, totalItemCount)" disabled="@(Engine.Page >= totalPages)">Next</button>
         </nav>
     }
     else if (!VirtualizeRows && PagerContent is not null)

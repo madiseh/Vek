@@ -80,13 +80,11 @@ Keep simple components in a `.razor` file. Add a `.razor.cs` code-behind when th
 
 ## Cross-platform component architecture
 
-When one component category is implemented for multiple UI platforms, its Core project owns platform-neutral contracts, state, and shared behavior. Each UI project owns only its platform interaction and presentation: native events, rendering, templates, editors, styling, and platform-specific capabilities.
+The [Core Architecture Rule](core-architecture.md) is the canonical, mandatory policy for every Core project and its adapters. Read it before adding shared behavior, designing contracts, or refactoring cross-platform components.
 
-All adapters use the same Core interfaces, state names, operation names, and local names for shared concepts. For DataGrid, canonical names include `Items`, `Page`, `PageSize`, `Sorts`, `Filters`, `Groups`, and `SelectedKeys`. Core defines one generic `IVekDataGridColumn<TItem, TTemplate>` contract. Its `TTemplate` parameter is supplied by each adapter (`RenderFragment` in Blazor and `DataTemplate` in WPF), while `VekDataGridTemplate<TContext, TTemplate>` preserves the exact context and native template types for cell, filter, group, edit, and detail slots. An adapter maps UI event arguments into these contracts, calls Core, and renders the resulting state. Shared algorithms such as filtering, sorting, paging, grouping, aggregation, selection transitions, and edit transitions belong in Core. Features declared by the shared contract must be supported by every adapter.
+Core owns shared rules, contracts, state, and behavior with zero UI-platform dependencies. UI adapters own native controls, lifecycle, rendering, templates, and platform-specific behavior. Shared methods are implemented once in Core and reused through neutral contracts and extension methods where appropriate, without per-operation forwarding wrappers in every adapter. Optional callbacks are limited to workflows that actually need a varying step; there is no mandatory global UI hook.
 
-For remote data, Core creates a neutral request descriptor containing page and query state. The host calls its data provider with that descriptor and a cancellation token, then supplies the returned items and total count to Core. Core does not depend on a provider, HTTP client, database, or UI framework.
-
-Keep template implementations, visual state, editor components, and concrete native UI types out of Core. Generic template type parameters and platform-neutral template contexts may appear in Core contracts without referencing UI frameworks. A component that has only one UI implementation does not need a Core project. Use `Vek.Core.DataGrid` and its Blazor and WPF adapters as the example when adding another cross-platform component category.
+The policy includes a [DataGrid target example](core-architecture.md#datagrid-target-example). It describes the agreed architecture for the upcoming refactoring; the current DataGrid implementation is not a compliance reference.
 
 ## Target Framework and Platforms
 

@@ -81,6 +81,9 @@ public class VekDataGridEngine<TItem, TTemplate>
     /// <summary>Gets active filters.</summary>
     public IReadOnlyList<VekDataGridFilter> Filters => _filters;
 
+    /// <summary>Gets or sets the default case sensitivity for new filter interactions.</summary>
+    public bool FilterCaseSensitive { get; set; }
+
     /// <summary>Gets active group definitions.</summary>
     public IReadOnlyList<VekDataGridGroupDefinition> Groups => _groups;
 
@@ -304,7 +307,7 @@ public class VekDataGridEngine<TItem, TTemplate>
     public void ToggleSelection(TItem item, VekDataGridSelectionMode mode)
     {
         if (mode == VekDataGridSelectionMode.None) return;
-        var key = GetKey(item);
+        var key = GetItemKey(item);
 
         if (mode == VekDataGridSelectionMode.Single)
         {
@@ -328,7 +331,7 @@ public class VekDataGridEngine<TItem, TTemplate>
     /// </summary>
     public bool IsSelected(TItem item)
     {
-        return _selectedKeys.Contains(GetKey(item));
+        return _selectedKeys.Contains(GetItemKey(item));
     }
 
     /// <summary>
@@ -539,7 +542,10 @@ public class VekDataGridEngine<TItem, TTemplate>
         return results;
     }
 
-    private string GetKey(TItem item)
+    /// <summary>Gets the stable selection key for an item using the configured selector or the default hash.</summary>
+    /// <param name="item">The item whose selection key is returned.</param>
+    /// <returns>The configured key, or the item's hash code formatted with invariant culture.</returns>
+    public string GetItemKey(TItem item)
     {
         if (_itemKeySelector != null) return _itemKeySelector(item);
         return item?.GetHashCode().ToString(CultureInfo.InvariantCulture) ?? string.Empty;
@@ -782,17 +788,3 @@ public class VekDataGridEngine<TItem, TTemplate>
     }
 }
 
-/// <summary>Provides a template-neutral compatibility engine using <see cref="object"/> templates.</summary>
-/// <typeparam name="TItem">The type of row item.</typeparam>
-public sealed class VekDataGridEngine<TItem> : VekDataGridEngine<TItem, object>
-{
-    /// <summary>Initializes a compatibility engine with object-typed columns.</summary>
-    /// <param name="columns">Optional initial columns.</param>
-    /// <param name="itemKeySelector">Optional selector for stable item keys.</param>
-    public VekDataGridEngine(
-        IEnumerable<IVekDataGridColumn<TItem, object>>? columns = null,
-        Func<TItem, string>? itemKeySelector = null)
-        : base(columns, itemKeySelector)
-    {
-    }
-}

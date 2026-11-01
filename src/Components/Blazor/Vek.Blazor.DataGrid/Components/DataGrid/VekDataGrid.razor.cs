@@ -5,7 +5,7 @@ namespace Vek.Components.Components.DataGrid;
 /// </summary>
 /// <typeparam name="TItem">The type of item represented by each row.</typeparam>
 [CascadingTypeParameter(nameof(TItem))]
-public partial class VekDataGrid<TItem> : IDisposable
+public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, RenderFragment>, IVekDataGridQueryObserver
 {
     private readonly List<IVekDataGridColumn<TItem, RenderFragment>> _columns = [];
     private readonly VekDataGridEngine<TItem, RenderFragment> _engine = new();
@@ -590,6 +590,10 @@ public partial class VekDataGrid<TItem> : IDisposable
     [Parameter]
     public IEqualityComparer<TItem>? SelectionComparer { get; set; }
 
+    /// <summary>Gets or sets the stable key selector used by the shared Core selection state.</summary>
+    [Parameter]
+    public Func<TItem, string>? ItemKeySelector { get; set; }
+
     /// <summary>Gets or sets the policy used when filters hide selected rows.</summary>
     [Parameter]
     public VekDataGridFilteredSelectionMode FilteredSelectionMode { get; set; }
@@ -672,7 +676,7 @@ public partial class VekDataGrid<TItem> : IDisposable
 
     /// <summary>Gets or sets whether string comparisons distinguish letter case.</summary>
     [Parameter]
-    public bool FilterCaseSensitive { get; set; }
+    public bool FilterCaseSensitive { get => _engine.FilterCaseSensitive; set => _engine.FilterCaseSensitive = value; }
 
     /// <summary>Gets or sets a callback invoked after filters are applied or cleared.</summary>
     [Parameter]
@@ -697,33 +701,31 @@ public partial class VekDataGrid<TItem> : IDisposable
         }
     }
 
-    /// <summary>Applies or replaces the filter for a column and resets the current page.</summary>
-    public async Task ApplyFilterAsync(string columnKey, VekDataGridFilterOperator op, object? value, bool? caseSensitive = null)
+    async ValueTask IVekDataGridQueryObserver.OnQueryChangedAsync(VekDataGridQueryChange change)
     {
-        _engine.ApplyFilter(columnKey, op, value, caseSensitive ?? FilterCaseSensitive);
-        await FilterChanged.InvokeAsync(_engine.Filters.ToArray());
-        await NotifySelectionAfterFilteringAsync();
-        await ReloadAfterStateChangeAsync();
-    }
-
-    /// <summary>Clears one column filter or all filters when no key is supplied.</summary>
-    public async Task ClearFilterAsync(string? columnKey = null)
-    {
-        _engine.RemoveFilter(columnKey);
-        await FilterChanged.InvokeAsync(_engine.Filters.ToArray());
-        await NotifySelectionAfterFilteringAsync();
-        await ReloadAfterStateChangeAsync();
-    }
-
-    /// <summary>Clears every active filter.</summary>
-    public Task ClearFiltersAsync() => ClearFilterAsync();
-
-    /// <summary>Clears every active sort and notifies bound consumers.</summary>
-    public async Task ClearSortAsync()
-    {
-        _engine.SetSorts(Array.Empty<VekDataGridSort>());
-        await SortChanged.InvokeAsync(Array.Empty<VekDataGridSort>());
-        await ReloadAfterStateChangeAsync();
+        await InvokeAsync(async () =>
+        {
+            if (change.HasFlag(VekDataGridQueryChange.Filters))
+            {
+                await FilterChanged.InvokeAsync(_engine.Filters.ToArray());
+                await NotifySelectionAfterFilteringAsync();
+            }
+            if (change.HasFlag(VekDataGridQueryChange.Sorts))
+                await SortChanged.InvokeAsync(_engine.Sorts.ToArray());
+            if (change.HasFlag(VekDataGridQueryChange.PageSize))
+            {
+                PageSize = _engine.PageSize;
+                await PageSizeChanged.InvokeAsync(PageSize);
+            }
+            if (change.HasFlag(VekDataGridQueryChange.Page))
+                await CurrentPageChanged.InvokeAsync(_engine.Page);
+            if (change.HasFlag(VekDataGridQueryChange.Groups))
+            {
+                GroupBy = _engine.Groups.ToArray();
+                await GroupChanged.InvokeAsync(GroupBy);
+            }
+            await ReloadAfterStateChangeAsync();
+        });
     }
 
     /// <summary>Reloads the current data source or rerenders local items.</summary>
@@ -732,9 +734,9 @@ public partial class VekDataGrid<TItem> : IDisposable
     internal string? GetFilterValue(string key) => _engine.Filters.FirstOrDefault(filter => filter.ColumnKey == key)?.Value?.ToString();
 
     internal Task ApplyTextFilter(IVekDataGridColumn<TItem, RenderFragment> column, string? value) =>
-        ApplyFilterAsync(column.Key, column.FilterOperator, value);
+        this.ApplyFilterAsync(column.Key, column.FilterOperator, value);
 
-    internal Task ClearColumnFilter(IVekDataGridColumn<TItem, RenderFragment> column) => ClearFilterAsync(column.Key);
+    internal Task ClearColumnFilter(IVekDataGridColumn<TItem, RenderFragment> column) => this.ClearFilterAsync(column.Key);
 
     /// <summary>Gets whether an item can currently be selected.</summary>
     public bool CanSelectItem(TItem item) => SelectionMode != VekDataGridSelectionMode.None
@@ -835,8 +837,11 @@ public partial class VekDataGrid<TItem> : IDisposable
 
     private IEqualityComparer<TItem> ItemComparer => SelectionComparer ?? EqualityComparer<TItem>.Default;
 
-    private void SyncCoreSelection() => _engine.SetSelectedKeys(
-        SelectedItems.Select(item => item?.GetHashCode().ToString(CultureInfo.InvariantCulture) ?? string.Empty));
+    private void SyncCoreSelection()
+    {
+        _engine.SetItemKeySelector(ItemKeySelector);
+        _engine.SetSelectedKeys(SelectedItems.Select(_engine.GetItemKey));
+    }
 
     /// <summary>Gets whether the row has any editable columns.</summary>
     public bool CanEditRow => EditMode != VekDataGridEditMode.None
@@ -1383,6 +1388,8 @@ public partial class VekDataGrid<TItem> : IDisposable
     /// <summary>Clamps the current page when incoming data or parameters reduce the page count.</summary>
     protected override async Task OnParametersSetAsync()
     {
+        _engine.SetItemKeySelector(ItemKeySelector);
+
         if (VirtualizeRows)
         {
             if (VirtualItemSize <= 0 || VirtualMaxItemCount <= 0 || VirtualOverscanCount < 0)
@@ -1547,42 +1554,23 @@ public partial class VekDataGrid<TItem> : IDisposable
         _engine.SetGroups(GroupBy);
         _engine.SetAggregates(Aggregates.Select(definition =>
             (Vek.Core.DataGrid.VekDataGridAggregateDefinition<TItem>)definition));
-        _engine.SetSelectedKeys(SelectedItems.Select(item => item?.GetHashCode().ToString(CultureInfo.InvariantCulture) ?? string.Empty));
+        SyncCoreSelection();
     }
 
     private int GetTotalPages(int itemCount) => _engine.GetPageCount(itemCount, EffectivePageSize);
 
-    private async Task SetCurrentPageAsync(int page)
+    private async Task ChangePageSizeAsync(ChangeEventArgs args)
     {
-        _engine.Page = Math.Clamp(page, 1, GetTotalPages(TotalItems));
-        _engine.SetPage(_engine.Page, EffectivePageSize);
-        await CurrentPageChanged.InvokeAsync(_engine.Page);
-        await ReloadAfterStateChangeAsync();
-    }
-
-    private async Task SetPageSizeAsync(ChangeEventArgs args)
-    {
-        if (!int.TryParse(args.Value?.ToString(), out var pageSize)) return;
-        await SetPageSizeAsync(pageSize);
-    }
-
-    private async Task SetPageSizeAsync(int pageSize)
-    {
-        if (pageSize < 1) return;
-        PageSize = pageSize;
-        _engine.Page = 1;
-        _engine.SetPage(_engine.Page, pageSize);
-        await PageSizeChanged.InvokeAsync(pageSize);
-        await CurrentPageChanged.InvokeAsync(_engine.Page);
-        await ReloadAfterStateChangeAsync();
+        if (int.TryParse(args.Value?.ToString(), out var pageSize) && pageSize > 0)
+            await this.SetPageSizeAsync(pageSize);
     }
 
     private VekDataGridPagerContext<TItem> CreatePagerContext(int totalItems, int totalPages) => new(
         CurrentState,
         totalItems,
         totalPages,
-        SetCurrentPageAsync,
-        SetPageSizeAsync);
+        page => this.SetPageAsync(page, TotalItems),
+        size => this.SetPageSizeAsync(size));
 
     private string GetAriaSort(IVekDataGridColumn<TItem, RenderFragment> column)
     {
@@ -1617,15 +1605,8 @@ public partial class VekDataGrid<TItem> : IDisposable
             return;
         }
 
-        _engine.ApplySortInteraction(
-            column.Key,
-            SortMode,
-            AllowUnsorted,
-            removeSort: args.AltKey,
-            preserveExistingSorts: args.CtrlKey);
-        _engine.Page = 1;
-        await SortChanged.InvokeAsync(GetSortState());
-        await ReloadAfterStateChangeAsync();
+        await this.SortAsync(column.Key, SortMode, AllowUnsorted,
+            removeSort: args.AltKey, preserveExistingSorts: args.CtrlKey);
     }
 
     private IReadOnlyList<VekDataGridSort> GetSortState() => _engine.Sorts;

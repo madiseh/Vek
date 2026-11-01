@@ -95,6 +95,20 @@ public sealed class SelectionTests : BunitContext
         Assert.True(cut.Find("tbody tr input[type=checkbox]").HasAttribute("checked"));
     }
 
+    /// <summary>Verifies a stable item key keeps Core selection across row instances with changed values.</summary>
+    [Fact]
+    public void ItemKeySelectorKeepsCoreSelectionAcrossEquivalentRowInstances()
+    {
+        var product = new TestProduct("Desk Lamp", 20m, "Lighting");
+        var cut = RenderSelectionGrid(
+            [product],
+            selectionMode: VekDataGridSelectionMode.Multiple,
+            itemKeySelector: item => item.Name);
+        cut.Find("tbody tr input[type=checkbox]").Change(true);
+
+        Assert.True(cut.Instance.IsItemSelected(new TestProduct("Desk Lamp", 21m, "Lighting")));
+    }
+
     /// <summary>Verifies the configured policy clears selections when a row is filtered out.</summary>
     [Fact]
     public async Task FilteredOutSelectionFollowsConfiguredPolicy()
@@ -115,9 +129,11 @@ public sealed class SelectionTests : BunitContext
         VekDataGridFilteredSelectionMode filteredSelectionMode = VekDataGridFilteredSelectionMode.Keep,
         bool rowClickSelection = false,
         Func<TestProduct, bool>? isRowSelectable = null,
-        IEqualityComparer<TestProduct>? comparer = null) => Render<VekDataGrid<TestProduct>>(parameters => parameters
+        IEqualityComparer<TestProduct>? comparer = null,
+        Func<TestProduct, string>? itemKeySelector = null) => Render<VekDataGrid<TestProduct>>(parameters => parameters
             .Add(grid => grid.Items, items ?? DataGridTestHelpers.Products)
             .Add(grid => grid.PageSize, 10)
+            .Add(grid => grid.ItemKeySelector, itemKeySelector)
             .Add(grid => grid.SelectionMode, selectionMode)
             .Add(grid => grid.RowClickSelection, rowClickSelection)
             .Add(grid => grid.IsRowSelectable, isRowSelectable)

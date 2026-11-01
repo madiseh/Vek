@@ -36,6 +36,7 @@
   </Folder>
   <Folder Name="/tests/" />
   <Folder Name="/tests/Components/">
+    <Project Path="tests/Components/Vek.Core.DataGrid.Tests/Vek.Core.DataGrid.Tests.csproj" />
     <Project Path="tests/Components/Vek.Components.Tests/Vek.Components.Tests.csproj" />
   </Folder>
   <Folder Name="/tests/Demo/">

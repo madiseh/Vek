@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Globalization;
 using System.Reflection;
+using System.Windows.Data;
 using Vek.Core.DataGrid;
 
 namespace Vek.WPF.DataGrid.Components;
@@ -7,11 +9,60 @@ namespace Vek.WPF.DataGrid.Components;
 /// <summary>
 /// The base WPF data grid component.
 /// </summary>
-public class VekDataGrid : System.Windows.Controls.DataGrid
+public class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGridHost<object, System.Windows.DataTemplate>, IVekDataGridQueryObserver
 {
     private IEnumerable? _sourceItems;
     private readonly VekDataGridEngine<object, System.Windows.DataTemplate> _engine = new();
     private readonly Dictionary<string, object> _columnDefinitions = new(StringComparer.OrdinalIgnoreCase);
+    private Func<object, string>? _itemKeySelector;
+
+    /// <summary>Gets or sets whether sorting uses one column or an ordered set of columns.</summary>
+    public VekDataGridSortMode SortMode { get; set; } = VekDataGridSortMode.Single;
+
+    /// <summary>Gets or sets the one-based page displayed by this grid.</summary>
+    public int CurrentPage
+    {
+        get => _engine.Page;
+        set
+        {
+            _engine.SetPage(value, _engine.PageSize);
+            RefreshLocalItems();
+        }
+    }
+
+    /// <summary>Gets or sets the number of rows displayed on each page.</summary>
+    public int PageSize
+    {
+        get => _engine.PageSize;
+        set
+        {
+            _engine.SetPage(_engine.Page, value);
+            RefreshLocalItems();
+        }
+    }
+
+    /// <summary>Gets or sets the stable item key selector used by the shared Core selection state.</summary>
+    public Func<object, string>? ItemKeySelector
+    {
+        get => _itemKeySelector;
+        set
+        {
+            _itemKeySelector = value;
+            _engine.SetItemKeySelector(value);
+            SyncCoreSelection();
+        }
+    }
+
+    /// <summary>Gets or sets the ordered grouping columns shared with the Blazor adapter.</summary>
+    public IReadOnlyList<VekDataGridGroupDefinition> GroupBy
+    {
+        get => _engine.Groups;
+        set
+        {
+            _engine.SetGroups(value);
+            RefreshLocalItems();
+        }
+    }
 
     /// <summary>Gets the shared platform-neutral state and behavior for this grid instance.</summary>
     public VekDataGridEngine<object, System.Windows.DataTemplate> Engine => _engine;
@@ -64,6 +115,16 @@ public class VekDataGrid : System.Windows.Controls.DataGrid
         ? definition as IVekDataGridColumn<TItem, System.Windows.DataTemplate>
         : null;
 
+    ValueTask IVekDataGridQueryObserver.OnQueryChangedAsync(VekDataGridQueryChange change)
+    {
+        if (Dispatcher.CheckAccess())
+        {
+            RefreshLocalItems();
+            return ValueTask.CompletedTask;
+        }
+        return new ValueTask(Dispatcher.InvokeAsync(RefreshLocalItems).Task);
+    }
+
     /// <summary>Synchronizes the native WPF sort gesture with the shared DataGrid engine.</summary>
     protected override void OnSorting(System.Windows.Controls.DataGridSortingEventArgs e)
     {
@@ -86,25 +147,24 @@ public class VekDataGrid : System.Windows.Controls.DataGrid
                 comparer: (left, right) => CompareByProperty(left, right, GetProperty(left))));
         }
 
-        _engine.ApplySortInteraction(columnKey, VekDataGridSortMode.Single);
-        var activeSort = _engine.Sorts.FirstOrDefault();
+        _engine.ApplySortInteraction(
+            columnKey,
+            SortMode,
+            preserveExistingSorts: SortMode == VekDataGridSortMode.Multiple);
+        var activeSort = _engine.Sorts.FirstOrDefault(sort =>
+            string.Equals(sort.ColumnKey, columnKey, StringComparison.OrdinalIgnoreCase));
         e.Column.SortDirection = activeSort?.Direction == VekSortDirection.Descending
             ? System.ComponentModel.ListSortDirection.Descending
             : activeSort is null ? null : System.ComponentModel.ListSortDirection.Ascending;
 
-        if (_sourceItems is IEnumerable source)
-        {
-            ItemsSource = _engine.GetLocalData(source.Cast<object>()).Items;
-        }
+        RefreshLocalItems();
     }
 
     /// <summary>Copies native WPF selection state into the shared selected-key state.</summary>
     protected override void OnSelectionChanged(System.Windows.Controls.SelectionChangedEventArgs e)
     {
         base.OnSelectionChanged(e);
-        _engine.SetSelectedKeys(SelectedItems
-            .Cast<object>()
-            .Select(item => item.GetHashCode().ToString(System.Globalization.CultureInfo.InvariantCulture)));
+        SyncCoreSelection();
     }
 
     private static int CompareByProperty(object left, object right, PropertyInfo? property)
@@ -112,6 +172,54 @@ public class VekDataGrid : System.Windows.Controls.DataGrid
         var leftValue = property?.GetValue(left);
         var rightValue = property?.GetValue(right);
         return Comparer<object?>.Default.Compare(leftValue, rightValue);
+    }
+
+    private void RefreshLocalItems()
+    {
+        _sourceItems ??= ItemsSource;
+        if (_sourceItems is IEnumerable source)
+        {
+            var items = _engine.GetLocalData(source.Cast<object>()).Items;
+            var view = CollectionViewSource.GetDefaultView(items) as CollectionView;
+            if (view is not null)
+            {
+                view.GroupDescriptions.Clear();
+                foreach (var group in _engine.Groups)
+                {
+                    var column = _engine.Columns.FirstOrDefault(candidate => candidate.Key == group.ColumnKey);
+                    if (column is null) continue;
+
+                    var groupDescription = new WpfGroupDescription(column.GroupBy ?? column.ValueAccessor)
+                    {
+                        CustomSort = new WpfGroupValueComparer(group.SortOrder)
+                    };
+                    view.GroupDescriptions.Add(groupDescription);
+                }
+            }
+
+            ItemsSource = view ?? items;
+        }
+    }
+
+    private void SyncCoreSelection()
+    {
+        _engine.SetItemKeySelector(_itemKeySelector);
+        _engine.SetSelectedKeys(SelectedItems.Cast<object>().Select(_engine.GetItemKey));
+    }
+
+    private sealed class WpfGroupDescription(Func<object, object?> groupValueSelector) : GroupDescription
+    {
+        public override object GroupNameFromItem(object item, int level, CultureInfo culture) =>
+            groupValueSelector(item) ?? string.Empty;
+    }
+
+    private sealed class WpfGroupValueComparer(VekDataGridGroupSortOrder sortOrder) : IComparer
+    {
+        public int Compare(object? x, object? y)
+        {
+            var comparison = Comparer.DefaultInvariant.Compare(x, y);
+            return sortOrder == VekDataGridGroupSortOrder.Descending ? -comparison : comparison;
+        }
     }
 
     private VekDataGridEditTemplateContext<TItem> CreateEditTemplateContext<TItem>(TItem item)

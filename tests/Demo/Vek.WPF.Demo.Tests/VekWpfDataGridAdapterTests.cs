@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows.Controls;
+using System.Windows.Data;
 using Vek.Core.DataGrid;
 using Vek.WPF.DataGrid.Components;
 
@@ -99,6 +100,46 @@ public sealed class VekWpfDataGridAdapterTests
         });
     }
 
+    /// <summary>Verifies a configured item key keeps Core selection across refreshed WPF row instances.</summary>
+    [Fact]
+    public async Task ItemKeySelectorPreservesSelectionAcrossEquivalentRows()
+    {
+        await WpfTestDispatcher.RunAsync(() =>
+        {
+            var grid = new VekDataGrid
+            {
+                ItemsSource = new[] { new TestRow("row-1") },
+                ItemKeySelector = item => ((TestRow)item).Key
+            };
+            grid.SelectedItem = new TestRow("row-1");
+
+            Assert.True(grid.Engine.IsSelected(new TestRow("row-1")));
+            return true;
+        });
+    }
+
+    /// <summary>
+    /// Applies shared Core filtering to the WPF grid's displayed rows and restores the full source when cleared.
+    /// </summary>
+    [Fact]
+    public async Task AppliesAndClearsCoreFiltersForDisplayedRows()
+    {
+        await WpfTestDispatcher.RunAsync(async () =>
+        {
+            var rows = new[] { new TestRow("row-1"), new TestRow("row-2") };
+            var grid = new VekDataGrid { ItemsSource = rows };
+            grid.AddColumn(new VekDataGridColumn<TestRow, DataTemplate>("Key", item => item.Key));
+
+            await grid.ApplyFilterAsync("Key", VekDataGridFilterOperator.Equals, "row-2");
+
+            Assert.Equal(new[] { rows[1] }, grid.Items.Cast<TestRow>().ToArray());
+
+            await grid.ClearFilterAsync();
+
+            Assert.Equal(rows, grid.Items.Cast<TestRow>().ToArray());
+        });
+    }
+
     /// <summary>
     /// Registers the shared generic column contract as a native WPF template column and preserves its template slots.
     /// </summary>
@@ -151,7 +192,91 @@ public sealed class VekWpfDataGridAdapterTests
         });
     }
 
+    /// <summary>
+    /// Keeps the first sort key as the primary order when the WPF adapter is configured for multiple sorting.
+    /// </summary>
+    [Fact]
+    public async Task MultipleSortModeAppliesOrderedCoreSortsToDisplayedRows()
+    {
+        await WpfTestDispatcher.RunAsync(() =>
+        {
+            var rows = new[]
+            {
+                new TestSortRow("A", 2),
+                new TestSortRow("B", 2),
+                new TestSortRow("A", 1)
+            };
+            var grid = new TestableVekDataGrid
+            {
+                ItemsSource = rows,
+                SortMode = VekDataGridSortMode.Multiple
+            };
+            var nameColumn = new DataGridTextColumn { Header = "Name", SortMemberPath = "Name" };
+            var valueColumn = new DataGridTextColumn { Header = "Value", SortMemberPath = "Value" };
+
+            grid.TriggerSorting(new DataGridSortingEventArgs(nameColumn));
+            grid.TriggerSorting(new DataGridSortingEventArgs(valueColumn));
+
+            Assert.Equal(new[] { "Name", "Value" }, grid.Engine.Sorts.OrderBy(sort => sort.Priority).Select(sort => sort.ColumnKey));
+            Assert.Equal(
+                new[] { "A:1", "A:2", "B:2" },
+                grid.Items.Cast<TestSortRow>().Select(item => $"{item.Name}:{item.Value}"));
+            return true;
+        });
+    }
+
+    /// <summary>
+    /// Shows the requested page from the original local source when WPF page state changes.
+    /// </summary>
+    [Fact]
+    public async Task PageSizeAndCurrentPageSliceDisplayedRows()
+    {
+        await WpfTestDispatcher.RunAsync(() =>
+        {
+            var rows = new[] { new TestRow("row-1"), new TestRow("row-2"), new TestRow("row-3") };
+            var grid = new VekDataGrid { ItemsSource = rows, PageSize = 1, CurrentPage = 2 };
+
+            Assert.Equal(new[] { rows[1] }, grid.Items.Cast<TestRow>().ToArray());
+
+            grid.CurrentPage = 3;
+
+            Assert.Equal(new[] { rows[2] }, grid.Items.Cast<TestRow>().ToArray());
+            return true;
+        });
+    }
+
+    /// <summary>Verifies shared Core group definitions create native WPF collection-view groups.</summary>
+    [Fact]
+    public async Task GroupByCreatesNativeCollectionViewGroups()
+    {
+        await WpfTestDispatcher.RunAsync(() =>
+        {
+            var grid = new VekDataGrid
+            {
+                ItemsSource = new[]
+                {
+                    new TestGroupRow("Furniture", "Chair"),
+                    new TestGroupRow("Furniture", "Desk"),
+                    new TestGroupRow("Office", "Notebook")
+                }
+            };
+            grid.AddColumn(new VekDataGridColumn<TestGroupRow, DataTemplate>("Category", item => item.Category));
+
+            grid.GroupBy = new[] { new VekDataGridGroupDefinition("Category") };
+
+            var view = Assert.IsAssignableFrom<CollectionView>(grid.ItemsSource);
+            var groups = view.Groups!.Cast<CollectionViewGroup>().ToArray();
+            Assert.Equal(new[] { "Furniture", "Office" }, groups.Select(group => group.Name));
+            Assert.Equal(new[] { 2, 1 }, groups.Select(group => group.ItemCount));
+            return true;
+        });
+    }
+
     private sealed record TestRow(string Key);
+
+    private sealed record TestSortRow(string Name, int Value);
+
+    private sealed record TestGroupRow(string Category, string Name);
 
     private sealed class TestableVekDataGrid : VekDataGrid
     {
