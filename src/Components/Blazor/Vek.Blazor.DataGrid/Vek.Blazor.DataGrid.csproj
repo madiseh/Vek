@@ -3,18 +3,36 @@
     <IsPackable>true</IsPackable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>Vek.Blazor.DataGrid</PackageId>
-    <Version>0.1.0</Version>
+    <Version>1.0.0</Version>
     <Authors>AMIN SABAGHI</Authors>
     <Description>Data grid components for Blazor and .NET 10.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>blazor;components;ui;data-grid;datagrid</PackageTags>
+    <RepositoryUrl>https://github.com/madiseh/Vek</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/madiseh/Vek</PackageProjectUrl>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeCoreDataGridAssembly</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" />
-    <ProjectReference Include="..\..\Core\Vek.Core.DataGrid\Vek.Core.DataGrid.csproj" />
+    <ProjectReference Include="..\..\Core\Vek.Core.DataGrid\Vek.Core.DataGrid.csproj">
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <Target Name="IncludeCoreDataGridAssembly">
+    <ItemGroup>
+      <BuildOutputInPackage Include="$(TargetDir)Vek.Core.DataGrid.dll">
+        <FinalOutputPath>$(TargetDir)Vek.Core.DataGrid.dll</FinalOutputPath>
+      </BuildOutputInPackage>
+    </ItemGroup>
+  </Target>
 
   <Target Name="BuildTailwindCss" BeforeTargets="PrepareForBuild" Condition="Exists('$(MSBuildProjectDirectory)/node_modules/@tailwindcss/cli')" Inputs="Styles/tailwind.css;Components/**/*.razor" Outputs="wwwroot/vek-components.css">
     <Exec Command="npm run build:css" WorkingDirectory="$(MSBuildProjectDirectory)" />

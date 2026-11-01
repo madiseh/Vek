@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../Components/Blazor/Vek.Blazor.DataGrid/Vek.Blazor.DataGrid.csproj" />
+    <ProjectReference Include="../../Components/Core/Vek.Core.DataGrid/Vek.Core.DataGrid.csproj" />
     <ProjectReference Include="../../Components/Blazor/Vek.Blazor.CodeView/Vek.Blazor.CodeView.csproj" />
     <ProjectReference Include="../../Ports/Vek.Demo.Abstractions/Vek.Demo.Abstractions.csproj" />
     <ProjectReference Include="../../Adapters/Vek.SimulatedData/Vek.SimulatedData.csproj" />

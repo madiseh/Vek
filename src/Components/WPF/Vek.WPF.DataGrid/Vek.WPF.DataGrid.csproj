@@ -5,10 +5,37 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageId>Vek.WPF.DataGrid</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>AMIN SABAGHI</Authors>
+    <Description>Native data grid components for WPF and .NET 10.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>wpf;components;ui;data-grid;datagrid;windows</PackageTags>
+    <RepositoryUrl>https://github.com/madiseh/Vek</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/madiseh/Vek</PackageProjectUrl>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeCoreDataGridAssembly</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\Vek.Core.DataGrid\Vek.Core.DataGrid.csproj" />
+    <ProjectReference Include="..\..\Core\Vek.Core.DataGrid\Vek.Core.DataGrid.csproj">
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <Target Name="IncludeCoreDataGridAssembly">
+    <ItemGroup>
+      <BuildOutputInPackage Include="$(TargetDir)Vek.Core.DataGrid.dll">
+        <FinalOutputPath>$(TargetDir)Vek.Core.DataGrid.dll</FinalOutputPath>
+      </BuildOutputInPackage>
+    </ItemGroup>
+  </Target>
 
 </Project>
