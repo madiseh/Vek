@@ -63,6 +63,7 @@ Created: 2026-11-02
 - [x] Remove the long-lived `NUGET_API_KEY` workflow dependency.
 - [x] Pack only `Vek.Blazor.DataGrid` and `Vek.WPF.DataGrid`; remove CodeView from workflow outputs and push paths.
 - [x] Preserve validated version-tag parsing and verify both package paths exist before push.
+- [x] Stop immediately if either pack or push command fails, so partial release steps cannot report success.
 - [x] Let pushes fail when a package version already exists; do not mask an immutable version collision with `--skip-duplicate`.
 - [x] Run the package workflow steps locally where possible and inspect the final diff.
 - [ ] Read `docs/1.governance/git-commits.md`, commit the release preparation, tag `v1.0.0`, and push the branch/tag so GitHub Actions performs the NuGet publication.
