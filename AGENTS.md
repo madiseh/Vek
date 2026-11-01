@@ -5,6 +5,11 @@
 - This project explicitly targets **.NET 10**. Project files must target `net10.0` unless a documented project-specific reason requires otherwise.
 - The solution uses **hexagonal architecture**. Keep ports/contracts independent of adapters and keep reusable `Vek.Blazor.*` packages independent of Demo and sample-data projects.
 - `Vek.Demo.Abstractions` contains the demo-facing ports and models. `Vek.SimulatedData` implements those ports with sample JSON data. `Vek.Demo` is the composition root.
+- For a component category used by multiple UI platforms, put shared state, neutral contracts, and behavior in `Vek.Core.<Category>`. UI projects are adapters: they translate platform events and rendering into that Core API and display Core results. Keep UI rendering, native events, editors, templates, styling, and platform-only features in their UI projects.
+- The Core contract is canonical across adapters. Keep shared interface/type/property/operation names and state variable names identical in every UI adapter; do not reimplement shared algorithms in an adapter. A platform-only component does not need a Core project.
+- A feature exposed by the shared Core contract must be supported by every adapter for that component. Keep native template types strongly typed through a generic Core contract (for DataGrid: `IVekDataGridColumn<TItem, TTemplate>` and `VekDataGridTemplate<TContext, TTemplate>`); adapters provide their own `TTemplate` without adding a second platform-specific column interface. Add XML documentation to public contracts and tests for observable behavior in each adapter.
+- For shared remote data features, Core builds platform-neutral request/state descriptors. The UI host invokes its configured provider with the descriptor and cancellation token, then passes the returned data back to Core.
+- Follow the DataGrid implementation as the reference pattern; see [`docs/1.governance/architecture.md`](docs/1.governance/architecture.md#cross-platform-component-architecture).
 
 ## Repository Guidance Routing
 

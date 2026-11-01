@@ -1,66 +1,4 @@
-namespace Vek.Blazor.DataGrid.Components.DataGrid;
-
-/// <summary>
-/// Describes the direction applied to a grid sort definition.
-/// </summary>
-public enum VekSortDirection
-{
-    /// <summary>
-    /// Sorts values from lowest to highest.
-    /// </summary>
-    Ascending,
-
-    /// <summary>
-    /// Sorts values from highest to lowest.
-    /// </summary>
-    Descending
-}
-
-/// <summary>
-/// Determines how many grid columns may contribute to sorting.
-/// </summary>
-public enum VekDataGridSortMode
-{
-    /// <summary>Disables sorting for all columns.</summary>
-    None,
-    /// <summary>Sorts by one column at a time.</summary>
-    Single,
-    /// <summary>Allows multiple columns to contribute to the sort order.</summary>
-    Multiple
-}
-
-/// <summary>
-/// Describes a comparison used to filter a grid column.
-/// </summary>
-public enum VekDataGridFilterOperator
-{
-    /// <summary>Matches equal values.</summary>
-    Equals,
-    /// <summary>Matches unequal values.</summary>
-    NotEquals,
-    /// <summary>Matches strings containing a value.</summary>
-    Contains,
-    /// <summary>Matches strings beginning with a value.</summary>
-    StartsWith,
-    /// <summary>Matches strings ending with a value.</summary>
-    EndsWith,
-    /// <summary>Matches values greater than a value.</summary>
-    GreaterThan,
-    /// <summary>Matches values greater than or equal to a value.</summary>
-    GreaterThanOrEqual,
-    /// <summary>Matches values less than a value.</summary>
-    LessThan,
-    /// <summary>Matches values less than or equal to a value.</summary>
-    LessThanOrEqual,
-    /// <summary>Matches null or empty values.</summary>
-    IsEmpty,
-    /// <summary>Matches nonempty values.</summary>
-    IsNotEmpty,
-    /// <summary>Matches null values.</summary>
-    IsNull,
-    /// <summary>Matches non-null values.</summary>
-    IsNotNull
-}
+namespace Vek.Components.Components.DataGrid;
 
 /// <summary>Chooses where a grid displays column filter controls.</summary>
 public enum VekDataGridFilterMode
@@ -71,48 +9,6 @@ public enum VekDataGridFilterMode
     ColumnMenu,
     /// <summary>Displays filter controls in a row below the headings.</summary>
     ColumnRow
-}
-
-/// <summary>Controls whether the grid permits no, one, or multiple selected rows.</summary>
-public enum VekDataGridSelectionMode
-{
-    /// <summary>Row selection is disabled.</summary>
-    None,
-    /// <summary>Only one row can be selected at a time.</summary>
-    Single,
-    /// <summary>Multiple rows can be selected at a time.</summary>
-    Multiple
-}
-
-/// <summary>Controls selection retention when an active filter hides selected rows.</summary>
-public enum VekDataGridFilteredSelectionMode
-{
-    /// <summary>Keep selected items while they are filtered out.</summary>
-    Keep,
-    /// <summary>Remove selected items when a filter hides them.</summary>
-    Clear
-}
-
-/// <summary>Controls how grid rows expose their editable fields.</summary>
-public enum VekDataGridEditMode
-{
-    /// <summary>Editing is disabled.</summary>
-    None,
-    /// <summary>Edits one cell at a time.</summary>
-    Cell,
-    /// <summary>Edits all configured cells for one row at a time.</summary>
-    Row,
-    /// <summary>Edits one row through a form-oriented template.</summary>
-    Form
-}
-
-/// <summary>Defines the ordering applied to the values in a grouped column.</summary>
-public enum VekDataGridGroupSortOrder
-{
-    /// <summary>Orders group values from lowest to highest.</summary>
-    Ascending,
-    /// <summary>Orders group values from highest to lowest.</summary>
-    Descending
 }
 
 /// <summary>Determines which surfaces can reorder grid columns.</summary>
@@ -153,35 +49,7 @@ public enum VekDataGridDensity
 /// <param name="ColumnKeys">The ordered stable keys of the grouped columns.</param>
 public sealed record VekDataGridColumnGroup(string Title, IReadOnlyList<string> ColumnKeys);
 
-/// <summary>Chooses the calculation performed for an aggregate definition.</summary>
-public enum VekDataGridAggregateType
-{
-    /// <summary>Adds the non-null numeric values.</summary>
-    Sum,
-    /// <summary>Calculates the mean of non-null numeric values.</summary>
-    Average,
-    /// <summary>Counts non-null selected values.</summary>
-    Count,
-    /// <summary>Returns the least non-null selected value.</summary>
-    Min,
-    /// <summary>Returns the greatest non-null selected value.</summary>
-    Max,
-    /// <summary>Uses the aggregate delegate supplied by the caller.</summary>
-    Custom
-}
-
-/// <summary>Controls whether an aggregate appears in the overall footer, group headers, or both.</summary>
-public enum VekDataGridAggregateScope
-{
-    /// <summary>Shows the aggregate in the grid footer.</summary>
-    Footer,
-    /// <summary>Shows the aggregate in group headers.</summary>
-    Group,
-    /// <summary>Shows the aggregate in the footer and each group.</summary>
-    Both
-}
-
-/// <summary>Defines one built-in or custom aggregate calculation.</summary>
+/// <summary>Defines one built-in or custom aggregate calculation with optional Blazor template rendering.</summary>
 /// <typeparam name="TItem">The type of item represented by the grid.</typeparam>
 /// <param name="Key">A stable key identifying this aggregate.</param>
 /// <param name="ColumnKey">The column whose values are used by the calculation.</param>
@@ -199,7 +67,20 @@ public sealed record VekDataGridAggregateDefinition<TItem>(
     string? Format = null,
     VekDataGridAggregateScope Scope = VekDataGridAggregateScope.Both,
     RenderFragment<VekDataGridAggregateContext<TItem>>? Template = null,
-    Func<TItem, object?>? Selector = null);
+    Func<TItem, object?>? Selector = null)
+{
+    /// <summary>
+    /// Converts this Blazor aggregate definition to a Core aggregate definition.
+    /// </summary>
+    public Vek.Core.DataGrid.VekDataGridAggregateDefinition<TItem> ToCore() =>
+        new(Key, ColumnKey, Type, CustomAggregate, Format, Scope, Selector);
+
+    /// <summary>
+    /// Implicitly converts a Blazor aggregate definition to a Core aggregate definition.
+    /// </summary>
+    public static implicit operator Vek.Core.DataGrid.VekDataGridAggregateDefinition<TItem>(VekDataGridAggregateDefinition<TItem> definition) =>
+        definition.ToCore();
+}
 
 /// <summary>Contains the calculated value and item scope for an aggregate template.</summary>
 /// <typeparam name="TItem">The type of item represented by the grid.</typeparam>
@@ -217,13 +98,6 @@ public sealed class VekDataGridAggregateContext<TItem>
     /// <summary>Gets the value formatted for display.</summary>
     public string FormattedValue { get; }
 }
-
-/// <summary>Describes a calculated aggregate value.</summary>
-/// <param name="Key">The key of the aggregate definition.</param>
-/// <param name="Title">The title displayed beside the result.</param>
-/// <param name="Value">The raw aggregate value.</param>
-/// <param name="FormattedValue">The value formatted for display.</param>
-public sealed record VekDataGridAggregateResult(string Key, string Title, object? Value, string FormattedValue);
 
 /// <summary>Provides the filtered item scope and aggregate results to footer content.</summary>
 /// <typeparam name="TItem">The type of item represented by the grid.</typeparam>
@@ -300,13 +174,6 @@ public sealed class VekDataGridCellContext<TItem>
     /// <summary>Starts editing this cell when its column is editable.</summary>
     public Func<Task> EditAsync { get; }
 }
-
-/// <summary>Describes one level in the grid's nested grouping order.</summary>
-/// <param name="ColumnKey">The stable key of the column used to group rows.</param>
-/// <param name="SortOrder">The order in which distinct group values appear.</param>
-public sealed record VekDataGridGroupDefinition(
-    string ColumnKey,
-    VekDataGridGroupSortOrder SortOrder = VekDataGridGroupSortOrder.Ascending);
 
 /// <summary>Provides a group definition, its rows, and its expand/collapse action to a template.</summary>
 /// <typeparam name="TItem">The type of item represented by the grid.</typeparam>
@@ -406,46 +273,3 @@ public sealed class VekDataGridPagerContext<TItem>
     /// <summary>Changes the number of rows displayed per page.</summary>
     public Func<int, Task> SetPageSizeAsync { get; }
 }
-
-/// <summary>
-/// Describes one ordered sort operation in a grid state.
-/// </summary>
-/// <param name="ColumnKey">The stable key of the sorted column.</param>
-/// <param name="Direction">The direction applied to the column.</param>
-/// <param name="Priority">The order in which this sort is applied.</param>
-public sealed record VekDataGridSort(string ColumnKey, VekSortDirection Direction, int Priority);
-
-/// <summary>
-/// Describes one active filter operation in a grid state.
-/// </summary>
-/// <param name="ColumnKey">The stable key of the filtered column.</param>
-/// <param name="Operator">The comparison applied to the value.</param>
-/// <param name="Value">The value used by the comparison.</param>
-/// <param name="CaseSensitive">Whether string comparisons distinguish letter case.</param>
-public sealed record VekDataGridFilter(
-    string ColumnKey,
-    VekDataGridFilterOperator Operator,
-    object? Value,
-    bool CaseSensitive);
-
-/// <summary>
-/// Describes the page, sort, and filter state requested from a grid data source.
-/// </summary>
-/// <typeparam name="TItem">The type of item represented by each row.</typeparam>
-/// <param name="Page">The one-based page requested by the grid.</param>
-/// <param name="PageSize">The maximum number of items requested for the page.</param>
-/// <param name="Sorts">The sort operations in priority order.</param>
-/// <param name="Filters">The active filter operations.</param>
-public sealed record VekDataGridState<TItem>(
-    int Page,
-    int PageSize,
-    IReadOnlyList<VekDataGridSort> Sorts,
-    IReadOnlyList<VekDataGridFilter> Filters);
-
-/// <summary>
-/// Contains one page of items and the total number of matching items.
-/// </summary>
-/// <typeparam name="TItem">The type of item represented by each row.</typeparam>
-/// <param name="Items">The items displayed by the current page.</param>
-/// <param name="TotalItems">The total count before paging.</param>
-public sealed record VekDataGridData<TItem>(IReadOnlyList<TItem> Items, int TotalItems);

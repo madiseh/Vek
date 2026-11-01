@@ -1,7 +1,6 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using System.Linq.Expressions;
-using Vek.Blazor.DataGrid.Components.DataGrid;
 using Vek.Components.Components.DataGrid;
 
 namespace Vek.Components.Tests.DataGrid;

@@ -5,10 +5,8 @@
     var sortedItems = ServerData is null ? GetSortedItems() : _serverItems.ToList();
     var totalItemCount = ServerData is null ? sortedItems.Count : _serverTotalItems;
     var totalPages = GetTotalPages(totalItemCount);
-    _currentPage = Math.Clamp(_currentPage, 1, totalPages);
-    var pageItems = ServerData is null
-        ? sortedItems.Skip((_currentPage - 1) * EffectivePageSize).Take(EffectivePageSize).ToList()
-        : sortedItems;
+    Engine.Page = Math.Clamp(Engine.Page, 1, totalPages);
+    var pageItems = ServerData is null ? GetPageItems() : sortedItems;
 }
 
 <CascadingValue Value="this" IsFixed="true">
@@ -230,7 +228,7 @@
                 }
                 else if (EffectiveGroups.Count > 0)
                 {
-                    @RenderGroupRows(BuildGroupNodes(pageItems, 0, string.Empty))
+                    @RenderGroupRows(BuildGroupNodes(pageItems))
                 }
                 else
                 {
@@ -272,9 +270,9 @@
                     }
                 </select>
             </label>
-            <button type="button" aria-label="Previous page" @onclick="() => SetCurrentPageAsync(_currentPage - 1)" disabled="@(_currentPage <= 1)">Previous</button>
-            <span>Page @_currentPage of @totalPages</span>
-            <button type="button" aria-label="Next page" @onclick="() => SetCurrentPageAsync(_currentPage + 1)" disabled="@(_currentPage >= totalPages)">Next</button>
+            <button type="button" aria-label="Previous page" @onclick="() => SetCurrentPageAsync(Engine.Page - 1)" disabled="@(Engine.Page <= 1)">Previous</button>
+            <span>Page @Engine.Page of @totalPages</span>
+            <button type="button" aria-label="Next page" @onclick="() => SetCurrentPageAsync(Engine.Page + 1)" disabled="@(Engine.Page >= totalPages)">Next</button>
         </nav>
     }
     else if (!VirtualizeRows && PagerContent is not null)
@@ -284,11 +282,11 @@
 </div>
 
 @code {
-    private RenderFragment RenderFilterControl(IVekDataGridColumn<TItem> column) => builder =>
+    private RenderFragment RenderFilterControl(IVekDataGridColumn<TItem, RenderFragment> column) => builder =>
     {
         if (column.FilterTemplate is not null)
         {
-            builder.AddContent(0, column.FilterTemplate(new VekDataGridFilterContext(
+            builder.AddContent(0, column.FilterTemplate(new Vek.Core.DataGrid.VekDataGridFilterContext(
                 GetFilterValue(column.Key),
                 value => _ = ApplyTextFilter(column, value),
                 () => _ = ClearColumnFilter(column))));

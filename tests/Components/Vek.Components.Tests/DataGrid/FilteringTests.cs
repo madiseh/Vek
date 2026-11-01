@@ -1,6 +1,5 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
-using Vek.Blazor.DataGrid.Components.DataGrid;
 using Vek.Components.Components.DataGrid;
 
 namespace Vek.Components.Tests.DataGrid;
@@ -45,7 +44,7 @@ public sealed class FilteringTests : BunitContext
     [Fact]
     public void FilterTemplateAppliesAndClearsDefinition()
     {
-        VekDataGridFilterContext? filterContext = null;
+        Vek.Components.Components.DataGrid.VekDataGridFilterContext? filterContext = null;
         var cut = RenderFilterGrid(filterTemplate: context => builder =>
         {
             filterContext = context;
@@ -94,7 +93,7 @@ public sealed class FilteringTests : BunitContext
         int pageSize = 3,
         bool caseSensitive = false,
         VekDataGridFilterMode filterMode = VekDataGridFilterMode.Simple,
-        RenderFragment<VekDataGridFilterContext>? filterTemplate = null) => Render<VekDataGrid<TestProduct>>(parameters => parameters
+        RenderFragment<Vek.Components.Components.DataGrid.VekDataGridFilterContext>? filterTemplate = null) => Render<VekDataGrid<TestProduct>>(parameters => parameters
             .Add(grid => grid.Items, DataGridTestHelpers.Products)
             .Add(grid => grid.PageSize, pageSize)
             .Add(grid => grid.FilterCaseSensitive, caseSensitive)

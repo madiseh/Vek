@@ -1,6 +1,5 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
-using Vek.Blazor.DataGrid.Components.DataGrid;
 using Vek.Components.Components.DataGrid;
 
 namespace Vek.Components.Tests.DataGrid;
@@ -86,7 +85,7 @@ public sealed class HierarchyTests : BunitContext
             {
                 builder.OpenComponent<HierarchyColumn<TestProduct>>(0);
                 builder.AddAttribute(1, nameof(HierarchyColumn<TestProduct>.DetailTemplate),
-                    (RenderFragment<VekDataGridRowDetailContext<TestProduct>>)(context => content =>
+                    (RenderFragment<Vek.Components.Components.DataGrid.VekDataGridRowDetailContext<TestProduct>>)(context => content =>
                         content.AddContent(0, $"Details for {context.Item.Name}")));
                 builder.CloseComponent();
                 builder.OpenComponent<PropertyColumn<TestProduct, string>>(2);

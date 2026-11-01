@@ -1,5 +1,5 @@
 using Vek.Demo.Abstractions;
-using Vek.Blazor.DataGrid.Components.DataGrid;
+using Vek.Components.Components.DataGrid;
 
 namespace Vek.Demo.Components.Pages.Docs.Blazor.DataGrid.Aggregation;
 
@@ -45,7 +45,7 @@ public partial class Aggregation
 
     private IReadOnlyList<DemoProduct>? _products;
     private IReadOnlyList<VekDataGridGroupDefinition> _groups = [new("Category")];
-    private IReadOnlyList<VekDataGridAggregateDefinition<DemoProduct>> _aggregates =
+    private IReadOnlyList<Vek.Components.Components.DataGrid.VekDataGridAggregateDefinition<DemoProduct>> _aggregates =
     [
         new("Sum", "Price", VekDataGridAggregateType.Sum, Format: "C2"),
         new("Average", "Price", VekDataGridAggregateType.Average, Format: "C2"),

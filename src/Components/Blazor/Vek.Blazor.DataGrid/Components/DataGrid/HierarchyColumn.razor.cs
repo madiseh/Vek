@@ -1,10 +1,8 @@
-using Vek.Blazor.DataGrid.Components.DataGrid;
-
 namespace Vek.Components.Components.DataGrid;
 
 /// <summary>Adds row controls and detail templates to a data grid.</summary>
 /// <typeparam name="TItem">The type of item represented by each row.</typeparam>
-public partial class HierarchyColumn<TItem> : IDisposable, IVekDataGridColumn<TItem>
+public partial class HierarchyColumn<TItem> : IDisposable, IVekDataGridColumn<TItem, RenderFragment>
 {
     [CascadingParameter]
     private VekDataGrid<TItem>? Grid { get; set; }
@@ -49,39 +47,41 @@ public partial class HierarchyColumn<TItem> : IDisposable, IVekDataGridColumn<TI
         _registeredGrid.RegisterColumn(this);
     }
 
-    string IVekDataGridColumn<TItem>.Key => "__hierarchy";
-    bool IVekDataGridColumn<TItem>.Visible { get => Visible; set => Visible = value; }
-    async Task IVekDataGridColumn<TItem>.SetVisibleAsync(bool visible)
+    string Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.Key => "__hierarchy";
+    bool IVekDataGridColumn<TItem, RenderFragment>.Visible { get => Visible; set => Visible = value; }
+    async Task IVekDataGridColumn<TItem, RenderFragment>.SetVisibleAsync(bool visible)
     {
         Visible = visible;
         await VisibleChanged.InvokeAsync(visible);
     }
-    int? IVekDataGridColumn<TItem>.Width { get => Width; set => Width = value; }
-    int IVekDataGridColumn<TItem>.MinWidth => MinWidth;
-    int IVekDataGridColumn<TItem>.MaxWidth => MaxWidth;
-    async Task IVekDataGridColumn<TItem>.SetWidthAsync(int width)
+    int? IVekDataGridColumn<TItem, RenderFragment>.Width { get => Width; set => Width = value; }
+    int IVekDataGridColumn<TItem, RenderFragment>.MinWidth => MinWidth;
+    int IVekDataGridColumn<TItem, RenderFragment>.MaxWidth => MaxWidth;
+    async Task IVekDataGridColumn<TItem, RenderFragment>.SetWidthAsync(int width)
     {
         Width = width;
         await WidthChanged.InvokeAsync(width);
     }
-    bool IVekDataGridColumn<TItem>.Sortable => false;
-    bool IVekDataGridColumn<TItem>.Filterable => false;
-    Func<TItem, object?>? IVekDataGridColumn<TItem>.FilterBy => null;
-    VekDataGridFilterOperator IVekDataGridColumn<TItem>.FilterOperator => VekDataGridFilterOperator.Contains;
-    RenderFragment<VekDataGridFilterContext>? IVekDataGridColumn<TItem>.FilterTemplate => null;
-    bool IVekDataGridColumn<TItem>.IsSelectionColumn => false;
-    bool IVekDataGridColumn<TItem>.Editable => false;
-    RenderFragment<VekDataGridEditContext<TItem>>? IVekDataGridColumn<TItem>.EditTemplate => null;
-    string IVekDataGridColumn<TItem>.GetRowLabel(TItem item) => "Details";
-    bool IVekDataGridColumn<TItem>.Groupable => false;
-    Func<TItem, object?>? IVekDataGridColumn<TItem>.GroupBy => null;
-    RenderFragment<VekDataGridGroupContext<TItem>>? IVekDataGridColumn<TItem>.GroupTemplate => null;
-    Func<TItem, object?>? IVekDataGridColumn<TItem>.AggregateBy => null;
-    bool IVekDataGridColumn<TItem>.IsHierarchyColumn => true;
-    RenderFragment<VekDataGridRowDetailContext<TItem>>? IVekDataGridColumn<TItem>.DetailTemplate => DetailTemplate;
-    string IVekDataGridColumn<TItem>.Title => "Details";
-    Comparison<TItem> IVekDataGridColumn<TItem>.CompareItems => static (_, _) => 0;
-    RenderFragment<TItem> IVekDataGridColumn<TItem>.CellTemplate => item => builder =>
+    bool Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.Sortable => false;
+    bool Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.Filterable => false;
+    Func<TItem, object?>? Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.FilterBy => null;
+    VekDataGridFilterOperator Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.FilterOperator => VekDataGridFilterOperator.Contains;
+    VekDataGridTemplate<Vek.Core.DataGrid.VekDataGridFilterContext, RenderFragment>? IVekDataGridColumn<TItem, RenderFragment>.FilterTemplate => null;
+    bool IVekDataGridColumn<TItem, RenderFragment>.IsSelectionColumn => false;
+    bool IVekDataGridColumn<TItem, RenderFragment>.Editable => false;
+    VekDataGridTemplate<Vek.Core.DataGrid.VekDataGridEditTemplateContext<TItem>, RenderFragment>? IVekDataGridColumn<TItem, RenderFragment>.EditTemplate => null;
+    string IVekDataGridColumn<TItem, RenderFragment>.GetRowLabel(TItem item) => "Details";
+    bool Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.Groupable => false;
+    Func<TItem, object?>? Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.GroupBy => null;
+    VekDataGridTemplate<Vek.Core.DataGrid.VekDataGridGroupContext<TItem>, RenderFragment>? IVekDataGridColumn<TItem, RenderFragment>.GroupTemplate => null;
+    Func<TItem, object?>? Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.AggregateBy => null;
+    bool IVekDataGridColumn<TItem, RenderFragment>.IsHierarchyColumn => true;
+    VekDataGridTemplate<Vek.Core.DataGrid.VekDataGridRowDetailContext<TItem>, RenderFragment> IVekDataGridColumn<TItem, RenderFragment>.DetailTemplate =>
+        context => DetailTemplate(new VekDataGridRowDetailContext<TItem>(context.Item, context.Expanded, context.ToggleAsync));
+    string Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.Title => "Details";
+    Comparison<TItem> Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.CompareItems => static (_, _) => 0;
+    Func<TItem, object?> Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.ValueAccessor => static _ => null;
+    VekDataGridTemplate<TItem, RenderFragment> IVekDataGridColumn<TItem, RenderFragment>.CellTemplate => item => builder =>
     {
         var expanded = Grid!.IsRowExpanded(item);
         builder.OpenElement(0, "button");

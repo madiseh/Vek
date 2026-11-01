@@ -1,6 +1,5 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
-using Vek.Blazor.DataGrid.Components.DataGrid;
 using Vek.Components.Components.DataGrid;
 
 namespace Vek.Components.Tests.DataGrid;
@@ -40,7 +39,7 @@ public sealed class GroupingTests : BunitContext
     [Fact]
     public void GroupTemplateReceivesDefinition()
     {
-        VekDataGridGroupContext<TestProduct>? received = null;
+        Vek.Components.Components.DataGrid.VekDataGridGroupContext<TestProduct>? received = null;
         var cut = RenderGroupGrid([new("Category")], context => builder =>
         {
             received = context;
@@ -81,7 +80,7 @@ public sealed class GroupingTests : BunitContext
 
     private IRenderedComponent<VekDataGrid<TestProduct>> RenderGroupGrid(
         IReadOnlyList<VekDataGridGroupDefinition> groups,
-        RenderFragment<VekDataGridGroupContext<TestProduct>>? groupTemplate = null,
+        RenderFragment<Vek.Components.Components.DataGrid.VekDataGridGroupContext<TestProduct>>? groupTemplate = null,
         int pageSize = 10) => Render<VekDataGrid<TestProduct>>(parameters => parameters
             .Add(grid => grid.Items, DataGridTestHelpers.Products)
             .Add(grid => grid.PageSize, pageSize)

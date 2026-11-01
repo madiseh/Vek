@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" />
+    <ProjectReference Include="..\..\Core\Vek.Core.DataGrid\Vek.Core.DataGrid.csproj" />
   </ItemGroup>
 
   <Target Name="BuildTailwindCss" BeforeTargets="PrepareForBuild" Condition="Exists('$(MSBuildProjectDirectory)/node_modules/@tailwindcss/cli')" Inputs="Styles/tailwind.css;Components/**/*.razor" Outputs="wwwroot/vek-components.css">

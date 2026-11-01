@@ -1,6 +1,5 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
-using Vek.Blazor.DataGrid.Components.DataGrid;
 using Vek.Components.Components.DataGrid;
 
 namespace Vek.Components.Tests.DataGrid;
@@ -77,6 +76,23 @@ public sealed class SelectionTests : BunitContext
 
         Assert.Equal("Desk Lamp", cut.Instance.SelectedItems.Single().Name);
         Assert.True(cut.Find("tbody tr:nth-child(2) input[type=checkbox]").HasAttribute("checked"));
+    }
+
+    /// <summary>Verifies Core selection keys honor the configured item comparer.</summary>
+    [Fact]
+    public void CoreSelectionUsesTheConfiguredComparerHash()
+    {
+        var products = new[] { new TestProduct("Desk Lamp", 20m, "Lighting") };
+        var comparer = EqualityComparer<TestProduct>.Create(
+            (left, right) => StringComparer.OrdinalIgnoreCase.Equals(left?.Name, right?.Name),
+            product => StringComparer.OrdinalIgnoreCase.GetHashCode(product.Name));
+        var cut = RenderSelectionGrid(products, selectionMode: VekDataGridSelectionMode.Multiple, comparer: comparer);
+        cut.Find("tbody tr input[type=checkbox]").Change(true);
+
+        products = [new TestProduct("desk lamp", 20m, "Lighting")];
+        cut.Render(parameters => parameters.Add(grid => grid.Items, products));
+
+        Assert.True(cut.Find("tbody tr input[type=checkbox]").HasAttribute("checked"));
     }
 
     /// <summary>Verifies the configured policy clears selections when a row is filtered out.</summary>

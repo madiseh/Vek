@@ -6,6 +6,7 @@ Vek contains reusable .NET 10 Blazor component packages, a reusable WPF DataGrid
 
 | Project | Responsibility |
 | --- | --- |
+| `Vek.Core.DataGrid` | Platform-neutral DataGrid contracts, per-instance state, and shared data operations used by UI adapters. |
 | `Vek.Blazor.DataGrid` | NuGet-ready Razor Class Library for the reusable DataGrid feature family. |
 | `Vek.Blazor.CodeView` | NuGet-ready Razor Class Library for reusable code-viewer components. |
 | `Vek.WPF.DataGrid` | Reusable WPF class library for the native DataGrid control. |
@@ -22,6 +23,7 @@ Vek contains reusable .NET 10 Blazor component packages, a reusable WPF DataGrid
 flowchart LR
     Demo[Vek.Demo<br/>composition root]
     DataGrid[Vek.Blazor.DataGrid<br/>Razor Class Library]
+    CoreGrid[Vek.Core.DataGrid<br/>shared contracts and behavior]
     CodeView[Vek.Blazor.CodeView<br/>Razor Class Library]
     WpfDemo[Vek.WPF.Demo<br/>WPF composition root]
     WpfDataGrid[Vek.WPF.DataGrid<br/>WPF class library]
@@ -31,10 +33,12 @@ flowchart LR
     WpfTests[Vek.WPF.Demo.Tests<br/>WPF xUnit tests]
 
     Demo --> DataGrid
+    DataGrid --> CoreGrid
     Demo --> CodeView
     Demo --> Ports
     Demo --> SimData
     WpfDemo --> WpfDataGrid
+    WpfDataGrid --> CoreGrid
     WpfDemo --> Ports
     WpfDemo --> SimData
     SimData --> Ports
@@ -73,6 +77,16 @@ src/Components/Blazor/Vek.Blazor.CodeView/
 ```
 
 Keep simple components in a `.razor` file. Add a `.razor.cs` code-behind when the component's logic benefits from being separated from its markup. Keep package-wide styles under that package's `wwwroot/` directory.
+
+## Cross-platform component architecture
+
+When one component category is implemented for multiple UI platforms, its Core project owns platform-neutral contracts, state, and shared behavior. Each UI project owns only its platform interaction and presentation: native events, rendering, templates, editors, styling, and platform-specific capabilities.
+
+All adapters use the same Core interfaces, state names, operation names, and local names for shared concepts. For DataGrid, canonical names include `Items`, `Page`, `PageSize`, `Sorts`, `Filters`, `Groups`, and `SelectedKeys`. Core defines one generic `IVekDataGridColumn<TItem, TTemplate>` contract. Its `TTemplate` parameter is supplied by each adapter (`RenderFragment` in Blazor and `DataTemplate` in WPF), while `VekDataGridTemplate<TContext, TTemplate>` preserves the exact context and native template types for cell, filter, group, edit, and detail slots. An adapter maps UI event arguments into these contracts, calls Core, and renders the resulting state. Shared algorithms such as filtering, sorting, paging, grouping, aggregation, selection transitions, and edit transitions belong in Core. Features declared by the shared contract must be supported by every adapter.
+
+For remote data, Core creates a neutral request descriptor containing page and query state. The host calls its data provider with that descriptor and a cancellation token, then supplies the returned items and total count to Core. Core does not depend on a provider, HTTP client, database, or UI framework.
+
+Keep template implementations, visual state, editor components, and concrete native UI types out of Core. Generic template type parameters and platform-neutral template contexts may appear in Core contracts without referencing UI frameworks. A component that has only one UI implementation does not need a Core project. Use `Vek.Core.DataGrid` and its Blazor and WPF adapters as the example when adding another cross-platform component category.
 
 ## Target Framework and Platforms
 

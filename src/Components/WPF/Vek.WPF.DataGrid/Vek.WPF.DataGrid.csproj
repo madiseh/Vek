@@ -7,4 +7,8 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Vek.Core.DataGrid\Vek.Core.DataGrid.csproj" />
+  </ItemGroup>
+
 </Project>

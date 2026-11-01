@@ -16,7 +16,7 @@ public sealed class CodeSampleViewTests
             var window = new Window { Content = view };
             try
             {
-                window.Show();
+                WpfTestDispatcher.ShowTestWindow(window);
                 window.UpdateLayout();
                 window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
                 var sections = Descendants<StackPanel>(window)
@@ -55,7 +55,7 @@ public sealed class CodeSampleViewTests
             var window = new Window { Content = view };
             try
             {
-                window.Show();
+                WpfTestDispatcher.ShowTestWindow(window);
                 window.UpdateLayout();
                 window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
                 var tabs = Descendants<TabControl>(window).ToArray();

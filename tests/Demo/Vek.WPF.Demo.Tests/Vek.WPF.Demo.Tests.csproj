@@ -17,6 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../../../src/Components/Core/Vek.Core.DataGrid/Vek.Core.DataGrid.csproj" />
+    <ProjectReference Include="../../../src/Components/WPF/Vek.WPF.DataGrid/Vek.WPF.DataGrid.csproj" />
     <ProjectReference Include="../../../src/Demo/WPF/Vek.WPF.Demo/Vek.WPF.Demo.csproj" />
   </ItemGroup>
 </Project>

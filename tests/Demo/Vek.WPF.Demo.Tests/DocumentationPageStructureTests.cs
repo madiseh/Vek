@@ -191,7 +191,7 @@ public sealed class DocumentationPageStructureTests
         });
         try
         {
-            window.Show();
+            WpfTestDispatcher.ShowTestWindow(window);
             window.UpdateLayout();
             window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
             assertion(window);

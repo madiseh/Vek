@@ -1,6 +1,5 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
-using Vek.Blazor.DataGrid.Components.DataGrid;
 using Vek.Components.Components.DataGrid;
 
 namespace Vek.Components.Tests.DataGrid;
@@ -94,10 +93,10 @@ public sealed class AggregationTests : BunitContext
     }
 
     private IRenderedComponent<VekDataGrid<TestProduct>> RenderAggregateGrid(
-        IReadOnlyList<VekDataGridAggregateDefinition<TestProduct>>? aggregates = null,
+        IReadOnlyList<Vek.Components.Components.DataGrid.VekDataGridAggregateDefinition<TestProduct>>? aggregates = null,
         IReadOnlyList<VekDataGridGroupDefinition>? groups = null,
         RenderFragment<VekDataGridFooterContext<TestProduct>>? footerTemplate = null,
-        RenderFragment<VekDataGridGroupContext<TestProduct>>? groupTemplate = null) => Render<VekDataGrid<TestProduct>>(parameters => parameters
+        RenderFragment<Vek.Components.Components.DataGrid.VekDataGridGroupContext<TestProduct>>? groupTemplate = null) => Render<VekDataGrid<TestProduct>>(parameters => parameters
             .Add(grid => grid.Items, Products)
             .Add(grid => grid.PageSize, 10)
             .Add(grid => grid.Aggregates, aggregates ?? BuiltInDefinitions())
@@ -120,7 +119,7 @@ public sealed class AggregationTests : BunitContext
                 builder.CloseComponent();
             }));
 
-    private static IReadOnlyList<VekDataGridAggregateDefinition<TestProduct>> BuiltInDefinitions() =>
+    private static IReadOnlyList<Vek.Components.Components.DataGrid.VekDataGridAggregateDefinition<TestProduct>> BuiltInDefinitions() =>
     [
         new("Sum", "Price", VekDataGridAggregateType.Sum, Format: "0.00"),
         new("Average", "Price", VekDataGridAggregateType.Average, Format: "0.00"),

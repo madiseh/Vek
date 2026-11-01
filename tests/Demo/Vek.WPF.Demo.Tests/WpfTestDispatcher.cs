@@ -4,6 +4,18 @@ internal static class WpfTestDispatcher
 {
     private static readonly Dispatcher UiDispatcher = StartDispatcher();
 
+    public static void ShowTestWindow(Window window)
+    {
+        ArgumentNullException.ThrowIfNull(window);
+        window.WindowStartupLocation = WindowStartupLocation.Manual;
+        window.ShowActivated = false;
+        window.ShowInTaskbar = false;
+        window.Opacity = 0;
+        window.Left = SystemParameters.VirtualScreenLeft - Math.Max(window.Width, 1) - 16;
+        window.Top = SystemParameters.VirtualScreenTop - Math.Max(window.Height, 1) - 16;
+        window.Show();
+    }
+
     public static Task<T> RunAsync<T>(Func<T> action)
     {
         var completion = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);

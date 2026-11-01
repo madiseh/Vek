@@ -13,7 +13,7 @@ public sealed class DemoProviderIntegrationTests
             var window = new MainWindow(new JsonDemoProductProvider());
             try
             {
-                window.Show();
+                WpfTestDispatcher.ShowTestWindow(window);
                 window.UpdateLayout();
                 var model = Assert.IsType<MainWindowViewModel>(window.DataContext);
                 model.GetStartedCommand.Execute(null);
@@ -72,7 +72,7 @@ public sealed class DemoProviderIntegrationTests
             var window = new MainWindow();
             try
             {
-                window.Show();
+                WpfTestDispatcher.ShowTestWindow(window);
                 var model = Assert.IsType<MainWindowViewModel>(window.DataContext);
                 model.GetStartedCommand.Execute(null);
                 window.UpdateLayout();
@@ -116,7 +116,7 @@ public sealed class DemoProviderIntegrationTests
             var window = new MainWindow();
             try
             {
-                window.Show();
+                WpfTestDispatcher.ShowTestWindow(window);
                 window.UpdateLayout();
                 var home = Assert.Single(Descendants<Home>(window));
                 var repositoryText = Assert.Single(Descendants<TextBlock>(home)
@@ -156,7 +156,7 @@ public sealed class DemoProviderIntegrationTests
             var window = new MainWindow();
             try
             {
-                window.Show();
+                WpfTestDispatcher.ShowTestWindow(window);
                 window.UpdateLayout();
                 window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
                 Assert.Single(Descendants<Home>(window));
@@ -196,7 +196,7 @@ public sealed class DemoProviderIntegrationTests
             try
             {
                 var viewModel = Assert.IsType<MainWindowViewModel>(window.DataContext);
-                window.Show();
+                WpfTestDispatcher.ShowTestWindow(window);
                 window.UpdateLayout();
                 viewModel.GetStartedCommand.Execute(null);
                 window.UpdateLayout();

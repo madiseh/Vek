@@ -1,5 +1,3 @@
-using Vek.Blazor.DataGrid.Components.DataGrid;
-
 namespace Vek.Components.Components.DataGrid;
 
 /// <summary>
@@ -9,15 +7,12 @@ namespace Vek.Components.Components.DataGrid;
 [CascadingTypeParameter(nameof(TItem))]
 public partial class VekDataGrid<TItem> : IDisposable
 {
-    private readonly List<IVekDataGridColumn<TItem>> _columns = [];
-    private readonly List<ActiveSort> _sorts = [];
-    private readonly List<VekDataGridFilter> _filters = [];
+    private readonly List<IVekDataGridColumn<TItem, RenderFragment>> _columns = [];
+    private readonly VekDataGridEngine<TItem, RenderFragment> _engine = new();
     private List<TItem> _expandedRows = [];
-    private readonly HashSet<string> _collapsedGroups = new(StringComparer.Ordinal);
-    private int _currentPage = 1;
     private TItem? _editingOriginal;
     private TItem? _editingDraft;
-    private IVekDataGridColumn<TItem>? _editingColumn;
+    private IVekDataGridColumn<TItem, RenderFragment>? _editingColumn;
     private EditContext? _editContext;
     private VekDataGridEditContext<TItem>? _activeEditContext;
     private bool _isEditing;
@@ -41,15 +36,18 @@ public partial class VekDataGrid<TItem> : IDisposable
     private string? _draggedColumnKey;
     private string? _dropTargetColumnKey;
 
-    private sealed record ActiveSort(IVekDataGridColumn<TItem> Column, VekSortDirection Direction);
     private sealed record GroupNode(
         VekDataGridGroupDefinition Definition,
-        IVekDataGridColumn<TItem> Column,
+        IVekDataGridColumn<TItem, RenderFragment> Column,
         object? Value,
         IReadOnlyList<TItem> Items,
         int Level,
-        string Path);
+        string Path,
+        IReadOnlyList<GroupNode> Children);
     private sealed record ColumnGroupSegment(string? Title, int Span);
+
+    /// <summary>Gets the platform-neutral behavior and state engine for this grid instance.</summary>
+    public VekDataGridEngine<TItem, RenderFragment> Engine => _engine;
 
     /// <summary>
     /// Gets or sets the complete collection of items displayed by the grid.
@@ -82,10 +80,10 @@ public partial class VekDataGrid<TItem> : IDisposable
     {
         if (_disposed) return;
         var totalPages = GetTotalPages(TotalItems);
-        if (_currentPage > totalPages)
+        if (_engine.Page > totalPages)
         {
-            _currentPage = totalPages;
-            await CurrentPageChanged.InvokeAsync(_currentPage);
+            _engine.Page = totalPages;
+            await CurrentPageChanged.InvokeAsync(_engine.Page);
         }
 
         if (ReconcileObservableSelection())
@@ -291,8 +289,8 @@ public partial class VekDataGrid<TItem> : IDisposable
     /// <summary>Gets the total number of matching items before paging.</summary>
     public int TotalItems => ServerData is null ? GetSortedItems().Count : _serverTotalItems;
 
-    private IReadOnlyList<IVekDataGridColumn<TItem>> VisibleColumns => _columns.Where(column => column.Visible).ToArray();
-    private IEnumerable<IVekDataGridColumn<TItem>> SearchableColumns => string.IsNullOrWhiteSpace(_columnSearch)
+    private IReadOnlyList<IVekDataGridColumn<TItem, RenderFragment>> VisibleColumns => _columns.Where(column => column.Visible).ToArray();
+    private IEnumerable<IVekDataGridColumn<TItem, RenderFragment>> SearchableColumns => string.IsNullOrWhiteSpace(_columnSearch)
         ? _columns
         : _columns.Where(column => column.Title.Contains(_columnSearch.Trim(), StringComparison.OrdinalIgnoreCase));
     private int VisibleColumnCount => Math.Max(VisibleColumns.Count, 1) + (RowActionsTemplate is null ? 0 : 1);
@@ -355,9 +353,9 @@ public partial class VekDataGrid<TItem> : IDisposable
             ? ResizeColumnAsync(columnKey, width)
             : Task.CompletedTask;
 
-    private int GetColumnWidthValue(IVekDataGridColumn<TItem> column) => column.Width ?? 160;
+    private int GetColumnWidthValue(IVekDataGridColumn<TItem, RenderFragment> column) => column.Width ?? 160;
 
-    private string? GetColumnWidthStyle(IVekDataGridColumn<TItem> column)
+    private string? GetColumnWidthStyle(IVekDataGridColumn<TItem, RenderFragment> column)
     {
         var widthStyle = column.Width is int width ? $"width: {width}px;" : null;
         var minWidthStyle = column.MinWidth > 0 ? $"min-width: {column.MinWidth}px;" : null;
@@ -381,7 +379,7 @@ public partial class VekDataGrid<TItem> : IDisposable
         => string.Join(' ', new[] { GetColumnDragClass(key), HeaderClass?.Invoke(key) }
             .Where(value => !string.IsNullOrWhiteSpace(value)));
 
-    private string? GetCellStyle(TItem item, IVekDataGridColumn<TItem> column, int index)
+    private string? GetCellStyle(TItem item, IVekDataGridColumn<TItem, RenderFragment> column, int index)
         => string.Concat(GetColumnWidthStyle(column), CellStyle?.Invoke(item, column.Key, index));
 
     private int GetRowIndex(TItem item)
@@ -393,7 +391,7 @@ public partial class VekDataGrid<TItem> : IDisposable
         if (itemIndex < 0) itemIndex = 0;
         return ServerVirtualData is not null
             ? _virtualServerStartIndex + itemIndex
-            : ServerData is not null ? ((_currentPage - 1) * EffectivePageSize) + itemIndex : itemIndex;
+            : ServerData is not null ? ((_engine.Page - 1) * EffectivePageSize) + itemIndex : itemIndex;
     }
 
     private IReadOnlyList<ColumnGroupSegment> GetColumnGroupSegments()
@@ -432,7 +430,7 @@ public partial class VekDataGrid<TItem> : IDisposable
 
     private VekDataGridCellContext<TItem> CreateCellActionsContext(
         TItem item,
-        IVekDataGridColumn<TItem> column,
+        IVekDataGridColumn<TItem, RenderFragment> column,
         int rowIndex) => new(
             item,
             column.Key,
@@ -540,8 +538,8 @@ public partial class VekDataGrid<TItem> : IDisposable
     [Parameter]
     public int CurrentPage
     {
-        get => _currentPage;
-        set => _currentPage = Math.Max(value, 1);
+        get => _engine.Page;
+        set => _engine.Page = Math.Max(value, 1);
     }
 
     /// <summary>Gets or sets the available choices in the rows-per-page selector.</summary>
@@ -689,30 +687,21 @@ public partial class VekDataGrid<TItem> : IDisposable
     /// <summary>
     /// Gets the current page, sort, and filter state of this grid.
     /// </summary>
-    public VekDataGridState<TItem> CurrentState => new(
-        _currentPage,
-        EffectivePageSize,
-        GetSortState(),
-        _filters.ToArray());
+    public VekDataGridState<TItem> CurrentState
+    {
+        get
+        {
+            SyncCoreState();
+            var request = _engine.CreateServerRequest();
+            return new VekDataGridState<TItem>(request.Page, request.PageSize, request.Sorts, request.Filters);
+        }
+    }
 
     /// <summary>Applies or replaces the filter for a column and resets the current page.</summary>
     public async Task ApplyFilterAsync(string columnKey, VekDataGridFilterOperator op, object? value, bool? caseSensitive = null)
     {
-        _filters.RemoveAll(filter => filter.ColumnKey == columnKey);
-        if (op is not VekDataGridFilterOperator.IsNull and not VekDataGridFilterOperator.IsNotNull
-            and not VekDataGridFilterOperator.IsEmpty and not VekDataGridFilterOperator.IsNotEmpty
-            && value is null or "")
-        {
-            _currentPage = 1;
-            await FilterChanged.InvokeAsync(_filters.ToArray());
-            await NotifySelectionAfterFilteringAsync();
-            await ReloadAfterStateChangeAsync();
-            return;
-        }
-
-        _filters.Add(new VekDataGridFilter(columnKey, op, value, caseSensitive ?? FilterCaseSensitive));
-        _currentPage = 1;
-        await FilterChanged.InvokeAsync(_filters.ToArray());
+        _engine.ApplyFilter(columnKey, op, value, caseSensitive ?? FilterCaseSensitive);
+        await FilterChanged.InvokeAsync(_engine.Filters.ToArray());
         await NotifySelectionAfterFilteringAsync();
         await ReloadAfterStateChangeAsync();
     }
@@ -720,10 +709,8 @@ public partial class VekDataGrid<TItem> : IDisposable
     /// <summary>Clears one column filter or all filters when no key is supplied.</summary>
     public async Task ClearFilterAsync(string? columnKey = null)
     {
-        if (columnKey is null) _filters.Clear();
-        else _filters.RemoveAll(filter => filter.ColumnKey == columnKey);
-        _currentPage = 1;
-        await FilterChanged.InvokeAsync(_filters.ToArray());
+        _engine.RemoveFilter(columnKey);
+        await FilterChanged.InvokeAsync(_engine.Filters.ToArray());
         await NotifySelectionAfterFilteringAsync();
         await ReloadAfterStateChangeAsync();
     }
@@ -734,7 +721,7 @@ public partial class VekDataGrid<TItem> : IDisposable
     /// <summary>Clears every active sort and notifies bound consumers.</summary>
     public async Task ClearSortAsync()
     {
-        _sorts.Clear();
+        _engine.SetSorts(Array.Empty<VekDataGridSort>());
         await SortChanged.InvokeAsync(Array.Empty<VekDataGridSort>());
         await ReloadAfterStateChangeAsync();
     }
@@ -742,41 +729,45 @@ public partial class VekDataGrid<TItem> : IDisposable
     /// <summary>Reloads the current data source or rerenders local items.</summary>
     public Task ReloadAsync() => ReloadAfterStateChangeAsync();
 
-    internal string? GetFilterValue(string key) => _filters.FirstOrDefault(filter => filter.ColumnKey == key)?.Value?.ToString();
+    internal string? GetFilterValue(string key) => _engine.Filters.FirstOrDefault(filter => filter.ColumnKey == key)?.Value?.ToString();
 
-    internal Task ApplyTextFilter(IVekDataGridColumn<TItem> column, string? value) =>
+    internal Task ApplyTextFilter(IVekDataGridColumn<TItem, RenderFragment> column, string? value) =>
         ApplyFilterAsync(column.Key, column.FilterOperator, value);
 
-    internal Task ClearColumnFilter(IVekDataGridColumn<TItem> column) => ClearFilterAsync(column.Key);
+    internal Task ClearColumnFilter(IVekDataGridColumn<TItem, RenderFragment> column) => ClearFilterAsync(column.Key);
 
     /// <summary>Gets whether an item can currently be selected.</summary>
     public bool CanSelectItem(TItem item) => SelectionMode != VekDataGridSelectionMode.None
         && (IsRowSelectable?.Invoke(item) ?? true);
 
     /// <summary>Gets whether an item is selected using the configured comparer.</summary>
-    public bool IsItemSelected(TItem item) => SelectedItems.Any(selected => ItemComparer.Equals(selected, item));
+    public bool IsItemSelected(TItem item)
+    {
+        SyncCoreSelection();
+        return _engine.IsSelected(item);
+    }
 
     /// <summary>Toggles selection for one row and invokes the appropriate binding callbacks.</summary>
     public async Task ToggleSelectionAsync(TItem item, bool selected)
     {
         if (!CanSelectItem(item)) return;
 
-        if (SelectionMode == VekDataGridSelectionMode.Single)
+        SyncCoreSelection();
+        if (_engine.IsSelected(item) != selected)
         {
-            SelectedItem = selected ? item : default;
-            SelectedItems = selected ? new[] { item } : Array.Empty<TItem>();
-            await SelectedItemChanged.InvokeAsync(SelectedItem);
+            _engine.ToggleSelection(item, SelectionMode);
         }
-        else if (SelectionMode == VekDataGridSelectionMode.Multiple)
-        {
-            var selectedItems = SelectedItems.ToList();
-            selectedItems.RemoveAll(existing => ItemComparer.Equals(existing, item));
-            if (selected) selectedItems.Add(item);
-            SelectedItems = selectedItems;
-            SelectedItem = selectedItems.FirstOrDefault();
-            await SelectedItemsChanged.InvokeAsync(SelectedItems);
-            await SelectedItemChanged.InvokeAsync(SelectedItem);
-        }
+
+        var currentItems = ServerData is null ? Items : _serverItems;
+        SelectedItems = SelectedItems
+            .Concat(currentItems)
+            .Append(item)
+            .Distinct(ItemComparer)
+            .Where(_engine.IsSelected)
+            .ToArray();
+        SelectedItem = SelectedItems.FirstOrDefault();
+        await SelectedItemsChanged.InvokeAsync(SelectedItems);
+        await SelectedItemChanged.InvokeAsync(SelectedItem);
 
         await InvokeAsync(StateHasChanged);
     }
@@ -801,14 +792,22 @@ public partial class VekDataGrid<TItem> : IDisposable
     /// <summary>Selects or clears all selectable rows on the current page.</summary>
     public async Task ToggleAllVisibleItemsAsync(bool selected)
     {
-        foreach (var item in GetPageItems().Where(CanSelectItem))
+        SyncCoreSelection();
+        var visibleItems = GetPageItems().Where(CanSelectItem).ToArray();
+        foreach (var item in visibleItems)
         {
-            var selectedItems = SelectedItems.ToList();
-            selectedItems.RemoveAll(existing => ItemComparer.Equals(existing, item));
-            if (selected) selectedItems.Add(item);
-            SelectedItems = selectedItems;
+            if (_engine.IsSelected(item) != selected)
+            {
+                _engine.ToggleSelection(item, SelectionMode);
+            }
         }
+        SelectedItems = SelectedItems
+            .Concat(visibleItems)
+            .Distinct(ItemComparer)
+            .Where(_engine.IsSelected)
+            .ToArray();
         SelectedItem = SelectedItems.FirstOrDefault();
+        SyncCoreSelection();
         await SelectedItemsChanged.InvokeAsync(SelectedItems);
         await SelectedItemChanged.InvokeAsync(SelectedItem);
         await InvokeAsync(StateHasChanged);
@@ -836,6 +835,9 @@ public partial class VekDataGrid<TItem> : IDisposable
 
     private IEqualityComparer<TItem> ItemComparer => SelectionComparer ?? EqualityComparer<TItem>.Default;
 
+    private void SyncCoreSelection() => _engine.SetSelectedKeys(
+        SelectedItems.Select(item => item?.GetHashCode().ToString(CultureInfo.InvariantCulture) ?? string.Empty));
+
     /// <summary>Gets whether the row has any editable columns.</summary>
     public bool CanEditRow => EditMode != VekDataGridEditMode.None
         && VisibleColumns.Any(column => column.Editable && column.EditTemplate is not null);
@@ -860,22 +862,41 @@ public partial class VekDataGrid<TItem> : IDisposable
     public Task CancelEditAsync() => CancelActiveEditAsync();
 
     /// <summary>Gets whether the requested item and column are being edited.</summary>
-    private bool IsEditing(TItem item, IVekDataGridColumn<TItem> column) => _isEditing
+    private bool IsEditing(TItem item, IVekDataGridColumn<TItem, RenderFragment> column) => _isEditing
         && ItemComparer.Equals(_editingOriginal!, item)
         && (EditMode != VekDataGridEditMode.Cell || ReferenceEquals(_editingColumn, column));
 
     /// <summary>Gets the active draft template context when the requested cell is being edited.</summary>
-    private VekDataGridEditContext<TItem>? GetEditContext(TItem item, IVekDataGridColumn<TItem> column) =>
-        IsEditing(item, column) ? _activeEditContext : null;
+    private Vek.Core.DataGrid.VekDataGridEditTemplateContext<TItem>? GetEditContext(
+        TItem item,
+        IVekDataGridColumn<TItem, RenderFragment> column) =>
+        IsEditing(item, column)
+            ? new Vek.Core.DataGrid.VekDataGridEditTemplateContext<TItem>(
+                _editingDraft!,
+                Culture ?? CultureInfo.CurrentCulture,
+                UpdateEditDraft,
+                CommitActiveEditAsync,
+                CancelActiveEditAsync)
+            : null;
+
+    internal VekDataGridEditContext<TItem> CreateBlazorEditContext(
+        Vek.Core.DataGrid.VekDataGridEditTemplateContext<TItem> context) => new(
+            context.Item,
+            _editContext ?? new EditContext(context.Item!),
+            context.UpdateItem,
+            context.CommitAsync,
+            context.CancelAsync,
+            context.Culture);
 
     /// <summary>Starts editing a row or a single cell using an isolated draft.</summary>
-    private async Task StartEditAsync(TItem item, IVekDataGridColumn<TItem>? column = null)
+    private async Task StartEditAsync(TItem item, IVekDataGridColumn<TItem, RenderFragment>? column = null)
     {
         if (!CanEditRow || _isEditing || (EditMode == VekDataGridEditMode.Cell && (column is null || !column.Editable)))
             return;
 
         _editingOriginal = item;
         _editingDraft = CloneItem is null ? CloneByMemberwiseCopy(item) : CloneItem(item);
+        _engine.BeginEdit(_editingOriginal, _editingDraft);
         _editingColumn = column;
         _isEditing = true;
         _editContext = new EditContext(_editingDraft!);
@@ -891,6 +912,7 @@ public partial class VekDataGrid<TItem> : IDisposable
     {
         if (!_isEditing) return;
         _editingDraft = item;
+        _engine.UpdateDraft(item);
         _editContext = new EditContext(item!);
         _activeEditContext = new VekDataGridEditContext<TItem>(
             item, _editContext, UpdateEditDraft, CommitActiveEditAsync, CancelActiveEditAsync,
@@ -910,8 +932,10 @@ public partial class VekDataGrid<TItem> : IDisposable
         if (!_isEditing || _editingDraft is null || _editContext is null || !_editContext.Validate()) return false;
         if (CommitEdit is not null && !await CommitEdit(_editingDraft)) return false;
 
+        if (!await _engine.CommitEditAsync()) return false;
+
         await ItemCommitted.InvokeAsync(_editingDraft);
-        ClearEditState();
+        ClearEditState(cancelCoreEdit: false);
         await InvokeAsync(StateHasChanged);
         return true;
     }
@@ -924,8 +948,9 @@ public partial class VekDataGrid<TItem> : IDisposable
         await InvokeAsync(StateHasChanged);
     }
 
-    private void ClearEditState()
+    private void ClearEditState(bool cancelCoreEdit = true)
     {
+        if (cancelCoreEdit) _engine.CancelEdit();
         _editingOriginal = default;
         _editingDraft = default;
         _editingColumn = null;
@@ -976,6 +1001,11 @@ public partial class VekDataGrid<TItem> : IDisposable
         IsRowExpanded(item),
         () => ToggleRowDetailsAsync(item));
 
+    private Vek.Core.DataGrid.VekDataGridRowDetailContext<TItem> CreateCoreRowDetailContext(TItem item) => new(
+        item,
+        IsRowExpanded(item),
+        () => ToggleRowDetailsAsync(item));
+
     private RenderFragment RenderRowDetails(TItem item) => builder =>
     {
         var detailTemplate = VisibleColumns.FirstOrDefault(column => column.IsHierarchyColumn)?.DetailTemplate;
@@ -985,7 +1015,7 @@ public partial class VekDataGrid<TItem> : IDisposable
         builder.AddAttribute(2, "data-for-row", GetRowLabel(item));
         builder.OpenElement(3, "td");
         builder.AddAttribute(4, "colspan", VisibleColumnCount);
-        builder.AddContent(5, detailTemplate(CreateRowDetailContext(item)));
+        builder.AddContent(5, detailTemplate(CreateCoreRowDetailContext(item)));
         builder.CloseElement();
         builder.CloseElement();
     };
@@ -994,7 +1024,13 @@ public partial class VekDataGrid<TItem> : IDisposable
         ? _virtualServerItems.ToList()
         : ServerData is not null
             ? _serverItems.ToList()
-            : GetSortedItems().Skip((_currentPage - 1) * EffectivePageSize).Take(EffectivePageSize).ToList();
+            : GetCorePageItems();
+
+    private List<TItem> GetCorePageItems()
+    {
+        SyncCoreState();
+        return _engine.GetLocalData(Items.Where(item => QuickFilter?.Invoke(item) ?? true)).Items.ToList();
+    }
 
     private IReadOnlyList<TItem> GetCurrentItems() => ServerVirtualData is not null
         ? _virtualServerItems
@@ -1113,52 +1149,65 @@ public partial class VekDataGrid<TItem> : IDisposable
         builder.AddContent(sequence, RenderRowDetails(item));
     };
 
-    private IReadOnlyList<(VekDataGridGroupDefinition Definition, IVekDataGridColumn<TItem> Column, Func<TItem, object?> Selector)> EffectiveGroups => GroupBy
+    private IReadOnlyList<(VekDataGridGroupDefinition Definition, IVekDataGridColumn<TItem, RenderFragment> Column, Func<TItem, object?> Selector)> EffectiveGroups => GroupBy
         .Select(definition => (Definition: definition, Column: _columns.FirstOrDefault(column => column.Key == definition.ColumnKey)))
         .Where(pair => pair.Column?.Groupable == true && pair.Column.GroupBy is not null)
         .Select(pair => (pair.Definition, pair.Column!, pair.Column!.GroupBy!))
         .ToArray();
 
-    private List<GroupNode> BuildGroupNodes(IEnumerable<TItem> items, int level, string parentPath)
+    private List<GroupNode> BuildGroupNodes(IEnumerable<TItem> items)
     {
         var definitions = EffectiveGroups;
-        if (level >= definitions.Count) return [];
-        var (definition, column, selector) = definitions[level];
-        var groups = items.GroupBy(selector)
-            .OrderBy(group => group.Key, Comparer<object?>.Create(CompareGroupValues))
+        if (definitions.Count == 0)
+        {
+            _engine.SetKnownGroupKeys(Array.Empty<string>());
+            return [];
+        }
+        SyncCoreState();
+        _engine.SetGroups(definitions.Select(group => group.Definition));
+        var groups = _engine.ComputeGroups(items)
+            .Select(group => CreateGroupNode(group, definitions, 0))
             .ToList();
-        if (definition.SortOrder == VekDataGridGroupSortOrder.Descending) groups.Reverse();
-        return groups.Select(group => new GroupNode(
-            definition,
-            column,
-            group.Key,
-            group.ToArray(),
-            level,
-            $"{parentPath}/{column.Key}:{group.Key?.ToString()?.Length ?? 0}:{group.Key}"))
-            .ToList();
+        _engine.SetKnownGroupKeys(EnumerateGroupKeys(groups));
+        return groups;
     }
 
-    private int CompareGroupValues(object? left, object? right)
+    private static IEnumerable<string> EnumerateGroupKeys(IEnumerable<GroupNode> groups) => groups
+        .SelectMany(group => new[] { group.Path }.Concat(EnumerateGroupKeys(group.Children)));
+
+    private GroupNode CreateGroupNode(
+        Vek.Core.DataGrid.VekDataGridGroup<TItem> group,
+        IReadOnlyList<(VekDataGridGroupDefinition Definition, IVekDataGridColumn<TItem, RenderFragment> Column, Func<TItem, object?> Selector)> definitions,
+        int level)
     {
-        if (ReferenceEquals(left, right)) return 0;
-        if (left is null) return -1;
-        if (right is null) return 1;
-        if (left is string leftText && right is string rightText)
-            return StringComparer.Create(Culture ?? CultureInfo.CurrentCulture, ignoreCase: false).Compare(leftText, rightText);
-        return left is IComparable comparable ? comparable.CompareTo(right) :
-            StringComparer.Create(Culture ?? CultureInfo.CurrentCulture, ignoreCase: false).Compare(left.ToString(), right.ToString());
+        var (definition, column, _) = definitions[level];
+        var path = group.Key;
+        var children = (group.Children ?? Array.Empty<Vek.Core.DataGrid.VekDataGridGroup<TItem>>())
+            .Select(child => CreateGroupNode(child, definitions, level + 1))
+            .ToArray();
+        return new GroupNode(definition, column, group.Value, group.Items, level, path, children);
     }
 
-    private bool IsGroupExpanded(string path) => !_collapsedGroups.Contains(path);
+    private bool IsGroupExpanded(string path) => _engine.IsGroupExpanded(path);
 
     private async Task ToggleGroupAsync(string path)
     {
-        if (!_collapsedGroups.Add(path)) _collapsedGroups.Remove(path);
+        _engine.SetGroupExpanded(path, !_engine.IsGroupExpanded(path));
         await GroupChanged.InvokeAsync(GroupBy);
         await InvokeAsync(StateHasChanged);
     }
 
     private VekDataGridGroupContext<TItem> CreateGroupContext(GroupNode node) => new(
+        node.Column.Key,
+        node.Column.Title,
+        node.Value,
+        node.Level,
+        node.Items,
+        IsGroupExpanded(node.Path),
+        () => ToggleGroupAsync(node.Path),
+        ComputeAggregates(node.Items, VekDataGridAggregateScope.Group));
+
+    private Vek.Core.DataGrid.VekDataGridGroupContext<TItem> CreateCoreGroupContext(GroupNode node) => new(
         node.Column.Key,
         node.Column.Title,
         node.Value,
@@ -1176,47 +1225,10 @@ public partial class VekDataGrid<TItem> : IDisposable
 
     private IReadOnlyList<VekDataGridAggregateResult> ComputeAggregates(
         IReadOnlyList<TItem> items,
-        VekDataGridAggregateScope scope) => Aggregates
-        .Where(definition => definition.Scope == VekDataGridAggregateScope.Both || definition.Scope == scope)
-        .Select(definition => ComputeAggregate(definition, items))
-        .ToArray();
-
-    private VekDataGridAggregateResult ComputeAggregate(VekDataGridAggregateDefinition<TItem> definition, IReadOnlyList<TItem> items)
+        VekDataGridAggregateScope scope)
     {
-        var column = _columns.FirstOrDefault(candidate => candidate.Key == definition.ColumnKey);
-        var selector = definition.Selector ?? column?.AggregateBy;
-        if (selector is null)
-            return new VekDataGridAggregateResult(definition.Key, definition.Key, null, string.Empty);
-
-        var values = items.Select(selector).ToArray();
-        var nonNullValues = values.Where(value => value is not null).ToArray();
-        object? result = definition.Type switch
-        {
-            VekDataGridAggregateType.Count => nonNullValues.Length,
-            VekDataGridAggregateType.Custom => definition.CustomAggregate?.Invoke(values),
-            VekDataGridAggregateType.Sum => NumericValues(nonNullValues).Sum(),
-            VekDataGridAggregateType.Average => NumericValues(nonNullValues) is { Length: > 0 } numbers ? numbers.Average() : null,
-            VekDataGridAggregateType.Min => nonNullValues.OrderBy(value => value, Comparer<object?>.Create(CompareGroupValues)).FirstOrDefault(),
-            VekDataGridAggregateType.Max => nonNullValues.OrderBy(value => value, Comparer<object?>.Create(CompareGroupValues)).LastOrDefault(),
-            _ => null
-        };
-
-        var formatted = result is IFormattable formattable && definition.Format is not null
-            ? formattable.ToString(definition.Format, Culture ?? CultureInfo.CurrentCulture) ?? string.Empty
-            : Convert.ToString(result, Culture ?? CultureInfo.CurrentCulture) ?? string.Empty;
-        return new VekDataGridAggregateResult(definition.Key, definition.Key, result, formatted);
-    }
-
-    private decimal[] NumericValues(IEnumerable<object?> values)
-    {
-        try
-        {
-            return values.Select(value => Convert.ToDecimal(value, Culture ?? CultureInfo.CurrentCulture)).ToArray();
-        }
-        catch (Exception exception) when (exception is FormatException or InvalidCastException or OverflowException)
-        {
-            return [];
-        }
+        SyncCoreState();
+        return _engine.ComputeAggregates(items, scope);
     }
 
     private RenderFragment RenderAggregate(VekDataGridAggregateResult result, IReadOnlyList<TItem> items) => builder =>
@@ -1254,7 +1266,7 @@ public partial class VekDataGrid<TItem> : IDisposable
             builder.AddContent(sequence++, context.Expanded ? "−" : "+");
             builder.CloseElement();
             if (group.Column.GroupTemplate is not null)
-                builder.AddContent(sequence++, group.Column.GroupTemplate(context));
+                builder.AddContent(sequence++, group.Column.GroupTemplate(CreateCoreGroupContext(group)));
             else
                 builder.AddContent(sequence++, $"{group.Column.Title}: {group.Value ?? "(empty)"} ({group.Items.Count}) ");
             foreach (var aggregate in context.Aggregates)
@@ -1266,8 +1278,7 @@ public partial class VekDataGrid<TItem> : IDisposable
 
             if (context.Expanded)
             {
-                var nested = BuildGroupNodes(group.Items, group.Level + 1, group.Path);
-                builder.AddContent(sequence++, nested.Count > 0 ? RenderGroupRows(nested) : RenderDataRows(group.Items));
+                builder.AddContent(sequence++, group.Children.Count > 0 ? RenderGroupRows(group.Children) : RenderDataRows(group.Items));
             }
         }
     };
@@ -1367,7 +1378,7 @@ public partial class VekDataGrid<TItem> : IDisposable
         ? PageSize
         : ServerData is not null
             ? 10
-            : Math.Max(TotalItems, 1);
+            : Math.Max(Items.Count(), 1);
 
     /// <summary>Clamps the current page when incoming data or parameters reduce the page count.</summary>
     protected override async Task OnParametersSetAsync()
@@ -1415,10 +1426,10 @@ public partial class VekDataGrid<TItem> : IDisposable
         }
 
         var lastPage = GetTotalPages(TotalItems);
-        if (_currentPage > lastPage)
+        if (_engine.Page > lastPage)
         {
-            _currentPage = lastPage;
-            await CurrentPageChanged.InvokeAsync(_currentPage);
+            _engine.Page = lastPage;
+            await CurrentPageChanged.InvokeAsync(_engine.Page);
         }
 
         var selectionChanged = ReconcileSelection();
@@ -1470,7 +1481,11 @@ public partial class VekDataGrid<TItem> : IDisposable
         return changed;
     }
 
-    private bool MatchesCurrentFilters(TItem item) => (QuickFilter?.Invoke(item) ?? true) && MatchesFilters(item);
+    private bool MatchesCurrentFilters(TItem item)
+    {
+        SyncCoreState();
+        return (QuickFilter?.Invoke(item) ?? true) && _engine.MatchesFilters(item);
+    }
 
     private async Task NotifySelectionAfterFilteringAsync()
     {
@@ -1482,7 +1497,7 @@ public partial class VekDataGrid<TItem> : IDisposable
     }
 
     /// <summary>Gets the total item count after filtering and before paging.</summary>
-    internal void RegisterColumn(IVekDataGridColumn<TItem> column)
+    internal void RegisterColumn(IVekDataGridColumn<TItem, RenderFragment> column)
     {
         if (_columns.Contains(column))
         {
@@ -1490,21 +1505,29 @@ public partial class VekDataGrid<TItem> : IDisposable
         }
 
         _columns.Add(column);
+        RegisterCoreColumn(column);
         _ = InvokeAsync(StateHasChanged);
     }
 
-    internal void UnregisterColumn(IVekDataGridColumn<TItem> column)
+    private void RegisterCoreColumn(IVekDataGridColumn<TItem, RenderFragment> column)
+    {
+        _engine.AddOrUpdateColumn(column);
+    }
+
+    internal void UnregisterColumn(IVekDataGridColumn<TItem, RenderFragment> column)
     {
         if (_columns.Remove(column))
         {
+            _engine.RemoveColumn(column.Key);
             _ = InvokeAsync(StateHasChanged);
         }
     }
 
-    internal void RefreshColumn(IVekDataGridColumn<TItem> column)
+    internal void RefreshColumn(IVekDataGridColumn<TItem, RenderFragment> column)
     {
         if (_columns.Contains(column))
         {
+            RegisterCoreColumn(column);
             _ = InvokeAsync(StateHasChanged);
         }
     }
@@ -1512,81 +1535,28 @@ public partial class VekDataGrid<TItem> : IDisposable
     private List<TItem> GetSortedItems()
     {
         if (ServerData is not null) return _serverItems.ToList();
-        var items = Items?.Where(item => QuickFilter?.Invoke(item) ?? true)
-            .Where(MatchesFilters).ToList() ?? [];
-        if (_sorts.Count == 0)
-        {
-            return items;
-        }
-
-        var comparer = Comparer<TItem>.Create(CompareByActiveSorts);
-        return items.OrderBy(item => item, comparer).ToList();
+        SyncCoreState();
+        return _engine.GetFilteredAndSortedItems(Items.Where(item => QuickFilter?.Invoke(item) ?? true)).ToList();
     }
 
-    private bool MatchesFilters(TItem item)
+    private void SyncCoreState()
     {
-        foreach (var filter in _filters)
-        {
-            var column = _columns.FirstOrDefault(candidate => candidate.Key == filter.ColumnKey);
-            var selector = column?.FilterBy;
-            if (selector is null || !MatchesValue(selector(item), filter)) return false;
-        }
-        return true;
+        foreach (var column in _columns) RegisterCoreColumn(column);
+        _engine.SetPage(_engine.Page, EffectivePageSize);
+        _engine.Culture = Culture ?? CultureInfo.CurrentCulture;
+        _engine.SetGroups(GroupBy);
+        _engine.SetAggregates(Aggregates.Select(definition =>
+            (Vek.Core.DataGrid.VekDataGridAggregateDefinition<TItem>)definition));
+        _engine.SetSelectedKeys(SelectedItems.Select(item => item?.GetHashCode().ToString(CultureInfo.InvariantCulture) ?? string.Empty));
     }
 
-    private bool MatchesValue(object? source, VekDataGridFilter filter)
-    {
-        if (filter.Operator == VekDataGridFilterOperator.IsNull) return source is null;
-        if (filter.Operator == VekDataGridFilterOperator.IsNotNull) return source is not null;
-        if (filter.Operator == VekDataGridFilterOperator.IsEmpty) return source is null || source is string { Length: 0 };
-        if (filter.Operator == VekDataGridFilterOperator.IsNotEmpty) return source is not null && source is not string { Length: 0 };
-        if (source is null || filter.Value is null) return filter.Operator == VekDataGridFilterOperator.NotEquals && source != filter.Value;
-        if (source is string sourceText)
-        {
-            var value = Convert.ToString(filter.Value, Culture ?? CultureInfo.CurrentCulture) ?? string.Empty;
-            var compareOptions = filter.CaseSensitive ? CompareOptions.None : CompareOptions.IgnoreCase;
-            var compareInfo = (Culture ?? CultureInfo.CurrentCulture).CompareInfo;
-            return filter.Operator switch
-            {
-                VekDataGridFilterOperator.Equals => compareInfo.Compare(sourceText, value, compareOptions) == 0,
-                VekDataGridFilterOperator.NotEquals => compareInfo.Compare(sourceText, value, compareOptions) != 0,
-                VekDataGridFilterOperator.StartsWith => compareInfo.IsPrefix(sourceText, value, compareOptions),
-                VekDataGridFilterOperator.EndsWith => compareInfo.IsSuffix(sourceText, value, compareOptions),
-                _ => compareInfo.IndexOf(sourceText, value, compareOptions) >= 0
-            };
-        }
-
-        int result;
-        try
-        {
-            result = source is IComparable comparable
-                ? comparable.CompareTo(Convert.ChangeType(filter.Value, source.GetType(), Culture ?? CultureInfo.CurrentCulture))
-                : Equals(source, filter.Value) ? 0 : -1;
-        }
-        catch (Exception exception) when (exception is FormatException or InvalidCastException or OverflowException or ArgumentException)
-        {
-            return false;
-        }
-        return filter.Operator switch
-        {
-            VekDataGridFilterOperator.Equals => result == 0,
-            VekDataGridFilterOperator.NotEquals => result != 0,
-            VekDataGridFilterOperator.GreaterThan => result > 0,
-            VekDataGridFilterOperator.GreaterThanOrEqual => result >= 0,
-            VekDataGridFilterOperator.LessThan => result < 0,
-            VekDataGridFilterOperator.LessThanOrEqual => result <= 0,
-            _ => false
-        };
-    }
-
-    private int GetTotalPages(int itemCount) => itemCount == 0
-        ? 1
-        : (itemCount - 1) / EffectivePageSize + 1;
+    private int GetTotalPages(int itemCount) => _engine.GetPageCount(itemCount, EffectivePageSize);
 
     private async Task SetCurrentPageAsync(int page)
     {
-        _currentPage = Math.Clamp(page, 1, GetTotalPages(TotalItems));
-        await CurrentPageChanged.InvokeAsync(_currentPage);
+        _engine.Page = Math.Clamp(page, 1, GetTotalPages(TotalItems));
+        _engine.SetPage(_engine.Page, EffectivePageSize);
+        await CurrentPageChanged.InvokeAsync(_engine.Page);
         await ReloadAfterStateChangeAsync();
     }
 
@@ -1600,9 +1570,10 @@ public partial class VekDataGrid<TItem> : IDisposable
     {
         if (pageSize < 1) return;
         PageSize = pageSize;
-        _currentPage = 1;
+        _engine.Page = 1;
+        _engine.SetPage(_engine.Page, pageSize);
         await PageSizeChanged.InvokeAsync(pageSize);
-        await CurrentPageChanged.InvokeAsync(_currentPage);
+        await CurrentPageChanged.InvokeAsync(_engine.Page);
         await ReloadAfterStateChangeAsync();
     }
 
@@ -1613,9 +1584,9 @@ public partial class VekDataGrid<TItem> : IDisposable
         SetCurrentPageAsync,
         SetPageSizeAsync);
 
-    private string GetAriaSort(IVekDataGridColumn<TItem> column)
+    private string GetAriaSort(IVekDataGridColumn<TItem, RenderFragment> column)
     {
-        var activeSort = _sorts.FirstOrDefault(sort => ReferenceEquals(sort.Column, column));
+        var activeSort = _engine.Sorts.FirstOrDefault(sort => string.Equals(sort.ColumnKey, column.Key, StringComparison.Ordinal));
         if (activeSort is null)
         {
             return "none";
@@ -1624,90 +1595,39 @@ public partial class VekDataGrid<TItem> : IDisposable
         return activeSort.Direction == VekSortDirection.Ascending ? "ascending" : "descending";
     }
 
-    private int? GetSortPriority(IVekDataGridColumn<TItem> column)
+    private int? GetSortPriority(IVekDataGridColumn<TItem, RenderFragment> column)
     {
-        var index = _sorts.FindIndex(sort => ReferenceEquals(sort.Column, column));
-        return index < 0 ? null : index + 1;
+        var sort = _engine.Sorts.FirstOrDefault(sort => string.Equals(sort.ColumnKey, column.Key, StringComparison.Ordinal));
+        return sort is null ? null : _engine.Sorts.ToList().IndexOf(sort) + 1;
     }
 
-    private string GetSortIndicator(IVekDataGridColumn<TItem> column)
+    private string GetSortIndicator(IVekDataGridColumn<TItem, RenderFragment> column)
     {
-        var sort = _sorts.First(activeSort => ReferenceEquals(activeSort.Column, column));
+        var sort = _engine.Sorts.First(activeSort => string.Equals(activeSort.ColumnKey, column.Key, StringComparison.Ordinal));
         var arrow = sort.Direction == VekSortDirection.Ascending ? "\u2191" : "\u2193";
         return SortMode == VekDataGridSortMode.Multiple
             ? $"{arrow}{GetSortPriority(column)}"
             : arrow;
     }
 
-    private async Task SortBy(IVekDataGridColumn<TItem> column, MouseEventArgs args)
+    private async Task SortBy(IVekDataGridColumn<TItem, RenderFragment> column, MouseEventArgs args)
     {
         if (SortMode == VekDataGridSortMode.None || !column.Sortable)
         {
             return;
         }
 
-        var index = _sorts.FindIndex(sort => ReferenceEquals(sort.Column, column));
-        if (args.AltKey && SortMode == VekDataGridSortMode.Multiple)
-        {
-            if (index >= 0)
-            {
-                _sorts.RemoveAt(index);
-            }
-        }
-        else
-        {
-            if (index >= 0)
-            {
-                var current = _sorts[index];
-                if (AllowUnsorted && current.Direction == VekSortDirection.Descending)
-                {
-                    _sorts.RemoveAt(index);
-                }
-                else
-                {
-                    _sorts[index] = current with
-                    {
-                        Direction = current.Direction == VekSortDirection.Ascending
-                            ? VekSortDirection.Descending
-                            : VekSortDirection.Ascending
-                    };
-                }
-            }
-            else
-            {
-                if (SortMode == VekDataGridSortMode.Single || !args.CtrlKey)
-                {
-                    _sorts.Clear();
-                }
-
-                _sorts.Add(new ActiveSort(column, VekSortDirection.Ascending));
-            }
-        }
-
-        _currentPage = 1;
+        _engine.ApplySortInteraction(
+            column.Key,
+            SortMode,
+            AllowUnsorted,
+            removeSort: args.AltKey,
+            preserveExistingSorts: args.CtrlKey);
+        _engine.Page = 1;
         await SortChanged.InvokeAsync(GetSortState());
         await ReloadAfterStateChangeAsync();
     }
 
-    private int CompareByActiveSorts(TItem left, TItem right)
-    {
-        foreach (var sort in _sorts)
-        {
-            var comparison = sort.Column.CompareItems(left, right);
-            if (comparison != 0)
-            {
-                return sort.Direction == VekSortDirection.Ascending ? comparison : -comparison;
-            }
-        }
-
-        return 0;
-    }
-
-    private IReadOnlyList<VekDataGridSort> GetSortState() => _sorts
-        .Select((sort, index) => new VekDataGridSort(
-            sort.Column.Key,
-            sort.Direction,
-            index + 1))
-        .ToArray();
+    private IReadOnlyList<VekDataGridSort> GetSortState() => _engine.Sorts;
 
 }
