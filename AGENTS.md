@@ -28,6 +28,25 @@ Before carrying out work covered by a guide below, read and follow that guide. I
 - Put namespaces shared by C# files in the project-level `GlobalUsings.cs` file with `global using` directives instead of repeating file-local `using` directives.
 - When a namespace is needed in both Razor markup and C# files, add it to both central import locations; Razor `@using` directives do not apply to standalone C# files.
 
+## File Headers
+
+- Every new, hand-authored, project-maintained text file must begin with a file-appropriate comment header identifying this project's copyright holder and MIT license, followed by its original creation date in `YYYY-MM-DD` format.
+- Use this content, adapting only the comment syntax required by the file format:
+  ```text
+  Copyright (c) <creation year> AMIN SABAGHI
+  Licensed under the MIT License. See the LICENSE file in the project root for more information.
+  Created: <YYYY-MM-DD>
+  ```
+- For example, a C# file created on 2026-11-01 starts with:
+  ```csharp
+  // Copyright (c) 2026 AMIN SABAGHI
+  // Licensed under the MIT License. See the LICENSE file in the project root for more information.
+  // Created: 2026-11-01
+  ```
+- Use the equivalent valid comment form for the file type (for example, `<!-- ... -->` for HTML or Razor, `/* ... */` for CSS, and `# ...` for shell or Python). Keep the header at the beginning of the file, before code or content.
+- Record the file's original creation date and do not change it when editing the file later. Use the current local date when creating a new file.
+- Do not add this header to binary files, generated files, vendored or third-party files, lockfiles, or formats that do not support comments without changing their meaning or validity.
+
 ## C# File Organization
 
 - Put each top-level class, interface, and record declaration in its own `.cs` file. Do not group these declarations in one source file. Name the file after the type it contains; use a distinguishing suffix when generic arities share a type name.
