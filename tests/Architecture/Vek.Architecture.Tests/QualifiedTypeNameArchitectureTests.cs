@@ -1,12 +1,12 @@
 // Copyright (c) 2026 AMIN SABAGHI
 // Licensed under the MIT License. See the LICENSE file in the project root for more information.
-// Created: 2026-11-01
+// Created: 2026-11-02
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Vek.WPF.Demo.Tests;
+namespace Vek.Architecture.Tests;
 
 /// <summary>
 /// Architecture harness verifying that C# source files do not contain qualified type names (names with dots) in their code definitions,
@@ -55,7 +55,6 @@ public sealed class QualifiedTypeNameArchitectureTests
                 var root = tree.GetRoot();
 
                 // 1. Qualified type names (e.g. System.Windows.Controls.DataGrid or System.Windows.DataTemplate)
-                // Filter out the namespace declaration itself:
                 var qualifiedTypes = root.DescendantNodes()
                     .OfType<QualifiedNameSyntax>()
                     .Where(q => q.Ancestors().All(a => a is not UsingDirectiveSyntax) &&
