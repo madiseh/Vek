@@ -5,7 +5,7 @@ namespace Vek.Components.Components.DataGrid;
 /// </summary>
 /// <typeparam name="TItem">The type of item represented by each row.</typeparam>
 [CascadingTypeParameter(nameof(TItem))]
-public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, RenderFragment>, IVekDataGridQueryObserver
+public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, RenderFragment>
 {
     private readonly List<IVekDataGridColumn<TItem, RenderFragment>> _columns = [];
     private readonly VekDataGridEngine<TItem, RenderFragment> _engine = new();
@@ -701,31 +701,22 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
         }
     }
 
-    async ValueTask IVekDataGridQueryObserver.OnQueryChangedAsync(VekDataGridQueryChange change)
+    async ValueTask IVekDataGridHost<TItem, RenderFragment>.AfterCoreChangeAsync()
     {
         await InvokeAsync(async () =>
         {
-            if (change.HasFlag(VekDataGridQueryChange.Filters))
-            {
-                await FilterChanged.InvokeAsync(_engine.Filters.ToArray());
-                await NotifySelectionAfterFilteringAsync();
-            }
-            if (change.HasFlag(VekDataGridQueryChange.Sorts))
-                await SortChanged.InvokeAsync(_engine.Sorts.ToArray());
-            if (change.HasFlag(VekDataGridQueryChange.PageSize))
-            {
-                PageSize = _engine.PageSize;
-                await PageSizeChanged.InvokeAsync(PageSize);
-            }
-            if (change.HasFlag(VekDataGridQueryChange.Page))
-                await CurrentPageChanged.InvokeAsync(_engine.Page);
-            if (change.HasFlag(VekDataGridQueryChange.Groups))
-            {
-                GroupBy = _engine.Groups.ToArray();
-                await GroupChanged.InvokeAsync(GroupBy);
-            }
+            await FilterChanged.InvokeAsync(_engine.Filters.ToArray());
+            await NotifySelectionAfterFilteringAsync();
             await ReloadAfterStateChangeAsync();
         });
+    }
+
+    /// <summary>Clears every active sort and notifies bound consumers.</summary>
+    public async Task ClearSortAsync()
+    {
+        _engine.SetSorts(Array.Empty<VekDataGridSort>());
+        await SortChanged.InvokeAsync(Array.Empty<VekDataGridSort>());
+        await ReloadAfterStateChangeAsync();
     }
 
     /// <summary>Reloads the current data source or rerenders local items.</summary>
@@ -734,9 +725,9 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
     internal string? GetFilterValue(string key) => _engine.Filters.FirstOrDefault(filter => filter.ColumnKey == key)?.Value?.ToString();
 
     internal Task ApplyTextFilter(IVekDataGridColumn<TItem, RenderFragment> column, string? value) =>
-        this.ApplyFilterAsync(column.Key, column.FilterOperator, value);
+        this.ApplyFilterAsync(column.Key, column.FilterOperator, value).AsTask();
 
-    internal Task ClearColumnFilter(IVekDataGridColumn<TItem, RenderFragment> column) => this.ClearFilterAsync(column.Key);
+    internal Task ClearColumnFilter(IVekDataGridColumn<TItem, RenderFragment> column) => this.RemoveFilterAsync(column.Key).AsTask();
 
     /// <summary>Gets whether an item can currently be selected.</summary>
     public bool CanSelectItem(TItem item) => SelectionMode != VekDataGridSelectionMode.None
@@ -1559,18 +1550,37 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
 
     private int GetTotalPages(int itemCount) => _engine.GetPageCount(itemCount, EffectivePageSize);
 
-    private async Task ChangePageSizeAsync(ChangeEventArgs args)
+    private async Task SetCurrentPageAsync(int page)
     {
-        if (int.TryParse(args.Value?.ToString(), out var pageSize) && pageSize > 0)
-            await this.SetPageSizeAsync(pageSize);
+        _engine.Page = Math.Clamp(page, 1, GetTotalPages(TotalItems));
+        _engine.SetPage(_engine.Page, EffectivePageSize);
+        await CurrentPageChanged.InvokeAsync(_engine.Page);
+        await ReloadAfterStateChangeAsync();
+    }
+
+    private async Task SetPageSizeAsync(ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), out var pageSize)) return;
+        await SetPageSizeAsync(pageSize);
+    }
+
+    private async Task SetPageSizeAsync(int pageSize)
+    {
+        if (pageSize < 1) return;
+        PageSize = pageSize;
+        _engine.Page = 1;
+        _engine.SetPage(_engine.Page, pageSize);
+        await PageSizeChanged.InvokeAsync(pageSize);
+        await CurrentPageChanged.InvokeAsync(_engine.Page);
+        await ReloadAfterStateChangeAsync();
     }
 
     private VekDataGridPagerContext<TItem> CreatePagerContext(int totalItems, int totalPages) => new(
         CurrentState,
         totalItems,
         totalPages,
-        page => this.SetPageAsync(page, TotalItems),
-        size => this.SetPageSizeAsync(size));
+        SetCurrentPageAsync,
+        SetPageSizeAsync);
 
     private string GetAriaSort(IVekDataGridColumn<TItem, RenderFragment> column)
     {
@@ -1605,8 +1615,15 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
             return;
         }
 
-        await this.SortAsync(column.Key, SortMode, AllowUnsorted,
-            removeSort: args.AltKey, preserveExistingSorts: args.CtrlKey);
+        _engine.ApplySortInteraction(
+            column.Key,
+            SortMode,
+            AllowUnsorted,
+            removeSort: args.AltKey,
+            preserveExistingSorts: args.CtrlKey);
+        _engine.Page = 1;
+        await SortChanged.InvokeAsync(GetSortState());
+        await ReloadAfterStateChangeAsync();
     }
 
     private IReadOnlyList<VekDataGridSort> GetSortState() => _engine.Sorts;

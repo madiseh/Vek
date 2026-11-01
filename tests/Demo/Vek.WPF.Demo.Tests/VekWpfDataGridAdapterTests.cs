@@ -124,7 +124,7 @@ public sealed class VekWpfDataGridAdapterTests
     [Fact]
     public async Task AppliesAndClearsCoreFiltersForDisplayedRows()
     {
-        await WpfTestDispatcher.RunAsync(async () =>
+        await await WpfTestDispatcher.RunAsync(async () =>
         {
             var rows = new[] { new TestRow("row-1"), new TestRow("row-2") };
             var grid = new VekDataGrid { ItemsSource = rows };
@@ -134,7 +134,7 @@ public sealed class VekWpfDataGridAdapterTests
 
             Assert.Equal(new[] { rows[1] }, grid.Items.Cast<TestRow>().ToArray());
 
-            await grid.ClearFilterAsync();
+            await grid.RemoveFilterAsync();
 
             Assert.Equal(rows, grid.Items.Cast<TestRow>().ToArray());
         });

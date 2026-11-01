@@ -59,7 +59,7 @@ public sealed class ContextActionsTests : BunitContext
         await cut.Instance.ApplyFilterAsync("Name", VekDataGridFilterOperator.Contains, "Desk");
         Assert.Single(cut.FindAll("tbody tr"));
 
-        await cut.Instance.ClearFiltersAsync();
+        await cut.Instance.RemoveFilterAsync();
         await cut.Instance.ClearSortAsync();
         Assert.Empty(cut.Instance.CurrentState.Filters);
         Assert.Empty(cut.Instance.CurrentState.Sorts);

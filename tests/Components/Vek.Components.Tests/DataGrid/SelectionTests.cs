@@ -118,7 +118,7 @@ public sealed class SelectionTests : BunitContext
             filteredSelectionMode: VekDataGridFilteredSelectionMode.Clear);
         cut.Find("tbody tr:nth-child(1) input[type=checkbox]").Change(true);
 
-        await cut.InvokeAsync(() => cut.Instance.ApplyFilterAsync("Name", VekDataGridFilterOperator.Contains, "Notebook"));
+        await cut.InvokeAsync(() => cut.Instance.ApplyFilterAsync("Name", VekDataGridFilterOperator.Contains, "Notebook").AsTask());
 
         Assert.Empty(cut.Instance.SelectedItems);
     }

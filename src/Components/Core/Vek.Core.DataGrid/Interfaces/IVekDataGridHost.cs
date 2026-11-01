@@ -7,4 +7,8 @@ public interface IVekDataGridHost<TItem, TTemplate>
 {
     /// <summary>Gets the authoritative shared state and behavior for this grid.</summary>
     VekDataGridEngine<TItem, TTemplate> Engine { get; }
+
+    /// <summary>Completes host-owned work after a successful shared filtering operation.</summary>
+    /// <returns>Completion of the host work; failures propagate without rolling back the completed mutation.</returns>
+    ValueTask AfterCoreChangeAsync();
 }

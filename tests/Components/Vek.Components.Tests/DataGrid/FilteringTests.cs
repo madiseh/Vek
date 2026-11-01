@@ -24,7 +24,7 @@ public sealed class FilteringTests : BunitContext
     public async Task ColumnFilterModesApplyPredicates()
     {
         var cut = RenderFilterGrid();
-        await cut.InvokeAsync(() => cut.Instance.ApplyFilterAsync("Name", VekDataGridFilterOperator.Contains, "Desk"));
+        await cut.InvokeAsync(() => cut.Instance.ApplyFilterAsync("Name", VekDataGridFilterOperator.Contains, "Desk").AsTask());
         Assert.Equal(new[] { "Desk Lamp" }, DataGridTestHelpers.GetRowNames(cut));
         Assert.Equal("Desk", cut.Instance.CurrentState.Filters.Single().Value);
     }
@@ -34,9 +34,9 @@ public sealed class FilteringTests : BunitContext
     public async Task StringCaseSensitivityIsConfigurable()
     {
         var cut = RenderFilterGrid(caseSensitive: true);
-        await cut.InvokeAsync(() => cut.Instance.ApplyFilterAsync("Name", VekDataGridFilterOperator.Contains, "desk"));
+        await cut.InvokeAsync(() => cut.Instance.ApplyFilterAsync("Name", VekDataGridFilterOperator.Contains, "desk").AsTask());
         Assert.Equal(new[] { "No items to display." }, DataGridTestHelpers.GetRowNames(cut));
-        await cut.InvokeAsync(() => cut.Instance.ApplyFilterAsync("Name", VekDataGridFilterOperator.Contains, "Desk"));
+        await cut.InvokeAsync(() => cut.Instance.ApplyFilterAsync("Name", VekDataGridFilterOperator.Contains, "Desk").AsTask());
         Assert.Equal(new[] { "Desk Lamp" }, DataGridTestHelpers.GetRowNames(cut));
     }
 
@@ -69,7 +69,7 @@ public sealed class FilteringTests : BunitContext
         cut.Find(".pager button[aria-label='Next page']").Click();
         Assert.Contains("Page 2 of 3", cut.Markup);
 
-        await cut.InvokeAsync(() => cut.Instance.ApplyFilterAsync("Name", VekDataGridFilterOperator.Contains, "Notebook"));
+        await cut.InvokeAsync(() => cut.Instance.ApplyFilterAsync("Name", VekDataGridFilterOperator.Contains, "Notebook").AsTask());
 
         Assert.Contains("Page 1 of 1", cut.Markup);
         Assert.Equal(new[] { "Notebook Set" }, DataGridTestHelpers.GetRowNames(cut));

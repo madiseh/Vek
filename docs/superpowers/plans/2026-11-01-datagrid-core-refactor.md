@@ -1,5 +1,7 @@
 # DataGrid Core Architecture Refactoring Implementation Plan
 
+**Scope revision:** The user limited the active work to `ApplyFilterAsync` and `RemoveFilterAsync` through `IVekDataGridHost.Engine` and `AfterCoreChangeAsync`. The broader tasks below are deferred. Only these two filtering operations use the shared extensions in this step; sort, paging, grouping, selection, and editing remain outside the active refactoring.
+
 **Goal:** Refactor the complete DataGrid family against the Core Architecture Rule while preserving observable behavior.
 
 **Spec:** `docs/1.governance/core-architecture.md`

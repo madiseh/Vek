@@ -9,7 +9,7 @@ namespace Vek.WPF.DataGrid.Components;
 /// <summary>
 /// The base WPF data grid component.
 /// </summary>
-public class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGridHost<object, System.Windows.DataTemplate>, IVekDataGridQueryObserver
+public class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGridHost<object, System.Windows.DataTemplate>
 {
     private IEnumerable? _sourceItems;
     private readonly VekDataGridEngine<object, System.Windows.DataTemplate> _engine = new();
@@ -115,7 +115,7 @@ public class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGridHost<ob
         ? definition as IVekDataGridColumn<TItem, System.Windows.DataTemplate>
         : null;
 
-    ValueTask IVekDataGridQueryObserver.OnQueryChangedAsync(VekDataGridQueryChange change)
+    ValueTask IVekDataGridHost<object, System.Windows.DataTemplate>.AfterCoreChangeAsync()
     {
         if (Dispatcher.CheckAccess())
         {
@@ -197,7 +197,7 @@ public class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGridHost<ob
                 }
             }
 
-            ItemsSource = view ?? items;
+            ItemsSource = (IEnumerable?)view ?? items;
         }
     }
 
