@@ -6,6 +6,27 @@ namespace Vek.Components.Tests.DataGrid;
 
 public sealed class SortingTests : BunitContext
 {
+    /// <summary>Clearing sorts restores source order and sends the sort callback without sending a filter callback.</summary>
+    [Fact]
+    public async Task ClearSortRestoresRowsAndNotifiesOnlySorting()
+    {
+        var sortReports = new List<IReadOnlyList<VekDataGridSort>>();
+        var filterReports = 0;
+        var cut = DataGridTestHelpers.RenderGrid(this, pageSize: 3);
+        cut.Render(parameters => parameters
+            .Add(grid => grid.SortChanged, Microsoft.AspNetCore.Components.EventCallback.Factory.Create<IReadOnlyList<VekDataGridSort>>(this, sorts => sortReports.Add(sorts)))
+            .Add(grid => grid.FilterChanged, Microsoft.AspNetCore.Components.EventCallback.Factory.Create<IReadOnlyList<VekDataGridFilter>>(this, _ => filterReports++)));
+        cut.Find("thead button.sort-button").Click();
+        sortReports.Clear();
+
+        await cut.InvokeAsync(() => VekDataGridHostExtensions.ClearSortAsync(cut.Instance).AsTask());
+
+        Assert.Empty(Assert.Single(sortReports));
+        Assert.Equal(0, filterReports);
+        Assert.Equal(new[] { "Task Chair", "Desk Lamp", "Notebook Set" }, DataGridTestHelpers.GetRowNames(cut));
+        Assert.Equal("none", cut.Find("thead th").GetAttribute("aria-sort"));
+    }
+
     /// <summary>
     /// Verifies that clicking anywhere in the column heading cycles through ascending, descending, and unsorted.
     /// </summary>

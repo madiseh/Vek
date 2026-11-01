@@ -2,6 +2,58 @@ namespace Vek.Core.DataGrid.Tests;
 
 public sealed class HostOperationsTests
 {
+    /// <summary>Clears sorting without changing filters, paging, or invoking the filtering continuation.</summary>
+    [Fact]
+    public async Task ClearSortPreservesTheOtherQueryState()
+    {
+        var host = new Host { AfterChange = () => throw new InvalidOperationException("Unexpected filtering notification") };
+        host.Engine.SetSorts([new VekDataGridSort("name", VekSortDirection.Ascending)]);
+        host.Engine.ApplyFilter("name", VekDataGridFilterOperator.Contains, "a");
+        host.Engine.SetPage(2, 1);
+
+        await host.ClearSortAsync();
+
+        Assert.Empty(host.Engine.Sorts);
+        Assert.Equal("a", Assert.Single(host.Engine.Filters).Value);
+        Assert.Equal(2, host.Engine.Page);
+        Assert.Equal(1, host.Engine.PageSize);
+        Assert.Equal("Ada", Assert.Single(host.Engine.GetLocalData(["Grace", "Ada"]).Items));
+    }
+
+    /// <summary>Awaits the sort continuation after clearing descriptors and propagates failures without rollback.</summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ClearSortAwaitsItsOwnContinuation(bool fail)
+    {
+        var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var calls = 0;
+        var host = new SortHost();
+        host.Engine.SetSorts([new VekDataGridSort("name", VekSortDirection.Ascending)]);
+        host.AfterSortChange = () =>
+        {
+            Assert.Empty(host.Engine.Sorts);
+            calls++;
+            return new ValueTask(completion.Task);
+        };
+
+        var operation = host.ClearSortAsync();
+        Assert.False(operation.IsCompleted);
+        if (fail)
+        {
+            var failure = new InvalidOperationException("sort continuation failed");
+            completion.SetException(failure);
+            Assert.Same(failure, await Assert.ThrowsAsync<InvalidOperationException>(() => operation.AsTask()));
+        }
+        else
+        {
+            completion.SetResult();
+            await operation;
+        }
+        Assert.Equal(1, calls);
+        Assert.Empty(host.Engine.Sorts);
+    }
+
     /// <summary>Applies and removes filters through the shared host surface and resets paging before notifying the host.</summary>
     [Fact]
     public async Task FiltersUseTheSharedHostSurface()
@@ -87,5 +139,13 @@ public sealed class HostOperationsTests
         public VekDataGridEngine<string, string> Engine { get; } = new([
             new VekDataGridColumn<string, string>("name", value => value)
         ]);
+    }
+
+    private sealed class SortHost : IVekDataGridHost<string, string>
+    {
+        public VekDataGridEngine<string, string> Engine { get; } = new();
+        public Func<ValueTask> AfterSortChange { get; set; } = () => ValueTask.CompletedTask;
+        public ValueTask AfterCoreChangeAsync() => throw new InvalidOperationException("Unexpected filtering notification");
+        public ValueTask AfterSortChangeAsync() => AfterSortChange();
     }
 }

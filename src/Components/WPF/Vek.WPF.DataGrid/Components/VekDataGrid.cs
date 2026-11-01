@@ -115,7 +115,8 @@ public class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGridHost<ob
         ? definition as IVekDataGridColumn<TItem, System.Windows.DataTemplate>
         : null;
 
-    ValueTask IVekDataGridHost<object, System.Windows.DataTemplate>.AfterCoreChangeAsync()
+    /// <summary>Refreshes native rows after a shared filtering operation on the control's dispatcher.</summary>
+    public ValueTask AfterCoreChangeAsync()
     {
         if (Dispatcher.CheckAccess())
         {
@@ -123,6 +124,23 @@ public class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGridHost<ob
             return ValueTask.CompletedTask;
         }
         return new ValueTask(Dispatcher.InvokeAsync(RefreshLocalItems).Task);
+    }
+
+    /// <summary>Refreshes native rows and sort indicators after a shared sorting change.</summary>
+    public ValueTask AfterSortChangeAsync()
+    {
+        if (Dispatcher.CheckAccess())
+        {
+            RefreshSortProjection();
+            return ValueTask.CompletedTask;
+        }
+        return new ValueTask(Dispatcher.InvokeAsync(RefreshSortProjection).Task);
+    }
+
+    private void RefreshSortProjection()
+    {
+        foreach (var column in Columns) column.SortDirection = null;
+        RefreshLocalItems();
     }
 
     /// <summary>Synchronizes the native WPF sort gesture with the shared DataGrid engine.</summary>

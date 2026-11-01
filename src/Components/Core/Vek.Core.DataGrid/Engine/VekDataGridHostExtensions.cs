@@ -1,12 +1,25 @@
 namespace Vek.Core.DataGrid;
 
-/// <summary>Implements shared filtering workflows for grid hosts.</summary>
+/// <summary>Implements shared filtering and sorting workflows for grid hosts.</summary>
 /// <remarks>
 /// A successful mutation precedes the awaited host continuation. A failed continuation does not
 /// roll back or retry that mutation. These operations have no knowledge of rendering or native controls.
 /// </remarks>
 public static class VekDataGridHostExtensions
 {
+    /// <summary>Clears active sorts, preserves other query state, and awaits the optional sorting continuation.</summary>
+    /// <typeparam name="TItem">The row item type.</typeparam>
+    /// <typeparam name="TTemplate">An opaque template value supplied by the host.</typeparam>
+    /// <param name="grid">The host supplying shared state and any sorting continuation.</param>
+    /// <returns>Completion of the sorting change and its optional host continuation.</returns>
+    public static async ValueTask ClearSortAsync<TItem, TTemplate>(
+        this IVekDataGridHost<TItem, TTemplate> grid)
+    {
+        ArgumentNullException.ThrowIfNull(grid);
+        grid.Engine.SetSorts([]);
+        await grid.AfterSortChangeAsync();
+    }
+
     /// <summary>Applies a column filter, resets paging, and awaits host-owned follow-up work.</summary>
     /// <typeparam name="TItem">The row item type.</typeparam>
     /// <typeparam name="TTemplate">An opaque template value supplied by the host.</typeparam>

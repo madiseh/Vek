@@ -45,7 +45,8 @@ public partial class SelectionColumn<TItem> : IDisposable, IVekDataGridColumn<TI
 
     string Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.Key => "__selection";
     bool IVekDataGridColumn<TItem, RenderFragment>.Visible { get => Visible; set => Visible = value; }
-    async Task IVekDataGridColumn<TItem, RenderFragment>.SetVisibleAsync(bool visible)
+    /// <inheritdoc />
+    public async Task SetVisibleAsync(bool visible)
     {
         Visible = visible;
         await VisibleChanged.InvokeAsync(visible);
@@ -53,7 +54,8 @@ public partial class SelectionColumn<TItem> : IDisposable, IVekDataGridColumn<TI
     int? IVekDataGridColumn<TItem, RenderFragment>.Width { get => Width; set => Width = value; }
     int IVekDataGridColumn<TItem, RenderFragment>.MinWidth => MinWidth;
     int IVekDataGridColumn<TItem, RenderFragment>.MaxWidth => MaxWidth;
-    async Task IVekDataGridColumn<TItem, RenderFragment>.SetWidthAsync(int width)
+    /// <inheritdoc />
+    public async Task SetWidthAsync(int width)
     {
         Width = width;
         await WidthChanged.InvokeAsync(width);
@@ -66,7 +68,8 @@ public partial class SelectionColumn<TItem> : IDisposable, IVekDataGridColumn<TI
     bool IVekDataGridColumn<TItem, RenderFragment>.IsSelectionColumn => true;
     bool IVekDataGridColumn<TItem, RenderFragment>.Editable => false;
     VekDataGridTemplate<Vek.Core.DataGrid.VekDataGridEditTemplateContext<TItem>, RenderFragment>? IVekDataGridColumn<TItem, RenderFragment>.EditTemplate => null;
-    string IVekDataGridColumn<TItem, RenderFragment>.GetRowLabel(TItem item) => "Select";
+    /// <inheritdoc />
+    public string GetRowLabel(TItem item) => "Select";
     bool Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.Groupable => false;
     Func<TItem, object?>? Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.GroupBy => null;
     VekDataGridTemplate<Vek.Core.DataGrid.VekDataGridGroupContext<TItem>, RenderFragment>? IVekDataGridColumn<TItem, RenderFragment>.GroupTemplate => null;

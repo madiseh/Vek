@@ -203,7 +203,8 @@ public partial class PropertyColumn<TItem, TValue>
 
     bool IVekDataGridColumn<TItem, RenderFragment>.Visible { get => Visible; set => Visible = value; }
 
-    async Task IVekDataGridColumn<TItem, RenderFragment>.SetVisibleAsync(bool visible)
+    /// <inheritdoc />
+    public async Task SetVisibleAsync(bool visible)
     {
         Visible = visible;
         await VisibleChanged.InvokeAsync(visible);
@@ -212,7 +213,8 @@ public partial class PropertyColumn<TItem, TValue>
     int? IVekDataGridColumn<TItem, RenderFragment>.Width { get => Width; set => Width = value; }
     int IVekDataGridColumn<TItem, RenderFragment>.MinWidth => MinWidth;
     int IVekDataGridColumn<TItem, RenderFragment>.MaxWidth => MaxWidth;
-    async Task IVekDataGridColumn<TItem, RenderFragment>.SetWidthAsync(int width)
+    /// <inheritdoc />
+    public async Task SetWidthAsync(int width)
     {
         Width = width;
         await WidthChanged.InvokeAsync(width);
@@ -236,7 +238,8 @@ public partial class PropertyColumn<TItem, TValue>
     bool IVekDataGridColumn<TItem, RenderFragment>.Editable => Editable;
     VekDataGridTemplate<Vek.Core.DataGrid.VekDataGridEditTemplateContext<TItem>, RenderFragment>? IVekDataGridColumn<TItem, RenderFragment>.EditTemplate =>
         EditTemplate is null ? null : context => EditTemplate(Grid!.CreateBlazorEditContext(context));
-    string IVekDataGridColumn<TItem, RenderFragment>.GetRowLabel(TItem item) => Convert.ToString(_propertyGetter!(item)) ?? string.Empty;
+    /// <inheritdoc />
+    public string GetRowLabel(TItem item) => Convert.ToString(_propertyGetter!(item)) ?? string.Empty;
     bool Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.Groupable => Groupable;
     Func<TItem, object?>? Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.GroupBy => Groupable ? GroupBy ?? (item => _propertyGetter!(item)) : null;
     VekDataGridTemplate<Vek.Core.DataGrid.VekDataGridGroupContext<TItem>, RenderFragment>? IVekDataGridColumn<TItem, RenderFragment>.GroupTemplate =>

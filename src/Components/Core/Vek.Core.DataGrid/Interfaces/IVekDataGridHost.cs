@@ -11,4 +11,9 @@ public interface IVekDataGridHost<TItem, TTemplate>
     /// <summary>Completes host-owned work after a successful shared filtering operation.</summary>
     /// <returns>Completion of the host work; failures propagate without rolling back the completed mutation.</returns>
     ValueTask AfterCoreChangeAsync();
+
+    /// <summary>Optionally completes host-owned work after a successful shared sorting change.</summary>
+    /// <returns>Completion of the host work; the default requires no additional work.</returns>
+    /// <remarks>This continuation is independent of filtering notifications. Failures do not roll back the completed change.</remarks>
+    ValueTask AfterSortChangeAsync() => ValueTask.CompletedTask;
 }

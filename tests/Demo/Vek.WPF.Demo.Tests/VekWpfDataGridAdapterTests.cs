@@ -8,6 +8,28 @@ namespace Vek.WPF.Demo.Tests;
 
 public sealed class VekWpfDataGridAdapterTests
 {
+    /// <summary>Clearing shared sorts restores native rows to source order and removes the native sort indicator.</summary>
+    [Fact]
+    public async Task ClearSortRestoresNativeRowsAndSortIndicator()
+    {
+        await await WpfTestDispatcher.RunAsync(async () =>
+        {
+            var rows = new[] { new TestRow("row-2"), new TestRow("row-1") };
+            var grid = new TestableVekDataGrid { ItemsSource = rows };
+            var column = grid.AddColumn(new VekDataGridColumn<TestRow, DataTemplate>("Key", item => item.Key));
+            grid.TriggerSorting(new DataGridSortingEventArgs(column));
+            Assert.Equal(new[] { rows[1], rows[0] }, grid.Items.Cast<TestRow>().ToArray());
+            Assert.Equal(VekSortDirection.Ascending, Assert.Single(grid.Engine.Sorts).Direction);
+            column.SortDirection = ListSortDirection.Ascending;
+
+            await grid.ClearSortAsync();
+
+            Assert.Empty(grid.Engine.Sorts);
+            Assert.Equal(rows, grid.Items.Cast<TestRow>().ToArray());
+            Assert.Null(column.SortDirection);
+        });
+    }
+
     /// <summary>Ensures WPF test windows are laid out without becoming visible or stealing focus.</summary>
     [Fact]
     public async Task TestWindowsAreShownOffscreenWithoutActivation()

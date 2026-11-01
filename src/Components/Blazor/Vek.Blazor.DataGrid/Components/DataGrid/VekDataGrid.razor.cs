@@ -701,7 +701,8 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
         }
     }
 
-    async ValueTask IVekDataGridHost<TItem, RenderFragment>.AfterCoreChangeAsync()
+    /// <summary>Notifies filter bindings and refreshes results after a shared filtering operation.</summary>
+    public async ValueTask AfterCoreChangeAsync()
     {
         await InvokeAsync(async () =>
         {
@@ -711,12 +712,14 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
         });
     }
 
-    /// <summary>Clears every active sort and notifies bound consumers.</summary>
-    public async Task ClearSortAsync()
+    /// <summary>Notifies sort bindings and refreshes results after a shared sorting change.</summary>
+    public async ValueTask AfterSortChangeAsync()
     {
-        _engine.SetSorts(Array.Empty<VekDataGridSort>());
-        await SortChanged.InvokeAsync(Array.Empty<VekDataGridSort>());
-        await ReloadAfterStateChangeAsync();
+        await InvokeAsync(async () =>
+        {
+            await SortChanged.InvokeAsync(_engine.Sorts.ToArray());
+            await ReloadAfterStateChangeAsync();
+        });
     }
 
     /// <summary>Reloads the current data source or rerenders local items.</summary>
