@@ -27,6 +27,7 @@ Before carrying out work covered by a guide below, read and follow that guide. I
 - Put namespaces shared by Razor components in the nearest `_Imports.razor` file instead of repeating `@using` directives in individual `.razor` files.
 - Put namespaces shared by C# files in the project-level `GlobalUsings.cs` file with `global using` directives instead of repeating file-local `using` directives.
 - When a namespace is needed in both Razor markup and C# files, add it to both central import locations; Razor `@using` directives do not apply to standalone C# files.
+- **No Qualified Type Names / Namespace Prefixes in Code Definitions**: Never write qualified type names containing dots (e.g. `System.Windows.Controls.DataGrid`, `System.Windows.DataTemplate`, `Vek.Core.DataGrid.*`) directly in code definitions (class bases, interfaces, method signatures, local declarations, etc.). Always import types via `using` or `global using`. When name collisions or ambiguities occur across namespaces, define a type alias in `GlobalUsings.cs` (or locally at the top of the file via `using Alias = ...;`) and reference only the alias in code. This rule is enforced by the architecture harness `QualifiedTypeNameArchitectureTests`.
 
 ## File Headers
 

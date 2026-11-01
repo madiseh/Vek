@@ -1,3 +1,24 @@
+using Vek.WPF.Demo.Components.Pages;
+using Vek.WPF.Demo.Components.Pages.Docs.WPF;
+using Vek.WPF.Demo.Components.Pages.Docs.WPF.CodeView;
+using AggregationPage = Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.Aggregation.Aggregation;
+using BasicUsagePage = Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.BasicUsage.BasicUsage;
+using ColumnLayoutPage = Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.ColumnLayout.ColumnLayout;
+using ColumnManagementPage = Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.ColumnManagement.ColumnManagement;
+using ContextActionsPage = Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.ContextActions.ContextActions;
+using EditingPage = Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.Editing.Editing;
+using FilteringPage = Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.Filtering.Filtering;
+using GroupingPage = Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.Grouping.Grouping;
+using HierarchyPage = Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.Hierarchy.Hierarchy;
+using ObservabilityPage = Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.Observability.Observability;
+using PaginationPage = Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.Pagination.Pagination;
+using PresentationPage = Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.Presentation.Presentation;
+using SelectionPage = Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.Selection.Selection;
+using ServerDataPage = Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.ServerData.ServerData;
+using SortingPage = Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.Sorting.Sorting;
+using VirtualizationPage = Vek.WPF.Demo.Components.Pages.Docs.WPF.DataGrid.Virtualization.Virtualization;
+using CodeViewPage = Vek.WPF.Demo.Components.Pages.Docs.WPF.CodeView.CodeView;
+
 namespace Vek.WPF.Demo.Navigation;
 
 public enum DemoPageImplementationStatus
@@ -20,26 +41,26 @@ internal static class DemoPageTypes
 {
     private static readonly IReadOnlyDictionary<string, Type> Types = new Dictionary<string, Type>
     {
-        ["home"] = typeof(Components.Pages.Home),
-        ["getting-started"] = typeof(Components.Pages.Docs.WPF.GettingStarted),
-        ["vekdatagrid/basic-usage"] = typeof(Components.Pages.Docs.WPF.DataGrid.BasicUsage.BasicUsage),
-        ["vekdatagrid/sorting"] = typeof(Components.Pages.Docs.WPF.DataGrid.Sorting.Sorting),
-        ["vekdatagrid/filtering"] = typeof(Components.Pages.Docs.WPF.DataGrid.Filtering.Filtering),
-        ["vekdatagrid/pagination"] = typeof(Components.Pages.Docs.WPF.DataGrid.Pagination.Pagination),
-        ["vekdatagrid/selection"] = typeof(Components.Pages.Docs.WPF.DataGrid.Selection.Selection),
-        ["vekdatagrid/editing"] = typeof(Components.Pages.Docs.WPF.DataGrid.Editing.Editing),
-        ["vekdatagrid/grouping"] = typeof(Components.Pages.Docs.WPF.DataGrid.Grouping.Grouping),
-        ["vekdatagrid/aggregation"] = typeof(Components.Pages.Docs.WPF.DataGrid.Aggregation.Aggregation),
-        ["vekdatagrid/hierarchy"] = typeof(Components.Pages.Docs.WPF.DataGrid.Hierarchy.Hierarchy),
-        ["vekdatagrid/server-data"] = typeof(Components.Pages.Docs.WPF.DataGrid.ServerData.ServerData),
-        ["vekdatagrid/virtualization"] = typeof(Components.Pages.Docs.WPF.DataGrid.Virtualization.Virtualization),
-        ["vekdatagrid/column-management"] = typeof(Components.Pages.Docs.WPF.DataGrid.ColumnManagement.ColumnManagement),
-        ["vekdatagrid/column-layout"] = typeof(Components.Pages.Docs.WPF.DataGrid.ColumnLayout.ColumnLayout),
-        ["vekdatagrid/presentation"] = typeof(Components.Pages.Docs.WPF.DataGrid.Presentation.Presentation),
-        ["vekdatagrid/context-actions"] = typeof(Components.Pages.Docs.WPF.DataGrid.ContextActions.ContextActions),
-        ["vekdatagrid/observability"] = typeof(Components.Pages.Docs.WPF.DataGrid.Observability.Observability),
-        ["vekcodeview/basic-usage"] = typeof(Components.Pages.Docs.WPF.CodeView.CodeView),
-        ["vekcodeview/multi-sample"] = typeof(Components.Pages.Docs.WPF.CodeView.MultiSample),
+        ["home"] = typeof(Home),
+        ["getting-started"] = typeof(GettingStarted),
+        ["vekdatagrid/basic-usage"] = typeof(BasicUsagePage),
+        ["vekdatagrid/sorting"] = typeof(SortingPage),
+        ["vekdatagrid/filtering"] = typeof(FilteringPage),
+        ["vekdatagrid/pagination"] = typeof(PaginationPage),
+        ["vekdatagrid/selection"] = typeof(SelectionPage),
+        ["vekdatagrid/editing"] = typeof(EditingPage),
+        ["vekdatagrid/grouping"] = typeof(GroupingPage),
+        ["vekdatagrid/aggregation"] = typeof(AggregationPage),
+        ["vekdatagrid/hierarchy"] = typeof(HierarchyPage),
+        ["vekdatagrid/server-data"] = typeof(ServerDataPage),
+        ["vekdatagrid/virtualization"] = typeof(VirtualizationPage),
+        ["vekdatagrid/column-management"] = typeof(ColumnManagementPage),
+        ["vekdatagrid/column-layout"] = typeof(ColumnLayoutPage),
+        ["vekdatagrid/presentation"] = typeof(PresentationPage),
+        ["vekdatagrid/context-actions"] = typeof(ContextActionsPage),
+        ["vekdatagrid/observability"] = typeof(ObservabilityPage),
+        ["vekcodeview/basic-usage"] = typeof(CodeViewPage),
+        ["vekcodeview/multi-sample"] = typeof(MultiSample),
     };
 
     public static Type For(string pageId) => Types.TryGetValue(pageId, out var pageType)

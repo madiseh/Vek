@@ -1,1 +1,11 @@
 global using System.ComponentModel;
+global using System.Windows;
+global using System.Windows.Controls;
+global using WpfDataGrid = System.Windows.Controls.DataGrid;
+global using WpfDataTemplate = System.Windows.DataTemplate;
+global using WpfDataGridTemplateColumn = System.Windows.Controls.DataGridTemplateColumn;
+global using WpfDataGridLength = System.Windows.Controls.DataGridLength;
+global using WpfDataGridSortingEventArgs = System.Windows.Controls.DataGridSortingEventArgs;
+global using WpfSelectionChangedEventArgs = System.Windows.Controls.SelectionChangedEventArgs;
+global using WpfDataTemplateSelector = System.Windows.Controls.DataTemplateSelector;
+global using WpfDependencyObject = System.Windows.DependencyObject;

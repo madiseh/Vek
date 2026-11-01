@@ -1,3 +1,6 @@
+using System.Diagnostics;
+using System.Windows.Navigation;
+
 namespace Vek.WPF.Demo.Components.Pages;
 
 public partial class Home : UserControl
@@ -7,9 +10,9 @@ public partial class Home : UserControl
         InitializeComponent();
     }
 
-    private void OpenRepository(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+    private void OpenRepository(object sender, RequestNavigateEventArgs e)
     {
-        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+        Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
         e.Handled = true;
     }
 }
