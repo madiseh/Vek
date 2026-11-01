@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace Vek.Core.DataGrid;
 
 /// <summary>Provides the platform-neutral edit state and actions for an edit template.</summary>

@@ -1,15 +1,9 @@
-using System.Collections;
-using System.Globalization;
-using System.Reflection;
-using System.Windows.Data;
-using Vek.Core.DataGrid;
-
 namespace Vek.WPF.DataGrid.Components;
 
 /// <summary>
 /// The base WPF data grid component.
 /// </summary>
-public class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGridHost<object, System.Windows.DataTemplate>
+public partial class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGridHost<object, System.Windows.DataTemplate>
 {
     private IEnumerable? _sourceItems;
     private readonly VekDataGridEngine<object, System.Windows.DataTemplate> _engine = new();
@@ -65,7 +59,15 @@ public class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGridHost<ob
     }
 
     /// <summary>Gets the shared platform-neutral state and behavior for this grid instance.</summary>
-    public VekDataGridEngine<object, System.Windows.DataTemplate> Engine => _engine;
+    public VekDataGridEngine<object, System.Windows.DataTemplate> Engine
+    {
+        get
+        {
+            if (Dispatcher.CheckAccess()) PrepareHostState();
+            else Dispatcher.Invoke(PrepareHostState);
+            return _engine;
+        }
+    }
 
     /// <summary>Registers a column defined by the shared Core contract and creates its native WPF column.</summary>
     /// <typeparam name="TItem">The row item type declared by the shared column.</typeparam>
@@ -187,6 +189,22 @@ public class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGridHost<ob
     /// <summary>Copies native WPF selection state into the shared selected-key state.</summary>
     protected override void OnSelectionChanged(System.Windows.Controls.SelectionChangedEventArgs e)
     {
+        if (_projecting) { base.OnSelectionChanged(e); return; }
+        if (_suppressRowActivationSelection) { ApplyNativeSelection(); return; }
+        var previousItems = _engine.Interaction.SelectedItems;
+        var previousItem = _engine.Interaction.SelectedItem;
+        var rejected = e.AddedItems.Cast<object>().Where(item => !this.CanSelectItem(item)).ToArray();
+        if (rejected.Length > 0)
+        {
+            var restored = previousItems.Concat(SelectedItems.Cast<object>().Except(rejected))
+                .Where(item => this.CanSelectItem(item)).Distinct(_engine.Interaction.SelectionComparer).ToArray();
+            _engine.Interaction.SelectedItems = restored;
+            _engine.Interaction.SelectedItem = previousItem is not null && restored.Contains(previousItem)
+                ? previousItem : restored.FirstOrDefault();
+            ApplyNativeSelection();
+            SyncCoreSelection();
+            return;
+        }
         base.OnSelectionChanged(e);
         SyncCoreSelection();
     }
@@ -221,14 +239,18 @@ public class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGridHost<ob
                 }
             }
 
-            ItemsSource = (IEnumerable?)view ?? items;
+            _projecting = true;
+            try { ItemsSource = (IEnumerable?)view ?? items; }
+            finally { _projecting = false; }
+            ApplyNativeSelection();
         }
     }
 
     private void SyncCoreSelection()
     {
         _engine.SetItemKeySelector(_itemKeySelector);
-        _engine.SetSelectedKeys(SelectedItems.Cast<object>().Select(_engine.GetItemKey));
+        PrepareHostState();
+        _engine.SetSelectedKeys(_engine.Interaction.SelectedItems.Select(_engine.GetItemKey));
     }
 
     private sealed class WpfGroupDescription(Func<object, object?> groupValueSelector) : GroupDescription
@@ -241,24 +263,23 @@ public class VekDataGrid : System.Windows.Controls.DataGrid, IVekDataGridHost<ob
     {
         public int Compare(object? x, object? y)
         {
-            var comparison = Comparer.DefaultInvariant.Compare(x, y);
+            var comparison = Comparer.DefaultInvariant.Compare(
+                x is CollectionViewGroup left ? left.Name : x,
+                y is CollectionViewGroup right ? right.Name : y);
             return sortOrder == VekDataGridGroupSortOrder.Descending ? -comparison : comparison;
         }
     }
 
     private VekDataGridEditTemplateContext<TItem> CreateEditTemplateContext<TItem>(TItem item)
     {
-        _engine.BeginEdit(item!);
+        var draft = _engine.IsEditing && ReferenceEquals(_engine.OriginalEditItem, item)
+            && _engine.DraftEditItem is TItem current ? current : item;
         return new VekDataGridEditTemplateContext<TItem>(
-            item,
+            draft,
             System.Globalization.CultureInfo.CurrentCulture,
-            updatedItem => _engine.UpdateDraft(updatedItem!),
-            () => _engine.CommitEditAsync().AsTask(),
-            () =>
-            {
-                _engine.CancelEdit();
-                return Task.CompletedTask;
-            });
+            updatedItem => this.UpdateEditDraft(updatedItem!),
+            () => this.CommitEditAsync(),
+            () => this.CancelEditAsync());
     }
 
     private sealed class WpfTemplateSelector(Func<object?, System.Windows.DataTemplate?> selectTemplate)

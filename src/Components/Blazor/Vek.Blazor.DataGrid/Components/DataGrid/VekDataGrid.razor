@@ -49,7 +49,7 @@
                          @ondragend="EndColumnDrag">
                         <label>
                             <input type="checkbox" aria-label="Show @column.Title column" checked="@column.Visible"
-                                   @onchange="args => SetColumnVisibilityAsync(column.Key, args.Value is true)" />
+                                   @onchange="args => this.SetColumnVisibilityAsync(column.Key, args.Value is true)" />
                             <span class="column-title">@column.Title</span>
                         </label>
                         @if (CanReorderInPanel)
@@ -114,16 +114,16 @@
                             @if (column.IsHierarchyColumn)
                             {
                                 <button type="button" aria-label="Toggle all row details"
-                                        aria-expanded="@(AreAllRowsExpanded() ? "true" : "false")"
-                                        @onclick="ToggleAllRowDetailsAsync">@(AreAllRowsExpanded() ? "−" : "+")</button>
+                                        aria-expanded="@(this.AreAllRowsExpanded() ? "true" : "false")"
+                                        @onclick="this.ToggleAllRowDetailsAsync">@(this.AreAllRowsExpanded() ? "−" : "+")</button>
                             }
                             else if (column.IsSelectionColumn)
                             {
                                 @if (SelectionMode == VekDataGridSelectionMode.Multiple)
                                 {
                                     <input type="checkbox" aria-label="Select all visible rows"
-                                           checked="@AreAllVisibleItemsSelected()"
-                                           @onchange="args => ToggleAllVisibleItemsAsync(args.Value is true)" />
+                                           checked="@this.AreAllVisibleItemsSelected()"
+                                           @onchange="args => this.ToggleAllVisibleItemsAsync(args.Value is true)" />
                                 }
                             }
                             else
@@ -263,16 +263,16 @@
     {
         <nav class="pager" aria-label="Table pagination">
             <label>Rows per page
-                <select aria-label="Rows per page" value="@EffectivePageSize" @onchange="SetPageSizeAsync">
+                <select aria-label="Rows per page" value="@EffectivePageSize" @onchange="ChangePageSizeAsync">
                     @foreach (var option in PageSizeOptions.Where(option => option > 0).Append(EffectivePageSize).Distinct().Order())
                     {
                         <option value="@option">@option</option>
                     }
                 </select>
             </label>
-            <button type="button" aria-label="Previous page" @onclick="() => SetCurrentPageAsync(Engine.Page - 1)" disabled="@(Engine.Page <= 1)">Previous</button>
+            <button type="button" aria-label="Previous page" @onclick="() => this.SetCurrentPageAsync(Engine.Page - 1)" disabled="@(Engine.Page <= 1)">Previous</button>
             <span>Page @Engine.Page of @totalPages</span>
-            <button type="button" aria-label="Next page" @onclick="() => SetCurrentPageAsync(Engine.Page + 1)" disabled="@(Engine.Page >= totalPages)">Next</button>
+            <button type="button" aria-label="Next page" @onclick="() => this.SetCurrentPageAsync(Engine.Page + 1)" disabled="@(Engine.Page >= totalPages)">Next</button>
         </nav>
     }
     else if (!VirtualizeRows && PagerContent is not null)

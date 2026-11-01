@@ -1,6 +1,3 @@
-using System.Collections.Concurrent;
-using System.Globalization;
-
 namespace Vek.Core.DataGrid;
 
 /// <summary>
@@ -12,6 +9,25 @@ namespace Vek.Core.DataGrid;
 /// <typeparam name="TTemplate">The native template type supplied by the UI adapter.</typeparam>
 public class VekDataGridEngine<TItem, TTemplate>
 {
+    /// <summary>Gets shared interaction configuration and state for this grid instance.</summary>
+    public VekDataGridInteractionState<TItem> Interaction { get; } = new();
+
+    /// <summary>Moves a registered column to a clamped insertion position while retaining its identity.</summary>
+    public bool ReorderColumn(string columnKey, int insertIndex)
+    {
+        var columns = _columns.Values.ToList();
+        var index = columns.FindIndex(column => string.Equals(column.Key, columnKey, StringComparison.OrdinalIgnoreCase));
+        if (index < 0) throw new ArgumentException($"No column with key '{columnKey}' is registered.", nameof(columnKey));
+        var column = columns[index];
+        columns.RemoveAt(index);
+        var target = Math.Clamp(insertIndex, 0, columns.Count);
+        if (target == index) return false;
+        columns.Insert(target, column);
+        _columns.Clear();
+        foreach (var item in columns) _columns.Add(item.Key, item);
+        return true;
+    }
+
     private readonly Dictionary<string, IVekDataGridColumn<TItem, TTemplate>> _columns = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<VekDataGridSort> _sorts = [];
     private readonly List<VekDataGridFilter> _filters = [];

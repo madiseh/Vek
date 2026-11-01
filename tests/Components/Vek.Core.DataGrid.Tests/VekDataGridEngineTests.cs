@@ -1,6 +1,4 @@
-using Vek.Core.DataGrid;
-
-namespace Vek.Components.Tests.DataGridCore;
+namespace Vek.Core.DataGrid.Tests;
 
 public sealed class VekDataGridEngineTests
 {

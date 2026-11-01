@@ -86,6 +86,8 @@ Core owns shared rules, contracts, state, and behavior with zero UI-platform dep
 
 The policy includes a [DataGrid target example](core-architecture.md#datagrid-target-example). It describes the agreed architecture for the upcoming refactoring; the current DataGrid implementation is not a compliance reference.
 
+The implemented shared command surface and native responsibilities are recorded in [DataGrid shared operations](datagrid-shared-operations.md). Use that map to distinguish completed command migration from future contract or presentation changes.
+
 ## Target Framework and Platforms
 
 - Cross-platform projects target `net10.0` through the root `Directory.Build.props`; WPF applications, controls, and tests target `net10.0-windows` and use WPF.

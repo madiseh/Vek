@@ -86,14 +86,15 @@ public partial class HierarchyColumn<TItem> : IDisposable, IVekDataGridColumn<TI
     Func<TItem, object?> Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.ValueAccessor => static _ => null;
     VekDataGridTemplate<TItem, RenderFragment> IVekDataGridColumn<TItem, RenderFragment>.CellTemplate => item => builder =>
     {
-        var expanded = Grid!.IsRowExpanded(item);
+        var grid = Grid ?? throw new InvalidOperationException("HierarchyColumn must be declared inside a VekDataGrid.");
+        var expanded = grid.IsRowExpanded(item);
         builder.OpenElement(0, "button");
         builder.AddAttribute(1, "type", "button");
         builder.AddAttribute(2, "class", "row-detail-toggle");
         builder.AddAttribute(3, "aria-expanded", expanded ? "true" : "false");
-        builder.AddAttribute(4, "aria-label", $"{(expanded ? "Collapse" : "Expand")} details for {Grid.GetRowLabel(item)}");
+        builder.AddAttribute(4, "aria-label", $"{(expanded ? "Collapse" : "Expand")} details for {grid.GetRowLabel(item)}");
         builder.AddAttribute(5, "onclick:stopPropagation", true);
-        builder.AddAttribute(6, "onclick", EventCallback.Factory.Create(this, () => Grid.ToggleRowDetailsAsync(item)));
+        builder.AddAttribute(6, "onclick", EventCallback.Factory.Create(this, () => grid.ToggleRowDetailsAsync(item)));
         builder.AddContent(7, expanded ? "−" : "+");
         builder.CloseElement();
     };

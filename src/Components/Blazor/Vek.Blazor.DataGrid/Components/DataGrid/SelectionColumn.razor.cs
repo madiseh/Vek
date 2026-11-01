@@ -85,10 +85,10 @@ public partial class SelectionColumn<TItem> : IDisposable, IVekDataGridColumn<TI
         builder.AddAttribute(1, "type", "checkbox");
         builder.AddAttribute(2, "aria-label", $"Select {item}");
         builder.AddAttribute(3, "checked", Grid!.IsItemSelected(item));
-        builder.AddAttribute(4, "disabled", !Grid.CanSelectItem(item));
+        builder.AddAttribute(4, "disabled", !Grid!.CanSelectItem(item));
         builder.AddAttribute(5, "onclick:stopPropagation", true);
         builder.AddAttribute(6, "onchange", EventCallback.Factory.Create<ChangeEventArgs>(this,
-            args => Grid.ToggleSelectionAsync(item, args.Value is true)));
+            args => Grid!.ToggleSelectionAsync(item, args.Value is true)));
         builder.CloseElement();
     };
 

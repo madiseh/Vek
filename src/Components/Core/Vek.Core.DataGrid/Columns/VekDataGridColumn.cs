@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace Vek.Core.DataGrid;
 
 /// <summary>Defines platform-neutral column behavior and its platform-native templates.</summary>

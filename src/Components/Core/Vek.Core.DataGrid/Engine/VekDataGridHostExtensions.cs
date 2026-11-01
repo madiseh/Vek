@@ -5,7 +5,7 @@ namespace Vek.Core.DataGrid;
 /// A successful mutation precedes the awaited host continuation. A failed continuation does not
 /// roll back or retry that mutation. These operations have no knowledge of rendering or native controls.
 /// </remarks>
-public static class VekDataGridHostExtensions
+public static partial class VekDataGridHostExtensions
 {
     /// <summary>Applies a sort interaction, returns to the first page, and awaits the optional sorting continuation.</summary>
     /// <typeparam name="TItem">The row item type.</typeparam>
@@ -64,7 +64,10 @@ public static class VekDataGridHostExtensions
     {
         ArgumentNullException.ThrowIfNull(grid);
         ArgumentException.ThrowIfNullOrWhiteSpace(columnKey);
-        grid.Engine.ApplyFilter(columnKey, op, value, caseSensitive ?? grid.Engine.FilterCaseSensitive);
+        var engine = grid.Engine;
+        engine.ApplyFilter(columnKey, op, value, caseSensitive ?? engine.FilterCaseSensitive);
+        if (engine.Interaction.FilteredSelectionMode == VekDataGridFilteredSelectionMode.Clear)
+            await grid.ReconcileSelectionAsync();
         await grid.AfterCoreChangeAsync();
     }
 
@@ -79,7 +82,10 @@ public static class VekDataGridHostExtensions
         string? columnKey = null)
     {
         ArgumentNullException.ThrowIfNull(grid);
-        grid.Engine.RemoveFilter(columnKey);
+        var engine = grid.Engine;
+        engine.RemoveFilter(columnKey);
+        if (engine.Interaction.FilteredSelectionMode == VekDataGridFilteredSelectionMode.Clear)
+            await grid.ReconcileSelectionAsync();
         await grid.AfterCoreChangeAsync();
     }
 }

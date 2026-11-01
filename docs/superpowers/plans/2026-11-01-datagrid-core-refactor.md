@@ -1,6 +1,6 @@
 # DataGrid Core Architecture Refactoring Implementation Plan
 
-**Scope revision:** The user limited the active work to `ApplyFilterAsync` and `RemoveFilterAsync` through `IVekDataGridHost.Engine` and `AfterCoreChangeAsync`. The broader tasks below are deferred. Only these two filtering operations use the shared extensions in this step; sort, paging, grouping, selection, and editing remain outside the active refactoring.
+**Scope revision:** After the initial filter and sort stages, the user authorized migration of all remaining shared methods. Paging, column commands, selection, detail expansion, group expansion, and editing now use the shared host extensions. See [the implemented command map](../../1.governance/datagrid-shared-operations.md). Native lifecycle, rendering, and provider invocation remain in adapters. The broader model/template consolidation tasks below are separate from this command migration.
 
 **Goal:** Refactor the complete DataGrid family against the Core Architecture Rule while preserving observable behavior.
 
@@ -20,15 +20,15 @@
 
 ## Tasks
 
-- [ ] Establish a Core-only test project and move existing engine tests into it.
-- [ ] Test optional host workflow continuation ordering, omission, asynchronous completion, and error propagation before implementing `IVekDataGridHost` and shared extensions.
-- [ ] Replace duplicated query wrappers with the shared host surface in both adapters; keep native notifications in optional semantic capabilities.
-- [ ] Consolidate shared template contexts and strongly typed aggregate definitions into Core; update adapters, demos, and tests together.
-- [ ] Move shared selection, expansion, edit state, query/paging and column operation rules out of adapters, protecting newly exposed boundary cases first.
-- [ ] Complete native WPF integration for shared state and template slots; retain only native projections and event translation in that adapter.
-- [ ] Split remaining aggregate source files by responsibility/type and centralize imports.
-- [ ] Run Core, Blazor, WPF, and demo suites; audit resolved Core dependencies, source semantics, public surface shadowing, and remaining duplicate algorithms.
-- [ ] Update architecture documentation to distinguish the final implementation from illustrative sketches and record actual validation results.
+- [x] Establish a Core-only test project and move existing engine tests into it.
+- [x] Test optional host workflow continuation ordering, omission, asynchronous completion, and error propagation before implementing `IVekDataGridHost` and shared extensions.
+- [x] Replace duplicated query wrappers with the shared host surface in both adapters; keep native notifications in optional semantic capabilities.
+- [ ] Deferred contract/presentation work: consolidate remaining template contexts and strongly typed aggregate definitions; this is separate from shared command migration.
+- [x] Move shared selection, expansion, edit state, query/paging and column operation rules out of adapters, protecting newly exposed boundary cases first.
+- [x] Complete native WPF command integration for shared state and detail/edit template contexts; retain native projections and event translation in that adapter.
+- [ ] Deferred contract/presentation work: split remaining presentation model files by type.
+- [x] Run Core, Blazor, WPF, and demo suites; audit resolved Core dependencies, source semantics, public surface shadowing, and remaining duplicate command algorithms. Final solution run: 201 passed.
+- [x] Update architecture documentation to distinguish implemented shared commands from illustrative sketches and deferred contract/presentation work.
 
 ## Review focus
 

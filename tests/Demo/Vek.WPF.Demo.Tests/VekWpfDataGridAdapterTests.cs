@@ -8,6 +8,200 @@ namespace Vek.WPF.Demo.Tests;
 
 public sealed class VekWpfDataGridAdapterTests
 {
+    /// <summary>Native row-edit completion and cancellation also finish the authoritative shared edit session.</summary>
+    [Theory]
+    [InlineData(DataGridEditAction.Commit)]
+    [InlineData(DataGridEditAction.Cancel)]
+    public async Task NativeEditEndingFinishesSharedSession(DataGridEditAction action)
+    {
+        await await WpfTestDispatcher.RunAsync(async () =>
+        {
+            var item = new TestRow("one");
+            var grid = new TestableVekDataGrid { ItemsSource = new[] { item } };
+            grid.AddColumn(new VekDataGridColumn<TestRow, DataTemplate>("Key", row => row.Key,
+                editable: true, editTemplate: _ => new DataTemplate()));
+            await grid.EditItemAsync(item);
+            Assert.True(grid.Engine.IsEditing);
+            grid.TriggerRowEditEnding(new DataGridRowEditEndingEventArgs(new DataGridRow { Item = item }, action));
+            Assert.False(grid.Engine.IsEditing);
+        });
+    }
+
+    /// <summary>Sorting an ordinary native text column does not make its editor enter the shared-template editing path.</summary>
+    [Fact]
+    public async Task NativeTextEditingAfterSortingDoesNotEnterSharedEditing()
+    {
+        await await WpfTestDispatcher.RunAsync(async () =>
+        {
+            var item = new TestRow("one");
+            var grid = new TestableVekDataGrid { ItemsSource = new[] { item } };
+            var column = new DataGridTextColumn { SortMemberPath = "Key", Header = "Key" };
+            grid.Columns.Add(column);
+            grid.TriggerSorting(new DataGridSortingEventArgs(column));
+            Exception? failure = null;
+            System.Windows.Threading.DispatcherUnhandledExceptionEventHandler handler = (_, args) =>
+            {
+                failure = args.Exception;
+                args.Handled = true;
+            };
+            grid.Dispatcher.UnhandledException += handler;
+            try
+            {
+                grid.TriggerBeginningEdit(new DataGridBeginningEditEventArgs(column, new DataGridRow { Item = item }, null));
+                await grid.Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Background);
+                Assert.Null(failure);
+                Assert.False(grid.Engine.IsEditing);
+            }
+            finally { grid.Dispatcher.UnhandledException -= handler; }
+        });
+    }
+
+    /// <summary>Native selection rejects rows disallowed by the same shared eligibility policy as selection commands.</summary>
+    [Theory]
+    [InlineData(DataGridSelectionMode.Single)]
+    [InlineData(DataGridSelectionMode.Extended)]
+    public async Task NativeSelectionHonorsEligibility(DataGridSelectionMode mode)
+    {
+        await WpfTestDispatcher.RunAsync(() =>
+        {
+            var item = new TestRow("disabled");
+            var allowed = new TestRow("allowed");
+            var grid = new VekDataGrid { ItemsSource = new[] { item, allowed }, IsRowSelectable = row => ((TestRow)row).Key != "disabled", SelectionMode = mode };
+            grid.SelectedItem = allowed;
+            grid.SelectedItem = item;
+            Assert.Same(allowed, grid.SelectedItem);
+            Assert.Equal(grid.Engine.GetItemKey(allowed), Assert.Single(grid.Engine.SelectedKeys));
+            return true;
+        });
+    }
+
+    /// <summary>Disabling row activation prevents mouse-driven selection while retaining programmatic selection.</summary>
+    [Fact]
+    public async Task NativeRowActivationHonorsRowClickPolicy()
+    {
+        await await WpfTestDispatcher.RunAsync(async () =>
+        {
+            var item = new TestRow("one");
+            var grid = new TestableVekDataGrid { ItemsSource = new[] { item }, RowClickSelection = false };
+            var args = new System.Windows.Input.MouseButtonEventArgs(System.Windows.Input.Mouse.PrimaryDevice, 0, System.Windows.Input.MouseButton.Left)
+            {
+                RoutedEvent = UIElement.PreviewMouseLeftButtonDownEvent,
+                Source = new DataGridRow { Item = item }
+            };
+            grid.TriggerPreviewMouseLeftButtonDown(args);
+            grid.SelectedItem = item;
+            Assert.Null(grid.SelectedItem);
+            await grid.Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Background);
+            grid.SelectedItem = item;
+            Assert.Same(item, grid.SelectedItem);
+        });
+    }
+
+    /// <summary>Shared paging commands slice the original source and clamp requests to the final native page.</summary>
+    [Fact]
+    public async Task SharedPagingCommandsSliceTheNativeSource()
+    {
+        await await WpfTestDispatcher.RunAsync(async () =>
+        {
+            var rows = new[] { new TestRow("one"), new TestRow("two"), new TestRow("three") };
+            var grid = new VekDataGrid { ItemsSource = rows };
+            await grid.SetPageSizeAsync(1);
+            Assert.Same(rows[0], Assert.Single(grid.Items.Cast<TestRow>()));
+            await grid.SetCurrentPageAsync(100);
+            Assert.Equal(3, grid.CurrentPage);
+            Assert.Same(rows[2], Assert.Single(grid.Items.Cast<TestRow>()));
+        });
+    }
+
+    /// <summary>Native editing retains rejected shared drafts and publishes accepted drafts without mutating the original row.</summary>
+    [Fact]
+    public async Task SharedEditRetainsRejectedDraftAndPublishesCommittedValue()
+    {
+        await await WpfTestDispatcher.RunAsync(async () =>
+        {
+            var original = new TestRow("original");
+            var accepted = false;
+            object? committed = null;
+            object? cancelled = null;
+            var grid = new VekDataGrid { ItemsSource = new[] { original }, CommitEditHandler = _ => Task.FromResult(accepted) };
+            grid.ItemCommitted += item => committed = item;
+            grid.EditCancelled += item => cancelled = item;
+            grid.AddColumn(new VekDataGridColumn<TestRow, DataTemplate>("Key", row => row.Key,
+                editable: true, editTemplate: _ => new DataTemplate()));
+            await grid.EditItemAsync(original);
+            Assert.NotSame(original, grid.Engine.DraftEditItem);
+            var draft = new TestRow("edited");
+            grid.UpdateEditDraft(draft);
+            Assert.False(await grid.CommitEditAsync());
+            Assert.True(grid.Engine.IsEditing);
+            accepted = true;
+            Assert.True(await grid.CommitEditAsync());
+            Assert.Same(draft, committed);
+            Assert.Equal("original", original.Key);
+            Assert.False(grid.Engine.IsEditing);
+            await grid.EditItemAsync(original);
+            await grid.CancelEditAsync();
+            Assert.Same(original, cancelled);
+            Assert.False(grid.Engine.IsEditing);
+        });
+    }
+
+    /// <summary>Shared column commands update native visibility, width, and display order.</summary>
+    [Fact]
+    public async Task SharedColumnCommandsUpdateNativeColumns()
+    {
+        await await WpfTestDispatcher.RunAsync(async () =>
+        {
+            var grid = new VekDataGrid();
+            var first = grid.AddColumn(new VekDataGridColumn<TestRow, DataTemplate>("Key", row => row.Key));
+            grid.AddColumn(new VekDataGridColumn<TestRow, DataTemplate>("Other", row => row.Key));
+            await grid.ResizeColumnAsync("Key", 123);
+            await grid.SetColumnVisibilityAsync("Key", false);
+            await grid.ReorderColumnAsync("Key", 1);
+            Assert.Equal(123, first.Width.Value);
+            Assert.Equal(Visibility.Collapsed, first.Visibility);
+            Assert.Equal(1, first.DisplayIndex);
+        });
+    }
+
+    /// <summary>Shared selection updates the native selection collection and selected-key state together.</summary>
+    [Fact]
+    public async Task SharedSelectionCommandsUpdateNativeSelection()
+    {
+        await await WpfTestDispatcher.RunAsync(async () =>
+        {
+            var rows = new[] { new TestRow("one"), new TestRow("two") };
+            var grid = new VekDataGrid { ItemsSource = rows };
+            await grid.SelectItemAsync(rows[0]);
+            await grid.SelectItemAsync(rows[1]);
+            Assert.Equal(rows, grid.SelectedItems.Cast<TestRow>().ToArray());
+            Assert.Equal(2, grid.Engine.SelectedKeys.Count);
+            await grid.SelectAllAsync(false);
+            Assert.Empty(grid.SelectedItems.Cast<object>());
+            Assert.Empty(grid.Engine.SelectedKeys);
+        });
+    }
+
+    /// <summary>Shared detail expansion is supplied to the native detail template through its canonical context.</summary>
+    [Fact]
+    public async Task SharedExpansionUpdatesNativeDetailContext()
+    {
+        await await WpfTestDispatcher.RunAsync(async () =>
+        {
+            var row = new TestRow("one");
+            var template = new DataTemplate();
+            VekDataGridRowDetailContext<TestRow>? context = null;
+            var grid = new VekDataGrid { ItemsSource = new[] { row } };
+            grid.AddColumn(new VekDataGridColumn<TestRow, DataTemplate>("details", item => item.Key,
+                isHierarchyColumn: true, detailTemplate: value => { context = value; return template; }));
+            await grid.ToggleRowDetailsAsync(row);
+            Assert.Same(template, grid.RowDetailsTemplateSelector!.SelectTemplate(row, grid));
+            Assert.True(context!.Expanded);
+            await grid.CollapseAllAsync();
+            Assert.False(grid.IsRowExpanded(row));
+        });
+    }
+
     /// <summary>Shared sorting resets the page and refreshes the native rows and direction indicator.</summary>
     [Fact]
     public async Task SharedSortResetsPageAndRefreshesNativeProjection()
@@ -325,6 +519,9 @@ public sealed class VekWpfDataGridAdapterTests
 
     private sealed class TestableVekDataGrid : VekDataGrid
     {
+        public void TriggerRowEditEnding(DataGridRowEditEndingEventArgs args) => OnRowEditEnding(args);
+        public void TriggerBeginningEdit(DataGridBeginningEditEventArgs args) => OnBeginningEdit(args);
+        public void TriggerPreviewMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs args) => OnPreviewMouseLeftButtonDown(args);
         public void TriggerSorting(DataGridSortingEventArgs args)
         {
             OnSorting(args);

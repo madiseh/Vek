@@ -6,6 +6,21 @@ namespace Vek.Components.Tests.DataGrid;
 
 public sealed class SelectionTests : BunitContext
 {
+    /// <summary>Shared commands invoked outside the renderer dispatch binding callbacks and rendering through the adapter.</summary>
+    [Fact]
+    public async Task BackgroundSelectionPublishesOnTheRenderer()
+    {
+        var cut = RenderSelectionGrid(selectionMode: VekDataGridSelectionMode.Multiple);
+        IReadOnlyList<TestProduct>? reported = null;
+        cut.Render(parameters => parameters.Add(grid => grid.SelectedItemsChanged,
+            EventCallback.Factory.Create<IReadOnlyList<TestProduct>>(cut.Instance, items => reported = items)));
+
+        await Task.Run(() => cut.Instance.SelectItemAsync(DataGridTestHelpers.Products[0]));
+
+        Assert.Same(DataGridTestHelpers.Products[0], Assert.Single(reported!));
+        Assert.Contains("is-selected", cut.Find("tbody tr").ClassList);
+    }
+
     /// <summary>Verifies selecting a row in single mode updates the selected item.</summary>
     [Fact]
     public void RowClickSelectsSingleItem()
