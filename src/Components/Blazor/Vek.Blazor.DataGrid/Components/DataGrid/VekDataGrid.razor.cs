@@ -8,7 +8,7 @@ namespace Vek.Components.Components.DataGrid;
 public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, RenderFragment>
 {
     private readonly List<IVekDataGridColumn<TItem, RenderFragment>> _columns = [];
-    private readonly VekDataGridEngine<TItem, RenderFragment> _engine = new();
+    private readonly VekDataGridEngine<TItem, RenderFragment> _engine = new() { FilterCaseSensitive = false };
     private IReadOnlyList<TItem> _expandedRows => _engine.Interaction.ExpandedItems;
     private TItem? _editingOriginal => _engine.OriginalEditItem;
     private TItem? _editingDraft => _engine.DraftEditItem;
@@ -136,43 +136,43 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
 
     /// <summary>Gets or sets the asynchronous page source. Use instead of the local Items parameter.</summary>
     [Parameter]
-    public Func<VekDataGridState<TItem>, CancellationToken, Task<VekDataGridData<TItem>>>? ServerData { get; set; }
+    public Func<VekDataGridState<TItem>, CancellationToken, Task<VekDataGridData<TItem>>>? ServerData { get; set; } = null;
 
     /// <summary>Gets or sets custom content displayed while a server request is running.</summary>
     [Parameter]
-    public RenderFragment? LoadingContent { get; set; }
+    public RenderFragment? LoadingContent { get; set; } = null;
 
     /// <summary>Gets or sets custom content displayed when a server request fails.</summary>
     [Parameter]
-    public RenderFragment<Exception>? ErrorContent { get; set; }
+    public RenderFragment<Exception>? ErrorContent { get; set; } = null;
 
     /// <summary>Gets or sets custom content displayed when the current result set is empty.</summary>
     [Parameter]
-    public RenderFragment? EmptyContent { get; set; }
+    public RenderFragment? EmptyContent { get; set; } = null;
 
     /// <summary>Gets or sets custom actions displayed above the table.</summary>
     [Parameter]
-    public RenderFragment? ToolbarTemplate { get; set; }
+    public RenderFragment? ToolbarTemplate { get; set; } = null;
 
     /// <summary>Gets or sets additional rows or content rendered inside the table header.</summary>
     [Parameter]
-    public RenderFragment? HeaderTemplate { get; set; }
+    public RenderFragment? HeaderTemplate { get; set; } = null;
 
     /// <summary>Gets or sets custom cell content for each row. The template must render valid table cells.</summary>
     [Parameter]
-    public RenderFragment<TItem>? RowTemplate { get; set; }
+    public RenderFragment<TItem>? RowTemplate { get; set; } = null;
 
     /// <summary>Gets or sets action content appended to each row.</summary>
     [Parameter]
-    public RenderFragment<VekDataGridRowContext<TItem>>? RowActionsTemplate { get; set; }
+    public RenderFragment<VekDataGridRowContext<TItem>>? RowActionsTemplate { get; set; } = null;
 
     /// <summary>Gets or sets action content rendered inside each data cell.</summary>
     [Parameter]
-    public RenderFragment<VekDataGridCellContext<TItem>>? CellActionsTemplate { get; set; }
+    public RenderFragment<VekDataGridCellContext<TItem>>? CellActionsTemplate { get; set; } = null;
 
     /// <summary>Gets or sets the culture used to format values, aggregates, and edit contexts.</summary>
     [Parameter]
-    public CultureInfo? Culture { get; set; }
+    public CultureInfo? Culture { get; set; } = null;
 
     /// <summary>Gets or sets the accessible name announced for the table.</summary>
     [Parameter]
@@ -180,19 +180,19 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
 
     /// <summary>Gets or sets additional attributes applied to the table element.</summary>
     [Parameter(CaptureUnmatchedValues = true)]
-    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; } = null;
 
     /// <summary>Gets or sets whether the grid displays a column options panel.</summary>
     [Parameter]
-    public bool ShowColumnPanel { get; set; }
+    public bool ShowColumnPanel { get; set; } = false;
 
     /// <summary>Gets or sets the surfaces that can reorder columns.</summary>
     [Parameter]
-    public VekDataGridColumnReorderMode ColumnReorderMode { get; set; }
+    public VekDataGridColumnReorderMode ColumnReorderMode { get; set; } = VekDataGridColumnReorderMode.None;
 
     /// <summary>Gets or sets a callback invoked after the column order changes.</summary>
     [Parameter]
-    public EventCallback<IReadOnlyList<string>> ColumnReordered { get; set; }
+    public EventCallback<IReadOnlyList<string>> ColumnReordered { get; set; } = default;
 
     /// <summary>Gets or sets the visible column groups shown above the table headings.</summary>
     [Parameter]
@@ -200,7 +200,7 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
 
     /// <summary>Gets or sets the resizing surface enabled for the grid.</summary>
     [Parameter]
-    public VekDataGridColumnResizeMode ColumnResizeMode { get; set; }
+    public VekDataGridColumnResizeMode ColumnResizeMode { get; set; } = VekDataGridColumnResizeMode.None;
 
     /// <summary>Gets or sets the row density.</summary>
     [Parameter]
@@ -208,59 +208,59 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
 
     /// <summary>Gets or sets whether the grid draws cell borders.</summary>
     [Parameter]
-    public bool Bordered { get; set; }
+    public bool Bordered { get; set; } = false;
 
     /// <summary>Gets or sets whether alternating rows receive a contrasting background.</summary>
     [Parameter]
-    public bool Striped { get; set; }
+    public bool Striped { get; set; } = false;
 
     /// <summary>Gets or sets whether the table header remains visible while its container scrolls.</summary>
     [Parameter]
-    public bool FixedHeader { get; set; }
+    public bool FixedHeader { get; set; } = false;
 
     /// <summary>Gets or sets whether the grid applies narrow-screen overflow constraints.</summary>
     [Parameter]
-    public bool Responsive { get; set; }
+    public bool Responsive { get; set; } = false;
 
     /// <summary>Gets or sets the initial width of a resizable grid container in pixels.</summary>
     [Parameter]
-    public int? ContainerWidth { get; set; }
+    public int? ContainerWidth { get; set; } = null;
 
     /// <summary>Gets or sets a function that supplies a CSS class for a row.</summary>
     [Parameter]
-    public Func<TItem, int, string?>? RowClass { get; set; }
+    public Func<TItem, int, string?>? RowClass { get; set; } = null;
 
     /// <summary>Gets or sets a function that supplies inline CSS for a row.</summary>
     [Parameter]
-    public Func<TItem, int, string?>? RowStyle { get; set; }
+    public Func<TItem, int, string?>? RowStyle { get; set; } = null;
 
     /// <summary>Gets or sets a function that supplies a CSS class for a cell.</summary>
     [Parameter]
-    public Func<TItem, string, int, string?>? CellClass { get; set; }
+    public Func<TItem, string, int, string?>? CellClass { get; set; } = null;
 
     /// <summary>Gets or sets a function that supplies inline CSS for a cell.</summary>
     [Parameter]
-    public Func<TItem, string, int, string?>? CellStyle { get; set; }
+    public Func<TItem, string, int, string?>? CellStyle { get; set; } = null;
 
     /// <summary>Gets or sets a function that supplies a CSS class for a column heading.</summary>
     [Parameter]
-    public Func<string, string?>? HeaderClass { get; set; }
+    public Func<string, string?>? HeaderClass { get; set; } = null;
 
     /// <summary>Gets or sets a function that supplies inline CSS for a column heading.</summary>
     [Parameter]
-    public Func<string, string?>? HeaderStyle { get; set; }
+    public Func<string, string?>? HeaderStyle { get; set; } = null;
 
     /// <summary>Gets or sets a function that supplies a CSS class for the aggregate footer.</summary>
     [Parameter]
-    public Func<string?>? FooterClass { get; set; }
+    public Func<string?>? FooterClass { get; set; } = null;
 
     /// <summary>Gets or sets a function that supplies inline CSS for the aggregate footer.</summary>
     [Parameter]
-    public Func<string?>? FooterStyle { get; set; }
+    public Func<string?>? FooterStyle { get; set; } = null;
 
     /// <summary>Gets or sets whether rows are rendered through the framework virtualizer.</summary>
     [Parameter]
-    public bool VirtualizeRows { get; set; }
+    public bool VirtualizeRows { get; set; } = false;
 
     /// <summary>Gets or sets the estimated height in pixels for each virtualized row.</summary>
     [Parameter]
@@ -276,7 +276,7 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
 
     /// <summary>Gets or sets the asynchronous range source used for server virtualization.</summary>
     [Parameter]
-    public Func<VekDataGridState<TItem>, int, int, CancellationToken, Task<VekDataGridData<TItem>>>? ServerVirtualData { get; set; }
+    public Func<VekDataGridState<TItem>, int, int, CancellationToken, Task<VekDataGridData<TItem>>>? ServerVirtualData { get; set; } = null;
 
     /// <summary>Gets whether a server request is currently running.</summary>
     public bool IsLoading => _serverLoading;
@@ -512,7 +512,7 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
     /// when using server data, the default request size is 10.
     /// </summary>
     [Parameter]
-    public int PageSize { get; set; }
+    public int PageSize { get; set; } = 0;
 
     /// <summary>Gets or sets the current one-based page for two-way binding.</summary>
     [Parameter]
@@ -528,27 +528,27 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
 
     /// <summary>Gets or sets a callback invoked when the current page changes.</summary>
     [Parameter]
-    public EventCallback<int> CurrentPageChanged { get; set; }
+    public EventCallback<int> CurrentPageChanged { get; set; } = default;
 
     /// <summary>Gets or sets a callback invoked when the page size changes.</summary>
     [Parameter]
-    public EventCallback<int> PageSizeChanged { get; set; }
+    public EventCallback<int> PageSizeChanged { get; set; } = default;
 
     /// <summary>Gets or sets optional content used in place of the built-in pager.</summary>
     [Parameter]
-    public RenderFragment<VekDataGridPagerContext<TItem>>? PagerContent { get; set; }
+    public RenderFragment<VekDataGridPagerContext<TItem>>? PagerContent { get; set; } = null;
 
     /// <summary>Gets or sets the row selection mode.</summary>
     [Parameter]
-    public VekDataGridSelectionMode SelectionMode { get; set; }
+    public VekDataGridSelectionMode SelectionMode { get; set; } = VekDataGridSelectionMode.None;
 
     /// <summary>Gets or sets the selected item in single-selection mode.</summary>
     [Parameter]
-    public TItem? SelectedItem { get; set; }
+    public TItem? SelectedItem { get; set; } = default;
 
     /// <summary>Gets or sets the callback invoked when the selected item changes.</summary>
     [Parameter]
-    public EventCallback<TItem?> SelectedItemChanged { get; set; }
+    public EventCallback<TItem?> SelectedItemChanged { get; set; } = default;
 
     /// <summary>Gets or sets the selected items in multiple-selection mode.</summary>
     [Parameter]
@@ -556,51 +556,51 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
 
     /// <summary>Gets or sets the callback invoked when the selected item collection changes.</summary>
     [Parameter]
-    public EventCallback<IReadOnlyList<TItem>> SelectedItemsChanged { get; set; }
+    public EventCallback<IReadOnlyList<TItem>> SelectedItemsChanged { get; set; } = default;
 
     /// <summary>Gets or sets whether clicking a row toggles its selection.</summary>
     [Parameter]
-    public bool RowClickSelection { get; set; }
+    public bool RowClickSelection { get; set; } = false;
 
     /// <summary>Gets or sets a predicate that disables selection for matching rows.</summary>
     [Parameter]
-    public Func<TItem, bool>? IsRowSelectable { get; set; }
+    public Func<TItem, bool>? IsRowSelectable { get; set; } = null;
 
     /// <summary>Gets or sets the comparer used to identify selected rows across data refreshes.</summary>
     [Parameter]
-    public IEqualityComparer<TItem>? SelectionComparer { get; set; }
+    public IEqualityComparer<TItem>? SelectionComparer { get; set; } = null;
 
     /// <summary>Gets or sets the stable key selector used by the shared Core selection state.</summary>
     [Parameter]
-    public Func<TItem, string>? ItemKeySelector { get; set; }
+    public Func<TItem, string>? ItemKeySelector { get; set; } = null;
 
     /// <summary>Gets or sets the policy used when filters hide selected rows.</summary>
     [Parameter]
-    public VekDataGridFilteredSelectionMode FilteredSelectionMode { get; set; }
+    public VekDataGridFilteredSelectionMode FilteredSelectionMode { get; set; } = VekDataGridFilteredSelectionMode.Keep;
 
     /// <summary>Gets or sets the grid's editing mode.</summary>
     [Parameter]
-    public VekDataGridEditMode EditMode { get; set; }
+    public VekDataGridEditMode EditMode { get; set; } = VekDataGridEditMode.None;
 
     /// <summary>Gets or sets a callback invoked after a draft is created.</summary>
     [Parameter]
-    public EventCallback<TItem> EditStarted { get; set; }
+    public EventCallback<TItem> EditStarted { get; set; } = default;
 
     /// <summary>Gets or sets a strategy that creates an isolated draft item.</summary>
     [Parameter]
-    public Func<TItem, TItem>? CloneItem { get; set; }
+    public Func<TItem, TItem>? CloneItem { get; set; } = null;
 
     /// <summary>Gets or sets a callback that validates and accepts a draft. Return false to keep editing.</summary>
     [Parameter]
-    public Func<TItem, Task<bool>>? CommitEdit { get; set; }
+    public Func<TItem, Task<bool>>? CommitEdit { get; set; } = null;
 
     /// <summary>Gets or sets a callback invoked after a draft is committed.</summary>
     [Parameter]
-    public EventCallback<TItem> ItemCommitted { get; set; }
+    public EventCallback<TItem> ItemCommitted { get; set; } = default;
 
     /// <summary>Gets or sets a callback invoked after an edit draft is canceled.</summary>
     [Parameter]
-    public EventCallback<TItem> EditCancelled { get; set; }
+    public EventCallback<TItem> EditCancelled { get; set; } = default;
 
     /// <summary>Gets or sets the ordered grouping columns.</summary>
     [Parameter]
@@ -608,7 +608,7 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
 
     /// <summary>Gets or sets a callback invoked when a group is expanded or collapsed.</summary>
     [Parameter]
-    public EventCallback<IReadOnlyList<VekDataGridGroupDefinition>> GroupChanged { get; set; }
+    public EventCallback<IReadOnlyList<VekDataGridGroupDefinition>> GroupChanged { get; set; } = default;
 
     /// <summary>Gets or sets the calculations displayed in the grid footer and group headers.</summary>
     [Parameter]
@@ -616,23 +616,23 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
 
     /// <summary>Gets or sets custom content for the aggregate footer.</summary>
     [Parameter]
-    public RenderFragment<VekDataGridFooterContext<TItem>>? FooterTemplate { get; set; }
+    public RenderFragment<VekDataGridFooterContext<TItem>>? FooterTemplate { get; set; } = null;
 
     /// <summary>Gets or sets a predicate that marks rows initially expanded.</summary>
     [Parameter]
-    public Func<TItem, bool>? InitiallyExpanded { get; set; }
+    public Func<TItem, bool>? InitiallyExpanded { get; set; } = null;
 
     /// <summary>Gets or sets whether only one row can be expanded at a time.</summary>
     [Parameter]
-    public bool SingleExpandedRow { get; set; }
+    public bool SingleExpandedRow { get; set; } = false;
 
     /// <summary>Gets or sets the comparer used to preserve expanded rows across refreshes.</summary>
     [Parameter]
-    public IEqualityComparer<TItem>? RowDetailsComparer { get; set; }
+    public IEqualityComparer<TItem>? RowDetailsComparer { get; set; } = null;
 
     /// <summary>Gets or sets a callback invoked when the expanded row set changes.</summary>
     [Parameter]
-    public EventCallback<IReadOnlyList<TItem>> RowDetailsExpandedChanged { get; set; }
+    public EventCallback<IReadOnlyList<TItem>> RowDetailsExpandedChanged { get; set; } = default;
 
     /// <summary>
     /// Gets or sets whether sorting is disabled, limited to one column, or applied to multiple columns.
@@ -648,11 +648,15 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
 
     /// <summary>Gets or sets an optional predicate applied before column filters.</summary>
     [Parameter]
-    public Func<TItem, bool>? QuickFilter { get; set; }
+    public Func<TItem, bool>? QuickFilter { get; set; } = null;
 
     /// <summary>Gets or sets where the grid displays column filter controls.</summary>
     [Parameter]
     public VekDataGridFilterMode FilterMode { get; set; } = VekDataGridFilterMode.Simple;
+
+    /// <summary>Gets or sets whether the grid displays a filter row below its column headings.</summary>
+    [Parameter]
+    public bool ShowFilterRow { get; set; } = false;
 
     /// <summary>Gets or sets whether string comparisons distinguish letter case.</summary>
     [Parameter]
@@ -660,13 +664,13 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
 
     /// <summary>Gets or sets a callback invoked after filters are applied or cleared.</summary>
     [Parameter]
-    public EventCallback<IReadOnlyList<VekDataGridFilter>> FilterChanged { get; set; }
+    public EventCallback<IReadOnlyList<VekDataGridFilter>> FilterChanged { get; set; } = default;
 
     /// <summary>
     /// Gets or sets a callback invoked after the active sort definitions change.
     /// </summary>
     [Parameter]
-    public EventCallback<IReadOnlyList<VekDataGridSort>> SortChanged { get; set; }
+    public EventCallback<IReadOnlyList<VekDataGridSort>> SortChanged { get; set; } = default;
 
     /// <summary>
     /// Gets the current page, sort, and filter state of this grid.
@@ -1221,13 +1225,13 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
     /// Gets or sets an additional CSS class applied to the grid container.
     /// </summary>
     [Parameter]
-    public string? Class { get; set; }
+    public string? Class { get; set; } = null;
 
     /// <summary>
     /// Gets or sets the property columns displayed by the grid.
     /// </summary>
     [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+    public RenderFragment? ChildContent { get; set; } = null;
 
     private int EffectivePageSize => PageSize > 0
         ? PageSize

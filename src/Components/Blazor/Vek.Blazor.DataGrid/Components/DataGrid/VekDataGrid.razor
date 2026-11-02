@@ -66,7 +66,7 @@
             </section>
         }
     }
-    @if (FilterMode == VekDataGridFilterMode.Simple && VisibleColumns.Any(column => column.Filterable))
+    @if (!ShowFilterRow && FilterMode == VekDataGridFilterMode.Simple && VisibleColumns.Any(column => column.Filterable))
     {
         <div class="filter-panel" aria-label="Filters">
             @foreach (var column in VisibleColumns.Where(column => column.Filterable))
@@ -139,7 +139,7 @@
                                     }
                                 </button>
                             }
-                            @if (FilterMode == VekDataGridFilterMode.ColumnMenu && column.Filterable)
+                            @if (!ShowFilterRow && FilterMode == VekDataGridFilterMode.ColumnMenu && column.Filterable)
                             {
                                 <span class="sort-interactive-control" @onclick:stopPropagation="true">
                                     @RenderFilterControl(column)
@@ -160,7 +160,7 @@
                         <th class="row-actions-header" scope="col">Actions</th>
                     }
                 </tr>
-                @if (FilterMode == VekDataGridFilterMode.ColumnRow)
+                @if (ShowFilterRow || FilterMode == VekDataGridFilterMode.ColumnRow)
                 {
                     <tr class="filter-row">
                         @foreach (var column in VisibleColumns)
@@ -294,7 +294,7 @@
         }
 
         var sequence = 0;
-        if (FilterMode == VekDataGridFilterMode.ColumnMenu)
+        if (!ShowFilterRow && FilterMode == VekDataGridFilterMode.ColumnMenu)
         {
             builder.OpenElement(sequence++, "details");
             builder.OpenElement(sequence++, "summary");
@@ -310,6 +310,6 @@
             args => ApplyTextFilter(column, args.Value?.ToString())));
         builder.CloseElement();
         builder.CloseElement();
-        if (FilterMode == VekDataGridFilterMode.ColumnMenu) builder.CloseElement();
+        if (!ShowFilterRow && FilterMode == VekDataGridFilterMode.ColumnMenu) builder.CloseElement();
     };
 }

@@ -23,7 +23,9 @@
             else
             {
                 <div class="docs-example-frame">
-                    <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="10" FilterMode="_filterMode">
+                    <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="10"
+                                 FilterMode="@(_filterMode == VekDataGridFilterMode.ColumnRow ? VekDataGridFilterMode.Simple : _filterMode)"
+                                 ShowFilterRow="@(_filterMode == VekDataGridFilterMode.ColumnRow)">
                         <PropertyColumn Property="product => product.Name" Title="Name" Filterable="true" FilterOperator="VekDataGridFilterOperator.Contains" />
                         <PropertyColumn Property="product => product.Category" Title="Category" Filterable="true" FilterOperator="VekDataGridFilterOperator.Contains" />
                         <PropertyColumn Property="product => product.Price" Title="Price" Format="C2" Filterable="true" FilterOperator="VekDataGridFilterOperator.GreaterThanOrEqual" />

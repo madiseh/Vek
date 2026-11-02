@@ -6,7 +6,7 @@ namespace Vek.Demo.Components.Pages.Docs.Blazor.DataGrid.Filtering;
 public partial class Filtering
 {
     private const string RazorExample = """
-        <VekDataGrid TItem="DemoProduct" Items="_products" FilterMode="VekDataGridFilterMode.ColumnRow"
+        <VekDataGrid TItem="DemoProduct" Items="_products" ShowFilterRow="true"
                      FilterCaseSensitive="false" FilterChanged="OnFiltersChanged">
             <PropertyColumn Property="product => product.Name" Title="Name"
                             Filterable="true" FilterOperator="VekDataGridFilterOperator.Contains" />
@@ -39,7 +39,7 @@ public partial class Filtering
     private IDemoProductProvider ProductProvider { get; set; } = default!;
 
     private IReadOnlyList<DemoProduct>? _products;
-    private VekDataGridFilterMode _filterMode = VekDataGridFilterMode.Simple;
+    private VekDataGridFilterMode _filterMode = VekDataGridFilterMode.ColumnRow;
     private readonly IReadOnlyList<VekCodeViewTab> _codeSamples =
     [
         new("Sample.razor", VekCodeLanguage.Html, RazorExample),

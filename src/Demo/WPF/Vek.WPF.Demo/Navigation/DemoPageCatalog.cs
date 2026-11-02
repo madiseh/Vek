@@ -14,7 +14,7 @@ public static class DemoPageCatalog
         new("vekdatagrid/sorting", "Sorting", "VekDataGrid",
             "Sort by one column or combine columns to create a prioritized order.", DemoPageImplementationStatus.InDevelopment),
         new("vekdatagrid/filtering", "Filtering", "VekDataGrid",
-            "Combine quick predicates with per-column filters, choose a filter surface, and control string matching.", DemoPageImplementationStatus.InDevelopment),
+            "Filter rows with editors below the column headings.", DemoPageImplementationStatus.Implemented),
         new("vekdatagrid/pagination", "Pagination", "VekDataGrid",
             "Control the current page and page size, or replace the built-in pager with a custom surface.", DemoPageImplementationStatus.InDevelopment),
         new("vekdatagrid/selection", "Row Selection", "VekDataGrid",

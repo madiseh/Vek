@@ -8,10 +8,35 @@ public partial class VekDataGrid : WpfDataGrid, IVekDataGridHost<object, WpfData
     private IEnumerable? _sourceItems;
     private readonly VekDataGridEngine<object, WpfDataTemplate> _engine = new();
     private readonly Dictionary<string, object> _columnDefinitions = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<DataGridColumn, object?> _filterRowOriginalHeaders = new();
+    private readonly Dictionary<DataGridColumn, TextBox> _filterRowEditors = new();
     private Func<object, string>? _itemKeySelector;
+    private bool _showFilterRow;
+
+    /// <summary>Initializes the control and observes native column additions for filter editors.</summary>
+    public VekDataGrid() => Columns.CollectionChanged += (_, _) => UpdateFilterRow();
 
     /// <summary>Gets or sets whether sorting uses one column or an ordered set of columns.</summary>
     public VekDataGridSortMode SortMode { get; set; } = VekDataGridSortMode.Single;
+
+    /// <summary>Gets or sets whether filter editors appear below filterable column headings.</summary>
+    public bool ShowFilterRow
+    {
+        get => _showFilterRow;
+        set
+        {
+            if (_showFilterRow == value) return;
+            _showFilterRow = value;
+            UpdateFilterRow();
+        }
+    }
+
+    /// <summary>Gets or sets whether text filters distinguish uppercase and lowercase letters.</summary>
+    public bool FilterCaseSensitive
+    {
+        get => _engine.FilterCaseSensitive;
+        set => _engine.FilterCaseSensitive = value;
+    }
 
     /// <summary>Gets or sets the one-based page displayed by this grid.</summary>
     public int CurrentPage
@@ -105,6 +130,7 @@ public partial class VekDataGrid : WpfDataGrid, IVekDataGridHost<object, WpfData
         };
         if (column.Width is int width) nativeColumn.Width = new WpfDataGridLength(width);
         Columns.Add(nativeColumn);
+        UpdateFilterRow();
         return nativeColumn;
     }
 
@@ -159,9 +185,9 @@ public partial class VekDataGrid : WpfDataGrid, IVekDataGridHost<object, WpfData
         ArgumentNullException.ThrowIfNull(e);
         e.Handled = true;
 
-        var columnKey = string.IsNullOrWhiteSpace(e.Column.SortMemberPath)
-            ? Convert.ToString(e.Column.Header, CultureInfo.InvariantCulture)
-            : e.Column.SortMemberPath;
+        var columnKey = GetColumnKey(e.Column)
+            ?? Convert.ToString(_filterRowOriginalHeaders.GetValueOrDefault(e.Column) ?? e.Column.Header,
+                CultureInfo.InvariantCulture);
         if (string.IsNullOrWhiteSpace(columnKey)) return;
 
         _sourceItems ??= ItemsSource;
@@ -244,6 +270,110 @@ public partial class VekDataGrid : WpfDataGrid, IVekDataGridHost<object, WpfData
             finally { _projecting = false; }
             ApplyNativeSelection();
         }
+    }
+
+    private void UpdateFilterRow()
+    {
+        foreach (var column in Columns)
+        {
+            if (!ShowFilterRow)
+            {
+                if (_filterRowEditors.Remove(column, out var existingEditor))
+                    existingEditor.TextChanged -= FilterRowTextChanged;
+                if (_filterRowOriginalHeaders.Remove(column, out var originalHeader))
+                    column.Header = originalHeader;
+                continue;
+            }
+
+            if (_filterRowEditors.ContainsKey(column)) continue;
+            var key = GetColumnKey(column);
+            if (string.IsNullOrWhiteSpace(key)) continue;
+            var definition = GetFilterColumn(key, column);
+            if (definition is null || !definition.Filterable) continue;
+
+            var original = column.Header;
+            _filterRowOriginalHeaders[column] = original;
+            var title = Convert.ToString(original, CultureInfo.CurrentCulture) ?? definition.Title;
+            var header = new StackPanel { Orientation = Orientation.Vertical };
+            header.Children.Add(new TextBlock { Text = title, TextTrimming = TextTrimming.CharacterEllipsis });
+
+            var editor = new TextBox
+            {
+                MinWidth = 72,
+                Margin = new Thickness(0, 4, 0, 0),
+                ToolTip = $"Filter {title}",
+                Tag = column
+            };
+            AutomationProperties.SetName(editor, $"Filter {title}");
+            editor.PreviewMouseLeftButtonDown += (_, args) =>
+            {
+                args.Handled = true;
+                editor.Focus();
+            };
+            editor.TextChanged += FilterRowTextChanged;
+            _filterRowEditors.Add(column, editor);
+            header.Children.Add(editor);
+            column.Header = header;
+        }
+    }
+
+    private async void FilterRowTextChanged(object sender, TextChangedEventArgs args)
+    {
+        if (sender is not TextBox editor || editor.Tag is not DataGridColumn column) return;
+        var key = GetColumnKey(column);
+        if (string.IsNullOrWhiteSpace(key)) return;
+        var definition = _engine.Columns.FirstOrDefault(candidate =>
+            string.Equals(candidate.Key, key, StringComparison.OrdinalIgnoreCase));
+        if (definition is null) return;
+
+        if (string.IsNullOrEmpty(editor.Text))
+            await this.RemoveFilterAsync(key);
+        else
+            await this.ApplyFilterAsync(key, definition.FilterOperator, editor.Text, FilterCaseSensitive);
+    }
+
+    private IVekDataGridColumn<object, WpfDataTemplate>? GetFilterColumn(string key, DataGridColumn nativeColumn)
+    {
+        var existing = _engine.Columns.FirstOrDefault(candidate =>
+            string.Equals(candidate.Key, key, StringComparison.OrdinalIgnoreCase));
+        if (existing is not null) return existing;
+
+        var source = _sourceItems ?? ItemsSource;
+        var item = source?.Cast<object>().FirstOrDefault();
+        var itemType = item?.GetType() ?? GetSourceItemType(source);
+        var property = itemType?.GetProperty(key,
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
+        if (itemType is not null && property is null) return null;
+        var title = Convert.ToString(
+            _filterRowOriginalHeaders.GetValueOrDefault(nativeColumn) ?? nativeColumn.Header,
+            CultureInfo.CurrentCulture) ?? key;
+        var definition = new VekDataGridColumn<object, WpfDataTemplate>(
+            key,
+            row => (property ?? row.GetType().GetProperty(key,
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase))?.GetValue(row),
+            title: title,
+            filterable: true,
+            filterOperator: property?.PropertyType == typeof(string)
+                ? VekDataGridFilterOperator.Contains
+                : VekDataGridFilterOperator.Equals);
+        _engine.AddOrUpdateColumn(definition);
+        return definition;
+    }
+
+    private static Type? GetSourceItemType(IEnumerable? source)
+    {
+        var sourceType = source?.GetType();
+        return sourceType?.GetInterfaces().Append(sourceType)
+            .FirstOrDefault(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+            ?.GetGenericArguments()[0];
+    }
+
+    private static string? GetColumnKey(DataGridColumn column)
+    {
+        if (!string.IsNullOrWhiteSpace(column.SortMemberPath)) return column.SortMemberPath;
+        if (column is DataGridBoundColumn { Binding: Binding binding }
+            && !string.IsNullOrWhiteSpace(binding.Path?.Path)) return binding.Path.Path;
+        return null;
     }
 
     private void SyncCoreSelection()

@@ -13,7 +13,7 @@ public partial class TemplateColumn<TItem>
     /// Gets or sets the stable key used to identify this column.
     /// </summary>
     [Parameter]
-    public string? Key { get; set; }
+    public string? Key { get; set; } = null;
 
     /// <summary>Gets or sets whether this column is included in the rendered table.</summary>
     [Parameter]
@@ -21,11 +21,11 @@ public partial class TemplateColumn<TItem>
 
     /// <summary>Gets or sets the callback invoked when this column's visibility changes.</summary>
     [Parameter]
-    public EventCallback<bool> VisibleChanged { get; set; }
+    public EventCallback<bool> VisibleChanged { get; set; } = default;
 
     /// <summary>Gets or sets the initial or current width of the column in pixels.</summary>
     [Parameter]
-    public int? Width { get; set; }
+    public int? Width { get; set; } = null;
 
     /// <summary>Gets or sets the minimum resizable width in pixels.</summary>
     [Parameter]
@@ -37,7 +37,7 @@ public partial class TemplateColumn<TItem>
 
     /// <summary>Gets or sets the callback invoked when this column's width changes.</summary>
     [Parameter]
-    public EventCallback<int?> WidthChanged { get; set; }
+    public EventCallback<int?> WidthChanged { get; set; } = default;
 
     /// <summary>
     /// Gets or sets the column heading.
@@ -55,7 +55,7 @@ public partial class TemplateColumn<TItem>
     /// Gets or sets whether users can sort by this column.
     /// </summary>
     [Parameter]
-    public bool Sortable { get; set; }
+    public bool Sortable { get; set; } = false;
 
     private VekDataGrid<TItem>? _registeredGrid;
     private string? _lastKey;

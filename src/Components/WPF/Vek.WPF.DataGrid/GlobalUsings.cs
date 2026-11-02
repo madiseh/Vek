@@ -4,6 +4,7 @@ global using System.Globalization;
 global using System.Reflection;
 global using System.Windows.Data;
 global using System.Windows.Input;
+global using System.Windows.Automation;
 global using Vek.Core.DataGrid;
 global using System.Windows;
 global using System.Windows.Controls;

@@ -245,5 +245,6 @@ public partial class VekDataGrid
     {
         if (!_projecting) _sourceItems = newValue;
         base.OnItemsSourceChanged(oldValue, newValue);
+        if (!_projecting && ShowFilterRow) UpdateFilterRow();
     }
 }

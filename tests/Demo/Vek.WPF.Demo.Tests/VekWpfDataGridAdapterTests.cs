@@ -247,6 +247,54 @@ public sealed class VekWpfDataGridAdapterTests
         });
     }
 
+    /// <summary>Verifies that entering a value in a native filter-row editor filters and restores displayed rows.</summary>
+    [Fact]
+    public async Task FilterRowEditorFiltersAndRestoresNativeRows()
+    {
+        await await WpfTestDispatcher.RunAsync(async () =>
+        {
+            var rows = new[] { new TestRow("desk"), new TestRow("chair") };
+            var grid = new VekDataGrid { ItemsSource = rows, ShowFilterRow = true };
+            var column = grid.AddColumn(new VekDataGridColumn<TestRow, DataTemplate>(
+                "Key", item => item.Key, filterable: true, filterOperator: VekDataGridFilterOperator.Contains));
+            var header = Assert.IsType<StackPanel>(column.Header);
+            var editor = Assert.Single(header.Children.OfType<TextBox>());
+
+            editor.Text = "desk";
+            await grid.Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Background);
+            Assert.Equal(new[] { rows[0] }, grid.Items.Cast<TestRow>().ToArray());
+
+            editor.Text = string.Empty;
+            await grid.Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Background);
+            Assert.Equal(rows, grid.Items.Cast<TestRow>().ToArray());
+        });
+    }
+
+    /// <summary>Verifies the filter row derives its column selector from an ordinary WPF bound column.</summary>
+    [Fact]
+    public async Task FilterRowFiltersAnOrdinaryBoundColumn()
+    {
+        await await WpfTestDispatcher.RunAsync(async () =>
+        {
+            var rows = new[] { new TestRow("desk"), new TestRow("chair") };
+            var grid = new VekDataGrid { ItemsSource = rows, ShowFilterRow = true };
+            var column = new DataGridTextColumn
+            {
+                Header = "Key",
+                Binding = new Binding(nameof(TestRow.Key)),
+                SortMemberPath = nameof(TestRow.Key)
+            };
+            grid.Columns.Add(column);
+            var header = Assert.IsType<StackPanel>(column.Header);
+            var editor = Assert.Single(header.Children.OfType<TextBox>());
+
+            editor.Text = "desk";
+            await grid.Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Background);
+
+            Assert.Equal(new[] { rows[0] }, grid.Items.Cast<TestRow>().ToArray());
+        });
+    }
+
     /// <summary>Ensures WPF test windows are laid out without becoming visible or stealing focus.</summary>
     [Fact]
     public async Task TestWindowsAreShownOffscreenWithoutActivation()

@@ -19,11 +19,11 @@ public partial class HierarchyColumn<TItem> : IDisposable, IVekDataGridColumn<TI
 
     /// <summary>Gets or sets the callback invoked when this column's visibility changes.</summary>
     [Parameter]
-    public EventCallback<bool> VisibleChanged { get; set; }
+    public EventCallback<bool> VisibleChanged { get; set; } = default;
 
     /// <summary>Gets or sets the initial or current width of the column in pixels.</summary>
     [Parameter]
-    public int? Width { get; set; }
+    public int? Width { get; set; } = null;
 
     /// <summary>Gets or sets the minimum resizable width in pixels.</summary>
     [Parameter]
@@ -35,7 +35,7 @@ public partial class HierarchyColumn<TItem> : IDisposable, IVekDataGridColumn<TI
 
     /// <summary>Gets or sets the callback invoked when this column's width changes.</summary>
     [Parameter]
-    public EventCallback<int?> WidthChanged { get; set; }
+    public EventCallback<int?> WidthChanged { get; set; } = default;
 
     /// <summary>Registers the hierarchy column with its parent grid.</summary>
     protected override void OnParametersSet()

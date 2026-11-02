@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Vek.Components.Components.DataGrid;
 
 namespace Vek.Demo.Tests;
 
@@ -172,17 +173,28 @@ public sealed class DemoPageNavigationTests : BunitContext
 
         Assert.Equal("VekDataGrid: Filtering", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
-        Assert.Contains("FilterMode=\"VekDataGridFilterMode.ColumnRow\"", cut.Find(".vek-code-view pre code").TextContent);
+        Assert.Contains("ShowFilterRow=\"true\"", cut.Find(".vek-code-view pre code").TextContent);
         Assert.Contains("Filterable", cut.Find("#filter-options").TextContent);
         Assert.Contains("FilterBy", cut.Find("#filter-options").TextContent);
+        var grid = cut.FindComponent<VekDataGrid<DemoProduct>>();
+        Assert.True(grid.Instance.ShowFilterRow);
         var filterModeButtons = cut.FindAll(".filter-mode-picker button");
-        Assert.Equal("true", filterModeButtons[0].GetAttribute("aria-pressed"));
+        Assert.Equal("false", filterModeButtons[0].GetAttribute("aria-pressed"));
         Assert.Equal("false", filterModeButtons[1].GetAttribute("aria-pressed"));
+        Assert.Equal("true", filterModeButtons[2].GetAttribute("aria-pressed"));
         filterModeButtons[1].Click();
         Assert.Equal("true", cut.FindAll(".filter-mode-picker button")[1].GetAttribute("aria-pressed"));
+        Assert.False(grid.Instance.ShowFilterRow);
         Assert.Equal(
             "/docs/components/vekdatagrid/filtering",
             cut.Find(".docs-sidebar a.active").GetAttribute("href"));
+
+        cut.FindAll(".filter-mode-picker button")[2].Click();
+        Assert.True(grid.Instance.ShowFilterRow);
+        cut.Find("thead .filter-row input").Change("Desk");
+        var filteredRows = cut.FindAll("tbody tr");
+        Assert.Single(filteredRows);
+        Assert.Contains("Desk Lamp", filteredRows[0].TextContent);
     }
 
     /// <summary>

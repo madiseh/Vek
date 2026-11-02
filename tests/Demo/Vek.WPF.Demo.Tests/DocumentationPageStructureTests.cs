@@ -141,6 +141,27 @@ public sealed class DocumentationPageStructureTests
         });
     }
 
+    /// <summary>Verifies the WPF filtering guide renders a grid with filter-row editors.</summary>
+    [Fact]
+    public async Task WpfFilteringGuideShowsFilterRowGrid()
+    {
+        await WpfTestDispatcher.RunAsync(() =>
+        {
+            var page = DemoPageCatalog.All.Single(page => page.Id == "vekdatagrid/filtering");
+            var pageView = Assert.IsAssignableFrom<UserControl>(Activator.CreateInstance(page.PageType));
+            pageView.DataContext = page;
+            WithWindow(pageView, window =>
+            {
+                var grid = Assert.Single(Descendants<VekDataGrid>(window));
+                Assert.True(grid.ShowFilterRow);
+                Assert.Equal(2, grid.Columns.Count(column =>
+                    column.Header is StackPanel header && header.Children.OfType<TextBox>().Any()));
+                Assert.Single(Descendants<CodeSampleView>(window));
+            });
+            return true;
+        });
+    }
+
     /// <summary>
     /// Local TOC activation scrolls the article to the requested section instead of leaving a decorative link.
     /// </summary>

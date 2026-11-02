@@ -20,13 +20,13 @@ public partial class PropertyColumn<TItem, TValue>
     /// Gets or sets the column heading. When omitted, the selected property's name is used.
     /// </summary>
     [Parameter]
-    public string? Title { get; set; }
+    public string? Title { get; set; } = null;
 
     /// <summary>
     /// Gets or sets the stable key used to identify this column.
     /// </summary>
     [Parameter]
-    public string? Key { get; set; }
+    public string? Key { get; set; } = null;
 
     /// <summary>Gets or sets whether this column is included in the rendered table.</summary>
     [Parameter]
@@ -34,11 +34,11 @@ public partial class PropertyColumn<TItem, TValue>
 
     /// <summary>Gets or sets the callback invoked when this column's visibility changes.</summary>
     [Parameter]
-    public EventCallback<bool> VisibleChanged { get; set; }
+    public EventCallback<bool> VisibleChanged { get; set; } = default;
 
     /// <summary>Gets or sets the initial or current width of the column in pixels.</summary>
     [Parameter]
-    public int? Width { get; set; }
+    public int? Width { get; set; } = null;
 
     /// <summary>Gets or sets the minimum resizable width in pixels.</summary>
     [Parameter]
@@ -50,19 +50,19 @@ public partial class PropertyColumn<TItem, TValue>
 
     /// <summary>Gets or sets the callback invoked when this column's width changes.</summary>
     [Parameter]
-    public EventCallback<int?> WidthChanged { get; set; }
+    public EventCallback<int?> WidthChanged { get; set; } = default;
 
     /// <summary>
     /// Gets or sets the format string used when displaying formattable values.
     /// </summary>
     [Parameter]
-    public string? Format { get; set; }
+    public string? Format { get; set; } = null;
 
     /// <summary>
     /// Gets or sets the optional template used to render this column's cells.
     /// </summary>
     [Parameter]
-    public RenderFragment<TItem>? CellTemplate { get; set; }
+    public RenderFragment<TItem>? CellTemplate { get; set; } = null;
 
     /// <summary>
     /// Gets or sets whether users can sort by this column.
@@ -74,27 +74,27 @@ public partial class PropertyColumn<TItem, TValue>
     /// Gets or sets a custom value selector used when sorting this column.
     /// </summary>
     [Parameter]
-    public Func<TItem, object?>? SortBy { get; set; }
+    public Func<TItem, object?>? SortBy { get; set; } = null;
 
     /// <summary>
     /// Gets or sets a custom comparer used when sorting this column.
     /// </summary>
     [Parameter]
-    public IComparer<object?>? SortComparer { get; set; }
+    public IComparer<object?>? SortComparer { get; set; } = null;
 
     /// <summary>
     /// Gets or sets whether this column participates in filtering. Defaults to false; set to true to show its filter
     /// control when the grid's <see cref="VekDataGrid{TItem}.FilterMode"/> enables a filter surface.
     /// </summary>
     [Parameter]
-    public bool Filterable { get; set; }
+    public bool Filterable { get; set; } = false;
 
     /// <summary>
     /// Gets or sets the value selector used to compare this column during filtering. When unset, the value from
     /// <see cref="Property"/> is used. This selector is only used when <see cref="Filterable"/> is true.
     /// </summary>
     [Parameter]
-    public Func<TItem, object?>? FilterBy { get; set; }
+    public Func<TItem, object?>? FilterBy { get; set; } = null;
 
     /// <summary>
     /// Gets or sets the default comparison used by this column's filter control. Defaults to
@@ -108,15 +108,15 @@ public partial class PropertyColumn<TItem, TValue>
     /// column and is rendered only when <see cref="Filterable"/> is true.
     /// </summary>
     [Parameter]
-    public RenderFragment<VekDataGridFilterContext>? FilterTemplate { get; set; }
+    public RenderFragment<VekDataGridFilterContext>? FilterTemplate { get; set; } = null;
 
     /// <summary>Gets or sets whether this column can enter edit mode.</summary>
     [Parameter]
-    public bool Editable { get; set; }
+    public bool Editable { get; set; } = false;
 
     /// <summary>Gets or sets a custom editor rendered for this column.</summary>
     [Parameter]
-    public RenderFragment<VekDataGridEditContext<TItem>>? EditTemplate { get; set; }
+    public RenderFragment<VekDataGridEditContext<TItem>>? EditTemplate { get; set; } = null;
 
     /// <summary>Gets or sets whether this column can group the grid rows.</summary>
     [Parameter]
@@ -124,15 +124,15 @@ public partial class PropertyColumn<TItem, TValue>
 
     /// <summary>Gets or sets an optional value selector used to create groups.</summary>
     [Parameter]
-    public Func<TItem, object?>? GroupBy { get; set; }
+    public Func<TItem, object?>? GroupBy { get; set; } = null;
 
     /// <summary>Gets or sets a custom group header template.</summary>
     [Parameter]
-    public RenderFragment<VekDataGridGroupContext<TItem>>? GroupTemplate { get; set; }
+    public RenderFragment<VekDataGridGroupContext<TItem>>? GroupTemplate { get; set; } = null;
 
     /// <summary>Gets or sets an optional value selector used by aggregate definitions.</summary>
     [Parameter]
-    public Func<TItem, object?>? AggregateBy { get; set; }
+    public Func<TItem, object?>? AggregateBy { get; set; } = null;
 
     private Func<TItem, TValue>? _propertyGetter;
     private VekDataGrid<TItem>? _registeredGrid;

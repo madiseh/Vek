@@ -89,15 +89,29 @@ public sealed class FilteringTests : BunitContext
         Assert.Single(row.FindAll("thead .filter-row input"));
     }
 
+    /// <summary>Verifies a standalone filter-row option filters data when a user enters a column value.</summary>
+    [Fact]
+    public void FilterRowInputFiltersRows()
+    {
+        var cut = RenderFilterGrid(showFilterRow: true);
+
+        Assert.Empty(cut.FindAll(".filter-panel"));
+        cut.Find("thead .filter-row input").Change("Desk");
+
+        Assert.Equal(new[] { "Desk Lamp" }, DataGridTestHelpers.GetRowNames(cut));
+    }
+
     private IRenderedComponent<VekDataGrid<TestProduct>> RenderFilterGrid(
         int pageSize = 3,
         bool caseSensitive = false,
         VekDataGridFilterMode filterMode = VekDataGridFilterMode.Simple,
+        bool showFilterRow = false,
         RenderFragment<Vek.Components.Components.DataGrid.VekDataGridFilterContext>? filterTemplate = null) => Render<VekDataGrid<TestProduct>>(parameters => parameters
             .Add(grid => grid.Items, DataGridTestHelpers.Products)
             .Add(grid => grid.PageSize, pageSize)
             .Add(grid => grid.FilterCaseSensitive, caseSensitive)
             .Add(grid => grid.FilterMode, filterMode)
+            .Add(grid => grid.ShowFilterRow, showFilterRow)
             .AddChildContent(builder =>
             {
                 builder.OpenComponent<PropertyColumn<TestProduct, string>>(0);

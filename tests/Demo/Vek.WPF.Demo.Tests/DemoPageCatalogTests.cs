@@ -88,24 +88,27 @@ public sealed class DemoPageCatalogTests
     public void UnimplementedDataGridTopicsAreMarkedInDevelopment()
     {
         var pages = DemoPageCatalog.All
-            .Where(page => page.Section == "VekDataGrid" && page.Id != "vekdatagrid/basic-usage")
+            .Where(page => page.Section == "VekDataGrid"
+                && page.Id is not ("vekdatagrid/basic-usage" or "vekdatagrid/filtering"))
             .ToArray();
 
-        Assert.Equal(15, pages.Length);
+        Assert.Equal(14, pages.Length);
         Assert.All(pages, page => Assert.Equal(DemoPageImplementationStatus.InDevelopment, page.ImplementationStatus));
     }
 
     /// <summary>
-    /// Basic Usage is the only DataGrid topic advertised as implemented while native features are added incrementally.
+    /// Basic Usage and Filtering are implemented because each has a native interactive sample.
     /// </summary>
     [Fact]
-    public void BasicUsageIsTheOnlyImplementedDataGridTopic()
+    public void BasicUsageAndFilteringAreTheImplementedDataGridTopics()
     {
         var pages = DemoPageCatalog.All.Where(page => page.Section == "VekDataGrid").ToArray();
 
         Assert.Equal(DemoPageImplementationStatus.Implemented,
             pages.Single(page => page.Id == "vekdatagrid/basic-usage").ImplementationStatus);
-        Assert.All(pages.Where(page => page.Id != "vekdatagrid/basic-usage"), page =>
+        Assert.Equal(DemoPageImplementationStatus.Implemented,
+            pages.Single(page => page.Id == "vekdatagrid/filtering").ImplementationStatus);
+        Assert.All(pages.Where(page => page.Id is not ("vekdatagrid/basic-usage" or "vekdatagrid/filtering")), page =>
             Assert.Equal(DemoPageImplementationStatus.InDevelopment, page.ImplementationStatus));
     }
 
