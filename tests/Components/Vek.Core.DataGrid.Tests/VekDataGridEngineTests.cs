@@ -52,6 +52,50 @@ public sealed class VekDataGridEngineTests
     }
 
     /// <summary>
+    /// Searches only configured searchable columns and applies the query before paging.
+    /// </summary>
+    [Fact]
+    public void GlobalSearchMatchesConfiguredColumnsBeforePaging()
+    {
+        var engine = new VekDataGridEngine<Row>([
+            new VekDataGridColumn<Row>("name", row => row.Name, searchable: true),
+            new VekDataGridColumn<Row>("category", row => row.Category, searchable: true),
+            new VekDataGridColumn<Row>("rank", row => row.Rank)
+        ]);
+        engine.SetGlobalSearch("notebook");
+        engine.SetSorts([new VekDataGridSort("rank", VekSortDirection.Ascending)]);
+        engine.SetPage(1, 1);
+
+        var result = engine.GetLocalData([
+            new Row("Pencil", 2, "Notebook stock"),
+            new Row("Notebook", 1, "In stock")
+        ]);
+
+        Assert.Equal(2, result.TotalItems);
+        Assert.Equal("Notebook", Assert.Single(result.Items).Name);
+    }
+
+    /// <summary>
+    /// Allows an explicit global search target to include a column that is not searchable by default.
+    /// </summary>
+    [Fact]
+    public void GlobalSearchCanTargetColumnsWithoutDefaultSearchOptIn()
+    {
+        var engine = new VekDataGridEngine<Row>([
+            new VekDataGridColumn<Row>("name", row => row.Name, searchable: true),
+            new VekDataGridColumn<Row>("category", row => row.Category)
+        ]);
+        engine.SetGlobalSearch("notebook", ["category"]);
+
+        var result = engine.GetFilteredAndSortedItems([
+            new Row("Pencil", 2, "Notebook stock"),
+            new Row("Notebook", 1, "In stock")
+        ]);
+
+        Assert.Equal("Pencil", Assert.Single(result).Name);
+    }
+
+    /// <summary>
     /// Applies the shared sort interaction rules for single, multiple, and removable sorts.
     /// </summary>
     [Fact]

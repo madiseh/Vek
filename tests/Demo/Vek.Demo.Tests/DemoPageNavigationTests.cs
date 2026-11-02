@@ -173,6 +173,11 @@ public sealed class DemoPageNavigationTests : BunitContext
 
         Assert.Equal("VekDataGrid: Filtering", cut.Find("main h1").TextContent.Trim());
         Assert.Contains("Desk Lamp", cut.Find("tbody").TextContent);
+        var searchBox = cut.Find("input[aria-label='Search all columns']");
+        searchBox.Input("Desk");
+        Assert.Contains("Desk Lamp", Assert.Single(cut.FindAll("tbody tr")).TextContent);
+        Assert.DoesNotContain("Task Chair", cut.Find("tbody").TextContent);
+        searchBox.Input(string.Empty);
         Assert.Contains("ShowFilterRow=\"true\"", cut.Find(".vek-code-view pre code").TextContent);
         Assert.Contains("Filterable", cut.Find("#filter-options").TextContent);
         Assert.Contains("FilterBy", cut.Find("#filter-options").TextContent);

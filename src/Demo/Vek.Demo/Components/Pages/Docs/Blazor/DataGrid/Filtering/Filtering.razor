@@ -6,11 +6,11 @@
 <div class="docs-page-layout">
     <article class="docs-article">
         <h1>VekDataGrid: Filtering</h1>
-        <p class="docs-intro">Combine quick predicates with per-column filters, choose a filter surface, and control string matching.</p>
+        <p class="docs-intro">Search across selected columns, combine quick predicates with per-column filters, and choose a filter surface.</p>
 
         <section id="live-example" class="docs-section-content" aria-labelledby="live-example-heading">
             <h2 id="live-example-heading">Live example</h2>
-            <p>Choose a filter layout, then enter a value to narrow the products.</p>
+            <p>Search product names and categories, or choose a filter layout and enter a value to narrow the products.</p>
             <div class="filter-mode-picker" role="group" aria-label="Filter layout">
                 <button type="button" class="@ModeClass(VekDataGridFilterMode.Simple)" aria-pressed="@(_filterMode == VekDataGridFilterMode.Simple ? "true" : "false")" @onclick="() => SetMode(VekDataGridFilterMode.Simple)">Panel</button>
                 <button type="button" class="@ModeClass(VekDataGridFilterMode.ColumnMenu)" aria-pressed="@(_filterMode == VekDataGridFilterMode.ColumnMenu ? "true" : "false")" @onclick="() => SetMode(VekDataGridFilterMode.ColumnMenu)">Column menu</button>
@@ -26,8 +26,8 @@
                     <VekDataGrid TItem="DemoProduct" Items="_products" PageSize="10"
                                  FilterMode="@(_filterMode == VekDataGridFilterMode.ColumnRow ? VekDataGridFilterMode.Simple : _filterMode)"
                                  ShowFilterRow="@(_filterMode == VekDataGridFilterMode.ColumnRow)">
-                        <PropertyColumn Property="product => product.Name" Title="Name" Filterable="true" FilterOperator="VekDataGridFilterOperator.Contains" />
-                        <PropertyColumn Property="product => product.Category" Title="Category" Filterable="true" FilterOperator="VekDataGridFilterOperator.Contains" />
+                        <PropertyColumn Property="product => product.Name" Title="Name" Searchable="true" Filterable="true" FilterOperator="VekDataGridFilterOperator.Contains" />
+                        <PropertyColumn Property="product => product.Category" Title="Category" Searchable="true" Filterable="true" FilterOperator="VekDataGridFilterOperator.Contains" />
                         <PropertyColumn Property="product => product.Price" Title="Price" Format="C2" Filterable="true" FilterOperator="VekDataGridFilterOperator.GreaterThanOrEqual" />
                     </VekDataGrid>
                 </div>
@@ -44,6 +44,11 @@
             <h2 id="filter-modes-heading">Filter modes and operators</h2>
             <p><code>Simple</code> places controls above the grid, <code>ColumnMenu</code> groups each control in a menu, and <code>ColumnRow</code> places controls below the headings. Use <code>FilterBy</code> for a custom selector, <code>FilterTemplate</code> for a custom editor, and <code>FilterCaseSensitive</code> to set string matching behavior.</p>
             <p>Available operators include equality, text matching, numeric comparisons, and null or empty checks. Filter changes reset the page and are exposed through <code>CurrentState</code> and <code>FilterChanged</code>.</p>
+        </section>
+
+        <section id="global-search" class="docs-section-content" aria-labelledby="global-search-heading">
+            <h2 id="global-search-heading">Global search</h2>
+            <p>The search field matches text across columns marked <code>Searchable="true"</code>. Set <code>SearchColumnKeys</code> on the grid to choose an explicit target set, or provide <code>SearchBy</code> on a column to search a derived value.</p>
         </section>
 
         <section id="filter-options" class="docs-section-content" aria-labelledby="filter-options-heading">
@@ -98,6 +103,7 @@
         <a href="/docs/components/vekdatagrid/filtering#live-example">Live example</a>
         <a href="/docs/components/vekdatagrid/filtering#code">Code</a>
         <a href="/docs/components/vekdatagrid/filtering#filter-modes">Filter modes</a>
+        <a href="/docs/components/vekdatagrid/filtering#global-search">Global search</a>
         <a href="/docs/components/vekdatagrid/filtering#filter-options">Filter properties</a>
     </nav>
 </div>

@@ -19,6 +19,21 @@ Vek is a collection of reusable Blazor component packages targeting .NET 10. Eac
 
 Every component package under `src/Components/Blazor` must contain a `Components/` folder. Put each feature's Razor markup and isolated CSS together under that folder. This layout is checked during builds.
 
+## NuGet Packages
+
+### Blazor
+
+| Package | NuGet |
+| --- | --- |
+| `Vek.Blazor.DataGrid` | [nuget.org](https://www.nuget.org/packages/Vek.Blazor.DataGrid) |
+| `Vek.Blazor.CodeView` | [nuget.org](https://www.nuget.org/packages/Vek.Blazor.CodeView) |
+
+### WPF
+
+| Package | NuGet |
+| --- | --- |
+| `Vek.WPF.DataGrid` | [nuget.org](https://www.nuget.org/packages/Vek.WPF.DataGrid) |
+
 ## Build
 
 Install the .NET 10 SDK, then run:

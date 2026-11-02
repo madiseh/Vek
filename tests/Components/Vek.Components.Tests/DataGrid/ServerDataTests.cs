@@ -36,6 +36,24 @@ public sealed class ServerDataTests : BunitContext
         Assert.Contains("Page 1 of 12", cut.Markup);
     }
 
+    /// <summary>Verifies global search text and targets are sent to the remote data provider.</summary>
+    [Fact]
+    public void GlobalSearchIsIncludedInRemoteRequests()
+    {
+        VekDataGridState<TestProduct>? received = null;
+        var cut = RenderServerGrid((state, _) =>
+        {
+            received = state;
+            return Task.FromResult(new VekDataGridData<TestProduct>(DataGridTestHelpers.Products, 4));
+        }, searchColumnKeys: ["Name"]);
+
+        cut.Find("input[aria-label='Search all columns']").Input("Notebook");
+
+        Assert.NotNull(received);
+        Assert.Equal("Notebook", received!.GlobalSearchText);
+        Assert.Equal(["Name"], received.SearchColumnKeys);
+    }
+
     /// <summary>Verifies starting a newer server request cancels the previous request token.</summary>
     [Fact]
     public void NewRequestCancelsPreviousRequest()
@@ -101,10 +119,12 @@ public sealed class ServerDataTests : BunitContext
 
     private IRenderedComponent<VekDataGrid<TestProduct>> RenderServerGrid(
         Func<VekDataGridState<TestProduct>, CancellationToken, Task<VekDataGridData<TestProduct>>> serverData,
-        RenderFragment<Exception>? errorContent = null) => Render<VekDataGrid<TestProduct>>(parameters => parameters
+        RenderFragment<Exception>? errorContent = null,
+        IReadOnlyList<string>? searchColumnKeys = null) => Render<VekDataGrid<TestProduct>>(parameters => parameters
             .Add(grid => grid.PageSize, 1)
             .Add(grid => grid.ServerData, serverData)
             .Add(grid => grid.ErrorContent, errorContent)
+            .Add(grid => grid.SearchColumnKeys, searchColumnKeys)
             .AddChildContent(builder =>
             {
                 builder.OpenComponent<PropertyColumn<TestProduct, string>>(0);

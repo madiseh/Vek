@@ -9,6 +9,10 @@ Created: 2026-11-02
              xmlns:components="clr-namespace:Vek.WPF.DataGrid.Components;assembly=Vek.WPF.DataGrid"
              xmlns:codeview="clr-namespace:Vek.WPF.Demo.Components.CodeView"
              x:Name="Root">
+    <UserControl.Resources>
+        <DataTemplate x:Key="ProductNameCell"><TextBlock Text="{Binding Name}" /></DataTemplate>
+        <DataTemplate x:Key="ProductCategoryCell"><TextBlock Text="{Binding Category}" /></DataTemplate>
+    </UserControl.Resources>
     <Grid AutomationProperties.AutomationId="docs-page-layout">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -21,7 +25,7 @@ Created: 2026-11-02
                            TextWrapping="Wrap" AutomationProperties.AutomationId="article-title" />
                 <TextBlock Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0"
                            AutomationProperties.AutomationId="article-intro">
-                    Combine quick predicates with per-column filters, choose a filter surface, and control string matching.
+                    Search across selected columns, combine quick predicates with per-column filters, and choose a filter surface.
                 </TextBlock>
 
                 <StackPanel x:Name="Section_live_example" Margin="0,36,0,0" Focusable="True"
@@ -32,20 +36,20 @@ Created: 2026-11-02
                                Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0" />
                     <Border Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}"
                             BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,18,0,0">
-                        <components:VekDataGrid x:Name="FilterGrid"
-                            ItemsSource="{Binding DataContext.BasicUsage.Products, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-                            ShowFilterRow="True" AutoGenerateColumns="False" IsReadOnly="True"
-                            CanUserAddRows="False" CanUserDeleteRows="False" CanUserSortColumns="True"
-                            HeadersVisibility="Column" RowHeaderWidth="0" MinHeight="210" MaxHeight="340"
-                            Background="{DynamicResource SidebarBrush}" Foreground="{DynamicResource TextBrush}"
-                            BorderBrush="{DynamicResource BorderBrush}"
-                            HorizontalGridLinesBrush="{DynamicResource BorderBrush}"
-                            AutomationProperties.Name="Filterable sample products data grid">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" SortMemberPath="Name" Width="2*" />
-                                <DataGridTextColumn Header="Category" Binding="{Binding Category}" SortMemberPath="Category" Width="*" />
-                            </DataGrid.Columns>
-                        </components:VekDataGrid>
+                        <StackPanel>
+                            <TextBox x:Name="GlobalSearchBox" AutomationProperties.AutomationId="global-search-input"
+                                     AutomationProperties.Name="Search all columns" ToolTip="Search names and categories"
+                                     Margin="0,0,0,12" TextChanged="GlobalSearchTextChanged" />
+                            <components:VekDataGrid x:Name="FilterGrid"
+                                ItemsSource="{Binding DataContext.BasicUsage.Products, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                ShowFilterRow="True" AutoGenerateColumns="False" IsReadOnly="True"
+                                CanUserAddRows="False" CanUserDeleteRows="False" CanUserSortColumns="True"
+                                HeadersVisibility="Column" RowHeaderWidth="0" MinHeight="210" MaxHeight="340"
+                                Background="{DynamicResource SidebarBrush}" Foreground="{DynamicResource TextBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                HorizontalGridLinesBrush="{DynamicResource BorderBrush}"
+                                AutomationProperties.Name="Searchable and filterable sample products data grid" />
+                        </StackPanel>
                     </Border>
                 </StackPanel>
 
@@ -63,6 +67,13 @@ Created: 2026-11-02
                             AutomationProperties.Name="Filter modes and operators">
                     <TextBlock Text="Filter modes and operators" FontSize="25" FontWeight="SemiBold" />
                     <TextBlock Text="The WPF adapter places a text editor in each filterable column heading. The editor uses that column's configured filter operator and clears its filter when empty."
+                               Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0" />
+                </StackPanel>
+
+                <StackPanel x:Name="Section_global_search" Margin="0,36,0,0" Focusable="True"
+                            AutomationProperties.AutomationId="section:global-search" AutomationProperties.Name="Global search">
+                    <TextBlock Text="Global search" FontSize="25" FontWeight="SemiBold" />
+                    <TextBlock Text="Search the Name and Category columns. Shared column definitions opt in with Searchable, and the search box can target a custom set of column keys."
                                Style="{DynamicResource DescriptionStyle}" Margin="0,16,0,0" />
                 </StackPanel>
 
@@ -89,6 +100,9 @@ Created: 2026-11-02
                     <Button Content="Filter modes" Tag="{Binding ElementName=Section_filter_modes}"
                             Click="NavigateToSection" Style="{DynamicResource TocLinkStyle}"
                             AutomationProperties.AutomationId="toc:filter-modes" />
+                    <Button Content="Global search" Tag="{Binding ElementName=Section_global_search}"
+                            Click="NavigateToSection" Style="{DynamicResource TocLinkStyle}"
+                            AutomationProperties.AutomationId="toc:global-search" />
                     <Button Content="Filter properties" Tag="{Binding ElementName=Section_filter_options}"
                             Click="NavigateToSection" Style="{DynamicResource TocLinkStyle}"
                             AutomationProperties.AutomationId="toc:filter-options" />

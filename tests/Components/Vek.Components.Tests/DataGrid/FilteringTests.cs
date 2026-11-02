@@ -19,6 +19,17 @@ public sealed class FilteringTests : BunitContext
         Assert.Equal(new[] { "Notebook Set" }, DataGridTestHelpers.GetRowNames(cut));
     }
 
+    /// <summary>Verifies the global search input filters rows using opted-in property columns.</summary>
+    [Fact]
+    public void GlobalSearchInputMatchesConfiguredColumns()
+    {
+        var cut = RenderFilterGrid(searchable: true);
+
+        cut.Find("input[aria-label='Search all columns']").Input("Notebook");
+
+        Assert.Equal(new[] { "Notebook Set" }, DataGridTestHelpers.GetRowNames(cut));
+    }
+
     /// <summary>Verifies column definitions apply comparisons to their selected values.</summary>
     [Fact]
     public async Task ColumnFilterModesApplyPredicates()
@@ -106,6 +117,7 @@ public sealed class FilteringTests : BunitContext
         bool caseSensitive = false,
         VekDataGridFilterMode filterMode = VekDataGridFilterMode.Simple,
         bool showFilterRow = false,
+        bool searchable = false,
         RenderFragment<Vek.Components.Components.DataGrid.VekDataGridFilterContext>? filterTemplate = null) => Render<VekDataGrid<TestProduct>>(parameters => parameters
             .Add(grid => grid.Items, DataGridTestHelpers.Products)
             .Add(grid => grid.PageSize, pageSize)
@@ -118,6 +130,7 @@ public sealed class FilteringTests : BunitContext
                 builder.AddAttribute(1, nameof(PropertyColumn<TestProduct, string>.Property), (System.Linq.Expressions.Expression<Func<TestProduct, string>>)(product => product.Name));
                 builder.AddAttribute(2, nameof(PropertyColumn<TestProduct, string>.Key), "Name");
                 builder.AddAttribute(3, nameof(PropertyColumn<TestProduct, string>.Filterable), true);
+                builder.AddAttribute(5, nameof(PropertyColumn<TestProduct, string>.Searchable), searchable);
                 if (filterTemplate is not null)
                     builder.AddAttribute(4, nameof(PropertyColumn<TestProduct, string>.FilterTemplate), filterTemplate);
                 builder.CloseComponent();

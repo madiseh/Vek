@@ -89,6 +89,14 @@ public partial class PropertyColumn<TItem, TValue>
     [Parameter]
     public bool Filterable { get; set; } = false;
 
+    /// <summary>Gets or sets whether global search includes this column by default.</summary>
+    [Parameter]
+    public bool Searchable { get; set; }
+
+    /// <summary>Gets or sets the value selector used by global search.</summary>
+    [Parameter]
+    public Func<TItem, object?>? SearchBy { get; set; }
+
     /// <summary>
     /// Gets or sets the value selector used to compare this column during filtering. When unset, the value from
     /// <see cref="Property"/> is used. This selector is only used when <see cref="Filterable"/> is true.
@@ -142,6 +150,8 @@ public partial class PropertyColumn<TItem, TValue>
     private string? _lastFormat;
     private bool _lastSortable;
     private bool _lastFilterable;
+    private bool _lastSearchable;
+    private Func<TItem, object?>? _lastSearchBy;
     private VekDataGridFilterOperator _lastFilterOperator;
     private bool _lastEditable;
 
@@ -163,6 +173,8 @@ public partial class PropertyColumn<TItem, TValue>
             || Format != _lastFormat
             || Sortable != _lastSortable
             || Filterable != _lastFilterable
+            || Searchable != _lastSearchable
+            || !ReferenceEquals(SearchBy, _lastSearchBy)
             || FilterOperator != _lastFilterOperator
             || Editable != _lastEditable;
 
@@ -189,6 +201,8 @@ public partial class PropertyColumn<TItem, TValue>
         _lastFormat = Format;
         _lastSortable = Sortable;
         _lastFilterable = Filterable;
+        _lastSearchable = Searchable;
+        _lastSearchBy = SearchBy;
         _lastFilterOperator = FilterOperator;
         _lastEditable = Editable;
     }
@@ -249,6 +263,8 @@ public partial class PropertyColumn<TItem, TValue>
     Func<TItem, object?>? Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.AggregateBy => AggregateBy ?? (item => _propertyGetter!(item));
     Func<TItem, object?> Vek.Core.DataGrid.IVekDataGridColumn<TItem, RenderFragment>.ValueAccessor => item => SortBy is null ? _propertyGetter!(item) : SortBy(item);
     bool IVekDataGridColumn<TItem, RenderFragment>.IsHierarchyColumn => false;
+    bool IVekDataGridColumn<TItem, RenderFragment>.Searchable => Searchable;
+    Func<TItem, object?>? IVekDataGridColumn<TItem, RenderFragment>.SearchBy => SearchBy ?? (item => _propertyGetter!(item));
     VekDataGridTemplate<Vek.Core.DataGrid.VekDataGridRowDetailContext<TItem>, RenderFragment>? IVekDataGridColumn<TItem, RenderFragment>.DetailTemplate => null;
 
     VekDataGridTemplate<TItem, RenderFragment> IVekDataGridColumn<TItem, RenderFragment>.CellTemplate => item => builder =>

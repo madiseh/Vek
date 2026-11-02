@@ -16,6 +16,8 @@ public sealed class VekDataGridColumn<TItem> : VekDataGridColumn<TItem, object>
     /// <param name="groupBy">Optional selector used for grouping.</param>
     /// <param name="aggregateBy">Optional selector used for aggregation.</param>
     /// <param name="filterOperator">The default filter operator.</param>
+    /// <param name="searchable">Whether global search includes the column by default.</param>
+    /// <param name="searchBy">Optional selector used for global search.</param>
     public VekDataGridColumn(
         string key,
         Func<TItem, object?> valueAccessor,
@@ -27,8 +29,11 @@ public sealed class VekDataGridColumn<TItem> : VekDataGridColumn<TItem, object>
         Func<TItem, object?>? filterBy = null,
         Func<TItem, object?>? groupBy = null,
         Func<TItem, object?>? aggregateBy = null,
-        VekDataGridFilterOperator filterOperator = VekDataGridFilterOperator.Contains)
-        : base(key, valueAccessor, title, sortable, filterable, groupable, comparer, filterBy, groupBy, aggregateBy, filterOperator)
+        VekDataGridFilterOperator filterOperator = VekDataGridFilterOperator.Contains,
+        bool searchable = false,
+        Func<TItem, object?>? searchBy = null)
+        : base(key, valueAccessor, title, sortable, filterable, groupable, comparer, filterBy, groupBy, aggregateBy, filterOperator,
+            searchable: searchable, searchBy: searchBy)
     {
     }
 }

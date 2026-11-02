@@ -154,6 +154,15 @@ public sealed class DocumentationPageStructureTests
             {
                 var grid = Assert.Single(Descendants<VekDataGrid>(window));
                 Assert.True(grid.ShowFilterRow);
+                var searchBox = Assert.Single(Descendants<TextBox>(window).Where(box =>
+                    AutomationProperties.GetAutomationId(box) == "global-search-input"));
+                grid.ItemsSource = new[]
+                {
+                    new DemoProduct(1, "Desk Lamp", "Furniture", 49.99m),
+                    new DemoProduct(2, "Task Chair", "Furniture", 199.00m)
+                };
+                searchBox.Text = "Desk";
+                Assert.Equal("Desk Lamp", Assert.Single(grid.Items.Cast<DemoProduct>()).Name);
                 Assert.Equal(2, grid.Columns.Count(column =>
                     column.Header is StackPanel header && header.Children.OfType<TextBox>().Any()));
                 Assert.Single(Descendants<CodeSampleView>(window));

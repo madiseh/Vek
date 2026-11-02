@@ -7,9 +7,13 @@ namespace Vek.Core.DataGrid;
 /// <param name="PageSize">The page size.</param>
 /// <param name="Sorts">The active sorts in priority order.</param>
 /// <param name="Filters">The active filters.</param>
+/// <param name="GlobalSearchText">The current global search text.</param>
+/// <param name="SearchColumnKeys">The explicit global search targets, or null to use columns marked searchable.</param>
 public sealed record VekDataGridServerRequest(
     int Page,
     int PageSize,
     IReadOnlyList<VekDataGridSort> Sorts,
-    IReadOnlyList<VekDataGridFilter> Filters);
+    IReadOnlyList<VekDataGridFilter> Filters,
+    string GlobalSearchText = "",
+    IReadOnlyList<string>? SearchColumnKeys = null);
 

@@ -56,6 +56,22 @@ public sealed class VekWpfDataGridAdapterTests
         });
     }
 
+    /// <summary>Projects shared global search results into the native WPF row collection.</summary>
+    [Fact]
+    public async Task GlobalSearchFiltersNativeRows()
+    {
+        await WpfTestDispatcher.RunAsync(() =>
+        {
+            var grid = new VekDataGrid { ItemsSource = new[] { new TestRow("alpha"), new TestRow("beta") } };
+            grid.AddColumn(new VekDataGridColumn<TestRow, DataTemplate>("Key", row => row.Key, searchable: true));
+
+            grid.SetGlobalSearch("ALP");
+
+            Assert.Equal("alpha", Assert.Single(grid.Items.Cast<TestRow>()).Key);
+            return true;
+        });
+    }
+
     /// <summary>Native selection rejects rows disallowed by the same shared eligibility policy as selection commands.</summary>
     [Theory]
     [InlineData(DataGridSelectionMode.Single)]

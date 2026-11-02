@@ -40,6 +40,8 @@ public class VekDataGridEngine<TItem, TTemplate>
     private Func<TItem, string>? _itemKeySelector;
     private int _page = 1;
     private int _pageSize = 10;
+    private string _globalSearchText = string.Empty;
+    private IReadOnlyList<string>? _searchColumnKeys;
     private CultureInfo _culture = CultureInfo.InvariantCulture;
 
     // Edit state
@@ -97,6 +99,26 @@ public class VekDataGridEngine<TItem, TTemplate>
     /// <summary>Gets active filters.</summary>
     public IReadOnlyList<VekDataGridFilter> Filters => _filters;
 
+    /// <summary>Gets the current global search text.</summary>
+    public string GlobalSearchText => _globalSearchText;
+
+    /// <summary>Gets the configured global search columns, or null when searchable columns are used.</summary>
+    public IReadOnlyList<string>? SearchColumnKeys => _searchColumnKeys;
+
+    /// <summary>Sets global search text and optionally overrides the columns searched.</summary>
+    /// <param name="text">The text to find; null clears the search.</param>
+    /// <param name="columnKeys">Optional column keys to search. Null uses columns marked searchable.</param>
+    public void SetGlobalSearch(string? text, IEnumerable<string>? columnKeys = null)
+    {
+        var nextText = text?.Trim() ?? string.Empty;
+        var nextKeys = columnKeys?.Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+        if (_globalSearchText == nextText && ((_searchColumnKeys is null && nextKeys is null)
+            || (_searchColumnKeys is not null && nextKeys is not null && _searchColumnKeys.SequenceEqual(nextKeys, StringComparer.OrdinalIgnoreCase)))) return;
+        _globalSearchText = nextText;
+        _searchColumnKeys = nextKeys;
+        Page = 1;
+    }
+
     /// <summary>Gets or sets the default case sensitivity for new filter interactions.</summary>
     public bool FilterCaseSensitive { get; set; }
 
@@ -136,6 +158,8 @@ public class VekDataGridEngine<TItem, TTemplate>
         if (!_columns.Remove(columnKey)) return;
         _sorts.RemoveAll(sort => string.Equals(sort.ColumnKey, columnKey, StringComparison.OrdinalIgnoreCase));
         _filters.RemoveAll(filter => string.Equals(filter.ColumnKey, columnKey, StringComparison.OrdinalIgnoreCase));
+        if (_searchColumnKeys is not null)
+            _searchColumnKeys = _searchColumnKeys.Where(key => !string.Equals(key, columnKey, StringComparison.OrdinalIgnoreCase)).ToArray();
         _groups.RemoveAll(group => string.Equals(group.ColumnKey, columnKey, StringComparison.OrdinalIgnoreCase));
         _aggregates.RemoveAll(aggregate => string.Equals(aggregate.ColumnKey, columnKey, StringComparison.OrdinalIgnoreCase));
     }
@@ -474,7 +498,9 @@ public class VekDataGridEngine<TItem, TTemplate>
             _page,
             _pageSize,
             _sorts.ToArray(),
-            _filters.ToArray());
+            _filters.ToArray(),
+            _globalSearchText,
+            _searchColumnKeys);
     }
 
     /// <summary>
@@ -502,7 +528,7 @@ public class VekDataGridEngine<TItem, TTemplate>
     {
         ArgumentNullException.ThrowIfNull(source);
         var query = source.AsQueryable();
-        if (_filters.Count > 0) query = ApplyFiltering(query);
+        if (_filters.Count > 0 || _globalSearchText.Length > 0) query = ApplyFiltering(query);
         if (_sorts.Count > 0) query = ApplySorting(query);
         return query.ToArray();
     }
@@ -515,7 +541,24 @@ public class VekDataGridEngine<TItem, TTemplate>
             if (!_columns.TryGetValue(filter.ColumnKey, out var column)) return false;
             if (!MatchesFilter((column.FilterBy ?? column.ValueAccessor)(item), filter)) return false;
         }
-        return true;
+        return MatchesGlobalSearch(item);
+    }
+
+    /// <summary>Checks whether an item contains the current search text in a configured search column.</summary>
+    public bool MatchesGlobalSearch(TItem item)
+    {
+        if (_globalSearchText.Length == 0) return true;
+        var columns = _searchColumnKeys is null
+            ? _columns.Values.Where(column => column.Searchable && column.SearchBy is not null)
+            : _searchColumnKeys.Select(key => _columns.TryGetValue(key, out var column) ? column : null)
+                .Where(column => column?.SearchBy is not null);
+
+        foreach (var column in columns)
+        {
+            var value = Convert.ToString(column!.SearchBy!(item), CultureInfo.CurrentCulture);
+            if (value?.IndexOf(_globalSearchText, StringComparison.CurrentCultureIgnoreCase) >= 0) return true;
+        }
+        return false;
     }
 
     /// <summary>

@@ -650,6 +650,29 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
     [Parameter]
     public Func<TItem, bool>? QuickFilter { get; set; } = null;
 
+    /// <summary>Gets or sets the text matched across the configured searchable columns.</summary>
+    [Parameter]
+    public string GlobalSearchText { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets explicit column keys searched instead of columns marked searchable.</summary>
+    [Parameter]
+    public IReadOnlyList<string>? SearchColumnKeys { get; set; }
+
+    /// <summary>Gets or sets a callback invoked when the global search text changes.</summary>
+    [Parameter]
+    public EventCallback<string> GlobalSearchTextChanged { get; set; } = default;
+
+    private async Task OnGlobalSearchInputAsync(ChangeEventArgs args)
+    {
+        GlobalSearchText = args.Value?.ToString() ?? string.Empty;
+        _engine.SetGlobalSearch(GlobalSearchText, SearchColumnKeys);
+        await GlobalSearchTextChanged.InvokeAsync(GlobalSearchText);
+        if (ServerData is not null)
+            await ReloadAfterStateChangeAsync();
+        else
+            await InvokeAsync(StateHasChanged);
+    }
+
     /// <summary>Gets or sets where the grid displays column filter controls.</summary>
     [Parameter]
     public VekDataGridFilterMode FilterMode { get; set; } = VekDataGridFilterMode.Simple;
@@ -681,7 +704,8 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
         {
             SyncCoreState();
             var request = _engine.CreateServerRequest();
-            return new VekDataGridState<TItem>(request.Page, request.PageSize, request.Sorts, request.Filters);
+            return new VekDataGridState<TItem>(request.Page, request.PageSize, request.Sorts, request.Filters,
+                request.GlobalSearchText, request.SearchColumnKeys);
         }
     }
 
@@ -1354,6 +1378,7 @@ public partial class VekDataGrid<TItem> : IDisposable, IVekDataGridHost<TItem, R
     {
         foreach (var column in _columns) RegisterCoreColumn(column);
         _engine.SetPage(_engine.Page, EffectivePageSize);
+        _engine.SetGlobalSearch(GlobalSearchText, SearchColumnKeys);
         _engine.Culture = Culture ?? CultureInfo.CurrentCulture;
         _engine.SetGroups(GroupBy);
         _engine.SetAggregates(Aggregates.Select(definition =>

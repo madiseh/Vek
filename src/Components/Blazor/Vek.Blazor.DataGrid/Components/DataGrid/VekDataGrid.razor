@@ -26,6 +26,12 @@
                    value="@(CurrentContainerWidth ?? 900)" @oninput="ResizeContainerAsync" />
         </label>
     }
+    @if (_columns.Any(column => column.Searchable) || SearchColumnKeys?.Count > 0)
+    {
+        <label class="global-search-label">Search all columns
+            <input type="search" aria-label="Search all columns" value="@GlobalSearchText" @oninput="OnGlobalSearchInputAsync" />
+        </label>
+    }
     @if (ShowColumnPanel)
     {
         <div class="column-toolbar">

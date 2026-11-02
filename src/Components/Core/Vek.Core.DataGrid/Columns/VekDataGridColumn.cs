@@ -25,6 +25,8 @@ public class VekDataGridColumn<TItem, TTemplate> : IVekDataGridColumn<TItem, TTe
     /// <param name="editable">Whether the column can enter edit mode.</param>
     /// <param name="isSelectionColumn">Whether the column represents row selection.</param>
     /// <param name="isHierarchyColumn">Whether the column displays row details.</param>
+/// <param name="searchable">Whether global search includes the column by default.</param>
+/// <param name="searchBy">Optional selector used for global search.</param>
     public VekDataGridColumn(
         string key,
         Func<TItem, object?> valueAccessor,
@@ -44,7 +46,9 @@ public class VekDataGridColumn<TItem, TTemplate> : IVekDataGridColumn<TItem, TTe
         VekDataGridTemplate<VekDataGridRowDetailContext<TItem>, TTemplate>? detailTemplate = null,
         bool editable = false,
         bool isSelectionColumn = false,
-        bool isHierarchyColumn = false)
+        bool isHierarchyColumn = false,
+        bool searchable = false,
+        Func<TItem, object?>? searchBy = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
         ArgumentNullException.ThrowIfNull(valueAccessor);
@@ -68,6 +72,8 @@ public class VekDataGridColumn<TItem, TTemplate> : IVekDataGridColumn<TItem, TTe
         Editable = editable;
         IsSelectionColumn = isSelectionColumn;
         IsHierarchyColumn = isHierarchyColumn;
+        Searchable = searchable;
+        SearchBy = searchBy ?? ValueAccessor;
     }
 
     /// <summary>Gets the stable key identifying the column.</summary>
@@ -154,6 +160,12 @@ public class VekDataGridColumn<TItem, TTemplate> : IVekDataGridColumn<TItem, TTe
 
     /// <summary>Gets whether the column displays hierarchical row details.</summary>
     public bool IsHierarchyColumn { get; }
+
+    /// <summary>Gets whether this column is included in global search by default.</summary>
+    public bool Searchable { get; }
+
+    /// <summary>Gets the value selector used for global search.</summary>
+    public Func<TItem, object?>? SearchBy { get; }
 
     /// <summary>Gets the label used to identify an item's row.</summary>
     /// <param name="item">The row item.</param>

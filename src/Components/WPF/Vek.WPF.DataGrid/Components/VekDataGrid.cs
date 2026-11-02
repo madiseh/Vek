@@ -38,6 +38,20 @@ public partial class VekDataGrid : WpfDataGrid, IVekDataGridHost<object, WpfData
         set => _engine.FilterCaseSensitive = value;
     }
 
+    /// <summary>Gets or sets the text matched across searchable columns.</summary>
+    public string GlobalSearchText
+    {
+        get => _engine.GlobalSearchText;
+        set { _engine.SetGlobalSearch(value); RefreshLocalItems(); }
+    }
+
+    /// <summary>Sets the text and optional column keys used by global search.</summary>
+    public void SetGlobalSearch(string? text, IEnumerable<string>? columnKeys = null)
+    {
+        _engine.SetGlobalSearch(text, columnKeys);
+        RefreshLocalItems();
+    }
+
     /// <summary>Gets or sets the one-based page displayed by this grid.</summary>
     public int CurrentPage
     {
@@ -454,6 +468,8 @@ public partial class VekDataGrid : WpfDataGrid, IVekDataGridHost<object, WpfData
                 context.ColumnKey, context.Title, context.Value, context.Level, context.Items.Cast<TItem>().ToArray(),
                 context.Expanded, context.ToggleAsync, context.Aggregates));
         public bool IsHierarchyColumn => column.IsHierarchyColumn;
+        public bool Searchable => column.Searchable;
+        public Func<object, object?>? SearchBy => column.SearchBy is null ? null : item => column.SearchBy((TItem)item);
         public VekDataGridTemplate<VekDataGridRowDetailContext<object>, WpfDataTemplate>? DetailTemplate =>
             column.DetailTemplate is null ? null : context => column.DetailTemplate(new VekDataGridRowDetailContext<TItem>(
                 (TItem)context.Item, context.Expanded, context.ToggleAsync));

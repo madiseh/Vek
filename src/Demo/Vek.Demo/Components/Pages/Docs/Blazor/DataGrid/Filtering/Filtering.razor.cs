@@ -9,7 +9,8 @@ public partial class Filtering
         <VekDataGrid TItem="DemoProduct" Items="_products" ShowFilterRow="true"
                      FilterCaseSensitive="false" FilterChanged="OnFiltersChanged">
             <PropertyColumn Property="product => product.Name" Title="Name"
-                            Filterable="true" FilterOperator="VekDataGridFilterOperator.Contains" />
+                            Searchable="true" Filterable="true" FilterOperator="VekDataGridFilterOperator.Contains" />
+            <PropertyColumn Property="product => product.Category" Title="Category" Searchable="true" />
             <PropertyColumn Property="product => product.Price" Title="Price"
                             Filterable="true" FilterOperator="VekDataGridFilterOperator.GreaterThanOrEqual" />
         </VekDataGrid>

@@ -77,6 +77,12 @@ public interface IVekDataGridColumn<TItem, TTemplate>
     /// <summary>Gets whether the column displays hierarchical row details.</summary>
     bool IsHierarchyColumn { get; }
 
+    /// <summary>Gets whether this column is included in global search by default.</summary>
+    bool Searchable => false;
+
+    /// <summary>Gets the value selector used for global search.</summary>
+    Func<TItem, object?>? SearchBy => null;
+
     /// <summary>Gets the strongly typed row detail template for this column.</summary>
     VekDataGridTemplate<VekDataGridRowDetailContext<TItem>, TTemplate>? DetailTemplate { get; }
 
