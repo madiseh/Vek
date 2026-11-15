@@ -11,6 +11,8 @@ test("window is defined", () => {
 const expectedWindowGlobals: [name: string, type: "object" | "function"][] = [
     // vekDragAndDrop.ts
     ["vekDragAndDrop", "object"],
+    // vekDataGrid.ts
+    ["vekDataGrid", "object"],
     // vekElementReference.ts
     ["vekElementRef", "object"],
     // vekExitPrompt.ts

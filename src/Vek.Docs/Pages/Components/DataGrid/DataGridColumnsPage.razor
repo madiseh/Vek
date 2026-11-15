@@ -27,6 +27,18 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Fit Columns to Content">
+                <Description>
+                    Call <CodeInline>AutoFitColumnWidths</CodeInline> after the grid has rendered to size every visible column from its header and currently rendered cells.
+                    Pass a <CodeInline>Column</CodeInline> to fit just that column. When virtualization is enabled, measurement covers rows currently rendered in the viewport.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridAutoFitExample)" Block="true" FullWidth="true">
+                <DataGridAutoFitExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Resizing">
                 <Description>
                     The <CodeInline>&lt;VekDataGrid></CodeInline> allows you to resize columns interactively when

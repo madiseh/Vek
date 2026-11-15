@@ -1,6 +1,7 @@
 // Must stay the first import so the license banner leads the bundle.
 import "./vekAAAlicense";
 
+import VekDataGrid from "./vekDataGrid";
 import VekDragAndDrop from "./vekDragAndDrop";
 import VekElementReference from "./vekElementReference";
 import VekExitPrompt from "./vekExitPrompt";
@@ -37,6 +38,7 @@ declare global {
         getTabbableElements: typeof getTabbableElements;
         hasDefinedParentHeight: typeof hasDefinedParentHeight;
         vekDragAndDrop: VekDragAndDrop;
+        vekDataGrid: typeof VekDataGrid;
         vekElementRef: VekElementReference;
         vekExitPrompt: VekExitPrompt;
         vekFileUpload: VekFileUpload;
@@ -75,6 +77,7 @@ declare global {
 window.getTabbableElements = getTabbableElements;
 window.hasDefinedParentHeight = hasDefinedParentHeight;
 window.vekDragAndDrop = new VekDragAndDrop();
+window.vekDataGrid = VekDataGrid;
 window.vekElementRef = new VekElementReference();
 // Guard against a second copy of the script replacing the instance that owns the registered prompts.
 if (!window.vekExitPrompt) {

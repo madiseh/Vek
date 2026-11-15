@@ -495,6 +495,17 @@ namespace Vek
             return await GetCurrentCellWidth();
         }
 
+        internal async Task SetAutoFitWidthAsync(double targetWidth)
+        {
+            if (targetWidth <= 0)
+            {
+                return;
+            }
+
+            Width = targetWidth;
+            await InvokeAsync(StateHasChanged);
+        }
+
         internal async Task<double> GetCurrentCellWidth()
         {
             var boundingRect = await _headerElement.VekGetBoundingClientRectAsync();
