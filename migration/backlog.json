@@ -25,9 +25,11 @@
       "title": "DataGrid Built-in Data Export (XLSX and CSV)",
       "module": "DataGrid",
       "priority": 2,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/002-datagrid-data-export.md",
-      "dependencies": []
+      "dependencies": [],
+      "pr_url": "https://github.com/madiseh/Vek/pull/7",
+      "completed_at": "2026-11-15T15:32:07Z"
     },
     {
       "id": "003",

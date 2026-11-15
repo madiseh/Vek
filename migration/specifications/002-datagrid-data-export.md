@@ -4,7 +4,7 @@
 - **Feature ID**: 002
 - **Feature Slug**: datagrid-data-export
 - **Module**: DataGrid
-- **Status**: Ready
+- **Status**: Completed
 - **Dependencies**: None
 
 ---
