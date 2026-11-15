@@ -2212,6 +2212,85 @@ namespace Vek
             }
         }
 
+        /// <summary>
+        /// Adjusts each visible column to fit its rendered header and cell content.
+        /// </summary>
+        /// <remarks>
+        /// Only rows currently rendered in the grid are measured. With virtualization enabled, this includes the rendered viewport.
+        /// </remarks>
+        public async Task AutoFitColumnWidths()
+        {
+            var columns = RenderedColumns.Where(column => !column.HiddenState.Value).ToArray();
+            if (columns.Length == 0)
+            {
+                return;
+            }
+
+            var (success, widths) = await JSRuntime.InvokeAsyncWithErrorHandling(Array.Empty<double>(), "vekDataGrid.getColumnContentWidths", _gridElement);
+            if (!success || widths.Length == 0)
+            {
+                return;
+            }
+
+            var visibleColumnIndex = 0;
+            foreach (var column in columns)
+            {
+                if (visibleColumnIndex < widths.Length && widths[visibleColumnIndex] > 0 && column.HeaderCell is not null)
+                {
+                    await column.HeaderCell.SetAutoFitWidthAsync(widths[visibleColumnIndex]);
+                }
+
+                visibleColumnIndex++;
+            }
+        }
+
+        /// <summary>
+        /// Adjusts a visible column to fit its rendered header and cell content.
+        /// </summary>
+        /// <param name="column">The column to measure.</param>
+        /// <remarks>
+        /// Only rows currently rendered in the grid are measured. With virtualization enabled, this includes the rendered viewport.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="column"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="column"/> does not belong to this grid.</exception>
+        public async Task AutoFitColumnWidths(Column<T> column)
+        {
+            ArgumentNullException.ThrowIfNull(column);
+            if (!RenderedColumns.Contains(column))
+            {
+                throw new ArgumentException("The column does not belong to this data grid.", nameof(column));
+            }
+
+            if (column.HiddenState.Value)
+            {
+                return;
+            }
+
+            var visibleColumnIndex = 0;
+            foreach (var renderedColumn in RenderedColumns)
+            {
+                if (renderedColumn.HiddenState.Value)
+                {
+                    continue;
+                }
+
+                if (ReferenceEquals(renderedColumn, column))
+                {
+                    break;
+                }
+
+                visibleColumnIndex++;
+            }
+
+            var (success, widths) = await JSRuntime.InvokeAsyncWithErrorHandling(Array.Empty<double>(), "vekDataGrid.getColumnContentWidths", _gridElement);
+            if (!success || visibleColumnIndex >= widths.Length || widths[visibleColumnIndex] <= 0 || column.HeaderCell is null)
+            {
+                return;
+            }
+
+            await column.HeaderCell.SetAutoFitWidthAsync(widths[visibleColumnIndex]);
+        }
+
         internal IFilterDefinition<T> CreateFilterDefinitionInstance()
         {
             return _defaultFilterDefinitionFactory();

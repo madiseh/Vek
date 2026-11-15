@@ -10447,5 +10447,44 @@ namespace Vek.UnitTests.Components
             dataGrid.Instance.SortDefinitions.Should().BeEmpty();
             dataGrid.FindAll("th").Should().OnlyContain(header => !header.HasAttribute("aria-sort"));
         }
+
+        /// <summary>
+        /// Auto-fitting all columns applies the measured content widths to visible headers.
+        /// </summary>
+        [Test]
+        public async Task AutoFitColumnWidthsFitsAllVisibleColumns()
+        {
+            Context.JSInterop.Setup<double[]>("vekDataGrid.getColumnContentWidths", _ => true)
+                .SetResult([180, 120, 220]);
+            var comp = Context.Render<DataGridSortableTest>();
+            var dataGrid = comp.FindComponent<VekDataGrid<DataGridSortableTest.Item>>();
+
+            await dataGrid.InvokeAsync(() => dataGrid.Instance.AutoFitColumnWidths());
+
+            var headers = dataGrid.FindAll("thead th");
+            headers[0].GetAttribute("style").Should().Contain("180px");
+            headers[1].GetAttribute("style").Should().Contain("120px");
+            headers[2].GetAttribute("style").Should().Contain("220px");
+        }
+
+        /// <summary>
+        /// Auto-fitting one column leaves the other column widths unchanged.
+        /// </summary>
+        [Test]
+        public async Task AutoFitColumnWidthsFitsOnlyTheRequestedColumn()
+        {
+            Context.JSInterop.Setup<double[]>("vekDataGrid.getColumnContentWidths", _ => true)
+                .SetResult([180, 120, 220]);
+            var comp = Context.Render<DataGridSortableTest>();
+            var dataGrid = comp.FindComponent<VekDataGrid<DataGridSortableTest.Item>>();
+            var column = dataGrid.FindComponents<Column<DataGridSortableTest.Item>>()[1];
+
+            await dataGrid.InvokeAsync(() => dataGrid.Instance.AutoFitColumnWidths(column.Instance));
+
+            var headers = dataGrid.FindAll("thead th");
+            headers[0].GetAttribute("style").Should().NotContain("width");
+            headers[1].GetAttribute("style").Should().Contain("120px");
+            headers[2].GetAttribute("style").Should().NotContain("width");
+        }
     }
 }
