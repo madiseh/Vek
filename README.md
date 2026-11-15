@@ -9,6 +9,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![.NET 8.0](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![.NET 10.0](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![.NET 11.0](https://img.shields.io/badge/.NET-11.0-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![Blazor](https://img.shields.io/badge/Blazor-WebAssembly%20%26%20Server-512BD4.svg)](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor)
 
 Vek is an enterprise-ready UI component library designed for .NET developers building modern web applications with Blazor. Written in pure C# with seamless CSS variable integration, Vek delivers unmatched developer velocity, elegant visual styling, and robust runtime performance across both Blazor WebAssembly and Blazor Server.
@@ -26,7 +27,7 @@ Maintained and developed by **Amin Sabaghi** ([@madiseh](https://github.com/madi
 - **Comprehensive Theming**: Built-in dynamic Light and Dark mode switching, custom palette generation, and instant CSS variable updates.
 - **Enterprise Data Presentation**: High-throughput virtualized `VekDataGrid`, advanced filtering, multi-column sorting, and flexible pagination.
 - **Accessible & Responsive**: Built with accessibility (ARIA) best practices, comprehensive keyboard navigation, and responsive layout breakpoints.
-- **Multi-Target Support**: Built and tested for `.NET 8.0` and `.NET 10.0` (with full `.NET 9.0` compatibility).
+- **Multi-Target Support**: Built and tested for `.NET 8.0`, `.NET 10.0`, and `.NET 11.0` (with full `.NET 9.0` compatibility).
 
 ---
 

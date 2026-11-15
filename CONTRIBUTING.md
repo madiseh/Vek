@@ -55,7 +55,7 @@ Please make sure that you follow our [code of conduct](/CODE_OF_CONDUCT.md)
 
 -   [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (see `global.json` for the pinned feature band; any patch of that band works — it can build the older targets too)
 
-The `Vek` library multi-targets net8.0, net9.0, and net10.0. `dotnet test` and IDE builds only compile the framework that is needed (the tests build just net10.0), but a direct `dotnet build src/Vek` compiles all three. For a faster single-framework build while developing, pass `-f`:
+The `Vek` library multi-targets net8.0, net9.0, net10.0, and net11.0. `dotnet test` and IDE builds only compile the framework that is needed (the tests build just net10.0), but a direct `dotnet build src/Vek` compiles all four. For a faster single-framework build while developing, pass `-f`:
 
 ```bash
 dotnet build src/Vek -f net10.0

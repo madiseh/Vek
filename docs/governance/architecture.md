@@ -4,7 +4,7 @@
 
 **Vek** is an enterprise-grade, high-performance UI component library designed for .NET developers building modern web applications with Blazor. Written in pure C# with seamless CSS variable integration, Vek is engineered for maximum developer velocity, elegant visual styling, minimal DOM footprint, and robust runtime performance across both **Blazor WebAssembly** and **Blazor Server**.
 
-The library multi-targets `.NET 8.0`, `.NET 9.0`, and `.NET 10.0`.
+The library multi-targets `.NET 8.0`, `.NET 9.0`, `.NET 10.0`, and `.NET 11.0`.
 
 ---
 
