@@ -75,6 +75,26 @@ jobs:
         shell: pwsh
         run: ./tools/CheckPackageContainsStaticAssets.ps1 ./src/Vek/nupkgs Vek.min.js
 
+      - name: Check package contains target frameworks
+        shell: pwsh
+        run: |
+          Add-Type -assembly "system.io.compression.filesystem"
+          $nupkgFilePath = Get-ChildItem -Path ./src/Vek/nupkgs -Filter *.nupkg | Select-Object -First 1
+          $zip = [io.compression.zipfile]::OpenRead($nupkgFilePath.FullName)
+          $entries = $zip.Entries.FullName
+          $required = @('lib/net8.0/Vek.dll', 'lib/net9.0/Vek.dll', 'lib/net10.0/Vek.dll', 'lib/net11.0/Vek.dll')
+          try {
+            foreach ($tfm in $required) {
+              if (-not $entries.Contains($tfm)) {
+                Write-Error "Package $nupkgFilePath is missing $tfm"
+                exit 1
+              }
+              Write-Host "Verified $tfm is present in package"
+            }
+          } finally {
+            $zip.Dispose()
+          }
+
       - name: NuGet login (OIDC)
         uses: NuGet/login@v1
         id: nuget-login
