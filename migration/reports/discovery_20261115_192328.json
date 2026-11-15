@@ -1,0 +1,15 @@
+{
+  "discovered_feature": {
+    "id": "007",
+    "slug": "datagrid-batch-group-expand",
+    "title": "DataGrid Batch Group Collapse and Expand Controls",
+    "module": "DataGrid",
+    "priority": 7,
+    "status": "completed",
+    "specification": "specifications/007-datagrid-batch-group-expand.md",
+    "dependencies": [],
+    "discovered_at": "2026-11-15 19:23:28Z"
+  },
+  "timestamp": "2026-11-15 19:23:28Z",
+  "reference_analyzed": true
+}

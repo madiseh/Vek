@@ -3642,6 +3642,12 @@ namespace Vek
         /// <remarks>
         /// Applies when <see cref="Groupable"/> is <c>true</c>.
         /// </remarks>
+        /// <summary>
+        /// Expands every group in the current grouping hierarchy.
+        /// </summary>
+        /// <remarks>
+        /// Does nothing when the grid has no active grouping.
+        /// </remarks>
         public async Task ExpandAllGroupsAsync()
         {
             if (_groupDefinition != null && _groupable)
@@ -3655,6 +3661,12 @@ namespace Vek
         /// </summary>
         /// <remarks>
         /// Applies when <see cref="Groupable"/> is <c>true</c>.
+        /// </remarks>
+        /// <summary>
+        /// Collapses every group in the current grouping hierarchy.
+        /// </summary>
+        /// <remarks>
+        /// Does nothing when the grid has no active grouping.
         /// </remarks>
         public async Task CollapseAllGroupsAsync()
         {
