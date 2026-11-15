@@ -1,0 +1,14 @@
+﻿<CascadingValue Value="ProviderEnabled" Name="UsePopoverProvider">
+    <VekPopoverProvider />
+</CascadingValue>
+
+<div class="popoverparent">
+    <VekPopover Open="true">
+        <VekText id="my-content">Popover content</VekText>
+    </VekPopover>
+</div>
+
+@code {
+    [Parameter]
+    public bool ProviderEnabled { get; set; } = true;
+}

@@ -1,0 +1,15 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekTimePicker Label="12 hours" AmPm="true" @bind-Time="_time" />
+<VekTimePicker Label="24 hours" @bind-Time="_time" />
+<VekTimePicker Label="With action buttons">
+    <PickerActions>
+        <VekButton Class="mr-auto align-self-start" OnClick="@(() => context.ClearAsync())">Clear</VekButton>
+        <VekButton OnClick="@(() => context.CloseAsync(false))">Cancel</VekButton>
+        <VekButton Color="Color.Primary" OnClick="@(() => context.CloseAsync())">OK</VekButton>
+    </PickerActions>
+</VekTimePicker>
+
+@code{
+    private TimeSpan? _time = new TimeSpan(00, 45, 00);
+}

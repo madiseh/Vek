@@ -1,0 +1,38 @@
+<VekFileUpload @ref="@_fileUpload"
+               T="IReadOnlyList<IBrowserFile>"
+               AppendMultipleFiles="AppendMultipleFiles"
+               @bind-Files="Files"
+               @bind-Files:after="@OnFilesChangedAsync">
+    <CustomContent>
+        <VekButton OnClick="@context.OpenFilePickerAsync">
+            Open file picker
+        </VekButton>
+    </CustomContent>
+</VekFileUpload>
+
+<VekButton OnClick="@ClearAsync">
+    Clear
+</VekButton>
+
+@code {
+    public static string __description__ = "Tests appending files across selections and clearing uploaded files.";
+
+    private VekFileUpload<IReadOnlyList<IBrowserFile>> _fileUpload = null!;
+
+    [Parameter]
+    public bool AppendMultipleFiles { get; set; } = true;
+
+    public IReadOnlyList<IBrowserFile>? Files { get; private set; } = [];
+
+    private async Task OnFilesChangedAsync()
+    {
+        // reading files with every change should not throw errors in the console
+        foreach (var file in Files ?? [])
+        {
+            var content = new byte[file.Size];
+            _ = await file.OpenReadStream(long.MaxValue).ReadAsync(content);
+        }
+    }
+
+    private Task ClearAsync() => _fileUpload.ClearAsync();
+}

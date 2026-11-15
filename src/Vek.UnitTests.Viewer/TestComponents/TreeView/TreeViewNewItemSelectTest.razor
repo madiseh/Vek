@@ -1,0 +1,62 @@
+﻿<VekTreeView Items="@_treeItems" SelectionMode="SelectionMode.SingleSelection" @bind-SelectedValue="this.SelectedValue">
+    <ItemTemplate>
+        <VekTreeViewItem @bind-Expanded="@context.Expanded" Items="@context.Children" Value="@context.Value" Text="@context.Text" />
+    </ItemTemplate>
+</VekTreeView>
+
+<VekChipSet T="MyItem" @bind-SelectedValue="@SelectedValue" Color="Color.Primary" Variant="Variant.Text">
+    @foreach (var item in _myItems)
+    {
+        <VekChip Value="item" Text="@item.Name" />
+    }
+</VekChipSet>
+
+<VekButton id="add_item" OnClick="@AddItem">Add Item</VekButton>
+
+@code {
+    private readonly List<MyItem> _myItems =
+    [
+        new MyItem("1"),
+        new MyItem("2"),
+        new MyItem("3",
+            new MyItem("A"),
+            new MyItem("B"),
+            new MyItem("C"))
+    ];
+
+    private TreeItemData<MyItem?>[] _treeItems = [];
+
+    public MyItem? SelectedValue { get; private set; }
+
+    protected override void OnInitialized()
+    {
+        UpdateTreeItems();
+        SelectedValue = _myItems[1];
+    }
+
+    private void UpdateTreeItems()
+    {
+        _treeItems = _myItems.Select(BuildTreeItem).ToArray();
+        return;
+
+        static TreeItemData<MyItem?> BuildTreeItem(MyItem? item)
+        {
+            return new TreeItemData<MyItem?>
+            {
+                Text = item?.Name,
+                Value = item,
+                Children = item?.Children.Select(BuildTreeItem).ToArray()
+            };
+        }
+    }
+
+    private void AddItem()
+    {
+        MyItem newItem = new((_myItems.Count + 1).ToString());
+        _myItems.Add(newItem);
+        UpdateTreeItems();
+        SelectedValue = newItem;
+    }
+
+    public record MyItem(string Name, params MyItem[] Children);
+}

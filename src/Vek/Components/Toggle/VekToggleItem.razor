@@ -1,0 +1,33 @@
+﻿@namespace Vek
+@inherits VekComponentBase
+@typeparam T
+
+<VekButton role="checkbox"
+           aria-checked="@(Selected.ToString().ToLowerInvariant())"
+           @attributes="UserAttributes"
+           Class="@Classname"
+           Style="@Style"
+           OnClick="HandleOnClickAsync"
+           Size="AssertedParent.Size"
+           Color="AssertedParent.Color"
+           Variant="@(Selected ? Variant.Filled : Variant.Outlined)"
+           Disabled="Disabled || AssertedParent.Disabled"
+           Ripple="AssertedParent.Ripple">
+    @if (!string.IsNullOrWhiteSpace(GetCurrentIcon()))
+    {
+        <VekIcon Class="@CheckMarkClassname"
+                 Disabled="Disabled"
+                 Icon="@GetCurrentIcon()"
+                 Size="AssertedParent.Size" />
+    }
+    @if (ChildContent is not null)
+    {
+        <div class="vek-toggle-item-content">
+            @ChildContent(Selected)
+        </div>
+    }
+    else
+    {
+        @(Text == null ? Value : Text)
+    }
+</VekButton>

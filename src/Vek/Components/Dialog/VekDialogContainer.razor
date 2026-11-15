@@ -1,0 +1,33 @@
+﻿@namespace Vek
+@using Vek.Resources
+@inherits VekComponentBase
+@inject InternalVekLocalizer Localizer
+
+@{
+}
+
+<div @attributes="UserAttributes" id="@ElementId" class="vek-dialog-container @GetPosition()">
+    <VekOverlay Visible="true" OnClick="HandleBackgroundClickAsync" Class="@BackgroundClassname" DarkBackground="true" @onmouseup="OnMouseUpAsync" />
+    <div @ref="_dialogContainerReference" id="_@Id.ToString("N")" role="dialog" aria-modal="true" aria-labelledby="@GetAriaLabelledBy()" aria-label="@GetAriaLabel()" class="@Classname" style="@Style" tabindex="-1">
+        @if (!GetHideHeader())
+        {
+            <div id="@($"_{Id:N}_title")" class="@TitleClassname">
+                @if (TitleContent is null)
+                {
+                    <VekText Typo="Typo.h6">@_titleState.Value</VekText>
+                }
+                else
+                {
+                    @TitleContent
+                }
+                @if (GetCloseButton())
+                {
+                    <VekIconButton aria-label="@Localizer[LanguageResource.VekDialog_Close]" Icon="@CloseIcon" @onclick="((IVekDialogInstance)this).Cancel" Class="vek-button-close" />
+                }
+            </div>
+         }
+        <CascadingValue Value="(IVekDialogInstanceInternal)this" IsFixed="true">
+            @Content
+        </CascadingValue>
+    </div>
+</div>

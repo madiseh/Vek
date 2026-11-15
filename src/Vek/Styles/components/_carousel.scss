@@ -1,0 +1,209 @@
+@import '../abstracts/variables';
+
+.vek-carousel {
+  display: flex !important;
+  position: relative;
+  margin: 0px !important;
+  clip-path: inset(0px 0px 0px 0px);
+  overflow: hidden;
+
+  @each $color in $vek-palette-colors {
+    &.vek-carousel-#{$color} {
+      color: var(--vek-palette-#{$color}-text);
+    }
+  }
+}
+
+.vek-carousel-elements-rtl {
+  transform: rotate(180deg) !important;
+}
+
+.vek-carousel-item {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  margin: inherit;
+  padding: inherit;
+  z-index: 2;
+
+  @each $color in $vek-palette-colors {
+    &.vek-carousel-item-#{$color} {
+      color: var(--vek-palette-#{$color}-text);
+      background-color: var(--vek-palette-#{$color});
+    }
+  }
+}
+
+.vek-carousel-item-exit {
+  z-index: 1;
+}
+
+/* ### Transitions ### */
+
+/*Fade
+*/
+@keyframes vek-carousel-transition-fade-in-keyframe {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vek-carousel-transition-fade-out-keyframe {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+
+.vek-carousel-transition-fade-in {
+  animation: 0.5s vek-carousel-transition-fade-in-keyframe
+}
+
+.vek-carousel-transition-fade-out {
+  animation: 0.5s vek-carousel-transition-fade-out-keyframe;
+  animation-fill-mode: forwards;
+}
+
+.vek-carousel-transition-none {
+  display: none;
+}
+
+
+
+/*Slide
+*/
+@keyframes vek-carousel-transition-slide-next-enter-keyframe {
+  from {
+    transform: translate3d(100%, 0, 0);
+    visibility: visible;
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes vek-carousel-transition-slide-next-rtl-enter-keyframe {
+  from {
+    transform: translate3d(-100%, 0, 0);
+    visibility: visible;
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes vek-carousel-transition-slide-next-exit-keyframe {
+  from {
+    transform: translate3d(0, 0, 0);
+    visibility: visible;
+  }
+
+  to {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@keyframes vek-carousel-transition-slide-next-rtl-exit-keyframe {
+  from {
+    transform: translate3d(0, 0, 0);
+    visibility: visible;
+  }
+
+  to {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+.vek-carousel-transition-slide-next-enter {
+  animation: 0.5s vek-carousel-transition-slide-next-enter-keyframe
+}
+
+.vek-carousel-transition-slide-next-rtl-enter {
+  animation: 0.5s vek-carousel-transition-slide-next-rtl-enter-keyframe;
+}
+
+.vek-carousel-transition-slide-next-exit {
+  animation: 0.5s vek-carousel-transition-slide-next-exit-keyframe;
+  animation-fill-mode: forwards;
+}
+
+.vek-carousel-transition-slide-next-rtl-exit {
+  animation: 0.5s vek-carousel-transition-slide-next-rtl-exit-keyframe;
+  animation-fill-mode: forwards;
+}
+
+
+
+@keyframes vek-carousel-transition-slide-prev-enter-keyframe {
+  from {
+    transform: translate3d(-100%, 0, 0);
+    visibility: visible;
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes vek-carousel-transition-slide-prev-rtl-enter-keyframe {
+  from {
+    transform: translate3d(100%, 0, 0);
+    visibility: visible;
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes vek-carousel-transition-slide-prev-exit-keyframe {
+  from {
+    transform: translate3d(0, 0, 0);
+    visibility: visible;
+  }
+
+  to {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+@keyframes vek-carousel-transition-slide-prev-rtl-exit-keyframe {
+  from {
+    transform: translate3d(0, 0, 0);
+    visibility: visible;
+  }
+
+  to {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+.vek-carousel-transition-slide-prev-enter {
+  animation: 0.5s vek-carousel-transition-slide-prev-enter-keyframe
+}
+
+.vek-carousel-transition-slide-prev-rtl-enter {
+  animation: 0.5s vek-carousel-transition-slide-prev-rtl-enter-keyframe;
+}
+
+.vek-carousel-transition-slide-prev-exit {
+  animation: 0.5s vek-carousel-transition-slide-prev-exit-keyframe;
+  animation-fill-mode: forwards;
+}
+
+.vek-carousel-transition-slide-prev-rtl-exit {
+  animation: 0.5s vek-carousel-transition-slide-prev-rtl-exit-keyframe;
+  animation-fill-mode: forwards;
+}

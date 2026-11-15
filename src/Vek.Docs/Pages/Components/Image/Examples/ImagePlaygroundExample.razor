@@ -1,0 +1,49 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekGrid>
+    <VekItem xs="12" md="8" Class="d-flex justify-center align-center" Style="height:500px;">
+        <VekImage ObjectFit="ImageFit" Height="@(SetHeight ? ImageHeight : null)" Width="@(SetWidth ? ImageWidth : null)" Src="@($"images/{Image}")" Alt="Mony the dog" Elevation="25" Class="rounded-lg"/>
+    </VekItem>
+    <VekItem xs="12" md="4">
+        <VekPaper Class="pa-4 mt-6 mt-lg-16" Elevation="0">
+            <VekText Typo="Typo.h6">Options</VekText>
+            <VekSelect Label="Image" Dense="true" Margin="Margin.Dense" @bind-Value="Image" Class="mt-4">
+                <VekSelectItem T="string" Value="@("tractor.jpg")">Tractor</VekSelectItem>
+                <VekSelectItem T="string" Value="@("door.jpg")">Door</VekSelectItem>
+                <VekSelectItem T="string" Value="@("castle.jpg")">Castle</VekSelectItem>
+                <VekSelectItem T="string" Value="@("iceland.jpg")">Iceland</VekSelectItem>
+                <VekSelectItem T="string" Value="@("pilars.jpg")">Pilars</VekSelectItem>
+                <VekSelectItem T="string" Value="@("sweden.jpg")">Sweden</VekSelectItem>
+            </VekSelect>
+            <VekSelect Label="Image Fit" Dense="true" Margin="Margin.Dense" @bind-Value="ImageFit" Class="mt-4">
+                <VekSelectItem T="ObjectFit" Value="ObjectFit.None">None</VekSelectItem>
+                <VekSelectItem T="ObjectFit" Value="ObjectFit.Cover">Cover</VekSelectItem>
+                <VekSelectItem T="ObjectFit" Value="ObjectFit.Contain">Contain</VekSelectItem>
+                <VekSelectItem T="ObjectFit" Value="ObjectFit.Fill">Fill</VekSelectItem>
+                <VekSelectItem T="ObjectFit" Value="ObjectFit.ScaleDown">ScaleDown</VekSelectItem>
+            </VekSelect>
+            <div class="d-flex justify-space-between align-center mt-4">
+                <VekText>Width: @(SetWidth ? $"{ImageWidth}px" : "Auto")</VekText>
+                <VekSwitch @bind-Value="SetWidth" Color="Color.Primary" Class="mr-0" />
+            </div>
+            <VekSlider @bind-Value="ImageWidth" Disabled="@(!SetWidth)" Max="400" Color="Color.Primary"/>
+            <div class="d-flex justify-space-between align-center mt-4">
+                <VekText>Height: @(SetHeight ? $"{ImageHeight}px" : "Auto")</VekText>
+                <VekSwitch @bind-Value="SetHeight" Color="Color.Secondary" Class="mr-0" />
+            </div>
+            <VekSlider @bind-Value="ImageHeight" Disabled="@(!SetHeight)" Max="350" Color="Color.Secondary"/>
+        </VekPaper>
+    </VekItem>
+</VekGrid>
+
+@code {
+    public string Image { get; set; } = "tractor.jpg";
+    
+    public bool SetHeight { get; set; } = false;
+    public bool SetWidth { get; set; } = true;
+    
+    public int ImageHeight { get; set; } = 300;
+    public int ImageWidth { get; set; } = 300;
+
+    public ObjectFit ImageFit { get; set; } = ObjectFit.Cover;
+}

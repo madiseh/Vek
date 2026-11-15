@@ -1,0 +1,15 @@
+﻿<VekSplitPanel @ref="_panel" Horizontal="@Horizontal">
+    <FirstPanel>Panel</FirstPanel>
+    <SecondPanel>Panel</SecondPanel>
+</VekSplitPanel>
+
+@code {
+    private VekSplitPanel _panel = null!;
+    
+    [Parameter]
+    public bool Horizontal { get; set; }
+
+    public Task ResetDividerPositionAsync() => _panel.ResetDividerPositionAsync();
+    public Task SetDividerPositionAsync(int offset) => _panel.SetDividerPositionAsync(offset);
+    public Task<int> GetDividerPositionAsync() => _panel.GetDividerPositionAsync();
+}

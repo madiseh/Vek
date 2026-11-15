@@ -1,0 +1,19 @@
+﻿<VekPopoverProvider />
+
+<div>
+    <VekSelect T="string" Variant="Variant.Text" @bind-Value="_fruit" Dense SelectedValuesChanged="@(() => FruitChanged(null))">
+        <VekSelectItem Value="@("Apple")">Apple</VekSelectItem>
+        <VekSelectItem Value="@("Orange")">Orange</VekSelectItem>
+    </VekSelect>
+</div>
+
+@code{
+    private string _fruit = "Apple";
+
+    public int ChangeCount { get; private set; }
+
+    private void FruitChanged(IReadOnlyCollection<string>? fruits)
+    {
+        ChangeCount++;
+    }
+}

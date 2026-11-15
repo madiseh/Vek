@@ -1,0 +1,74 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekGrid>
+    <VekItem xs="12">
+        <VekSlider Min="1" Max="20" Immediate="true" Step="1" @bind-Value="papers"></VekSlider>
+    </VekItem>
+    <VekItem xs="12">
+        <VekSelect Label="Justify" T="Justify" @bind-Value="justification">
+            <VekSelectItem Value="Justify.FlexStart">Flex Start</VekSelectItem>
+            <VekSelectItem Value="Justify.FlexEnd">Flex End</VekSelectItem>
+            <VekSelectItem Value="Justify.Center">Center</VekSelectItem>
+            <VekSelectItem Value="Justify.SpaceAround">Space Around</VekSelectItem>
+            <VekSelectItem Value="Justify.SpaceBetween">Space Between</VekSelectItem>
+            <VekSelectItem Value="Justify.SpaceEvenly">Space Evenly</VekSelectItem>
+        </VekSelect>
+    </VekItem>
+    <VekItem xs="12">
+        <VekGrid Justify="justification">
+            @for (int i = 0; i < papers; i++)
+            {
+                int localindex = i;
+                
+                <VekItem xs="@breaks[localindex]">
+                    <VekPaper Class="d-flex flex-column align-center justify-center vek-width-full py-8">
+                        <VekIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" OnClick="(()=>UpdateBreaks(localindex,1))" Size="Size.Small" />
+                        <VekText Typo="Typo.h6" Align="Align.Center">@breaks[localindex]</VekText>
+                        <VekIconButton Icon="@Icons.Material.Filled.KeyboardArrowDown" OnClick="(()=>UpdateBreaks(localindex,-1))" Size="Size.Small" />
+                    </VekPaper>
+                </VekItem>
+             }
+        </VekGrid>
+    </VekItem>
+</VekGrid>
+
+@code{
+
+    int _papers = 7;
+    int papers { get { return _papers; } set { UpdatePapers(value); } }
+
+    int[] breaks = new int[7] { 3, 4, 2, 3, 3, 2, 4 };
+
+    Justify justification = Justify.FlexStart;
+
+    void UpdatePapers(int value)
+    {
+
+        int[] newbreaks = Enumerable.Repeat(3, value).ToArray();
+
+        for (int i = 0; i < newbreaks.Length; i++)
+        {
+            if ( i < breaks.Length)
+            {
+                newbreaks[i] = breaks[i];
+            }
+        }
+
+        breaks = newbreaks;
+
+        _papers = value;
+
+        StateHasChanged();
+    }
+
+    void UpdateBreaks(int index,int changeamount)
+    {
+        List<int> newbreaks = breaks.ToList();
+        if (newbreaks[index] + changeamount > 12 || newbreaks[index] + changeamount < 1) return; //don't go above 12 or below 1
+        newbreaks[index] += changeamount;
+
+        breaks = newbreaks.ToArray();
+
+        StateHasChanged();
+    }
+}

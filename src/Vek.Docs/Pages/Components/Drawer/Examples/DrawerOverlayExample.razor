@@ -1,0 +1,23 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => ToggleDrawer())">Toggle drawer</VekButton>
+
+<VekDrawer @bind-Open="@_open" Overlay="false" Elevation="1" Variant="@DrawerVariant.Temporary">
+    <VekDrawerHeader>
+        <VekText Typo="Typo.h6">My App</VekText>
+    </VekDrawerHeader>
+    <VekNavMenu>
+        <VekNavLink Match="NavLinkMatch.All">Store</VekNavLink>
+        <VekNavLink Match="NavLinkMatch.All">Library</VekNavLink>
+        <VekNavLink Match="NavLinkMatch.All">Community</VekNavLink>
+    </VekNavMenu>
+</VekDrawer>
+
+@code{ 
+    private bool _open;
+
+    private void ToggleDrawer()
+    {
+        _open = !_open;
+    }
+}

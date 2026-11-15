@@ -1,0 +1,9 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekText>The text after here is: <VekText Inline="@_inline" Color="Color.Primary">@(_inline ? "inline." : "block.")</VekText></VekText>
+
+<VekSwitch @bind-Value="_inline" Color="Color.Primary" Label="Inline" />
+
+@code {
+    bool _inline;
+}

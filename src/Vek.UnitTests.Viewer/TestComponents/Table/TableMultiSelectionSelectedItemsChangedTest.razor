@@ -1,0 +1,21 @@
+﻿<VekTable T="int" Items="_items" MultiSelection="true" SelectedItemsChanged="SelectedItemsChanged">
+    <HeaderContent>
+        <VekTh>#</VekTh>
+    </HeaderContent>
+    <RowTemplate>
+        <VekTd>@context</VekTd>
+        </RowTemplate>
+</VekTable>
+<VekText id="counter">@_counter</VekText>
+
+@code {
+    public static string __description__ = "Selecting the 'Select All' checkbox should trigger the 'SelectedItemsChanged' event only once";
+
+    private int _counter = 0;
+    private readonly int[] _items = [0, 1];
+
+    private void SelectedItemsChanged(HashSet<int> selectedItems)
+    {
+        _counter++;
+    }
+}

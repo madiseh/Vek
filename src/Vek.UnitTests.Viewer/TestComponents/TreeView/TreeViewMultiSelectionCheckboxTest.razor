@@ -1,0 +1,34 @@
+﻿<VekTreeView T="string" @bind-SelectedValues="SelectedValues" Disabled="@Disabled" ReadOnly="@ReadOnly" SelectionMode="SelectionMode.MultiSelection">
+    <VekTreeViewItem Value='"content"'>
+        <VekTreeViewItem Value='"logo.png"' />
+        <VekTreeViewItem Value='"Vek.svg"' />
+        <VekTreeViewItem Value='"Nuget.png"' />
+    </VekTreeViewItem>
+    <VekTreeViewItem Value='"src"'>
+        <VekTreeViewItem Value='"Vek"' />
+        <VekTreeViewItem Value='"Vek.Docs"'>
+            <VekTreeViewItem Value='"wwwroot"'>
+                <VekTreeViewItem Value='"VekAppbarCorner.svg"' />
+                <VekTreeViewItem Value='"VekDocs.min.css"' />
+            </VekTreeViewItem>
+        </VekTreeViewItem>
+    </VekTreeViewItem>
+</VekTreeView>
+
+<ul class="selected-values">
+    @foreach (var value in SelectedValues)
+    {
+        <li>@value</li>
+    }
+</ul>
+
+@code {
+    [Parameter]
+    public IReadOnlyCollection<string> SelectedValues { get; set; } = [];
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+}

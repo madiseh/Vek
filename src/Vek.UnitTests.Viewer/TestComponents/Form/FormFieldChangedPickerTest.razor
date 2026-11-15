@@ -1,0 +1,11 @@
+﻿@using Vek.Utilities
+
+<VekForm FieldChanged="v => FormFieldChangedEventArgs = v">
+    <VekDatePicker Editable />
+    <VekTimePicker Editable />
+    <VekColorPicker Editable />
+</VekForm>
+
+@code {
+    public FormFieldChangedEventArgs? FormFieldChangedEventArgs { get; private set; }
+}

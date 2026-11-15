@@ -1,0 +1,67 @@
+.vek-file-upload {
+  flex-grow: 0;
+
+  > .vek-input-control-input-container {
+    display: contents;
+  }
+
+  > .vek-input-control-input-container > .vek-file-upload-custom-content {
+    display: contents;
+  }
+
+  .vek-file-upload-dragover {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    top: 0;
+    left: 0;
+    z-index: 2;
+  }
+
+  .vek-file-upload-dragarea {
+    background-color: var(--vek-palette-surface);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 16px;
+    border-radius: var(--vek-default-borderradius);
+    border-width: 2px;
+    border-style: dashed;
+    border-color: var(--vek-palette-lines-default);
+
+    &:disabled {
+      cursor: default;
+      color: var(--vek-palette-action-disabled);
+    }
+  }
+
+  .vek-file-upload-dragarea-clickable {
+    cursor: pointer;
+    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+
+    @media(hover: hover) and (pointer: fine) {
+      &:hover {
+        background-color: var(--vek-palette-action-default-hover);
+        border-color: var(--vek-palette-primary);
+      }
+    }
+
+    &:focus-visible, &:active {
+      background-color: var(--vek-palette-action-default-hover);
+      border-color: var(--vek-palette-primary);
+    }
+  }
+
+  &.vek-input-control {
+    margin-top: 0;
+  }
+
+  .vek-file-upload-files-default-template {
+    margin-top: 4px;
+  }
+}

@@ -1,0 +1,17 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekButton OnClick="@AddMoreContent" Color="Color.Error">Add another line</VekButton>
+@foreach (var item in _content)
+{
+    <VekText Class="pa-2" Align="Align.Center">@item</VekText>
+}
+
+@code {
+
+    private List<String> _content = new();
+
+    public void AddMoreContent()
+    {
+        _content.Add("line of text");
+    }
+}

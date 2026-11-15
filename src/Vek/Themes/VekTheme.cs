@@ -1,0 +1,60 @@
+﻿namespace Vek
+{
+    /// <summary>
+    /// Theme settings that define the light and dark color palettes, typography, shadows, layout dimensions, and z-index values for Vek components.
+    /// </summary>
+    /// <remarks>
+    /// Applied to a page through a <see cref="VekThemeProvider"/>.
+    /// </remarks>
+    public class VekTheme
+    {
+        /// <summary>
+        /// The palette for the light theme.
+        /// </summary>
+        public Palette PaletteLight { get; set; }
+
+        /// <summary>
+        /// The palette for the dark theme.
+        /// </summary>
+        public Palette PaletteDark { get; set; }
+
+        /// <summary>
+        /// The shadow settings.
+        /// </summary>
+        public Shadow Shadows { get; set; }
+
+        /// <summary>
+        /// The typography settings.
+        /// </summary>
+        public Typography Typography { get; set; }
+
+        /// <summary>
+        /// The layout properties.
+        /// </summary>
+        public LayoutProperties LayoutProperties { get; set; }
+
+        /// <summary>
+        /// The z-index values.
+        /// </summary>
+        public ZIndex ZIndex { get; set; }
+
+        /// <summary>
+        /// The pseudo CSS styles.
+        /// </summary>
+        public PseudoCss PseudoCss { get; set; }
+
+        /// <summary>
+        /// Initializes the <see cref="VekTheme"/> class.
+        /// </summary>
+        public VekTheme()
+        {
+            PaletteLight = new PaletteLight();
+            PaletteDark = new PaletteDark();
+            Shadows = new Shadow();
+            Typography = new Typography();
+            LayoutProperties = new LayoutProperties();
+            ZIndex = new ZIndex();
+            PseudoCss = new PseudoCss();
+        }
+    }
+}

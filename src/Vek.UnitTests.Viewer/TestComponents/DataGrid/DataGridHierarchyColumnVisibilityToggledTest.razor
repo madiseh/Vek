@@ -1,0 +1,42 @@
+﻿@using Vek
+@using System.Collections.Generic
+@using Vek.Utilities
+
+<VekDataGrid T="Model" Items="@Items" ExpandSingleRow="@ExpandSingleRow">
+    <Columns>
+        @if (ShowHierarchyColumn)
+        {
+            <HierarchyColumn T="Model" HierarchyVisibilityToggled="OnHierarchyVisibilityToggled" />
+        }
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Age" />
+    </Columns>
+    <ChildRowContent>
+        <VekText>Child content for @context.Item.Name</VekText>
+    </ChildRowContent>
+</VekDataGrid>
+
+@code {
+    public record Model(string Name, int Age);
+
+    [Parameter]
+    public bool ExpandSingleRow { get; set; }
+
+    [Parameter]
+    public bool ShowHierarchyColumn { get; set; } = true;
+
+    public List<Model> Items { get; } = new()
+    {
+        new Model("John", 25),
+        new Model("Jane", 30),
+        new Model("Bob", 35)
+    };
+
+    public List<DataGridHierarchyVisibilityToggledEventArgs<Model>> ToggledEvents { get; } = [];
+
+    private Task OnHierarchyVisibilityToggled(DataGridHierarchyVisibilityToggledEventArgs<Model> args)
+    {
+        ToggledEvents.Add(args);
+        return Task.CompletedTask;
+    }
+}

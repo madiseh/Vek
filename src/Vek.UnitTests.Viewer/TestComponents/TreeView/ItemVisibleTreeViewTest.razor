@@ -1,0 +1,8 @@
+﻿<VekTreeView T="string">
+    <VekTreeViewItem T="string" Value="@("World")" Visible="@IsElementVisible"/>
+</VekTreeView>
+
+@code {
+    [Parameter]
+    public bool IsElementVisible { get; set; }
+}

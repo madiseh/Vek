@@ -1,0 +1,27 @@
+﻿<VekTabs HeaderPosition="@TabHeaderPosition" TabPanelHeaderPosition="@TabPanelHeaderPosition">
+    <ChildContent>
+        <VekTabPanel Text="First Tab" Tag="0">
+            <VekText Typo="Typo.h1">  First Tab Content</VekText>
+        </VekTabPanel>
+        <VekTabPanel Text="Second Tab" Tag="1">
+            <VekText Typo="Typo.h1">Second Tab Content</VekText>
+        </VekTabPanel>
+        <VekTabPanel Text="Third Tab" Tag="2">
+            <VekText Typo="Typo.h1">Third Tab Content</VekText>
+        </VekTabPanel>
+    </ChildContent>
+    <Header>
+        <VekText Typo="Typo.caption" Class="test-header-content">Count: @context.Panels.Count</VekText>
+    </Header>
+    <TabPanelHeader>
+        <VekText Typo="Typo.caption" Class="test-panel-header-content">Index: @context.Tag</VekText>
+    </TabPanelHeader>
+</VekTabs>
+
+@code {
+    [Parameter]
+    public TabHeaderPosition TabHeaderPosition { get; set; } = TabHeaderPosition.After;
+
+    [Parameter]
+    public TabHeaderPosition TabPanelHeaderPosition { get; set; } = TabHeaderPosition.After;
+}

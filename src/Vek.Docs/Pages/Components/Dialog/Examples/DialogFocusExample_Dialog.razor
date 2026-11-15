@@ -1,0 +1,21 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekDialog DefaultFocus="DefaultFocus.LastChild">
+    <DialogContent>
+        Dialog content
+    </DialogContent>
+    <DialogActions>
+        <VekButton OnClick="Cancel">Cancel</VekButton>
+        <VekButton Color="Color.Primary" OnClick="Submit">OK</VekButton>
+        <VekButton Color="Color.Success" >Focused Button</VekButton>
+    </DialogActions>
+</VekDialog>
+
+@code {
+    [CascadingParameter]
+    private IVekDialogInstance VekDialog { get; set; }
+
+    private void Submit() => VekDialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => VekDialog.Cancel();
+}

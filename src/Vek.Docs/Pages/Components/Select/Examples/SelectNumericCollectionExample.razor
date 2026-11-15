@@ -1,0 +1,20 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekSelect T="double" Label="Price (Datatype: double)" Clearable="true" Required="true">
+    @foreach (var price in prices)
+    {
+    <VekSelectItem Value="@price" />
+    }
+</VekSelect>
+
+<VekSelect T="double?" Label="Price (Datatype: double?)" Clearable="true" Required="true">
+    @foreach (double? price in prices)
+    {
+    <VekSelectItem Value="@price" />
+    }
+</VekSelect>
+
+@code
+{
+    private double[] prices = { 4.50, 4.99, 3.60, 21.99 };
+}

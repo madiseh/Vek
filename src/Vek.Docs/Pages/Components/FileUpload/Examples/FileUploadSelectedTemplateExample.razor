@@ -1,0 +1,96 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekStack Row Justify="Justify.SpaceAround" AlignItems="AlignItems.Start" Class="vek-width-full">
+    <VekFileUpload @bind-Files=@_file>
+        <CustomContent>
+            <VekButton Variant="Variant.Filled"
+                       OnClick="@context.OpenFilePickerAsync"
+                       Color="Color.Primary">
+                Default template
+            </VekButton>
+        </CustomContent>
+    </VekFileUpload>
+
+    <VekFileUpload T="IBrowserFile">
+        <CustomContent>
+            <VekButton Variant="Variant.Filled"
+                       OnClick="@context.OpenFilePickerAsync"
+                       Color="Color.Primary">
+                Single file
+            </VekButton>
+        </CustomContent>
+        <SelectedTemplate>
+            @if (context != null)
+            {
+                <VekText>@context.Name</VekText>
+            }
+            else
+            {
+                <VekText>No file selected</VekText>
+            }
+        </SelectedTemplate>
+    </VekFileUpload>
+
+    <VekFileUpload @bind-Files=@_files>
+        <CustomContent>
+            <VekButton Variant="Variant.Filled"
+                       OnClick="@context.OpenFilePickerAsync"
+                       Color="Color.Secondary">
+                Multiple files
+            </VekButton>
+        </CustomContent>
+        <SelectedTemplate>
+            @if (context != null)
+            {
+                @foreach (var file in context)
+                {
+                    <VekText>@file.Name</VekText>
+                }
+            }
+            else
+            {
+                <VekText>No files selected</VekText>
+            }
+        </SelectedTemplate>
+    </VekFileUpload>
+
+    <VekFileUpload @bind-Files=@_file>
+        <CustomContent>
+            <VekFab Color="Color.Warning"
+                    StartIcon="@Icons.Material.Filled.Image"
+                    OnClick="@context.OpenFilePickerAsync"
+                    Label="No template" />
+        </CustomContent>
+        <SelectedTemplate />
+    </VekFileUpload>
+</VekStack>
+
+@code
+{
+    private IBrowserFile _file = new DummyBrowserFile("test.jpg", DateTimeOffset.Now, 1024, "image/jpeg", new byte[1024]);
+    private IReadOnlyList<IBrowserFile> _files =
+    [
+        new DummyBrowserFile("test1.jpg", DateTimeOffset.Now, 1024, "image/jpeg", []),
+        new DummyBrowserFile("test2.jpg", DateTimeOffset.Now, 1024, "image/jpeg", []),
+    ];
+
+    public class DummyBrowserFile : IBrowserFile
+    {
+        public string Name { get; }
+        public DateTimeOffset LastModified { get; }
+        public long Size { get; }
+        public string ContentType { get; }
+        public byte[] Content { get; }
+
+        public DummyBrowserFile(string name, DateTimeOffset lastModified, long size, string contentType, byte[] content)
+        {
+            Name = name;
+            LastModified = lastModified;
+            Size = size;
+            ContentType = contentType;
+            Content = content;
+        }
+
+        public Stream OpenReadStream(long maxAllowedSize = 512000, CancellationToken cancellationToken = default) => new MemoryStream(Content);
+    }
+}

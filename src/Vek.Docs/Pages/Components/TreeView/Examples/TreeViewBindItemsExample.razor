@@ -1,0 +1,29 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekPaper Width="300px" Elevation="0">
+    <VekTreeView T="string" Hover SelectionMode="@SelectionMode.ToggleSelection" Color="Color.Tertiary">
+        <VekTreeViewItem Text="config" @bind-Expanded="ConfigExpanded" Icon="@Icons.Custom.Uncategorized.Folder" IconExpanded="@Icons.Custom.Uncategorized.FolderOpen">
+            <VekTreeViewItem Text="launch.json" @bind-Selected="LaunchSelected"  Icon="@Icons.Custom.FileFormats.FileCode" />
+            <VekTreeViewItem Text="tasks.json" @bind-Selected="TasksSelected" Icon="@Icons.Custom.FileFormats.FileCode" />
+        </VekTreeViewItem>
+        <VekTreeViewItem Text="images" @bind-Expanded="ImagesExpanded" Icon="@Icons.Custom.Uncategorized.Folder" IconExpanded="@Icons.Custom.Uncategorized.FolderOpen">
+            <VekTreeViewItem Text="logo.png" @bind-Selected="LogoSelected" Icon="@Icons.Custom.FileFormats.FileImage" />
+        </VekTreeViewItem>
+    </VekTreeView>
+</VekPaper>
+
+<VekStack Row Justify="Justify.Center" AlignItems="AlignItems.Center" Style="width: 100%" Wrap="Wrap.Wrap">
+    <VekSwitch @bind-Value="ConfigExpanded" Color="Color.Tertiary">config</VekSwitch>
+    <VekSwitch @bind-Value="ImagesExpanded" Color="Color.Tertiary">images</VekSwitch>
+    <VekCheckBox @bind-Value="LaunchSelected" Color="Color.Tertiary">launch.json</VekCheckBox>
+    <VekCheckBox @bind-Value="TasksSelected" Color="Color.Tertiary">tasks.json</VekCheckBox>
+    <VekCheckBox @bind-Value="LogoSelected" Color="Color.Tertiary">logo.png</VekCheckBox>
+</VekStack>
+
+@code {
+    public bool ConfigExpanded;
+    public bool ImagesExpanded;
+    public bool LaunchSelected = true;
+    public bool TasksSelected;
+    public bool LogoSelected;
+}

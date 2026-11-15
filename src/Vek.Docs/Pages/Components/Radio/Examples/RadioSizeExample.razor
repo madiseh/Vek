@@ -1,0 +1,11 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekRadioGroup @bind-Value="Radio_Size">
+    <VekRadio Value="1" Color="Color.Primary" Size="Size.Small">Small</VekRadio>
+    <VekRadio Value="2" Color="Color.Secondary" Size="Size.Medium">Medium</VekRadio>
+    <VekRadio Value="3" Color="Color.Tertiary" Size="Size.Large">Large</VekRadio>
+</VekRadioGroup>
+
+@code { 
+    public int Radio_Size { get; set; } = 2;
+}

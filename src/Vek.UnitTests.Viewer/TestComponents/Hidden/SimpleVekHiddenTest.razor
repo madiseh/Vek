@@ -1,0 +1,13 @@
+﻿<VekHidden Invert="@Invert" Breakpoint="@Breakpoint" HiddenChanged="@( x => HiddenChangedHistory.Add(x) )" >
+    <VekText>VekHidden content</VekText>
+</VekHidden>
+
+@code {
+    [Parameter]
+    public bool Invert { get; set; }
+
+    [Parameter]
+    public Breakpoint Breakpoint { get; set; }
+
+    public List<bool> HiddenChangedHistory { get; set; } = [];
+}

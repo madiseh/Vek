@@ -1,0 +1,336 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Vek.Examples.Data.Models
+@using Vek.Utilities
+@namespace Vek.Docs.Components.LandingPage
+
+<div class="d-flex vek-width-full vek-height-full">
+    <VekOverlay OnClick="@(() => ToggleMiniDrawer())" @bind-Visible="@overlayVisible" Absolute="true" ZIndex="1" />
+    <div class="@MiniDrawerClassNames" style="@GetDrawerWidth()">
+        <div class="d-flex align-center px-4">
+            <VekLogo Class="me-3" Style="width:36px;"/>
+            <VekText Typo="Typo.h6">Vek Mini</VekText>
+        </div>
+        <VekList T="int" @bind-SelectedValue="selectedValue" Class="py-6 mini-fake-nav">
+
+            <VekListSubheader Class="pt-6 pb-2">General</VekListSubheader>
+
+            <VekListItem tabindex="-1" Value="1" Icon="@Icons.Material.Rounded.SpaceDashboard" Text="Dashboard" IconColor="Color.Inherit"/>
+            <VekListItem tabindex="-1" Value="2" Icon="@Icons.Material.Rounded.ShoppingCart" Text="E-Commerce" IconColor="Color.Inherit"/>
+            <VekListItem tabindex="-1" Value="3" Icon="@Icons.Material.Rounded.AccountBalance" Text="Banking" IconColor="Color.Inherit"/>
+            <VekListItem tabindex="-1" Value="4" Icon="@Icons.Material.Rounded.Event" Text="Booking" IconColor="Color.Inherit"/>
+
+            <VekListSubheader Class="pt-6 pb-2">Applications</VekListSubheader>
+
+            <VekListItem tabindex="-1" Value="5" Icon="@Icons.Material.Rounded.Email" Text="Mail" IconColor="Color.Inherit" />
+            <VekListItem tabindex="-1" Value="6" Icon="@Icons.Material.Rounded.QuestionAnswer" Text="Chat" IconColor="Color.Inherit" />
+            <VekListItem tabindex="-1" Value="7" Icon="@Icons.Material.Rounded.EventNote" Text="Calendar" IconColor="Color.Inherit" />
+            <VekListItem tabindex="-1" Value="8" Icon="@Icons.Material.Rounded.ViewKanban" Text="Kanban" IconColor="Color.Inherit" />
+
+            <VekListSubheader Class="pt-6 pb-2">Manage</VekListSubheader>
+
+            <VekListItem tabindex="-1" Value="9" Icon="@Icons.Material.Rounded.Person" Text="Users" />
+            <VekListItem tabindex="-1" Value="10" Icon="@Icons.Material.Rounded.Group" Text="Groups" />
+            <VekListItem tabindex="-1" Value="11" Icon="@Icons.Material.Rounded.ShoppingCart" Text="E-Commerce" Expanded="false">
+                <NestedList>
+                    <VekListItem tabindex="-1" Value="12" Text="Analytics"/>
+                    <VekListItem tabindex="-1" Value="13" Text="Products"/>
+                    <VekListItem tabindex="-1" Value="14" Text="Orders"/>
+                    <VekListItem tabindex="-1" Value="15" Text="Invoice"/>
+                </NestedList>
+            </VekListItem>
+        </VekList>
+    </div>
+    <div class="@ContentClassNames">
+        <VekToolBar Gutters="false" Class="vek-text-secondary">
+            <VekIconButton tabindex="-1" OnClick="@(() => ToggleMiniDrawer())" Icon="@GetIcon()" Color="Color.Inherit" />
+            <VekIconButton tabindex="-1" Icon="@Icons.Material.Outlined.Search" Color="Color.Inherit" />
+            <VekSpacer />
+            <VekIconButton tabindex="-1" Class="vek-text-secondary" Icon="@Icons.Material.Outlined.Notifications"/>
+            <VekMenu AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" PopoverClass="vek-landingpage-scaled-menu vek-elevation-1">
+                <ActivatorContent>
+                    <div @onclick="@context.ToggleAsync" style="cursor: pointer">
+                        <MiniAppAvatar />
+                    </div>
+                </ActivatorContent>
+                <ChildContent>
+                    <div class="px-4">
+                        <VekText Typo="Typo.subtitle2">Martin Veksson</VekText>
+                        <VekText Class="mt-n2" Typo="Typo.body1">martin@veksson.se</VekText>
+                    </div>
+                    <VekDivider Class="my-2"/>
+                    <VekListItem T="string" Dense="true" Icon="@Icons.Material.Rounded.Person">Profile</VekListItem>
+                    <VekListItem T="string" Dense="true" Icon="@Icons.Material.Rounded.Settings">Settings</VekListItem>
+                    <VekListItem T="string" Dense="true" Icon="@Icons.Material.Rounded.Logout">Logout</VekListItem>
+                </ChildContent>
+            </VekMenu>
+        </VekToolBar>
+        <div class="lp-app-grid">
+            <VekPaper Class="py-4 px-6 rounded-lg d-flex align-center">
+                <div class="flex-grow-1">
+                    <VekText Typo="Typo.h6">Graphite on roof</VekText>
+                    <div class="d-flex align-center my-1">
+                        <VekAvatar Class="me-2 pa-4" Style="background-color: var(--vek-palette-primary-hover);" Size="Size.Small">
+                            <VekIcon Color="Color.Primary" Icon="@Icons.Material.Filled.TrendingDown" Size="Size.Small"/>
+                        </VekAvatar>
+                        <VekText Typo="Typo.subtitle2">+2.6%</VekText>
+                    </div>
+                    <VekText Typo="Typo.h4">149,567</VekText>
+                </div>
+                <div class="d-flex align-end justify-end vek-height-full py-8">
+                    <VekPaper Height="80%" Width="6px" Square="true" Class="vek-primary mr-1 rounded-t"/>
+                    <VekPaper Height="95%" Width="6px" Square="true" Class="vek-primary mr-1 rounded-t"/>
+                    <VekPaper Height="90%" Width="6px" Square="true" Class="vek-primary mr-1 rounded-t"/>
+                    <VekPaper Height="85%" Width="6px" Square="true" Class="vek-primary mr-1 rounded-t"/>
+                    <VekPaper Height="65%" Width="6px" Square="true" Class="vek-primary mr-1 rounded-t"/>
+                    <VekPaper Height="52%" Width="6px" Square="true" Class="vek-primary mr-1 rounded-t"/>
+                    <VekPaper Height="40%" Width="6px" Square="true" Class="vek-primary mr-1 rounded-t"/>
+                    <VekPaper Height="38%" Width="6px" Square="true" Class="vek-primary mr-1 rounded-t"/>
+                    <VekPaper Height="36%" Width="6px" Square="true" Class="vek-primary mr-1 rounded-t"/>
+                    <VekPaper Height="20%" Width="6px" Square="true" Class="vek-primary mr-1 rounded-t"/>
+                </div>
+            </VekPaper>
+            <VekPaper Class="py-4 px-6 rounded-lg d-flex align-center">
+                <div class="flex-grow-1">
+                    <VekText Typo="Typo.h6">Global Spread</VekText>
+                    <div class="d-flex align-center my-1">
+                        <VekAvatar Class="me-2 pa-4" Style="background-color: var(--vek-palette-secondary-hover);" Size="Size.Small">
+                            <VekIcon Color="Color.Secondary" Icon="@Icons.Material.Filled.TrendingUp" Size="Size.Small"/>
+                        </VekAvatar>
+                        <VekText Typo="Typo.subtitle2">+9.6%</VekText>
+                    </div>
+                    <VekText Typo="Typo.h4">12%</VekText>
+                </div>
+                <div class="d-flex align-end justify-end vek-height-full py-8">
+                    <VekPaper Height="15%" Width="6px" Square="true" Class="vek-secondary mr-1 rounded-t"/>
+                    <VekPaper Height="20%" Width="6px" Square="true" Class="vek-secondary mr-1 rounded-t"/>
+                    <VekPaper Height="53%" Width="6px" Square="true" Class="vek-secondary mr-1 rounded-t"/>
+                    <VekPaper Height="35%" Width="6px" Square="true" Class="vek-secondary mr-1 rounded-t"/>
+                    <VekPaper Height="45%" Width="6px" Square="true" Class="vek-secondary mr-1 rounded-t"/>
+                    <VekPaper Height="70%" Width="6px" Square="true" Class="vek-secondary mr-1 rounded-t"/>
+                    <VekPaper Height="58%" Width="6px" Square="true" Class="vek-secondary mr-1 rounded-t"/>
+                    <VekPaper Height="76%" Width="6px" Square="true" Class="vek-secondary mr-1 rounded-t"/>
+                    <VekPaper Height="85%" Width="6px" Square="true" Class="vek-secondary mr-1 rounded-t"/>
+                    <VekPaper Height="61%" Width="6px" Square="true" Class="vek-secondary mr-1 rounded-t"/>
+                </div>
+            </VekPaper>
+            <VekPaper Class="py-4 px-6 rounded-lg d-flex align-center">
+                <div class="flex-grow-1">
+                    <VekText Typo="Typo.h6">Roentgen</VekText>
+                    <div class="d-flex align-center my-1">
+                        <VekAvatar Class="me-2 pa-4" Style="background-color: var(--vek-palette-tertiary-hover);" Size="Size.Small">
+                            <VekIcon Color="Color.Tertiary" Icon="@Icons.Material.Filled.TrendingFlat" Size="Size.Small"/>
+                        </VekAvatar>
+                        <VekText Typo="Typo.subtitle2">~0.0%</VekText>
+                    </div>
+                    <VekText Typo="Typo.h4">3,6</VekText>
+                </div>
+                <div class="d-flex align-end justify-end vek-height-full py-8">
+                    <VekPaper Height="10%" Width="6px" Square="true" Class="vek-tertiary mr-1 rounded-t"/>
+                    <VekPaper Height="16%" Width="6px" Square="true" Class="vek-tertiary mr-1 rounded-t"/>
+                    <VekPaper Height="26%" Width="6px" Square="true" Class="vek-tertiary mr-1 rounded-t"/>
+                    <VekPaper Height="36%" Width="6px" Square="true" Class="vek-tertiary mr-1 rounded-t"/>
+                    <VekPaper Height="36%" Width="6px" Square="true" Class="vek-tertiary mr-1 rounded-t"/>
+                    <VekPaper Height="28%" Width="6px" Square="true" Class="vek-tertiary mr-1 rounded-t"/>
+                    <VekPaper Height="36%" Width="6px" Square="true" Class="vek-tertiary mr-1 rounded-t"/>
+                    <VekPaper Height="36%" Width="6px" Square="true" Class="vek-tertiary mr-1 rounded-t"/>
+                    <VekPaper Height="28%" Width="6px" Square="true" Class="vek-tertiary mr-1 rounded-t"/>
+                    <VekPaper Height="36%" Width="6px" Square="true" Class="vek-tertiary mr-1 rounded-t"/>
+                </div>
+            </VekPaper>
+        </div>
+        <div class="my-6 d-flex gap-6 flex-wrap">
+            <VekPaper Class="py-4 px-6 rounded-lg d-flex flex-column">
+                    <VekText Typo="Typo.h6">Uranium-235</VekText>
+                    <div class="d-flex align-center gap-4">
+                        <VekRating tabindex="-1" ReadOnly="true" SelectedValue="4" />
+                        <VekText Typo="Typo.subtitle2" Color="Color.Primary">See all 137 reviews</VekText>
+                    </div>
+                    <VekText>This is the type of uranium used in the RBMK reactors.</VekText>
+                    <VekDivider Class="my-3"/>
+                    <VekText Typo="Typo.subtitle2" GutterBottom="true">Reactor Type</VekText>
+                    <div class="mx-n2 mb-2">
+                    <VekChip tabindex="-1" T="string" Color="Color.Primary">RBMK-1000</VekChip><VekChip tabindex="-1" T="string">RBMK-1500</VekChip><VekChip tabindex="-1" T="string">RBMKP-2400</VekChip>
+                    </div>
+                    <div>
+                        <VekButton tabindex="-1" Variant="Variant.Text" Color="Color.Primary" Class="ml-n2 mb-n2">Read more</VekButton>
+                    </div>
+            </VekPaper>
+            @if(IsMobile == false)
+            {
+                <VekSimpleTable Dense="true" Hover="true" Class="flex-grow-1">
+                    <thead>
+                        <tr>
+                            <th>Nr</th>
+                            <th>Sign</th>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>Molar mass</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Elements)
+                        {
+                            <tr>
+                                <td>@item.Number</td>
+                                <td>@item.Sign</td>
+                                <td>@item.Name</td>
+                                <td>@item.Position</td>
+                                <td>@item.Molar</td>
+                            </tr>
+                        }
+                    </tbody>
+                </VekSimpleTable>
+            }
+        </div>
+        @if(IsMobile == false)
+        {
+        <div class="lp-app-grid">
+            <VekPaper Class="rounded-lg">
+                <VekDatePicker PickerVariant="PickerVariant.Static" Orientation="Orientation.Landscape" Date="@(DateTime.Today.AddDays(1))" Class="rounded-lg" />
+            </VekPaper>
+            <VekPaper Class="rounded-lg d-flex flex-column">
+                <div class="d-flex align-center px-4 pt-4 pb-3 gap-4">
+                    <VekIcon Icon="@Icons.Custom.Brands.Vek" Color="Color.Primary" />
+                    <VekText Typo="Typo.subtitle2">VekPay</VekText>
+                </div>
+                <VekDivider/>
+                <div class="d-flex flex-column pa-4 gap-4">
+                    <VekTextField tabindex="-1" T="string" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Rounded.CreditCard" Mask="@(new PatternMask("0000 0000 0000 0000"))" Label="Card Number" Placeholder="0000 0000 0000 0000"  Variant="@Variant.Text" />
+                    <div class="d-flex gap-4">
+                        <VekTextField tabindex="-1" T="string" Mask="@(new DateMask("MM/YY", 'Y', 'M'))" Label="Expiration" Placeholder="MM/YY"  Variant="@Variant.Text" />
+                        <VekTextField tabindex="-1" T="string" Mask="@(new PatternMask("000"))" Label="CVC" Placeholder="000" Variant="@Variant.Text" />
+                    </div>
+                </div>
+                <div class="d-flex align-end flex-grow-1 pa-4">
+                    <VekButton tabindex="-1" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" DropShadow="false">Pay now</VekButton>
+                </div>
+            </VekPaper>
+            <div class="d-flex flex-column gap-6">
+                <VekTabs Elevation="1" Rounded="true" Color="@Color.Primary">
+                    <VekTabPanel Text="One" />
+                    <VekTabPanel Text="Two" />
+                    <VekTabPanel Text="Three" />
+                    <VekTabPanel Text="Four" />
+                </VekTabs>
+                <div class="d-flex gap-6 flex-grow-1">
+                    <VekPaper Class="d-flex flex-column align-center py-2">
+                        <VekText Typo="Typo.body2">100°C</VekText>
+                        <div class="vek-height-full my-n6">
+                            <VekSlider tabindex="-1" Value="@sliderValue" Vertical="true" Class="d-flex mx-n8"/>
+                        </div>
+                        <VekText Typo="Typo.body2">0°C</VekText>
+                    </VekPaper>
+                    <div class="d-flex flex-column gap-6">
+                        <VekPaper Class="d-flex">
+                            <VekIconButton tabindex="-1" Icon="@Icons.Material.Filled.FormatAlignRight" Class="rounded-0 rounded-l" />
+                            <VekIconButton tabindex="-1" Icon="@Icons.Material.Filled.FormatAlignCenter" Class="rounded-0" />
+                            <VekIconButton tabindex="-1" Icon="@Icons.Material.Filled.FormatAlignLeft" Class="rounded-0" />
+                            <VekDivider Vertical="true" FlexItem="true" Class="mx-2" />
+                            <VekIconButton tabindex="-1" Icon="@Icons.Material.Filled.FormatBold" Class="rounded-0" />
+                            <VekIconButton tabindex="-1" Icon="@Icons.Material.Filled.FormatItalic" Class="rounded-0" />
+                            <VekIconButton tabindex="-1" Icon="@Icons.Material.Filled.FormatUnderlined" Class="rounded-0 rounded-r" />
+                        </VekPaper>
+                        <div class="relative">
+                            <VekExpansionPanels>
+                                <VekExpansionPanel>
+                                    <TitleContent>
+                                        <div class="d-flex gap-4">
+                                            <VekIcon Icon="@Icons.Material.Filled.Folder"/>
+                                            <VekText>Vek News</VekText>
+                                        </div>
+                                    </TitleContent>
+                                    <ChildContent>
+                                        Nope :)
+                                    </ChildContent>
+                                </VekExpansionPanel>
+                                <VekExpansionPanel @bind-Expanded="@expansionPanel1">
+                                    <TitleContent>
+                                        <div class="d-flex gap-4">
+                                            <VekIcon Icon="@Icons.Material.Filled.Folder"/>
+                                            <VekText>Scraped Ideas</VekText>
+                                        </div>
+                                    </TitleContent>
+                                    <ChildContent>
+                                        VekReactor
+                                    </ChildContent>
+                                </VekExpansionPanel>
+                            </VekExpansionPanels>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+</div>
+
+
+@code {
+    [Parameter] public bool IsMobile { get; set; }
+
+    private bool miniDrawerOpen;
+    private bool overlayVisible { get; set; }
+    private double sliderValue = 50.0;
+    private bool expansionPanel1 = true;
+    int selectedValue = 1;
+
+    private void ToggleMiniDrawer()
+    {
+        miniDrawerOpen = !miniDrawerOpen;
+        if (IsMobile && miniDrawerOpen)
+        {
+            overlayVisible = true;
+        }
+        else
+        {
+            overlayVisible = false;
+        }
+    }
+
+    private string GetIcon() => miniDrawerOpen ? Icons.Material.Rounded.MenuOpen : Icons.Material.Rounded.Menu;
+
+    protected string MiniDrawerClassNames =>
+        new CssBuilder("mini-drawer py-8 flex-grow-0 flex-shrink-0")
+            .AddClass("absolute", IsMobile)
+            .Build();
+
+    protected string ContentClassNames =>
+        new CssBuilder("flex-grow-1 flex-shrink-1")
+            .AddClass("pa-5", !IsMobile)
+            .AddClass("px-8", IsMobile)
+            .Build();
+
+    private string GetDrawerWidth()
+    {
+        if (miniDrawerOpen)
+        {
+            return "width:240px;";
+        }
+        else
+        {
+            return "width:0;opacity:0;";
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (IsMobile)
+        {
+            miniDrawerOpen = false;
+        }
+        else
+        {
+            miniDrawerOpen = true;
+        }
+    }
+
+    private IEnumerable<Element> Elements = new List<Element>()
+    {
+        new Element() { Number = 1, Sign = "H", Name = "Hydrogen", Position = 0, Molar = 1.00794},
+        new Element() { Number = 2, Sign = "He", Name = "Helium", Position = 17, Molar = 4.002602},
+        new Element() { Number = 3, Sign = "Li", Name = "Lithium", Position = 0, Molar = 6.941},
+        new Element() { Number = 4, Sign = "Be", Name = "Beryllium", Position = 1, Molar = 9.012182},
+        new Element() { Number = 5, Sign = "C", Name = "Carbon", Position = 13, Molar = 12.0107},
+        new Element() { Number = 6, Sign = "O", Name = "Oxygen", Position = 15, Molar = 15.9994},
+    };
+}

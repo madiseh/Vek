@@ -1,0 +1,12 @@
+﻿@typeparam T where T: Enum
+
+<div class="vek-width-full d-flex justify-end">
+    <VekButtonGroup OverrideStyles="false">
+        @foreach (int value in Enum.GetValues(Type))
+        {
+            <VekButton Color="Color.Primary" Size="Size.Small" DropShadow="false" Variant="@(value == Convert.ToInt32(Value) ? Variant.Filled : Variant.Outlined)" OnClick="@(() => Value = (T)Enum.ToObject(Type, value))">
+                @Enum.GetName(Type, value)
+            </VekButton>
+        }
+    </VekButtonGroup>
+</div>

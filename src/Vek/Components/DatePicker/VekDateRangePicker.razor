@@ -1,0 +1,50 @@
+﻿@namespace Vek
+@inherits VekBaseDatePicker
+@using Vek.Resources
+@inject InternalVekLocalizer Localizer
+
+@Render
+
+@code{
+
+    protected override RenderFragment InputContent=>
+        @<VekInputControl Label="@Label" Variant="@Variant" HelperText="@HelperText" Error="@ErrorState.Value" ErrorId="@ErrorIdState.Value"
+                          ErrorText="@ErrorTextState.Value" Disabled="@GetDisabledState()" Margin="@Margin" Required="@Required"
+                          @onclick="async () => { if (!Editable) await ToggleStateAsync(); }" ForId="@FieldId">
+               <InputContent>
+                   <VekRangeInput @ref="_rangeInput"
+                                  @attributes="UserAttributes"
+                                  InputType="@InputType.Text"
+                                  Class="@PickerInputClassname"
+                                  Style="@Style"
+                                  Variant="@Variant"
+                                  ReadOnly="@(!Editable)"
+                                  Label="@Label"
+                                  @bind-Value="@RangeText"
+                                  Disabled="@GetDisabledState()"
+                                  Adornment="@Adornment"
+                                  AdornmentIcon="@AdornmentIcon"
+                                  AdornmentColor="@AdornmentColor"
+                                  IconSize="@IconSize"
+                                  OnAdornmentClick="ToggleStateAsync"
+                                  Required="@Required"
+                                  RequiredError="@RequiredError"
+                                  Error="@ErrorState.Value"
+                                  ErrorId="@ErrorIdState.Value"
+                                  ErrorText="@ErrorTextState.Value"
+                                  Margin="@Margin"
+                                  AdornmentAriaLabel="@AdornmentAriaLabel"
+                                  PlaceholderStart="@PlaceholderStart"
+                                  PlaceholderEnd="@PlaceholderEnd"
+                                  StartInputAriaLabel="@(Localizer[LanguageResource.VekDateRangePicker_Start])"
+                                  EndInputAriaLabel="@(Localizer[LanguageResource.VekDateRangePicker_End])"
+                                  SeparatorIcon="@SeparatorIcon"
+                                  Clearable="@(Clearable && !GetReadOnlyState())"
+                                  ClearIcon="@ClearIcon"
+                                  Underline="@Underline"
+                                  ShrinkLabel="@ShrinkLabel"
+                                  InputId="@InputId" />
+               </InputContent>
+           </VekInputControl>;
+
+}

@@ -1,0 +1,23 @@
+name: deploy-vek-dev
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ dev ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Queue every run instead of cancelling the running or pending one, because a cancelled run marks its commit as failed.
+  queue: max
+
+jobs:
+  deploy-web-app:
+    name: Deploy web app to dev.vek.com
+    if: ${{ github.repository_owner == 'Vek' }}
+    uses: Vek/Workflows/.github/workflows/template-deploy-web-app.yml@main
+    with:
+      dotnet-version: 10.0.x
+      web-app-name: vek-dev
+      project-directory: './src/Vek.Docs.WasmHost'
+    secrets:
+      publish-profile: ${{ secrets.PUBLISH_VEK_DEV }}

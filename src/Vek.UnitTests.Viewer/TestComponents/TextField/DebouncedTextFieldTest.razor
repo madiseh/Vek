@@ -1,0 +1,7 @@
+﻿<VekText Typo="Typo.h6">Result: @_searchString</VekText>
+<VekTextField @bind-Value="_searchString" T="string" DebounceInterval="500"></VekTextField>
+
+@code
+{
+    private string _searchString  = string.Empty;
+}

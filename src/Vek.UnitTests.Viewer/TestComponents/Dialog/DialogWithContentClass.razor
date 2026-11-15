@@ -1,0 +1,15 @@
+﻿<VekDialog ContentClass="@ContentClass" Gutters="@Gutters">
+    <DialogContent>
+    </DialogContent>
+</VekDialog>
+
+@code {
+    [CascadingParameter]
+    private IVekDialogInstance VekDialog { get; set; } = null!;
+
+    [Parameter]
+    public string ContentClass { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool Gutters { get; set; } = true;
+}

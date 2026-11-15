@@ -1,0 +1,15 @@
+﻿<VekTreeView T="string" @bind-SelectedValue="SelectedValue">
+    <VekTreeViewItem Value='"item1"'>
+        <VekTreeViewItem Value='"item1.1"' />
+        <VekTreeViewItem Value='"item1.2"' />
+    </VekTreeViewItem>
+</VekTreeView>
+
+<p class="selected-value">
+    @SelectedValue
+</p>
+
+@code {
+    [Parameter]
+    public string? SelectedValue { get; set; }
+}

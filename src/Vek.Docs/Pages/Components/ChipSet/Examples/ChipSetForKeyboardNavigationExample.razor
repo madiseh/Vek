@@ -1,0 +1,46 @@
+@namespace Vek.Docs.Examples
+<VekStack Justify="@Justify.Center"
+          Class="vek-width-full">
+    <VekChipSet T="string"
+                AllClosable="@true"
+                CheckMark="@true"
+                SelectionMode="@SelectionMode.MultiSelection"
+                OnClose="@OnChipClosed">
+        @for (var i = 0; i < _chips.Count; i++)
+        {
+            var localIndex = i;
+            <VekChip Value="@_chips[localIndex]"
+                     Color="@((Color)(localIndex % _numberOfColors))" />
+        }
+    </VekChipSet>
+    <VekButton OnClick="@AddChip"
+               Variant="@Variant.Filled">
+        Add chip
+    </VekButton>
+</VekStack>
+
+<VekDivider />
+
+<VekStack>
+    <VekChip T="string"
+             OnClick="@OpenDialogAsync"
+             Text="Click to open a dialog" />
+</VekStack>
+
+@code {
+    [Inject]
+    private IDialogService DialogService { get; set; }
+
+    private readonly List<string> _chips = ["Chip 1", "Chip 2", "Chip 3"];
+    private int _chipCounter = 3;
+    private int _numberOfColors = Enum.GetValues(typeof(Color)).Length;
+
+    private void AddChip()
+        => _chips.Add($"Chip {++_chipCounter}");
+
+    private void OnChipClosed(VekChip<string> chip)
+        => _chips.Remove(chip.Value);
+
+    private Task OpenDialogAsync()
+        => DialogService.ShowMessageBoxAsync("Dialog", "This is a dialog");
+}

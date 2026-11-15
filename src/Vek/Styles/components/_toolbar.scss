@@ -1,0 +1,46 @@
+@import '../abstracts/variables';
+
+.vek-toolbar {
+  display: flex;
+  position: relative;
+  align-items: center;
+  --vek-internal-toolbar-height: 56px;
+  height: var(--vek-internal-toolbar-height);
+}
+
+.vek-toolbar-gutters {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+@media (min-width:$breakpoint-xs) and (orientation: landscape) {
+  .vek-toolbar {
+    --vek-internal-toolbar-height: 48px;
+  }
+}
+
+@media (min-width:$breakpoint-sm) {
+  .vek-toolbar {
+    --vek-internal-toolbar-height: 64px;
+  }
+
+  .vek-toolbar-gutters {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+.vek-toolbar-dense {
+  --vek-internal-toolbar-height: 48px;
+}
+
+.vek-toolbar.vek-toolbar-wrap-content {
+  height: auto;
+  min-height: var(--vek-internal-toolbar-height);
+  flex-wrap: wrap;
+
+  &.vek-toolbar-appbar {
+    //This might need to be uppercased to be ignored by sass.
+    min-height: Min(var(--vek-appbar-height), var(--vek-internal-toolbar-height));
+  }
+}

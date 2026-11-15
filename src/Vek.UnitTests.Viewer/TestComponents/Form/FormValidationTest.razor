@@ -1,0 +1,10 @@
+﻿<VekForm ValidationDelay="0">
+    <VekTextField T="string" Required="true" RequiredError="Enter a star" Validation="@Validation"></VekTextField>
+</VekForm>
+
+@code {
+    public static string __description__ = "Supplied validation func should be called.";
+
+    [Parameter]
+    public object? Validation { get; set; }
+}

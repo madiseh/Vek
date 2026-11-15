@@ -1,0 +1,9 @@
+﻿<VekRadioGroup T="string" Class="some-main-class" InputClass="some-input-class">
+    <VekRadio Value="@("1")" LabelPlacement="Placement.Left" />
+    <VekRadio Value="@("2")" LabelPlacement="Placement.Top" />
+    <VekRadio Value="@("3")" />
+</VekRadioGroup>
+
+@code {
+    public static string __description__ = "Clicking the radios should change the selected radio.";
+}

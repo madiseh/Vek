@@ -1,0 +1,32 @@
+﻿// Copyright (c) Vek 2021
+// Vek licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using Microsoft.JSInterop;
+
+namespace Vek.Docs.Services
+{
+    public interface IDocsJsApiService
+    {
+        /// <summary>
+        /// Return the inner text of the HTML element referenced by given id
+        /// </summary>
+        ValueTask<string> GetInnerTextByIdAsync(string id);
+    }
+
+    public class DocsJsApiService : IDocsJsApiService
+    {
+        private readonly IJSRuntime _jsRuntime;
+
+        public DocsJsApiService(IJSRuntime jsRuntime)
+        {
+            _jsRuntime = jsRuntime;
+        }
+
+        /// <inheritdoc cref="IDocsJsApiService"/>
+        public ValueTask<string> GetInnerTextByIdAsync(string id)
+        {
+            return _jsRuntime.InvokeAsync<string>($"vekBlazorDocs.getInnerTextById", id);
+        }
+    }
+}

@@ -1,0 +1,18 @@
+﻿<VekText>SelectedItems { @string.Join(", ", _selectedItems) }</VekText>
+<VekTable Items="_items" @bind-SelectedItems="_selectedItems" MultiSelection="true" CustomHeader="true">
+    <HeaderContent>
+        <VekTHeadRow Checkable="true">
+            <VekTh>#</VekTh>
+        </VekTHeadRow>
+    </HeaderContent>
+    <RowTemplate>
+        <VekTd>@context</VekTd>
+    </RowTemplate>
+</VekTable>
+
+@code {
+    public static string __description__ = "the selected items (check-box click or row click) should be represented in SelectedItems.";
+
+    private readonly int[] _items = [0, 1, 2];
+    private HashSet<int> _selectedItems = [];
+}

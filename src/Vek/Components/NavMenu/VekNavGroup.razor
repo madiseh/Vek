@@ -1,0 +1,47 @@
+﻿@namespace Vek
+@using Vek.Resources
+@inherits VekComponentBase
+
+@inject InternalVekLocalizer Localizer
+
+<nav aria-label="@Title"
+     @attributes="UserAttributes"
+     class="@Classname"
+     disabled="@_navigationContext.Disabled"
+     style="@Style">
+    <button @onclick="ExpandedToggleAsync"
+            tabindex="@ButtonTabIndex"
+            class="@ButtonClassname"
+            aria-controls="@_navigationContext.MenuId"
+            aria-expanded="@_navigationContext.Expanded.ToString().ToLowerInvariant()"
+            aria-label="@Localizer[LanguageResource.VekNavGroup_ToggleExpand, Title ?? _navigationContext.MenuId]">
+        @if (!string.IsNullOrEmpty(Icon))
+        {
+            <VekIcon Disabled="@Disabled" Icon="@Icon" Color="@IconColor" Class="@IconClassname" />
+        }
+        <div Class="vek-nav-link-text">
+            @if (TitleContent is not null)
+            {
+                @TitleContent
+            }
+            else
+            {
+                @Title
+            }
+        </div>
+        @if (!HideExpandIcon)
+        {
+            <VekIcon Disabled="@Disabled" Icon="@ExpandIcon" Class="@ExpandIconClassname" />
+        }
+    </button>
+    <VekCollapse aria-hidden="@((!_navigationContext.Expanded).ToString().ToLowerInvariant())"
+                 Expanded="@_navigationContext.Expanded"
+                 MaxHeight="@MaxHeight"
+                 Class="vek-navgroup-collapse">
+        <CascadingValue Value="@_navigationContext">
+            <VekNavMenu role="none">
+                @ChildContent
+            </VekNavMenu>
+        </CascadingValue>
+    </VekCollapse>
+</nav>

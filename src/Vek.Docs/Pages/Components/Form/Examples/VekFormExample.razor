@@ -1,0 +1,76 @@
+﻿@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@namespace Vek.Docs.Examples
+
+<VekGrid>
+    <VekItem xs="12" sm="7">
+        <VekPaper Class="pa-4">
+            <VekForm @ref="_form" @bind-IsValid="@_success" @bind-Errors="@_errors" OnEnterPressed="@(() => _form.ValidateAsync())">
+                <VekTextField T="string" Label="Username" Required="true" RequiredError="User name is required!" />
+                <VekTextField T="string" Label="Email" Required="true" RequiredError="Email is required!"
+                              Validation="@(new EmailAddressAttribute { ErrorMessage = @"The email address is invalid" })" />
+                <VekTextField T="string"
+                              @bind-Value="@_password"
+                              Label="Password" 
+                              HelperText="Choose a strong password"
+                              InputType="InputType.Password"
+                              Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
+                              RequiredError="Password is required!"/>
+                <VekTextField T="string"
+                              Label="Password" HelperText="Repeat the password" InputType="InputType.Password"
+                              Validation="@(new Func<string, string>(PasswordMatch))"/>
+                <div class="d-flex">
+                    <VekRadioGroup T="string" Required="true" RequiredError="Account type is required!">
+                        <VekRadio Value="@("Personal")">Personal</VekRadio>
+                        <VekRadio Value="@("Professional")">Professional</VekRadio>
+                    </VekRadioGroup>
+                </div>
+                <div class="d-flex align-center justify-space-between">
+                    <VekCheckBox T="bool" Required="true" RequiredError="You must agree" Label="I agree!"  />
+                    <VekButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_success)" Class="ml-auto">Register</VekButton>
+                </div>
+            </VekForm>
+        </VekPaper>
+        <VekPaper Class="pa-4 mt-4">
+            <VekButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="false" OnClick="@(() => _form.ValidateAsync())">Validate</VekButton>
+            <VekButton Variant="Variant.Filled" Color="Color.Secondary" DropShadow="false" OnClick="@(() => _form.ResetAsync())" Class="mx-2">Reset</VekButton>
+            <VekButton Variant="Variant.Filled" DropShadow="false" OnClick="@(() => _form.ResetValidationAsync())">Reset Validation</VekButton>
+        </VekPaper>
+    </VekItem>
+    <VekItem xs="12" sm="5">
+        <VekPaper Class="pa-4 vek-height-full">
+            <VekText Typo="Typo.subtitle2">@($"Errors ({_errors.Length})")</VekText>
+            @foreach (var error in _errors)
+            {
+                <VekText Color="@Color.Error">@error</VekText>
+            }
+        </VekPaper>
+    </VekItem>
+</VekGrid>
+
+
+@code {
+    private bool _success;
+    private VekForm _form;
+    private string _password;
+    private string[] _errors = [];
+
+    private static IEnumerable<string> PasswordStrength(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "Password is required!";
+            yield break;
+        }
+        if (pw.Length < 8)
+            yield return "Password must be at least of length 8";
+        if (!Regex.IsMatch(pw, @"[A-Z]"))
+            yield return "Password must contain at least one capital letter";
+        if (!Regex.IsMatch(pw, @"[a-z]"))
+            yield return "Password must contain at least one lowercase letter";
+        if (!Regex.IsMatch(pw, @"[0-9]"))
+            yield return "Password must contain at least one digit";
+    }
+
+    private string PasswordMatch(string arg) => _password != arg ? "Passwords don't match" : null;
+}

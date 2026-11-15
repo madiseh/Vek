@@ -1,0 +1,19 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekStack Row="true" Style="width: 300px;" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+    <VekStack Spacing="0">
+        <VekSwitch @bind-Value="_open" Label="@(_open ? "Opened" : "Closed")" Color="Color.Primary"/>
+        <VekSwitch @bind-Value="_fixed" Label="@(_fixed ? "Fixed" : "Relative")" Color="Color.Primary"/>
+    </VekStack>
+    <VekFabMenu StartIcon="@Icons.Material.Outlined.Send" Color="Color.Primary" @bind-Open="@_open" Fixed="@_fixed">
+        <VekFabMenuItem StartIcon="@Icons.Custom.Brands.Slack"/>
+        <VekFabMenuItem StartIcon="@Icons.Custom.Brands.Discord"/>
+        <VekFabMenuItem StartIcon="@Icons.Custom.Brands.Gmail"/>
+    </VekFabMenu>
+</VekStack>
+
+@code
+{
+    private bool _open;
+    private bool _fixed;
+}

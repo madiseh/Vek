@@ -1,0 +1,30 @@
+﻿@namespace Vek
+@inherits VekBaseButton
+@implements IDisposable
+
+@{
+    OpenRoot(__builder, Classname);
+    RenderLabel(__builder);
+    __builder.CloseElement();
+}
+
+@code {
+    private void RenderLabel(RenderTreeBuilder __builder)
+    {
+        <span class="vek-button-label">
+            @if (!string.IsNullOrWhiteSpace(StartIcon))
+            {
+                <span class="@StartIconClass">
+                    <VekIcon Disabled="@Disabled" Icon="@StartIcon" Size="@(IconSize ?? Size)" Color="@IconColor" />
+                </span>
+            }
+            @ChildContent
+            @if (!string.IsNullOrWhiteSpace(EndIcon))
+            {
+                <span class="@EndIconClass">
+                    <VekIcon Disabled="@Disabled" Icon="@EndIcon" Size="@(IconSize ?? Size)" Color="@IconColor" />
+                </span>
+            }
+        </span>
+    }
+}

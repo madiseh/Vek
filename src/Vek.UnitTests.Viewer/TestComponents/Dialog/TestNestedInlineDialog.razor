@@ -1,0 +1,26 @@
+﻿<VekButton Variant="Variant.Filled" OnClick="()=>_visible=true">Open</VekButton>
+
+<VekDialog @bind-Visible="_visible">
+    <DialogContent>
+        <VekText>Scorpiany!</VekText>
+        <VekButton Variant="Variant.Filled" OnClick="()=>_nestedVisible=true">Open Nested</VekButton>
+        <VekDialog @bind-Visible="_nestedVisible">
+            <DialogContent>
+                <VekText Class="nested">Nested dialog!</VekText>
+            </DialogContent>
+            <DialogActions>
+                <VekButton Color="Color.Primary" OnClick="()=>_nestedVisible=false">Close</VekButton>
+            </DialogActions>
+        </VekDialog>
+    </DialogContent>
+    <DialogActions>
+        <VekButton Color="Color.Primary" OnClick="()=>_visible=false">Close</VekButton>
+    </DialogActions>
+</VekDialog>
+
+@code {
+    public static string __description__ = "Click on open will open the inlined dialog, and the nested dialog can be opened with a second click";
+
+    private bool _visible;
+    private bool _nestedVisible;
+}

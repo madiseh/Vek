@@ -1,0 +1,429 @@
+@import '../abstracts/variables';
+
+.vek-picker-datepicker-toolbar {
+  align-items: flex-start;
+  flex-direction: column;
+
+  .vek-button-year {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.75;
+    letter-spacing: 0.00938em;
+  }
+
+  .vek-button-date {
+    font-size: 2.125rem;
+    font-weight: 400;
+    line-height: 1.17;
+    letter-spacing: 0.00735em;
+    text-transform: none;
+  }
+}
+
+.vek-picker-datepicker-toolbar-landscape {
+  padding: 16px;
+}
+
+.vek-picker-datepicker-date-landscape {
+  margin-right: 16px;
+  margin-inline-end: 16px;
+  margin-inline-start: unset;
+}
+
+
+.vek-picker-calendar-header-switch {
+  display: flex;
+  margin-top: 4px;
+  align-items: center;
+  margin-bottom: 8px;
+  justify-content: space-between;
+
+  & > .vek-icon-button {
+    z-index: 1;
+    padding: 8px;
+    margin: 6px;
+    background-color: var(--vek-palette-surface);
+
+    @media(hover: hover) and (pointer: fine) {
+      &:hover {
+        background-color: var(--vek-palette-action-default-hover);
+      }
+    }
+  }
+
+  & .vek-picker-calendar-header-transition {
+    width: 100%;
+    height: 23px;
+    overflow: hidden;
+
+    @media(hover: hover) and (pointer: fine) {
+      &:hover {
+        & .vek-typography {
+          cursor: pointer;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
+
+
+.vek-picker-calendar-header-day {
+  display: flex;
+  max-height: 16px;
+  align-items: center;
+  justify-content: center;
+
+  .vek-day-label {
+    color: var(--vek-palette-text-secondary);
+    width: 36px;
+    margin: 0 2px;
+    text-align: center;
+  }
+}
+
+.vek-picker-year-container {
+  height: 300px;
+  overflow-y: auto;
+
+  .vek-picker-year {
+    cursor: pointer;
+    height: 40px;
+    display: flex;
+    outline: none;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    animation: vek-animation-fadein 500ms;
+    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+
+    @media(hover: hover) and (pointer: fine) {
+      &:hover {
+        background-color: var(--vek-palette-action-default-hover);
+      }
+    }
+
+    & .vek-picker-year-selected {
+      margin: 10px 0;
+      font-weight: 500;
+    }
+  }
+}
+
+.vek-picker-month-container {
+  width: 310px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: stretch;
+
+  .vek-picker-month {
+    flex: 1 0 33.33%;
+    cursor: pointer;
+    height: 60px;
+    display: flex;
+    outline: none;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+
+    @media(hover: hover) and (pointer: fine) {
+      &:hover {
+        background-color: var(--vek-palette-action-default-hover);
+      }
+    }
+
+    & .vek-picker-month-selected {
+      font-weight: 500;
+    }
+
+    &.vek-disabled {
+      color: var(--vek-palette-text-disabled);
+      pointer-events: none;
+    }
+  }
+}
+
+
+.vek-picker-slide-transition {
+  display: block;
+  position: relative;
+}
+
+.vek-picker-slide-transition > * {
+  top: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+}
+
+.vek-picker-calendar-transition {
+  margin-top: 12px;
+  min-height: 216px;
+}
+
+.vek-picker-calendar-progress-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vek-picker-calendar-content {
+  display: grid;
+  --selected-day: 0;
+  grid-column-gap: 10px;
+  grid-template-columns: auto;
+}
+
+@media(min-width: $breakpoint-sm) {
+  .vek-picker-calendar-content:not(.vek-picker-calendar-content-1) {
+    grid-template-columns: repeat(2, minmax(auto, 1fr));
+
+    .vek-picker-calendar-header-1,
+    .vek-picker-calendar-header-3,
+    .vek-picker-calendar-header-5,
+    .vek-picker-calendar-header-7,
+    .vek-picker-calendar-header-9,
+    .vek-picker-calendar-header-11 {
+      .vek-picker-nav-button-next {
+        visibility: hidden;
+      }
+
+      .vek-picker-nav-button-prev {
+        visibility: visible;
+      }
+    }
+
+    .vek-picker-calendar-header-2,
+    .vek-picker-calendar-header-4,
+    .vek-picker-calendar-header-6,
+    .vek-picker-calendar-header-8,
+    .vek-picker-calendar-header-10,
+    .vek-picker-calendar-header-12 {
+      .vek-picker-nav-button-next {
+        visibility: visible;
+      }
+
+      .vek-picker-nav-button-prev {
+        visibility: hidden;
+      }
+    }
+  }
+}
+
+@media(min-width: $breakpoint-md) {
+  .vek-picker-calendar-content:not(.vek-picker-calendar-content-1):not(.vek-picker-calendar-content-2) {
+    grid-template-columns: repeat(3, minmax(auto, 1fr));
+
+    .vek-picker-calendar-header-1,
+    .vek-picker-calendar-header-4,
+    .vek-picker-calendar-header-7,
+    .vek-picker-calendar-header-10 {
+      .vek-picker-nav-button-next {
+        visibility: hidden;
+      }
+
+      .vek-picker-nav-button-prev {
+        visibility: visible;
+      }
+    }
+
+    .vek-picker-calendar-header-2,
+    .vek-picker-calendar-header-5,
+    .vek-picker-calendar-header-8,
+    .vek-picker-calendar-header-11 {
+      .vek-picker-nav-button-next, .vek-picker-nav-button-prev {
+        visibility: hidden;
+      }
+    }
+
+    .vek-picker-calendar-header-3,
+    .vek-picker-calendar-header-6,
+    .vek-picker-calendar-header-9,
+    .vek-picker-calendar-header-12 {
+      .vek-picker-nav-button-next {
+        visibility: visible;
+      }
+
+      .vek-picker-nav-button-prev {
+        visibility: hidden;
+      }
+    }
+  }
+}
+
+:not(.vek-picker-hidden) {
+  .vek-picker-calendar-header-last {
+    .vek-picker-nav-button-next {
+      visibility: inherit !important;
+    }
+  }
+}
+
+.vek-picker-hidden {
+  .vek-picker-nav-button-next, .vek-picker-nav-button-prev {
+    visibility: hidden !important;
+  }
+}
+
+// Day ids are integers, so each clamp is 1 or 0: the start side rounds when the hovered day is not earlier, and the end side when it is not later.
+$anchor-start: calc(50% * clamp(0, var(--selected-day) - var(--day-id) + 1, 1));
+$anchor-end: calc(50% * clamp(0, var(--day-id) - var(--selected-day) + 1, 1));
+
+.vek-picker-calendar-container {
+  display: flex;
+  width: 310px;
+  flex-direction: column;
+}
+
+.vek-picker-calendar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  .vek-day {
+    color: var(--vek-palette-text-primary);
+    width: 36px;
+    height: 36px;
+    margin: 0 2px;
+    padding: 0;
+    font-size: 0.75rem;
+    font-weight: 500;
+
+    @media(hover: hover) and (pointer: fine) {
+      &:hover {
+        background-color: var(--vek-palette-action-default-hover);
+      }
+    }
+
+    &.vek-adjacent-month {
+      color: var(--vek-palette-text-secondary);
+    }
+
+    &.vek-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    &.vek-current {
+      font-weight: 600;
+    }
+
+    &.vek-selected {
+      font-weight: 500;
+    }
+
+    .vek-typography {
+      margin-top: 2px;
+    }
+
+    &.vek-disabled {
+      color: var(--vek-palette-text-disabled);
+      pointer-events: none;
+    }
+
+    &.vek-range {
+      margin: 0;
+      width: 40px;
+      transition: none;
+
+      &.vek-range-start-selected {
+        border-radius: 50% 0% 0% 50%;
+      }
+
+      &.vek-range-end-selected {
+        border-radius: 0% 50% 50% 0%;
+      }
+
+      // While the range is pending, the first date rounds only the side away from the hovered date, and both sides when it is hovered itself.
+      &.vek-range-selection-anchor {
+        border-radius: $anchor-start $anchor-end $anchor-end $anchor-start;
+      }
+
+      &.vek-range-between {
+        border-radius: 0;
+        background-color: var(--vek-palette-action-default-hover);
+      }
+
+      @media(hover: hover) and (pointer: fine) {
+        &.vek-range-selection:hover {
+          &.vek-range-start-selected {
+            border-radius: 50%;
+          }
+
+          &:not(.vek-range-start-selected) {
+            border-radius: 0% 50% 50% 0%;
+          }
+
+          &.vek-range-selection-before {
+            border-radius: 50% 0% 0% 50%;
+          }
+        }
+      }
+
+      &.vek-range-selection:not(:hover):not(.vek-range-start-selected) {
+        border-radius: 0;
+        background: linear-gradient(var(--vek-palette-action-default-hover) 100%, var(--vek-palette-action-default-hover) 100%, transparent 0%);
+        background-size: 100% calc(100% * (var(--selected-day) - var(--day-id)));
+
+        // Earlier days fill from the hovered date up to the first date.
+        &.vek-range-selection-before {
+          background-size: 100% calc(100% * (var(--day-id) - var(--selected-day)));
+        }
+      }
+    }
+  }
+}
+
+@each $color in $vek-palette-colors {
+  .vek-range-selection-#{$color} {
+    @media(hover: hover) and (pointer: fine) {
+      &:hover {
+        color: var(--vek-palette-#{$color}-text) !important;
+        background-color: var(--vek-palette-#{$color}) !important;
+      }
+    }
+  }
+}
+
+.vek-picker-calendar-week {
+  display: flex;
+  margin: 0 5px;
+  justify-content: center;
+  align-items: center;
+
+  .vek-picker-calendar-week-text {
+    width: 15px;
+    margin-top: 2px !important;
+    color: var(--vek-palette-text-disabled);
+  }
+}
+
+.vek-application-layout-rtl {
+  .vek-picker-calendar .vek-day.vek-range {
+    &.vek-range-start-selected {
+      border-radius: 0% 50% 50% 0%;
+    }
+
+    &.vek-range-end-selected {
+      border-radius: 50% 0% 0% 50%;
+    }
+
+    &.vek-range-selection-anchor {
+      border-radius: $anchor-end $anchor-start $anchor-start $anchor-end;
+    }
+
+    @media(hover: hover) and (pointer: fine) {
+      &.vek-range-selection:hover {
+        &:not(.vek-range-start-selected) {
+          border-radius: 50% 0% 0% 50%;
+        }
+
+        &.vek-range-selection-before {
+          border-radius: 0% 50% 50% 0%;
+        }
+      }
+    }
+  }
+}

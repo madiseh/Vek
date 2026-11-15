@@ -1,0 +1,27 @@
+﻿<VekForm @ref="_form" ValidationDelay="0">
+    <VekTextField Label="Phone" T="string" Required Immediate @bind-Value="@_phone" Mask="_phoneMask" />
+</VekForm>
+<br>
+<br>
+<span>Phone: @_phone</span>
+<br>
+<br>
+<VekButton Class="reset" OnClick="@ResetFormAsync">Reset</VekButton>
+
+@code
+{ 
+    public static string __description__ = "Calling Form.Reset() should clear the masked text field.";
+
+    private string? _phone;
+    private VekForm _form = null!;
+    private readonly PatternMask _phoneMask = new("(###) ###-####")
+    {
+        MaskChars = [new MaskChar('#', @"[0-9]")]
+    };
+
+    private async Task ResetFormAsync()
+    {
+        await _form.ResetAsync();
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,63 @@
+﻿@namespace Vek.Docs.Examples
+@using Vek.Utilities
+
+
+<VekPaper Elevation="0" Class="vek-width-full vek-height-full d-flex justify-center align-end pb-8" MinHeight="600px" Style="@($"background-image:linear-gradient({_degrees}deg, {_gradientPrimary.ToString(VekColorOutputFormats.RGBA)} 0%, {_gradientSecondary.ToString(VekColorOutputFormats.RGBA)} 100%);")">
+    <VekPaper Class="d-flex">
+        <VekColorPicker Rounded="true" Class="rounded-tr-0" PickerVariant="PickerVariant.Static" ShowModeSwitch="false" Value="_pickerColor" ValueChanged="UpdateSelectedColor" />
+        <div class="pa-2">
+            <VekText Typo="Typo.h6" Class="mx-1">Gradient Colors</VekText>
+
+            <VekList T="string" SelectedValueChanged="ChangeSelectedColor">
+                <VekListItem Text="1">
+                    <div class="vek-width-full rounded py-4" style="@($"background-color:{_gradientPrimary};")"></div>
+                </VekListItem>
+                <VekListItem Text="2">
+                    <div class="vek-width-full rounded py-4" style="@($"background-color:{_gradientSecondary};")"></div>
+                </VekListItem>
+            </VekList>
+            <VekSlider Min="0" Max="360" Step="1" @bind-Value="_degrees" Class="px-2">Degrees</VekSlider>
+        </div>
+    </VekPaper>
+</VekPaper>
+
+
+@code {
+    private VekColor _gradientPrimary = "#594AE2";
+    private VekColor _gradientSecondary = "#FF4081";
+    private VekColor _pickerColor = "#594AE2";
+
+    private int _degrees = 90;
+
+    bool _isFirstColor = true;
+
+    public void ChangeSelectedColor(string item)
+    {
+        if (item == "1")
+        {
+            _isFirstColor = true;
+            _pickerColor = _gradientPrimary;
+            UpdateSelectedColor(_gradientPrimary);
+        }
+        else if (item == "2")
+        {
+            _isFirstColor = false;
+            _pickerColor = _gradientSecondary;
+            UpdateSelectedColor(_gradientSecondary);
+        }
+    }
+
+    public void UpdateSelectedColor(VekColor value)
+    {
+        _pickerColor = value;
+
+        if (_isFirstColor)
+        {
+            _gradientPrimary = value;
+        }
+        else
+        {
+            _gradientSecondary = value;
+        }
+    }
+}

@@ -1,0 +1,27 @@
+﻿@namespace Vek
+@typeparam T
+@inherits VekFormComponent<T, T>
+
+@{
+#pragma warning disable CS0618 // Type or member is obsolete
+}
+
+<VekInputControl Class="@Classname" Style="@Style" Error="@HasErrors" ErrorId="@ErrorIdState.Value" ErrorText="@GetErrorText()" Required="@Required">
+    <InputContent>
+        <CascadingValue Value="@((IVekRadioGroup)this)" IsFixed="true">
+            <CascadingValue TValue="bool" Name="ParentDisabled" Value="@GetDisabledState()">
+                <CascadingValue TValue="bool" Name="ParentReadOnly" Value="@GetReadOnlyState()">
+                    <CascadingValue TValue="string" Name="RadioGroupName" Value="@Name">
+                        <CascadingValue TValue="bool" Name="RadioGroupHasErrors" Value="@HasErrors">
+                            <CascadingValue TValue="string" Name="RadioGroupErrorId" Value="@GetErrorId()">
+                                <div role="radiogroup" aria-required="@Required.ToString().ToLowerInvariant()" aria-invalid="@(HasErrors ? "true" : null)" aria-describedby="@(HasErrors ? ErrorIdState.Value : null)" @attributes="UserAttributes" class="@GetInputClass()" style="@InputStyle">
+                                    @ChildContent
+                                </div>
+                            </CascadingValue>
+                        </CascadingValue>
+                    </CascadingValue>
+                </CascadingValue>
+            </CascadingValue>
+        </CascadingValue>
+    </InputContent>
+</VekInputControl>

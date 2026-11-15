@@ -1,0 +1,8 @@
+﻿<VekCheckBox  @bind-Value="_isChecked">Synced</VekCheckBox>
+<VekCheckBox @bind-Value="_isChecked">Synced</VekCheckBox>
+
+@code {
+    public static string __description__ = "Clicking any checkbox should toggle both.";
+
+    private bool _isChecked = true;
+}

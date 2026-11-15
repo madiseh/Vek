@@ -1,0 +1,209 @@
+﻿@* MODE SELECTORS *@
+
+<VekStack Row AlignItems="AlignItems.End">
+    <VekSelect T="Margin" Label="Margin size" @bind-Value="Margin" Variant="Variant.Outlined" Margin="Margin.Dense">
+        @foreach (Margin margin in Enum.GetValues(typeof(Margin)))
+        {
+            <VekSelectItem Value="@margin">@margin</VekSelectItem>
+        }
+    </VekSelect>
+    <VekSelect T="AlignItems" Label="Align" @bind-Value="Align" Variant="Variant.Outlined" Margin="Margin.Dense">
+        @foreach (AlignItems align in Enum.GetValues(typeof(AlignItems)))
+        {
+            <VekSelectItem Value="@align">@align</VekSelectItem>
+        }
+    </VekSelect>
+</VekStack>
+
+@* INPUT EXAMPLES FOR EACH VARIANT *@
+
+<VekText Typo="Typo.h6" Class="mt-6 mb-2">VekField</VekText>
+<VekStack Row AlignItems="@Align">
+    <VekField Variant="Variant.Text" Margin="@Margin">Field value</VekField>
+    <VekField Variant="Variant.Filled" Margin="@Margin">Field value</VekField>
+    <VekField Variant="Variant.Outlined" Margin="@Margin">Field value</VekField>
+</VekStack>
+<VekStack Row AlignItems="@Align">
+    <VekField Label="With Label" Variant="Variant.Text" Margin="@Margin">Field value</VekField>
+    <VekField Label="With Label" Variant="Variant.Filled" Margin="@Margin">Field value</VekField>
+    <VekField Label="With Label" Variant="Variant.Outlined" Margin="@Margin">Field value</VekField>
+</VekStack>
+<VekStack Row AlignItems="@Align">
+    <VekField HelperText="With Helper" Variant="Variant.Text" Margin="@Margin">Field value</VekField>
+    <VekField HelperText="With Helper" Variant="Variant.Filled" Margin="@Margin">Field value</VekField>
+    <VekField HelperText="With Helper" Variant="Variant.Outlined" Margin="@Margin">Field value</VekField>
+</VekStack>
+
+<VekText Typo="Typo.h6" Class="mt-6 mb-2">VekTextField</VekText>
+<VekStack Row AlignItems="@Align">
+    <VekTextField T="string" Variant="Variant.Text" Margin="@Margin" />
+    <VekTextField T="string" Variant="Variant.Filled" Margin="@Margin" />
+    <VekTextField T="string" Variant="Variant.Outlined" Margin="@Margin" />
+</VekStack>
+<VekStack Row AlignItems="@Align">
+    <VekTextField T="string" Label="With Label" Variant="Variant.Text" Margin="@Margin" />
+    <VekTextField T="string" Label="With Label" Variant="Variant.Filled" Margin="@Margin" />
+    <VekTextField T="string" Label="With Label" Variant="Variant.Outlined" Margin="@Margin" />
+</VekStack>
+<VekStack Row AlignItems="@Align">
+    <VekTextField T="string" HelperText="With Helper" Variant="Variant.Text" Margin="@Margin" />
+    <VekTextField T="string" HelperText="With Helper" Variant="Variant.Filled" Margin="@Margin" />
+    <VekTextField T="string" HelperText="With Helper" Variant="Variant.Outlined" Margin="@Margin" />
+</VekStack>
+
+<VekText Typo="Typo.h6" Class="mt-6 mb-2">VekDatePicker</VekText>
+<VekStack Row AlignItems="@Align">
+    <VekDatePicker Variant="Variant.Text" Margin="@Margin" />
+    <VekDatePicker Variant="Variant.Filled" Margin="@Margin" />
+    <VekDatePicker Variant="Variant.Outlined" Margin="@Margin" />
+</VekStack>
+<VekStack Row AlignItems="@Align">
+    <VekDatePicker Label="With Label" Variant="Variant.Text" Margin="@Margin" />
+    <VekDatePicker Label="With Label" Variant="Variant.Filled" Margin="@Margin" />
+    <VekDatePicker Label="With Label" Variant="Variant.Outlined" Margin="@Margin" />
+</VekStack>
+<VekStack Row AlignItems="@Align">
+    <VekDatePicker HelperText="With Helper" Variant="Variant.Text" Margin="@Margin" />
+    <VekDatePicker HelperText="With Helper" Variant="Variant.Filled" Margin="@Margin" />
+    <VekDatePicker HelperText="With Helper" Variant="Variant.Outlined" Margin="@Margin" />
+</VekStack>
+
+<VekText Typo="Typo.h6" Class="mt-6 mb-2">VekTimePicker</VekText>
+<VekStack Row AlignItems="@Align">
+    <VekTimePicker Variant="Variant.Text" Margin="@Margin" />
+    <VekTimePicker Variant="Variant.Filled" Margin="@Margin" />
+    <VekTimePicker Variant="Variant.Outlined" Margin="@Margin" />
+</VekStack>
+<VekStack Row AlignItems="@Align">
+    <VekTimePicker Label="With Label" Variant="Variant.Text" Margin="@Margin" />
+    <VekTimePicker Label="With Label" Variant="Variant.Filled" Margin="@Margin" />
+    <VekTimePicker Label="With Label" Variant="Variant.Outlined" Margin="@Margin" />
+</VekStack>
+<VekStack Row AlignItems="@Align">
+    <VekTimePicker HelperText="With Helper" Variant="Variant.Text" Margin="@Margin" />
+    <VekTimePicker HelperText="With Helper" Variant="Variant.Filled" Margin="@Margin" />
+    <VekTimePicker HelperText="With Helper" Variant="Variant.Outlined" Margin="@Margin" />
+</VekStack>
+
+<VekText Typo="Typo.h6" Class="mt-6 mb-2">VekNumericField</VekText>
+<VekStack Row AlignItems="@Align">
+    <VekNumericField T="int" Variant="Variant.Text" Margin="@Margin" />
+    <VekNumericField T="int" Variant="Variant.Filled" Margin="@Margin" />
+    <VekNumericField T="int" Variant="Variant.Outlined" Margin="@Margin" />
+</VekStack>
+<VekStack Row AlignItems="@Align">
+    <VekNumericField T="int" Label="With Label" Variant="Variant.Text" Margin="@Margin" />
+    <VekNumericField T="int" Label="With Label" Variant="Variant.Filled" Margin="@Margin" />
+    <VekNumericField T="int" Label="With Label" Variant="Variant.Outlined" Margin="@Margin" />
+</VekStack>
+<VekStack Row AlignItems="@Align">
+    <VekNumericField T="int" HelperText="With Helper" Variant="Variant.Text" Margin="@Margin" />
+    <VekNumericField T="int" HelperText="With Helper" Variant="Variant.Filled" Margin="@Margin" />
+    <VekNumericField T="int" HelperText="With Helper" Variant="Variant.Outlined" Margin="@Margin" />
+</VekStack>
+
+<VekText Typo="Typo.h6" Class="mt-6 mb-2">VekSelect</VekText>
+<VekStack Row AlignItems="@Align">
+    <VekSelect T="string" Variant="Variant.Text" Margin="@Margin"></VekSelect>
+    <VekSelect T="string" Variant="Variant.Filled" Margin="@Margin"></VekSelect>
+    <VekSelect T="string" Variant="Variant.Outlined" Margin="@Margin"></VekSelect>
+</VekStack>
+<VekStack Row AlignItems="@Align">
+    <VekSelect T="string" Label="With Label" Variant="Variant.Text" Margin="@Margin"></VekSelect>
+    <VekSelect T="string" Label="With Label" Variant="Variant.Filled" Margin="@Margin"></VekSelect>
+    <VekSelect T="string" Label="With Label" Variant="Variant.Outlined" Margin="@Margin"></VekSelect>
+</VekStack>
+<VekStack Row AlignItems="@Align">
+    <VekSelect T="string" HelperText="With Helper" Variant="Variant.Text" Margin="@Margin"></VekSelect>
+    <VekSelect T="string" HelperText="With Helper" Variant="Variant.Filled" Margin="@Margin"></VekSelect>
+    <VekSelect T="string" HelperText="With Helper" Variant="Variant.Outlined" Margin="@Margin"></VekSelect>
+</VekStack>
+
+<VekText Typo="Typo.h6" Class="mt-6 mb-2">VekColorPicker</VekText>
+<VekStack Row AlignItems="@Align">
+    <VekColorPicker Variant="Variant.Text" Margin="@Margin" />
+    <VekColorPicker Variant="Variant.Filled" Margin="@Margin" />
+    <VekColorPicker Variant="Variant.Outlined" Margin="@Margin" />
+</VekStack>
+<VekStack Row AlignItems="@Align">
+    <VekColorPicker Label="With Label" Variant="Variant.Text" Margin="@Margin" />
+    <VekColorPicker Label="With Label" Variant="Variant.Filled" Margin="@Margin" />
+    <VekColorPicker Label="With Label" Variant="Variant.Outlined" Margin="@Margin" />
+</VekStack>
+<VekStack Row AlignItems="@Align">
+    <VekColorPicker HelperText="With Helper" Variant="Variant.Text" Margin="@Margin" />
+    <VekColorPicker HelperText="With Helper" Variant="Variant.Filled" Margin="@Margin" />
+    <VekColorPicker HelperText="With Helper" Variant="Variant.Outlined" Margin="@Margin" />
+</VekStack>
+
+<VekText Typo="Typo.h6" Class="mt-6 mb-2">VekAutocomplete</VekText>
+<VekStack Row AlignItems="@Align">
+    <VekAutocomplete T="string" Variant="Variant.Text" Margin="@Margin" />
+    <VekAutocomplete T="string" Variant="Variant.Filled" Margin="@Margin" />
+    <VekAutocomplete T="string" Variant="Variant.Outlined" Margin="@Margin" />
+</VekStack>
+<VekStack Row AlignItems="@Align">
+    <VekAutocomplete T="string" Label="With Label" Variant="Variant.Text" Margin="@Margin" />
+    <VekAutocomplete T="string" Label="With Label" Variant="Variant.Filled" Margin="@Margin" />
+    <VekAutocomplete T="string" Label="With Label" Variant="Variant.Outlined" Margin="@Margin" />
+</VekStack>
+<VekStack Row AlignItems="@Align">
+    <VekAutocomplete T="string" HelperText="With Helper" Variant="Variant.Text" Margin="@Margin" />
+    <VekAutocomplete T="string" HelperText="With Helper" Variant="Variant.Filled" Margin="@Margin" />
+    <VekAutocomplete T="string" HelperText="With Helper" Variant="Variant.Outlined" Margin="@Margin" />
+</VekStack>
+
+@* CHECKBOX, RADIOBUTTONS, SWITCHES *@
+
+<VekText Typo="Typo.h6" Class="mt-6 mb-2">VekCheckBox</VekText>
+<VekCheckBox T="bool" />
+<VekCheckBox T="bool" Label="With Label" />
+
+<VekText Typo="Typo.h6" Class="mt-6 mb-2">VekRadio</VekText>
+<VekRadioGroup T="string" Class="some-main-class" InputClass="some-input-class">
+    <VekRadio Value="@("1")" LabelPlacement="Placement.Left" />
+    <VekRadio Value="@("2")" LabelPlacement="Placement.Top" />
+    <VekRadio Value="@("3")" />
+</VekRadioGroup>
+<VekRadioGroup T="string" Class="some-main-class" InputClass="some-input-class">
+    <VekRadio Value="@("1")" LabelPlacement="Placement.Left">With Content</VekRadio>
+    <VekRadio Value="@("2")" LabelPlacement="Placement.Top">With Content</VekRadio>
+    <VekRadio Value="@("3")">With Content</VekRadio>
+</VekRadioGroup>
+
+<VekText Typo="Typo.h6" Class="mt-6 mb-2">VekSwitch</VekText>
+<VekSwitch T="bool" />
+<VekSwitch T="bool" Label="With Label" />
+
+<VekText Typo="Typo.h6" Class="mt-6 mb-2">Using a VekStack to align items that have no label</VekText>
+<VekStack Row AlignItems="AlignItems.Center">
+    <VekTextField T="string" />
+    <VekDatePicker />
+    <VekNumericField T="int" />
+    <VekSelect T="string"></VekSelect>
+    <VekColorPicker />
+    <VekCheckBox T="bool" />
+    <VekRadio Value="@("1")" LabelPlacement="Placement.Left" />
+    <VekSwitch T="bool" />
+    <VekButton Variant="Variant.Filled">Text</VekButton>
+</VekStack>
+
+<VekText Typo="Typo.h6" Class="mt-6 mb-2">Boolean Input</VekText>
+<VekRadioGroup T="int" Class="some-main-class" InputClass="some-input-class">
+    <VekRadio Value="1" LabelPlacement="Placement.Right">With Content</VekRadio>
+    <VekRadio Value="2" LabelPlacement="Placement.Right"></VekRadio>
+</VekRadioGroup>
+<VekCheckBox T="bool" LabelPlacement="Placement.Right" />
+<VekCheckBox T="bool" LabelPlacement="Placement.Right" Label="With Label" />
+<VekSwitch T="bool" />
+<VekSwitch T="bool" Label="With Label" />
+
+@code {
+    public static string __description__ = "Test used to validate any inputs leyout in a single place.";
+
+    [Parameter]
+    public Margin Margin { get; set; } = Margin.Dense;
+
+    [Parameter]
+    public AlignItems Align { get; set; } = AlignItems.End;
+}

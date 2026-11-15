@@ -1,0 +1,95 @@
+﻿@namespace Vek
+@inherits VekComponentBase
+@typeparam T
+
+@{
+    OpenRow(__builder);
+    RenderContent(__builder);
+    __builder.CloseElement();
+}
+
+@if (NestedList != null)
+{
+    <VekCollapse Expanded="@_expandedState.Value">
+        <VekList T="T"
+                Class="vek-nested-list"
+                Comparer="@Comparer"
+                SelectionMode="@SelectionMode"
+                ReadOnly="@ReadOnly"
+                Color="@(VekList?.Color ?? Color.Primary)"
+                Padding="false"
+                Disabled="@GetDisabled()"
+                Dense="@GetDense()"
+                Gutters="@(VekList?.Gutters ?? true)">
+            @NestedList
+        </VekList>
+    </VekCollapse>
+}
+
+@code {
+    private void RenderContent(RenderTreeBuilder __builder)
+    {
+        @if (AvatarContent is not null)
+        {
+            <div class="vek-list-item-avatar">
+                @AvatarContent
+            </div>
+        }
+        else if (!string.IsNullOrWhiteSpace(Icon))
+        {
+            <div class="vek-list-item-icon">
+                <VekIcon Icon="@Icon"
+                         Disabled="@GetDisabled()"
+                         Color="@IconColor"
+                         Size="@IconSize" />
+            </div>
+        }
+
+        @if (MultiSelection && NestedList is null)
+        {
+            <VekCheckBox T="bool?"
+                         TriState
+                         ReadOnly="@ReadOnly"
+                         KeyboardEnabled="false"
+                         Class="vek-list-item-checkbox my-n2 ms-n2"
+                         Disabled="@GetDisabled()"
+                         CheckedIcon="@GetCheckedIcon()"
+                         UncheckedIcon="@GetUncheckedIcon()"
+                         IndeterminateIcon="@GetIndeterminateIcon()"
+                         Color="@GetCheckBoxColor()"
+                         UncheckedColor="@GetCheckBoxColor()"
+                         @bind-Value:get="GetCheckBoxState()"
+                         @bind-Value:set="@(x => OnCheckboxChangedAsync())"
+                         tabindex="-1"
+                         aria-hidden="true" />
+        }
+
+        <div class="vek-list-item-text@(Inset ? " vek-list-item-text-inset" : string.Empty)">
+            <p class="@TextClassname">
+                @if (ChildContent != null)
+                {
+                    @ChildContent
+                }
+                else
+                {
+                    @Text
+                    @if (!string.IsNullOrEmpty(SecondaryText))
+                    {
+                        <br />
+                        <p class="vek-typography vek-typography-subtitle2 vek-list-item-secondary-text">
+                            @SecondaryText
+                        </p>
+                    }
+                }
+            </p>
+        </div>
+
+        @if (NestedList != null)
+        {
+            <VekIcon Disabled="@GetDisabled()"
+                     Icon="@($"{(_expandedState.Value ? ExpandLessIcon : ExpandMoreIcon)}")"
+                     Size="@IconSize"
+                     Color="@ExpandIconColor" />
+        }
+    }
+}

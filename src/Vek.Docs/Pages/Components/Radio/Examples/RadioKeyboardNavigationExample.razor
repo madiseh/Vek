@@ -1,0 +1,15 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekForm>
+    <VekRadioGroup @bind-Value="SelectedOption">
+        <VekRadio Value="@("Radio 1")" Color="Color.Primary">Primary</VekRadio>
+        <VekRadio Value="@("Radio 2")" Color="Color.Secondary">Secondary</VekRadio>
+        <VekRadio Value="@("Radio 3")" Color="Color.Tertiary">Tertiary</VekRadio>
+        <VekRadio Value="@("Radio 4")">Default</VekRadio>
+        <VekRadio Value="@("Radio 4")" Color="Color.Primary" Disabled="true">Disabled</VekRadio>
+    </VekRadioGroup>
+</VekForm>
+
+@code {
+    public string SelectedOption { get; set; }
+}

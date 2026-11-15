@@ -1,0 +1,16 @@
+﻿<VekTable T="int" Items="@(new[] { 1, 2, 3 })" PagerPosition="@Position">
+    <ToolBarContent>
+        <div class="test-toolbar">Toolbar</div>
+    </ToolBarContent>
+    <RowTemplate>
+        <VekTd DataLabel="Nr">@context</VekTd>
+    </RowTemplate>
+    <PagerContent>
+        <VekTablePager />
+    </PagerContent>
+</VekTable>
+
+@code {
+    [Parameter]
+    public PagerPosition Position { get; set; } = PagerPosition.Bottom;
+}

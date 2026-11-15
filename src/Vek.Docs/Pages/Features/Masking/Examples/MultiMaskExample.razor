@@ -1,0 +1,83 @@
+﻿@namespace Vek.Docs.Examples
+@using Vek.Interfaces
+
+<VekGrid Class="justify-space-between mb-3 mx-n3" Style="max-width: 800px;">
+    <VekItem xs="12">
+        <VekTextField Mask="@mask" Label="Credit Card Number" Style="max-width: 400px;"
+                  @bind-Value="cardNumber" Variant="@Variant.Text" Clearable/>
+    </VekItem>
+    <VekItem xs="12">
+        Credit Card: <b>@cardNumber</b>
+    </VekItem>
+</VekGrid>
+
+@code {
+    string cardNumber, cardType;
+
+    MultiMask mask = new MultiMask("0000 0000 0000 0000",
+        new MaskOption("American Express", "0000 000000 00000", @"^(34|37)"),
+        new MaskOption("Diners Club", "0000 000000 0000", @"^(30[0-59])"),
+        new MaskOption("JCB", "0000 0000 0000 0000", @"^(35|2131|1800)"),
+        new MaskOption("VISA", "0000 0000 0000 0000", @"^4"),
+        new MaskOption("MasterCard", "0000 0000 0000 0000", @"^(5[1-5]|2[2-7])"),
+        new MaskOption("Discover", "0000 0000 0000 0000", @"^(6011|65|64[4-9])")
+    );
+    MaskOption? option = null;
+    Dictionary<string, Variant> variants = new();
+    VekElement element;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        mask.OptionDetected += (o, input) =>
+        {
+            option = o;
+            cardType = o == null ? "Unknown" : o.Value.Id;
+            UpdateClasses();
+            // re-render only VekElement's children
+            (element as IVekStateHasChanged)?.StateHasChanged();
+        };
+        UpdateClasses();
+    }
+
+    void UpdateClasses()
+    {
+        foreach (var type in new[] { "American Express", "Diners Club", "JCB", "VISA", "MasterCard", "Discover" })
+            variants[type] = type == cardType ? Variant.Filled : Variant.Outlined;
+    }
+}
+
+@* Note: VekElement is used here to limit the render-update to this html tree  *@
+<VekElement HtmlTag="div" @ref="element" Style="max-width: 800px;" Class="vek-width-full">
+    <VekGrid Class="justify-space-between">
+        <VekItem xs="12" sm="6">
+            <VekAlert Variant="@variants["American Express"]" NoIcon Dense Class="mb-2">
+                American Express: starts with 34/37<br/>
+                <pre>34&#183;&#183; &#183;&#183;&#183;&#183;&#183;&#183; &#183;&#183;&#183;&#183;&#183;</pre>
+            </VekAlert>
+            <VekAlert Variant="@variants["Diners Club"]" NoIcon Dense Class="mb-2">
+                Diners Club: starts with 300-305/309<br/>
+                <pre>300&#183; &#183;&#183;&#183;&#183;&#183;&#183; &#183;&#183;&#183;</pre>
+            </VekAlert>
+            <VekAlert Variant="@variants["JCB"]" NoIcon Dense Class="mb-2">
+                JCB: starts with 35/2131/1800<br/>
+                <pre>35&#183;&#183; &#183;&#183;&#183;&#183; &#183;&#183;&#183;&#183; &#183;&#183;&#183;&#183;</pre>
+            </VekAlert>
+        </VekItem>
+        <VekItem xs="12" sm="6">
+            <VekAlert Variant="@variants["VISA"]" NoIcon Dense Class="mb-2">
+                VISA: starts with 4<br/>
+                <pre>4&#183;&#183;&#183; &#183;&#183;&#183;&#183; &#183;&#183;&#183;&#183; &#183;&#183;&#183;&#183;</pre>
+            </VekAlert>
+            <VekAlert Variant="@variants["MasterCard"]" NoIcon Dense Class="mb-2">
+                MasterCard: starts with 51-55/22-27<br/>
+                <pre>51&#183;&#183; &#183;&#183;&#183;&#183; &#183;&#183;&#183;&#183; &#183;&#183;&#183;&#183;</pre>
+            </VekAlert>
+            <VekAlert Variant="@variants["Discover"]" NoIcon Dense Class="mb-2">
+                Discover: starts with 6011/65/644-649<br/>
+                <pre>6011 &#183;&#183;&#183;&#183; &#183;&#183;&#183;&#183; &#183;&#183;&#183;&#183;</pre>
+            </VekAlert>
+        </VekItem>
+    </VekGrid>
+    <VekText Class="vek-text-secondary" Typo="Typo.body2">Example inspired by Cleave.js</VekText>
+</VekElement>

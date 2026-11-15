@@ -1,0 +1,15 @@
+﻿<VekForm ValidationDelay="0">
+    <VekTextField T="string" Required="true" RequiredError="Enter a rock star"></VekTextField>
+    <VekDatePicker @bind-Date="_date"></VekDatePicker>
+
+    <VekForm ValidationDelay="0">
+        <VekTextField T="string" Required="true" RequiredError="Enter a rock star"></VekTextField>
+        <VekDatePicker @bind-Date="_date"></VekDatePicker>
+    </VekForm>
+</VekForm>
+
+@code {
+    public static string __description__ = "Changing any of the fields, required or not, should set the forms IsTouched property to true";
+    
+    private DateTime? _date = new DateTime(2021, 05, 15);
+}

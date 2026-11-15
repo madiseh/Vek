@@ -1,0 +1,22 @@
+﻿<VekTable @ref="Table" T="string" Items="_items" @bind-SelectedItem="_selectedItem">
+    <HeaderContent>
+        <VekTh>#</VekTh>
+    </HeaderContent>
+    <RowTemplate>
+        <VekTd>@context</VekTd>
+    </RowTemplate>
+    <RowEditingTemplate>
+        <VekTd>
+            <VekTextField T="string" @bind-Value="@context"></VekTextField>
+        </VekTd>
+    </RowEditingTemplate>
+</VekTable>
+
+@code {
+    public static string __description__ = "Inline Edit Table: Basic";
+
+    private string? _selectedItem;
+    private readonly string[] _items = ["A", "B", "C"];
+
+    public VekTable<string> Table { get; private set; } = null!;
+}

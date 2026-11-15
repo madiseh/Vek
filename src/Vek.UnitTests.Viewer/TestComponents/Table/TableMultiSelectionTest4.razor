@@ -1,0 +1,16 @@
+﻿<VekText>SelectedItems { @string.Join(", ", _selectedItems) }</VekText>
+<VekTable Items="_items" @bind-SelectedItems="_selectedItems" MultiSelection="true">
+    <HeaderContent>
+        <VekTh>#</VekTh>
+    </HeaderContent>
+    <RowTemplate>
+        <VekTd>@context</VekTd>
+    </RowTemplate>
+</VekTable>
+
+@code {
+    public static string __description__ = "The checkboxes should all be checked on load, even the header checkbox.";
+
+    private readonly int[] _items = [0, 1, 2];
+    private HashSet<int> _selectedItems = [0, 1, 2];
+}

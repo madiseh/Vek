@@ -1,0 +1,40 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekContainer Class="mt-8" Style="justify-items: center">
+    <VekPaper Class="mt-4 px-8">
+        <VekStepper @ref="_stepper" NonLinear Class="mr-4">
+            <ChildContent>
+                <VekStep Title="Step 1" CompletedChanged="@(() => StateHasChanged())">Introductory Step</VekStep>
+                <VekStep Title="Step 2" CompletedChanged="@(() => StateHasChanged())">More Details</VekStep>
+                <VekStep Title="Step 3" CompletedChanged="@(() => StateHasChanged())">Wrap things up</VekStep>
+            </ChildContent>
+        </VekStepper>
+
+        @if (_stepper is not null)
+        {
+            <VekStack Row Class="justify-center">
+                @foreach (var step in _stepper.Steps)
+                {
+                    <VekChip T="string" Color="@GetColor(step.Completed)">
+                        @step.Title
+                    </VekChip>
+                }
+            </VekStack>
+
+            <VekStack Row Class="justify-center">
+                @foreach (var step in _stepper.Steps)
+                {
+                    <VekChip T="string" Color="@GetColor(step.Completed)">
+                        @step.Title
+                    </VekChip>
+                }
+            </VekStack>
+        }
+    </VekPaper>
+</VekContainer>
+
+@code {
+    private VekStepper _stepper = null!;
+
+    private static Color GetColor(bool completed) => completed ? Color.Success : Color.Error;
+}

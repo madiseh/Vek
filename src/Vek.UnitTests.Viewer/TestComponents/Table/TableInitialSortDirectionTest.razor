@@ -1,0 +1,15 @@
+﻿<VekTable Items="@_examples" T="string">
+    <HeaderContent>
+        <VekTh><VekTableSortLabel InitialSortDirection="@InitialSortDirection" SortBy="new Func<string, object>(x=>x)">#</VekTableSortLabel></VekTh>
+    </HeaderContent>
+    <RowTemplate>
+        <VekTd DataLabel="Nr">@context</VekTd>
+    </RowTemplate>
+</VekTable>
+
+@code {
+    [Parameter]
+    public SortDirection InitialSortDirection { get; set; } = SortDirection.Descending;
+
+    private readonly IEnumerable<string> _examples = new List<string> { "B", "A", "C" };
+}

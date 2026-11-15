@@ -1,0 +1,34 @@
+﻿<VekLink Href="https://github.com/madiseh/vek/issues/13998" Target="_blank">Vek/Issues/13998</VekLink>
+
+<VekMenu Label="Downward" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopLeft" PopoverClass="popover-downward-long">
+    @for (var i = 1; i <= 30; i++)
+    {
+        var label = $"Option {i}";
+        <VekMenuItem Label="@label" />
+    }
+</VekMenu>
+
+@* Pinned to the viewport bottom so the anchors end 8px above it, like the reporter's page scrolled to the end. *@
+@* Raised above the Viewer's drawer so the buttons stay clickable with the sidebar open. *@
+<VekPaper Elevation="0" Style="background: var(--vek-palette-background-gray); position: fixed; inset-inline: 0; bottom: 0; z-index: calc(var(--vek-zindex-drawer) + 1);">
+    <VekToolBar Gutters="false" Class="mx-1">
+        <VekMenu Icon="@Icons.Material.Filled.Add" AriaLabel="Add" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.BottomLeft" PopoverClass="popover-upward-short">
+            <VekMenuItem Label="Preview" Icon="@Icons.Material.Filled.Visibility" />
+            <VekMenuItem Label="Share" Icon="@Icons.Material.Filled.Share" />
+            <VekMenuItem Label="Get Link" Icon="@Icons.Material.Filled.Link" />
+            <VekDivider />
+            <VekMenuItem Label="Remove" Icon="@Icons.Material.Filled.Delete" />
+        </VekMenu>
+        <VekMenu Icon="@Icons.Material.Filled.MoreVert" AriaLabel="More options" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.BottomLeft" PopoverClass="popover-upward-long">
+            @for (var i = 1; i <= 30; i++)
+            {
+                var label = $"Option {i}";
+                <VekMenuItem Label="@label" />
+            }
+        </VekMenu>
+    </VekToolBar>
+</VekPaper>
+
+@code {
+    public static string __description__ = "Upward-opening menus near the viewport bottom keep their height; a long one clamps once to the space above its anchor.";
+}

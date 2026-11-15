@@ -1,0 +1,15 @@
+﻿<VekRadioGroup @bind-Value="@_option">
+    <VekRadio Value="@("1")" />
+    <VekRadio Value="@("2")" />
+</VekRadioGroup>
+
+<VekRadioGroup @bind-Value="@_option">
+    <VekRadio Value="@("1")" />
+    <VekRadio Value="@("2")" />
+</VekRadioGroup>
+
+@code {
+    public static string __description__ = "The two Radio groups should be synced via the SelectedOption parameter.";
+
+    private string _option = "2";
+}

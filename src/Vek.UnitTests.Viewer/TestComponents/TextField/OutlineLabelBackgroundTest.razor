@@ -1,0 +1,37 @@
+﻿<VekStack Class="test-container1" Row>
+    <VekTextField T="string" Variant="Variant.Outlined" Label="Normal"></VekTextField>
+    <VekTextField T="string" Variant="Variant.Outlined" Label="Shrink Normal" ShrinkLabel="true"></VekTextField>
+    <VekTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" Label="Dense"></VekTextField>
+    <VekTextField T="string" Variant="Variant.Outlined" Label="Shrink Dense" ShrinkLabel="true" Margin="Margin.Dense"></VekTextField>
+</VekStack>
+
+<VekRTLProvider RightToLeft>
+    <VekStack Class="test-container1" Row>
+        <VekTextField T="string" Variant="Variant.Outlined" Label="Shrink Dense" ShrinkLabel="true" Margin="Margin.Dense"></VekTextField>
+        <VekTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" Label="Dense"></VekTextField>
+        <VekTextField T="string" Variant="Variant.Outlined" Label="Shrink Normal" ShrinkLabel="true"></VekTextField>
+        <VekTextField T="string" Variant="Variant.Outlined" Label="Normal"></VekTextField>
+    </VekStack>
+</VekRTLProvider>
+
+<div class="test-container2">
+    <VekTextField T="string" Variant="Variant.Outlined" Label="Shrink Normal" ShrinkLabel="true"></VekTextField>
+</div>
+
+<VekRTLProvider RightToLeft>
+    <div class="test-container2">
+        <VekTextField T="string" Variant="Variant.Outlined" Label="Shrink Normal" ShrinkLabel="true"></VekTextField>
+    </div>
+</VekRTLProvider>
+
+
+<style>
+    .test-container1 {
+        padding: 20px;
+        background-color: deepskyblue;
+    }
+
+    .test-container2 {
+        background-color: deepskyblue;
+    }
+</style>
