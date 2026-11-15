@@ -28,10 +28,14 @@ namespace Vek.Docs.Extensions
         {
             // get the absolute path with out the base path
             var currentUri = navMan.Uri.Remove(0, navMan.BaseUri.Length - 1);
-            var secondElement = currentUri
-                .Split(new char[] { '/', '?' }, StringSplitOptions.RemoveEmptyEntries)
-                .ElementAtOrDefault(1);
-            return secondElement;
+            var path = currentUri.Split('?', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? string.Empty;
+            var segments = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            if (segments.Length > 1)
+            {
+                return string.Join('/', segments.Skip(1));
+            }
+
+            return null;
         }
 
         /// <summary>

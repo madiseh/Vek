@@ -1,0 +1,57 @@
+@page "/components/datagrid/sorting"
+
+<DocsPage>
+    <DocsPageHeader Title="DataGrid - Sorting" Component="@nameof(VekDataGrid<T>)">
+        <Description>
+            Learn how to sort data in the <CodeInline>&lt;VekDataGrid&gt;</CodeInline>, from single and multi-column sorting to custom comparers.
+        </Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Sorting">
+                <Description>
+                    The <CodeInline>&lt;VekDataGrid></CodeInline> allows you to either disable sorting entirely, sort by single column or by multiple columns via
+                    the <CodeInline>SortMode</CodeInline> property. The default (<CodeInline>SortMode.Multiple</CodeInline>) allows sorting on more than one column (Hold <CodeInline>Ctrl-Key</CodeInline>) while clicking
+                    on a header column to extend the sort operation to another column.<br />
+                    Clicking on the column header while <CodeInline>Alt-Key</CodeInline> is pressed, will un-sort a column (or remove it from the set of sorted columns) when multiple sorting
+                    is enabled. In the case of multiple sorting, a small index-number next to the sort direction arrow will indicate the order in which columns are sorted.<br />
+                    When mode is set to <CodeInline>SortMode.Single</CodeInline>, only a single column can be used for sorting at a time. Using another column for sorting will automatically
+                    un-sort any former sorted column. In single mode, the number indicator next to the direction arrow will not be shown.<br /><br />
+                    In both <i>active</i> modes, single columns can be excluded from sorting by setting the <CodeInline>Sortable</CodeInline> property to false for that column.
+                    When SortMode is set to <CodeInline>SortMode.None</CodeInline> sorting is disabled globally and setting the <CodeInline>Sortable</CodeInline> property on a column has no effect.<br /><br />
+                    You can also use the <CodeInline>SortBy</CodeInline> parameter on a <CodeInline>TemplateColumn</CodeInline> to allow sorting on that column.
+                    <br /><br />
+                    When using <CodeInline>PropertyColumn</CodeInline>, if the <CodeInline>Property</CodeInline> lambda expression returns a <b>primitive type</b>,
+                    the <CodeInline>SortDefinition</CodeInline>'s <CodeInline>SortBy</CodeInline> will return the Property's <CodeInline>nameof</CodeInline> value.
+                    Instead, if the Property lamda expression contains a complex value, the SortBy will return the column GUID.
+                    In this case, if you need to retrieve the column, you have several options:
+                    <VekList T="string" Dense>
+                        <VekListItem>- <b>Embed a CellTemplate within the PropertyColumn</b>: Use the lambda expression of the PropertyColumn to return the primitive Property value, while implementing the more complex, ad-hoc logic in the embedded CellTemplate.</VekListItem>
+                        <VekListItem>- <b>Title lookup via GUID</b>: Assign a Title to the TemplateColumn, and a reference to the VekDataGrid using <code>@@ref</code>. Iterate over the RenderedColumns to find the TemplateColumn by matching its unique identifier (where PropertyName == SortDefinition.SortBy), and extract its Title.</VekListItem>
+                        <VekListItem>- <b>Create a custom TemplateColumn</b>: Inherit from the Column base class and override the PropertyName's default behavior and implement your own custom logic instead of relying on a randomly generated identifier</VekListItem>
+                    </VekList>
+                    <VekAlert Severity="Severity.Info" Dense="true" Class="my-1">Changing the SortMode at runtime will reset any former sort orders on all columns.</VekAlert>
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridSortingExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridSortingExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Advanced Sorting">
+                <Description>
+                    The <CodeInline>&lt;VekDataGrid></CodeInline> allows you to provide your own <CodeInline>Comparer</CodeInline> for advanced sorting. Keep in mind that the <CodeInline>Comparer</CodeInline>
+                    will use the same object passed by the <CodeInline>SortBy</CodeInline> parameter. If <CodeInline>SortBy</CodeInline> is not supplied, it will use the column item for its comparison.
+                    You can also manually call <CodeInline>SetSortAsync</CodeInline> on the DataGrid while passing your <CodeInline>Comparer</CodeInline>.
+                    <CodeInline>Comparer</CodeInline> must implement <CodeInline>IComparer&lt;object></CodeInline>. This example uses a natural sorting algorithm to sort strings with numbers properly.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridCustomSortingExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridCustomSortingExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

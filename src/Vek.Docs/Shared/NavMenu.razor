@@ -20,7 +20,7 @@
                 @foreach (var subItem in item.GroupComponents)
                 {
                     var href = $"components/{subItem.Link}";
-                    <VekNavLink Href="@href">@subItem.Name</VekNavLink>
+                    <VekNavLink Href="@href" Match="NavLinkMatch.All">@subItem.Name</VekNavLink>
                 }
             </VekNavGroup>
         }

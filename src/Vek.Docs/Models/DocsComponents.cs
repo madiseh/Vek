@@ -10,10 +10,15 @@ namespace Vek.Docs.Models
 
         public DocsComponents AddItem(string name, Type component, params Type[] childComponents)
         {
+            return AddItem(name, component, null, childComponents);
+        }
+
+        public DocsComponents AddItem(string name, Type component, string link, params Type[] childComponents)
+        {
             var componentItem = new VekComponent
             {
                 Name = name,
-                Link = name.ToLowerInvariant().Replace(" ", ""),
+                Link = link ?? name.ToLowerInvariant().Replace(" ", ""),
                 Type = component,
                 ChildTypes = childComponents,
                 IsNavGroup = false
@@ -23,13 +28,13 @@ namespace Vek.Docs.Models
             return this;
         }
 
-        public DocsComponents AddNavGroup(string name, bool expanded, DocsComponents groupItems)
+        public DocsComponents AddNavGroup(string name, bool expanded, DocsComponents groupItems, bool sortByName = true)
         {
             var componentItem = new VekComponent
             {
                 Name = name,
                 NavGroupExpanded = expanded,
-                GroupComponents = groupItems.GetComponentsSortedByName(),
+                GroupComponents = sortByName ? groupItems.GetComponentsSortedByName() : groupItems.Components,
                 IsNavGroup = true
             };
             _vekComponents.Add(componentItem);
