@@ -1,0 +1,88 @@
+﻿@using System.Web
+@namespace Vek.Docs.Examples
+
+@inject NavigationManager NavigationManager
+
+<VekDialog>
+    <DialogContent>
+        <div class="d-flex flex-column py-1">
+            <VekButton OnClick="ChangeTitleAsync">Change Title</VekButton>
+            <VekButton OnClick="ToggleCloseButtonAsync">Toggle Close Button</VekButton>
+            <VekButton OnClick="ToggleFullWidthAsync">Toggle Full Width</VekButton>
+            <VekButton OnClick="ToggleHeaderAsync">Toggle Header</VekButton>
+            <VekCheckBox TriState="true" T="bool?" Value="VekDialog.Options.CloseOnNavigation" ValueChanged="@(async v => await CloseOnNavigationChangedAsync(v))">Close On Navigation</VekCheckBox>
+            <VekButton OnClick="ChangeUrl">Change Url</VekButton>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <VekButton Color="Color.Primary" OnClick="Close">OK</VekButton>
+    </DialogActions>
+</VekDialog>
+
+@code {
+    [CascadingParameter]
+    private IVekDialogInstance VekDialog { get; set; }
+
+    [SupplyParameterFromQuery(Name = "example")]
+    public int? QueryParameterExample { get; set; }
+
+    protected override void OnParametersSet() {
+        QueryParameterExample ??= 0;
+    }
+
+    private void Close() => VekDialog.Close(DialogResult.Ok(true));
+
+    private Task ChangeTitleAsync() => VekDialog.SetTitleAsync($"Current time is: {DateTime.Now}");
+
+    private Task ToggleCloseButtonAsync()
+    {
+        var options = VekDialog.Options with
+        {
+            CloseButton = !(VekDialog.Options.CloseButton ?? false)
+        };
+
+        return VekDialog.SetOptionsAsync(options);
+    }
+
+    private Task ToggleFullWidthAsync()
+    {
+        var options = VekDialog.Options with
+        {
+            FullWidth = !(VekDialog.Options.FullWidth ?? true)
+        };
+
+        return VekDialog.SetOptionsAsync(options);
+    }
+
+    private Task ToggleHeaderAsync()
+    {
+        var options = VekDialog.Options with
+        {
+            NoHeader = !(VekDialog.Options.NoHeader ?? false)
+        };
+
+        return VekDialog.SetOptionsAsync(options);
+    }
+
+    private void ChangeUrl() {
+        var uri = new Uri(NavigationManager.Uri);
+
+        var query = HttpUtility.ParseQueryString(uri.Query);
+
+        query["example"] = (QueryParameterExample + 1).ToString();
+
+        var newUri = $"{uri.GetLeftPart(UriPartial.Path)}?{query}";
+
+        NavigationManager.NavigateTo(newUri);
+    }
+
+    private Task CloseOnNavigationChangedAsync(bool? closeOnNavigation)
+    {
+        var options = VekDialog.Options with
+        {
+            CloseOnNavigation = closeOnNavigation
+        };
+
+        return VekDialog.SetOptionsAsync(options);
+    }
+}

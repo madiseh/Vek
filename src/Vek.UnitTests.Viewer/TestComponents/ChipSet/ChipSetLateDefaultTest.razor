@@ -1,0 +1,26 @@
+﻿<VekChipSet T="string" @bind-SelectedValues="_selectedValues" SelectionMode="SelectionMode.MultiSelection" CheckMark>
+    @if (_extraItem)
+    {
+        <VekChip Value="@("Extra Chip")" Default="true" />
+    }
+    <VekChip Value="@("Primary")" Default="true"/>
+</VekChipSet>
+
+Add chips
+<VekIconButton id="enable-button" Icon="@Icons.Material.Filled.Add" OnClick="Enable">Enable</VekIconButton>
+
+<br />
+@if (_selectedValues is { Count: > 0 }) {
+    <VekText>@string.Join(", ", _selectedValues.OrderBy(x => x))</VekText>
+}
+else {
+    <VekText>Nothing selected</VekText>
+}
+
+@code
+{ 
+    private bool _extraItem;
+    private IReadOnlyCollection<string>? _selectedValues;
+
+    public void Enable() => _extraItem = !_extraItem;
+}

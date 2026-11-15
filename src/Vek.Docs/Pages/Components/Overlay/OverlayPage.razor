@@ -1,0 +1,121 @@
+﻿@page "/components/overlay"
+@inject NavigationManager NavManager
+
+<style>
+    ul.bullet-list {
+        list-style: disc !important;
+        margin-left: 1.25rem !important;
+        padding-left: 0 !important;
+        color: inherit;
+    }
+</style>
+
+<DocsPage>
+    <DocsPageHeader Title="Overlay" Component="@nameof(VekOverlay)">
+        <Description>
+            <VekText Typo="Typo.h6" Class="mt-2">Default Behavior: </VekText>
+            <VekText Typo="Typo.body1">
+                <ul class="bullet-list">
+                    <li>
+                        <CodeInline>ZIndex</CodeInline> defaults to <CodeInline>5</CodeInline>.
+                    </li>
+                    <li>
+                        The <CodeInline Tag="true">VekOverlay</CodeInline> does not cover high-priority elements like the <CodeInline Tag="true">VekAppBar</CodeInline>
+                        or <CodeInline Tag="true">VekDrawer</CodeInline> when used alone as they render above overlays due to
+                        <VekLink Href="/customization/default-theme#vektheme-zindex">theme-level defaults</VekLink>.
+                    </li>
+                    <li>
+                        Unless excluded, the <CodeInline Tag="true">VekOverlay</CodeInline> is scaffolded globally via the <CodeInline Tag="true">VekPopoverProvider</CodeInline>,
+                        meaning only one overlay instance is active at a time. When scaffolded alongside a <CodeInline Tag="true">VekPopover</CodeInline>
+                        the overlay is assigned a ZIndex exactly one less than the popover so the popover remains interactive and visually above the overlay.
+                    </li>
+                </ul>
+            </VekText>
+        </Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="AutoClose">
+                <Description>
+                    Use the <CodeInline>AutoClose</CodeInline> property to allow users to close the overlay by clicking anywhere on it.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(OverlayUsageExample)" ShowCode="false">
+                <OverlayUsageExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Absolute">
+                <Description>
+                    The overlay can be contained inside its parent by setting the <CodeInline>Absolute</CodeInline> property along with the <CodeInline>relative</CodeInline> class (or CSS <CodeInline>position: relative</CodeInline> style). 
+                    <VekAlert Severity="Severity.Info">
+                        An overlay with <CodeInline>Absolute</CodeInline> set is excluded from scaffolding and is rendered individually.
+                    </VekAlert>
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(OverlayAbsoluteExample)" ShowCode="false">
+                <OverlayAbsoluteExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Color">
+                <Description>
+                    The overlay's default color is transparent, but you can adjust its appearance using either the <CodeInline>DarkBackground</CodeInline> or <CodeInline>LightBackground</CodeInline> properties.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(OverlayColorsExample)" ShowCode="false">
+                <OverlayColorsExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Z-Index">
+                <Description>
+                    <VekAlert Dense Severity="Severity.Warning">
+                        Use with caution when explicitly setting the ZIndex. Vek's automatic scaffolding logic for <CodeInline>VekPopover</CodeInline> 
+                        will use whichever value is higher: the explicitly set <CodeInline>ZIndex</CodeInline> or its own calculated value.
+                    </VekAlert>
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(OverlayZIndexExample)" ShowCode="false">
+                <OverlayZIndexExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="ChildContent as a Loader">
+                <Description>
+                    The overlay can contain any child content but here it's used to display loading progress.
+                    <VekAlert Severity="Severity.Info">
+                        An overlay that contains any <CodeInline>ChildContent</CodeInline> is excluded from scaffolding and is rendered individually.
+                    </VekAlert>
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(OverlayLoaderExample)" ShowCode="false" Block="true">
+                <OverlayLoaderExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+          <SectionHeader Title="Positioning">
+            <Description>
+              By default, <CodeInline>VekOverlay</CodeInline> is scaffolded into the <CodeInline>VekPopoverProvider</CodeInline>, producing a singleton stack where the most recently created overlay sits on top and stacks back down in reverse creation order as overlays close.
+                  In this context, an "overlay view" simply means a scaffolded overlay instance (the scrim/backdrop) that gets added to the stack by a component such as a popover, menu, or select.
+              <VekAlert Dense Severity="Severity.Info">The scaffolded ZIndex will be the higher value between the explicit `ZIndex` parameter and the internally calculated value. This means an explicit `ZIndex` does not automatically override the scaffolded value if the latter is higher.</VekAlert>
+              <ul class="bullet-list">
+                <li>Set <CodeInline>Absolute="true"</CodeInline> to scope the overlay to its parent (excluded from scaffolding).</li>
+                <li>Apply <CodeInline>vek-skip-overlay-section</CodeInline> to opt out of the global overlay stack (excluded from scaffolding).</li>
+                <li>Provide <CodeInline>ChildContent</CodeInline> to render custom content; overlays with <CodeInline>ChildContent</CodeInline> are excluded from scaffolding.</li>
+              </ul>
+              <p class="mt-2"><b>Theme defaults:</b> Unpaired overlays default to ZIndex 5; common theme values are AppBar 1300, Drawer 1100, Popover 1200.</p>
+            </Description>
+          </SectionHeader>
+          <SectionContent Code="@nameof(OverlayPositionExample)" ShowCode="false">
+            <OverlayPositionExample />
+          </SectionContent>
+        </DocsPageSection>
+    </DocsPageContent>
+</DocsPage>

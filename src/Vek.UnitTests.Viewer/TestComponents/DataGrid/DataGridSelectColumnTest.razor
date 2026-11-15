@@ -1,0 +1,11 @@
+﻿
+
+<VekDataGrid Items="@_items" MultiSelection>
+    <Columns>
+        <SelectColumn T="int" ShowInFooter="true" />
+    </Columns>
+</VekDataGrid>
+
+@code {
+    private List<int> _items = [1, 2];
+}

@@ -1,0 +1,16 @@
+﻿<VekToggleGroup @bind-Value="_value" T="string" Color="Color.Primary" Disabled="true">
+    <VekToggleItem T="string" Value="@("Enabled 1")" Text="Enabled Item 1" />
+    <VekToggleItem T="string" Value="@("Enabled 2")" Text="Enabled Item 2" />
+    <VekToggleItem T="string" Value="@("Disabled")" Text="Disabled Item" Disabled="true" />
+</VekToggleGroup>
+
+<VekToggleGroup @bind-Value="_value" T="string" Color="Color.Primary">
+    <VekToggleItem T="string" Value="@("Enabled 1")" Text="Enabled Item 1" />
+    <VekToggleItem T="string" Value="@("Enabled 2")" Text="Enabled Item 2" />
+    <VekToggleItem T="string" Value="@("Disabled")" Text="Disabled Item" Disabled="true" />
+</VekToggleGroup>
+
+@code {
+    public static string __description__ = "It should be possible to disable whole toggle groups and/or toggle items";
+    private string? _value;
+}

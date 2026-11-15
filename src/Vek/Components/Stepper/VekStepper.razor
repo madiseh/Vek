@@ -1,0 +1,184 @@
+﻿@namespace Vek
+@using Vek.Resources
+@using Vek.Utilities
+@inherits VekComponentBase
+
+@inject InternalVekLocalizer Localizer
+
+<div @attributes="@UserAttributes" class="@Classname" style="@Style">
+    <div class="@NavClassname" role="tablist">
+        @foreach (var step in _steps)
+        {
+            bool isActive = ActiveStep == step;
+            string stepClassname = new CssBuilder()
+                .AddClass("vek-step")
+                .AddClass("active", isActive)
+                .AddClass("vek-ripple", Ripple)
+                .AddClass("vek-clickable", NonLinear && !step.DisabledState.Value)
+                .AddClass("vek-step-error", step.HasErrorState.Value)
+                .AddClass("vek-step-completed", step.CompletedState.Value)
+                .AddClass("vek-step-skipped", step.SkippedState.Value)
+                .Build();
+
+            <button class="@stepClassname" role="tab" type="button" id="@GetStepButtonId(step)" aria-controls="@GetStepPanelIdIfRendered(step)" aria-selected="@(isActive.ToString().ToLowerInvariant())"
+                    @onclick="@(async e => await OnStepClickAsync(step, e))" disabled="@step.DisabledState.Value">
+                @RenderStepLabel(step, isActive)
+            </button>
+
+            @if (Vertical && !(IsCompleted && CompletedContent is not null)) 
+            {
+                @StepContent(step)
+            }
+
+            @if (_steps[^1] != step)
+            {
+                @if (ConnectorTemplate is not null)
+                {
+                    @ConnectorTemplate(step)
+                }
+                else
+                {
+                    <div class="vek-stepper-nav-connector">
+                        <div class="vek-stepper-nav-connector-line"></div>
+                    </div>
+                }
+            }
+        }
+    </div>
+
+    @if (IsCompleted && CompletedContent is not null)
+    {
+        <div class="@StepClassname vek-stepper-complete">
+            @CompletedContent
+        </div>
+    }
+    else if (!Vertical && _activeStep is not null) {
+        @StepContent(_activeStep)
+    }
+
+    <CascadingValue Value="this" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+
+    <VekCardActions Class="@ActionsClassname">
+        @if (ActionContent == null)
+        {
+            @if (ShowResetButton)
+            {
+                @* Reset Button *@
+                <VekButton StartIcon="@ResetButtonIcon" Class="vek-stepper-button-reset" Disabled="@(!CanReset)" OnClick="@(async () => await ResetAsync())">
+                    @Localizer[LanguageResource.VekStepper_Reset]
+                </VekButton>
+            }
+
+            @if (!IsCompleted)
+            {
+                @* Previous Button *@
+                <VekButton StartIcon="@PreviousButtonIcon" Class="vek-stepper-button-previous" OnClick="PreviousStepAsync" Disabled="@(!PreviousStepEnabled)">
+                    @Localizer[LanguageResource.VekStepper_Previous]
+                </VekButton>
+            }
+
+            <VekSpacer/>
+
+            @if (!IsCompleted)
+            {
+                @if (IsCurrentStepSkippable)
+                {
+                    @* Skip Button *@
+                    <VekButton StartIcon="@SkipButtonIcon" Class="vek-stepper-button-skip" OnClick="SkipCurrentStepAsync">
+                        @Localizer[LanguageResource.VekStepper_Skip]
+                    </VekButton>
+                }
+                @if (ShowCompleteInsteadOfNext)
+                {
+                    @* Complete Button *@
+                    <VekButton StartIcon="@CompleteButtonIcon" Class="vek-stepper-button-complete" OnClick="NextStepAsync" Color="Color.Primary">
+                        @Localizer[LanguageResource.VekStepper_Complete]
+                    </VekButton>
+                }
+                else 
+                {
+                    @* Next Button *@
+                    <VekButton StartIcon="@NextButtonIcon" Class="vek-stepper-button-next" OnClick="NextStepAsync" Color="Color.Primary" Disabled="@(!CanGoToNextStep)">
+                        @Localizer[LanguageResource.VekStepper_Next]
+                    </VekButton>
+                }
+            }
+        }
+        else
+        {
+            @ActionContent(this)
+        }
+    </VekCardActions>
+</div>
+
+@code {
+    private RenderFragment RenderStepLabel(VekStep step, bool isActive) =>
+        @<div class="@step.LabelClassname">
+            @if (LabelTemplate is not null)
+            {
+                @LabelTemplate(step)
+            }
+            else
+            {
+                <div class="@step.LabelIconClassname">
+                    @if(step.HasErrorState.Value)
+                    {
+                        <VekIcon Size="Size.Small" Icon="@StepErrorIcon" />
+                    }
+                    else if(step.SkippedState.Value && ShowSkip)
+                    {
+                        <VekIcon Size="Size.Small" Icon="@StepSkippedIcon" />
+                    }
+                    else if (step.CompletedState.Value)
+                    {
+                        <VekIcon Size="Size.Small" Icon="@StepCompleteIcon" />
+                    }
+                    else
+                    {
+                        <VekText Typo="Typo.caption">@(_steps.IndexOf(step) + 1)</VekText>
+                    }
+                </div>
+            }
+
+            @if (TitleTemplate is not null)
+            {
+                @TitleTemplate(step)
+            }
+            else
+            {
+                <div class="@step.LabelContentClassname">
+                    <VekText Typo="@(isActive ? Typo.subtitle2 : Typo.body2)" Class="vek-step-label-content-title">
+                        @step.TitleState.Value
+                    </VekText>
+
+                    @if (!string.IsNullOrEmpty(step.SecondaryTextState.Value))
+                    {
+                        <VekText Typo="Typo.caption" Class="vek-step-label-content-secondary-text">@step.SecondaryTextState.Value</VekText>
+                    }
+                </div>
+            }
+        </div>;
+
+    private RenderFragment StepContent(VekStep step) =>
+        @<CascadingValue Value="@CreateStepContext(step)">
+            <div @attributes="@step.UserAttributes" id="@GetStepPanelId(step)" class="@step.Classname" style="@step.Styles" role="tabpanel" aria-labelledby="@GetStepButtonId(step)" tabindex="0">
+                @if (step.ChildContent is not null)
+                {
+                    if (Vertical)
+                    {
+                        <VekCollapse Expanded="step == ActiveStep">
+                            @step.ChildContent
+                        </VekCollapse>
+                    }
+                    else
+                    {
+                        @step.ChildContent
+                    }
+                }
+            </div>
+        </CascadingValue>;
+
+    private VekStepContext CreateStepContext(VekStep step) => new(this, step);
+}

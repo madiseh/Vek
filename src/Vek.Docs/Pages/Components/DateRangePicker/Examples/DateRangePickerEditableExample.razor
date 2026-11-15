@@ -1,0 +1,17 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekStack>
+    <VekDateRangePicker @bind-DateRange="@_dateRange" Margin="Margin.Dense" ReadOnly="@(!_editable)" Clearable="@_clearable" 
+                        PlaceholderStart="Start Date" PlaceholderEnd="End Date" Label="Range"/>
+
+    <VekStack Row="true">
+        <VekSwitch @bind-Value="_editable" Color="Color.Secondary">Editable</VekSwitch>
+        <VekSwitch @bind-Value="_clearable" Color="Color.Secondary">Clearable</VekSwitch>
+    </VekStack>
+</VekStack>
+
+@code {
+    private bool _editable = true;
+    private bool _clearable = true;
+    private DateRange _dateRange { get; set; }
+}

@@ -1,0 +1,357 @@
+@import '../abstracts/variables';
+
+.vek-tabs {
+  display: flex;
+  flex-direction: column;
+
+  &.vek-tabs-reverse {
+    flex-direction: column-reverse;
+  }
+
+  &.vek-tabs-vertical {
+    flex-direction: row;
+
+    .vek-tooltip-root {
+      width: auto;
+    }
+  }
+
+  &.vek-tabs-vertical-reverse {
+    flex-direction: row-reverse;
+  }
+
+  &.vek-tabs-rounded {
+    border-radius: var(--vek-default-borderradius);
+    overflow: hidden;
+
+    .vek-tabs-tabbar {
+      border-radius: var(--vek-default-borderradius);
+    }
+
+    .vek-tabs-panels {
+      border-radius: var(--vek-default-borderradius);
+      flex-grow: 1;
+    }
+  }
+}
+
+.vek-tabs-tabbar {
+  position: relative;
+  background-color: var(--vek-palette-surface);
+
+  &.vek-tabs-border-left {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-right: 1px solid var(--vek-palette-lines-default);
+  }
+
+  &.vek-tabs-border-right {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-left: 1px solid var(--vek-palette-lines-default);
+  }
+
+  &.vek-tabs-border-top {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-bottom: 1px solid var(--vek-palette-lines-default);
+  }
+
+  &.vek-tabs-border-bottom {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    border-top: 1px solid var(--vek-palette-lines-default);
+  }
+
+  &.vek-tabs-rounded {
+    border-radius: var(--vek-default-borderradius);
+  }
+
+  &.vek-tabs-vertical {
+    .vek-tabs-tabbar-inner {
+      flex-direction: column;
+
+      .vek-tabs-scroll-button {
+        .vek-button-root {
+          width: 100%;
+          border-radius: 0px;
+          height: 32px;
+
+          .vek-icon-button-label {
+            .vek-icon-root {
+              transform: rotate(90deg);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  & .vek-tabs-tabbar-inner {
+    display: flex;
+    min-height: 48px;
+  }
+}
+
+
+.vek-tabs-tabbar-content {
+  width: 100%;
+  flex: 1 1 auto;
+  display: inline-block;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+
+  & .vek-tabs-tabbar-wrapper {
+    width: max-content;
+    position: inherit;
+    display: flex;
+    transition: .3s cubic-bezier(.25,.8,.5,1);
+
+    &.vek-tabs-centered {
+      margin: auto;
+    }
+
+    &.vek-tabs-vertical {
+      flex-direction: column;
+    }
+  }
+}
+
+.vek-tabs-panels {
+  position: relative;
+  transition: .3s cubic-bezier(.25,.8,.5,1);
+
+  // Descendant (not child) so panels are matched through wrapper elements such as VekForm.
+  // :not(.vek-tab) skips a nested tabs' bar buttons, which also carry .vek-tab-panel.
+  .vek-tab-panel:not(.vek-tab) {
+    display: none;
+
+    &.vek-tab-panel-active:not(.vek-tab-panel-hidden) {
+      display: contents;
+    }
+  }
+
+  &.vek-tabs-vertical {
+    display: flex;
+    flex-grow: 1;
+    min-width: 0;
+
+    // Child combinator on purpose: only the direct-child active panel is the flex item to clamp.
+    > .vek-tab-panel-active > * {
+      min-width: 0;
+    }
+  }
+}
+
+.vek-tabs-dropzone-horizontal {
+  > .vek-drop-item-preview-start {
+    width: 20px;
+    height: 100%;
+  }
+}
+
+.vek-tabs-dropzone-vertical {
+  > .vek-drop-item-preview-start {
+    width: 100%;
+    height: 20px;
+  }
+}
+
+.vek-tab {
+  width: 100%;
+  display: inline-flex;
+  padding: 6px 12px;
+  min-height: 48px;
+  flex-shrink: 0;
+  font-weight: 500;
+  line-height: 1.75;
+  user-select: none;
+  white-space: normal;
+  letter-spacing: 0.02857em;
+  text-transform: uppercase;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+
+  @media(hover: hover) and (pointer: fine) {
+    &:hover {
+      cursor: pointer;
+      background-color: var(--vek-palette-action-default-hover);
+    }
+  }
+
+  &.vek-tab-active {
+    color: var(--vek-palette-primary);
+
+    @media(hover: hover) and (pointer: fine) {
+      &:hover {
+        background-color: var(--vek-palette-primary-hover);
+      }
+    }
+  }
+
+  &.vek-disabled {
+    cursor: default;
+    pointer-events: none;
+    color: var(--vek-palette-text-disabled);
+  }
+
+  & .vek-tab-icon-text {
+    margin-right: 8px;
+    margin-inline-end: 8px;
+    margin-inline-start: unset;
+  }
+
+  &.vek-tab-panel-hidden {
+    display: none;
+  }
+}
+
+.vek-tab-slider {
+  position: absolute;
+  background: var(--vek-palette-primary);
+
+  &.vek-tab-slider-horizontal {
+    height: 2px;
+    bottom: 0;
+    transition: left .3s cubic-bezier(.64,.09,.08,1);
+    will-change: left;
+
+    &.vek-tab-slider-horizontal-reverse {
+      top: 0;
+      bottom: unset;
+    }
+  }
+
+  &.vek-tab-slider-vertical {
+    width: 2px;
+    right: 0;
+    transition: top .3s cubic-bezier(.64,.09,.08,1);
+    will-change: top;
+
+    &.vek-tab-slider-vertical-reverse {
+      left: 0;
+      right: unset;
+    }
+  }
+}
+
+.vek-tab-badge {
+  margin-left: 8px;
+  margin-inline-start: 8px;
+  margin-inline-end: unset;
+}
+
+.vek-tab-slider.vek-default {
+  background: var(--vek-palette-action-default);
+}
+
+@each $color in $vek-palette-colors {
+  .vek-tab-slider.vek-#{$color} {
+    background: var(--vek-palette-#{$color});
+  }
+}
+
+@each $color in $vek-palette-colors {
+  .vek-tabs-tabbar-#{$color} {
+    background-color: var(--vek-palette-#{$color});
+    color: var(--vek-palette-#{$color}-text);
+
+    .vek-tab-slider {
+      background: var(--vek-palette-#{$color}-text);
+    }
+
+    .vek-tab {
+      &.vek-tab-active {
+        color: var(--vek-palette-#{$color}-text);
+
+        @media(hover: hover) and (pointer: fine) {
+          &:hover {
+            background-color: var(--vek-palette-#{$color}-lighten);
+          }
+        }
+      }
+    }
+  }
+}
+
+
+.tab-transition {
+  &-enter {
+    transform: translate(100%, 0);
+  }
+
+  &-leave, &-leave-active {
+    position: absolute;
+    top: 0;
+  }
+
+  &-leave-to {
+    position: absolute;
+    transform: translate(-100%, 0);
+  }
+}
+
+.tab-reverse-transition {
+  &-enter {
+    transform: translate(-100%, 0);
+  }
+
+  &-leave, &-leave-to {
+    top: 0;
+    position: absolute;
+    transform: translate(100%, 0);
+  }
+}
+
+.vek-dynamic-tabs {
+  .vek-tabs-tabbar {
+    .vek-tab {
+      padding: 6px 14px;
+
+      .vek-icon-button {
+        padding: 4px;
+        margin-right: -4px;
+        margin-inline-end: -4px;
+        margin-inline-start: unset;
+      }
+
+      .vek-tabs-panel-header-before {
+        padding-right: 8px;
+        padding-inline-end: 8px;
+        padding-inline-start: unset;
+      }
+
+      .vek-tabs-panel-header-after {
+        padding-left: 8px;
+        padding-inline-start: 8px;
+        padding-inline-end: unset;
+      }
+    }
+  }
+}
+
+.vek-tabs-header {
+  &.vek-tabs-header-before {
+    display: inherit;
+  }
+
+  &.vek-tabs-header-after {
+    display: inherit;
+  }
+}
+
+.vek-tabs-panel-header {
+  display: flex;
+  flex: 1 1 auto;
+
+  &.vek-tabs-panel-header-before {
+    justify-content: flex-start;
+  }
+
+  &.vek-tabs-panel-header-after {
+    justify-content: flex-end;
+  }
+}

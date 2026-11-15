@@ -1,0 +1,22 @@
+﻿<VekTreeView T="string" @bind-SelectedValue="SelectedValue" SelectionMode="SelectionMode.ToggleSelection">
+    <VekTreeViewItem Value='"content"' Class="parent-item" ReadOnly="ParentItemReadOnly" Disabled="ParentItemDisabled">
+        <VekTreeViewItem Value='"logo.png"' />
+        <VekTreeViewItem Value='"Vek.svg"' />
+        <VekTreeViewItem Value='"Nuget.png"' />
+    </VekTreeViewItem>
+</VekTreeView>
+
+<p class="selected-value">
+    @SelectedValue
+</p>
+
+@code {
+    [Parameter] 
+    public bool ParentItemDisabled { get; set; }
+
+    [Parameter] 
+    public bool ParentItemReadOnly { get; set; }
+
+    [Parameter] 
+    public string? SelectedValue { get; set; }
+}

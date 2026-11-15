@@ -1,0 +1,14 @@
+﻿<VekForm ValidationDelay="0">
+    <VekTextField T="string" Required="true" RequiredError="Enter a star" Validation="@Validation"></VekTextField>
+    <VekSelect T="string" Required="false" >
+        <VekSelectItem T="string" Value="@("foo")" />
+        <VekSelectItem T="string" Value="@("bar")" />
+    </VekSelect>
+</VekForm>
+
+@code {
+    public static string __description__ = "Form should become valid as soon as all required fields are filled in correctly.";
+
+    [Parameter]
+    public object? Validation { get; set; }
+}

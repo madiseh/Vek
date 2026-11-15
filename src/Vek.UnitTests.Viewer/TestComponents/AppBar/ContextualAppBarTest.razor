@@ -1,0 +1,26 @@
+﻿<VekAppBar Color="Color.Primary" Fixed="false" Contextual="IsContextual" id="regular-app-bar">
+    <VekIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
+    <VekSpacer />
+    <VekText Typo="Typo.h6">Regular</VekText>
+    <VekSpacer />
+    <VekIconButton Icon="@Icons.Material.Filled.DarkMode" Color="Color.Inherit"/>
+</VekAppBar>
+
+<VekContextualActionBar Color="Color.Tertiary" Fixed="false" Visible="_visible" id="contextual-app-bar">
+    <VekIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Inherit" Edge="Edge.Start" OnClick="@(() => _visible = false)" />
+    <VekSpacer />
+    <VekText Class="pl-8" Typo="Typo.h6">Contextual</VekText>
+    <VekSpacer />
+    <VekIconButton Icon="@Icons.Material.Filled.LightMode" Color="Color.Inherit" />
+</VekContextualActionBar>
+
+<VekSwitch Class="pt-8" @bind-Value="_visible" />
+
+@code {
+    public static string __description__ = "App bar should change when toggled";
+
+    private bool _visible;
+
+    [Parameter]
+    public bool IsContextual { get; set; } = true;
+}

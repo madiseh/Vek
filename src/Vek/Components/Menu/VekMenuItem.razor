@@ -1,0 +1,39 @@
+﻿@namespace Vek
+@inherits VekComponentBase
+
+@{
+    OpenRow(__builder);
+    RenderContent(__builder);
+    __builder.CloseElement();
+}
+
+@code {
+    private void RenderContent(RenderTreeBuilder __builder)
+    {
+        @if (!string.IsNullOrWhiteSpace(Icon))
+        {
+            <VekIcon Class="vek-menu-item-icon"
+                     Icon="@Icon"
+                     Color="IconColor"
+                     Disabled="GetDisabled()" />
+        }
+
+        <p class="@TextClassname">
+            @if (ChildContent is null)
+            {
+                @Label
+            }
+            else
+            {
+                @ChildContent
+            }
+        </p>
+
+        @if (ActivatesSubMenu && !HideSubMenuArrow)
+        {
+            <VekIcon Class="vek-menu-submenu-icon"
+                     Icon="@(RightToLeft ? Icons.Material.Filled.ArrowLeft : Icons.Material.Filled.ArrowRight)"
+                     Disabled="GetDisabled()" />
+        }
+    }
+}

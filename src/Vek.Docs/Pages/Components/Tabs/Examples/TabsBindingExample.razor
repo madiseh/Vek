@@ -1,0 +1,14 @@
+﻿@namespace Vek.Docs.Examples
+
+
+<VekTabs Elevation="0" Outlined="true" @bind-ActivePanelIndex="activeIndex">
+    <VekTabPanel Text="Item One" ID='"pn_one"'></VekTabPanel>
+    <VekTabPanel Text="Item Two" ID='"pn_two"'></VekTabPanel>
+    <VekTabPanel Text="Item Three" ID='"pn_three"'></VekTabPanel>
+</VekTabs>
+<VekText>@($"Active Index: {activeIndex}")</VekText>
+
+@code
+{ 
+    int activeIndex = 2;
+}

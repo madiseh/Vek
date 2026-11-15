@@ -1,0 +1,36 @@
+﻿
+<VekPaper Height="200px" Style="overflow:hidden; position:relative;">
+    <VekDrawerContainer Class="vek-height-full">
+        <VekDrawer @bind-Open="@_open" Elevation="0" Variant="@DrawerVariant.Persistent" Color="Color.Primary">
+            <VekDrawerHeader>
+                <VekText Typo="Typo.h6">My App</VekText>
+            </VekDrawerHeader>
+            <VekPaper Height="2000px" Square="true">
+                <VekSelect Style="margin-top:100px;" T="string" Label="Coffee" AnchorOrigin="Origin.BottomLeft">
+                    <VekSelectItem Value="@("Cappuccino")" />
+                    <VekSelectItem Value="@("Cafe Latte")" />
+                    <VekSelectItem Value="@("Espresso")" />
+                </VekSelect>
+                <VekNavMenu>
+                    <VekNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" IconColor="Color.Inherit">Dashboard</VekNavLink>
+                    <VekNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.LocalLibrary" IconColor="Color.Inherit">Library</VekNavLink>
+                    <VekNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.People" IconColor="Color.Inherit">Community</VekNavLink>
+                </VekNavMenu>
+            </VekPaper>
+        </VekDrawer>
+        <div class="d-flex justify-center align-center vek-height-full">
+            <VekButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@ToggleDrawer">Persistent drawer</VekButton>
+        </div>
+    </VekDrawerContainer>
+</VekPaper>
+
+@code {
+    public static string __description__ = "A VekSelect inside a Drawer that stays fixed when scrolled";
+
+    private bool _open = false;
+
+    private void ToggleDrawer()
+    {
+        _open = !_open;
+    }
+}

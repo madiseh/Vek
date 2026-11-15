@@ -1,0 +1,10 @@
+﻿<VekPopoverProvider />
+
+<VekTooltip Text="My TooltipContent" Inline="@Inline">
+    <VekButton>My Button</VekButton>
+</VekTooltip>
+
+@code {
+    [Parameter]
+    public bool Inline { get; set; } = true;
+}

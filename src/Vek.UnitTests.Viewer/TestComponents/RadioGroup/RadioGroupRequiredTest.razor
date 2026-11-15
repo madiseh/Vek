@@ -1,0 +1,16 @@
+﻿<VekRadioGroup T="bool"
+               Required="@Required">
+    <VekRadio Value="@true">
+        True
+    </VekRadio>
+    <VekRadio Value="@false">
+        False
+    </VekRadio>
+</VekRadioGroup>
+
+@code {
+    public static string __description__ = "Required RadioGroup should have aria-required attributes.";
+
+    [Parameter]
+    public bool Required { get; set; }
+}

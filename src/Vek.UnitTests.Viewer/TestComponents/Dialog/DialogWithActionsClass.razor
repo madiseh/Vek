@@ -1,0 +1,14 @@
+﻿<VekDialog ActionsClass="@ActionsClass">
+    <DialogContent>
+    </DialogContent>
+    <DialogActions>
+    </DialogActions>
+</VekDialog>
+
+@code {
+    [CascadingParameter]
+    private IVekDialogInstance VekDialog { get; set; } = null!;
+
+    [Parameter]
+    public string ActionsClass { get; set; } = string.Empty;
+}

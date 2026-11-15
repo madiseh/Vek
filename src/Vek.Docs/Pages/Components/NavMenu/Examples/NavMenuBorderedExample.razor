@@ -1,0 +1,14 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekPaper Width="250px" Elevation="0" Class="py-3">
+    <VekNavMenu Bordered="true">
+        <VekNavLink Href="/dashboard">Dashboard</VekNavLink>
+        <VekNavLink Match="NavLinkMatch.Prefix" Href="/components/navmenu">Servers</VekNavLink>
+        <VekNavLink Href="/billing" Disabled="true">Billing</VekNavLink>
+        <VekNavGroup Title="Settings" Expanded="true">
+            <VekNavLink Href="/users">Users</VekNavLink>
+            <VekNavLink Href="/security">Security</VekNavLink>
+        </VekNavGroup>
+        <VekNavLink Href="/about">About</VekNavLink>
+    </VekNavMenu>
+</VekPaper>

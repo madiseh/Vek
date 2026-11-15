@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="VEK0002Description" xml:space="preserve">
+    <value>This is not a component parameter, it could be an attribute.</value>
+  </data>
+  <data name="VEK0002Title" xml:space="preserve">
+    <value>Unknown Vek attribute/parameter</value>
+  </data>
+  <data name="HelpLinkUrl" xml:space="preserve">
+    <value>https://github.com/madiseh/vekfeatures/analyzers</value>
+  </data>
+  <data name="VEK0002MessageFormat" xml:space="preserve">
+    <value>Illegal Attribute '{0}' on '{1}' using pattern '{2}' source location '{3}'{4}</value>
+    <comment>{4} is the migration hint for a parameter a past major version removed. It is empty for every other attribute, and each hint supplies its own leading space.</comment>
+  </data>
+  <data name="VEK0002MigrationHintRename" xml:space="preserve">
+    <value> '{0}' was removed in {1} and replaced by '{2}', which takes the same value. See {3}</value>
+    <comment>{0} is the removed parameter, {1} the major version that removed it such as v7, {2} the replacement parameter, and {3} a link. Keep the leading space.</comment>
+  </data>
+  <data name="VEK0002MigrationHintInversion" xml:space="preserve">
+    <value> '{0}' was removed in {1} and replaced by '{2}', which inverts the value: {0}="true" becomes {2}="false", {0}="false" becomes {2}="true", and {0}="@expression" becomes {2}="@(!expression)". See {3}</value>
+    <comment>{0} is the removed parameter, {1} the major version that removed it such as v7, {2} the replacement parameter, and {3} a link. Keep the markup examples and the leading space as they are.</comment>
+  </data>
+  <data name="VEK0002MigrationHintInversionWithNewDefault" xml:space="preserve">
+    <value> '{0}' was removed in {1} and replaced by '{2}', which inverts the value: {0}="true" becomes {2}="false", {0}="false" becomes {2}="true", and {0}="@expression" becomes {2}="@(!expression)". The default changed as well, so a {3} that never set '{0}' now needs {2}="true" to keep its old behavior. See {4}</value>
+    <comment>{0} is the removed parameter, {1} the major version that removed it such as v7, {2} the replacement parameter, {3} the component name, and {4} a link. Keep the markup examples and the leading space as they are.</comment>
+  </data>
+  <data name="VEK0002MigrationHintInheritedInversion" xml:space="preserve">
+    <value> '{0}' was removed in {1} and replaced by '{2}', which inverts the value: {0}="true" becomes {2}="false", and {0}="@expression" becomes {2}="@(expression ? false : null)". For {0}="false", leave '{2}' unset so it follows the parent {3}, because {2}="true" now overrides the parent. See {4}</value>
+    <comment>{0} is the removed parameter, {1} the major version that removed it such as v7, {2} the replacement parameter, {3} the parent component name, and {4} a link. Keep the markup examples and the leading space as they are.</comment>
+  </data>
+  <data name="VEK0002MigrationHintBinding" xml:space="preserve">
+    <value> '{0}' was removed in {1} and replaced by '{2}', which takes the same value. Its partner '{3}' became '{4}', so @bind-{5} becomes @bind-{6}. See {7}</value>
+    <comment>{0} is the removed parameter and {2} its replacement, {1} the major version that removed it such as v7, {3} and {4} the other half of the two-way binding before and after, {5} and {6} the bound value before and after, and {7} a link. Keep the leading space.</comment>
+  </data>
+  <data name="VEK0002MigrationHintInitialState" xml:space="preserve">
+    <value> '{0}' was removed in {1} and replaced by '{2}': {0}="true" becomes {2}="true". '{2}' holds the current state rather than a starting value, so merge it with any existing {2} or @bind-{2} instead of adding a second attribute. See {3}</value>
+    <comment>{0} is the removed parameter, {1} the major version that removed it such as v7, {2} the replacement parameter, and {3} a link. Keep the leading space.</comment>
+  </data>
+  <data name="VEK0002MigrationHintLabelPosition" xml:space="preserve">
+    <value> 'LabelPosition' was removed in v8 and replaced by 'LabelPlacement', which takes a Placement instead of a LabelPosition: LabelPosition="LabelPosition.Start" becomes LabelPlacement="Placement.Start", and LabelPosition="LabelPosition.End" becomes LabelPlacement="Placement.End". An expression has to produce a Placement instead. See https://github.com/madiseh/vek/discussions/12659</value>
+  </data>
+  <data name="VEK0002MigrationHintVekAlertAlertTextPosition" xml:space="preserve">
+    <value> 'AlertTextPosition' was removed in v7 and replaced by 'ContentAlignment', which takes a HorizontalAlignment with the same member names instead of an AlertTextPosition: AlertTextPosition="AlertTextPosition.Center" becomes ContentAlignment="HorizontalAlignment.Center". An expression has to produce a HorizontalAlignment instead. See https://github.com/madiseh/vek/discussions/12658</value>
+  </data>
+  <data name="VEK0002MigrationHintVekRadioPlacement" xml:space="preserve">
+    <value> 'Placement' was removed in v8 and replaced by 'LabelPlacement', which takes the same Placement value. Placement.Left and Placement.Right no longer swap sides in right-to-left layouts, so use Placement.Start or Placement.End there. See https://github.com/madiseh/vek/discussions/12659</value>
+  </data>
+  <data name="VEK0002MigrationHintVekAutocompleteSearchFuncWithCancel" xml:space="preserve">
+    <value> 'SearchFuncWithCancel' was removed in v7 and replaced by 'SearchFunc', which now takes the same cancellable delegate: SearchFuncWithCancel="Search" becomes SearchFunc="Search". Remove any old SearchFunc that has no CancellationToken parameter, because SearchFunc no longer accepts that signature. See https://github.com/madiseh/vek/discussions/12658</value>
+  </data>
+  <data name="VEK0002MigrationHintVekBaseInputOnKeyPress" xml:space="preserve">
+    <value> 'OnKeyPress' was removed in v7. Use 'OnKeyDown', which receives the same KeyboardEventArgs but also fires for keys that type no character, such as Tab, Shift, and the arrow keys, so check the key in the handler. See https://github.com/madiseh/vek/discussions/12658</value>
+  </data>
+  <data name="VEK0002MigrationHintVekInputAutoGrow" xml:space="preserve">
+    <value> 'AutoGrow' was removed in v9 and replaced by 'Sizing': AutoGrow="true" becomes Sizing="InputSizing.Auto", AutoGrow="false" becomes Sizing="InputSizing.Fixed", and AutoGrow="@expression" becomes Sizing="@(expression ? InputSizing.Auto : InputSizing.Fixed)". Lines and MaxLines keep their meaning. See https://github.com/madiseh/vekfeatures/analyzers#migration-hints</value>
+  </data>
+  <data name="VEK0002MigrationHintVekSelectOnClose" xml:space="preserve">
+    <value> 'OnClose' was removed in v9. Use 'OpenChanged', which receives true when the list opens and false when it closes: OnClose="Handler" becomes OpenChanged="@(open =&gt; { if (!open) Handler(); })", or OpenChanged="@(async open =&gt; { if (!open) await Handler(); })" when Handler returns a Task. It is raised only when the open state actually changes, and a component that also used OnOpen needs a single OpenChanged handler for both. See https://github.com/madiseh/vekfeatures/analyzers#migration-hints</value>
+  </data>
+  <data name="VEK0002MigrationHintVekSelectOnOpen" xml:space="preserve">
+    <value> 'OnOpen' was removed in v9. Use 'OpenChanged', which receives true when the list opens and false when it closes: OnOpen="Handler" becomes OpenChanged="@(open =&gt; { if (open) Handler(); })", or OpenChanged="@(async open =&gt; { if (open) await Handler(); })" when Handler returns a Task. It is raised only when the open state actually changes. See https://github.com/madiseh/vekfeatures/analyzers#migration-hints</value>
+  </data>
+  <data name="VEK0002MigrationHintVekTablePagerDisableRowsPerPage" xml:space="preserve">
+    <value> 'DisableRowsPerPage' was removed in v7 and replaced by 'HideRowsPerPage', which keeps the same value: DisableRowsPerPage="true" becomes HideRowsPerPage="true". Do not invert it; that only applies to VekDataGridPager. See https://github.com/madiseh/vekfeatures/analyzers#migration-hints</value>
+  </data>
+  <data name="VEK0002MigrationHintVekTabsPanelClass" xml:space="preserve">
+    <value> 'PanelClass' was removed in v9 and replaced by 'TabPanelsClass', which takes the same value and still styles the wrapper around all panels. VekTabPanel's own PanelClass is a different parameter that styles one panel. See https://github.com/madiseh/vek/issues/12666</value>
+  </data>
+  <data name="VEK0002MigrationHintVekTabsTabPanelClass" xml:space="preserve">
+    <value> 'TabPanelClass' was removed in v9 and replaced by 'TabButtonsClass', which takes the same value and still styles each tab button. TabPanelsClass and VekTabPanel's PanelClass style the panels instead. See https://github.com/madiseh/vek/issues/12666</value>
+  </data>
+  <data name="VEK0002MigrationHintVekTextFieldAutoGrow" xml:space="preserve">
+    <value> 'AutoGrow' was removed in v9 and replaced by 'Sizing': AutoGrow="true" becomes Sizing="InputSizing.Auto", AutoGrow="false" becomes Sizing="InputSizing.Fixed", and AutoGrow="@expression" becomes Sizing="@(expression ? InputSizing.Auto : InputSizing.Fixed)". Lines and MaxLines keep their meaning, and a masked VekTextField ignores Sizing just as it ignored AutoGrow. See https://github.com/madiseh/vekfeatures/analyzers#migration-hints</value>
+  </data>
+  <data name="VEK0002MigrationHintVekTooltipDelayed" xml:space="preserve">
+    <value> 'Delayed' was removed in v7 and replaced by 'Delay', which is in milliseconds instead of seconds: Delayed="0.5" becomes Delay="500", and Delayed="@seconds" becomes Delay="@(seconds * 1000)". See https://github.com/madiseh/vekfeatures/analyzers#migration-hints</value>
+  </data>
+  <data name="VEK0002MigrationHintVekTreeViewItemExpandedIcon" xml:space="preserve">
+    <value> 'ExpandedIcon' was removed in v7 and replaced by 'ExpandButtonIcon', which takes the same value and still sets the expand button's icon. It is not IconExpanded, which replaces the item's own icon while the item is expanded. See https://github.com/madiseh/vek/discussions/12658</value>
+  </data>
+  <data name="VEK0010Title" xml:space="preserve">
+    <value>Reading ParameterState property</value>
+  </data>
+  <data name="VEK0010Description" xml:space="preserve">
+    <value>Reading a parameter state property is not allowed.</value>
+  </data>
+  <data name="VEK0010MessageFormat" xml:space="preserve">
+    <value>Reading '{0}' parameter state property is not allowed. Use the backing ParameterState&lt;{1}&gt;.Value instance instead.</value>
+  </data>
+  <data name="VEK0011Title" xml:space="preserve">
+    <value>Writing to ParameterState property</value>
+  </data>
+  <data name="VEK0011Description" xml:space="preserve">
+    <value>Writing to a parameter state property is not allowed.</value>
+  </data>
+  <data name="VEK0011MessageFormat" xml:space="preserve">
+    <value>Writing to '{0}' parameter state property is not allowed. Use the backing ParameterState&lt;{1}&gt;.SetValueAsync instead.</value>
+  </data>
+  <data name="VEK0012Title" xml:space="preserve">
+    <value>External access of ParameterState property</value>
+  </data>
+  <data name="VEK0012Description" xml:space="preserve">
+    <value>External access of a parameter state property is not allowed.</value>
+  </data>
+  <data name="VEK0012MessageFormat" xml:space="preserve">
+    <value>External access of '{0}' parameter state property is not allowed. Use GetState(x =&gt; x.{0}) instead.</value>
+  </data>
+</root>

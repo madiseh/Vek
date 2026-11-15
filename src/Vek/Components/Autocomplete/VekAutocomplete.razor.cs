@@ -1,0 +1,1451 @@
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.Logging;
+using Vek.Utilities;
+
+namespace Vek
+{
+    /// <summary>
+    /// A text input for searching and selecting from a list of options. Unlike <see cref="VekSelect{T}"/>, it doesn't require the complete item list upfront and supports asynchronous search for database queries.
+    /// </summary>
+    /// <typeparam name="T">The type of item to search.</typeparam>
+    /// <seealso cref="VekSelect{T}"/>
+    public partial class VekAutocomplete<T> : VekBaseInput<T>
+    {
+        /// <summary>
+        /// We need a random id for the year items in the year list so we can scroll to the item safely in every DatePicker.
+        /// </summary>
+        private readonly string _componentId = Identifier.Create();
+        private readonly string _listboxId = Identifier.Create("listbox");
+
+        private bool _isCleared;
+        private bool _isProcessingValue;
+        private bool _skipNextEnterKeyUp;
+        private int _selectedListItemIndex;
+        private readonly int _elementKey = 0;
+        private int _returnedItemsCount;
+        private bool _open;
+        private bool _opening;
+        private bool _isValueCoerced;
+        private VekInput<string> _elementReference = null!;
+        private CancellationTokenSource? _cancellationTokenSrc;
+        private Task? _currentSearchTask;
+        private int _searchVersion;
+        private ITimer? _debounceTimer;
+        private T[]? _items;
+        private bool[] _itemDisabled = [];
+        private List<int> _enabledItemIndices = [];
+        private bool _handleNextFocus;
+
+        [Inject]
+        private IScrollManager ScrollManager { get; set; } = null!;
+
+        [Inject]
+        private IPopoverService PopoverService { get; set; } = null!;
+
+        [Inject]
+        private TimeProvider TimeProvider { get; set; } = null!;
+
+        protected string Classname =>
+            new CssBuilder("vek-select")
+                .AddClass(Class)
+                .Build();
+
+        protected string InputClassname =>
+            new CssBuilder("vek-select-input")
+                .AddClass("vek-readonly", GetReadOnlyState())
+                .AddClass(InputClass)
+                .Build();
+
+        protected string AutocompleteClassname =>
+            new CssBuilder("vek-select")
+                .AddClass("vek-autocomplete")
+                .AddClass("vek-width-full", FullWidth)
+                .AddClass("vek-autocomplete--with-progress", ShowProgressIndicator && IsLoading)
+                .AddClass(OuterClass)
+                .Build();
+
+        protected string CircularProgressClassname =>
+            new CssBuilder("progress-indicator-circular")
+                .AddClass("progress-indicator-circular--with-adornment", Adornment == Adornment.End)
+                .Build();
+
+        protected string GetListItemClassname(bool isSelected) =>
+            new CssBuilder()
+                .AddClass("vek-selected-item vek-primary-text vek-primary-hover", isSelected)
+                .AddClass(ListItemClass)
+                .Build();
+
+        /// <summary>
+        /// The CSS classes applied to the outer <c>div</c>.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.  Multiple classes must be separated by spaces.
+        /// </remarks>
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        [Parameter]
+        public string? OuterClass { get; set; }
+        /// <summary>
+        /// Input's classnames, separated by space.
+        /// </summary>
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        [Parameter]
+        public string? InputClass { get; set; }
+
+        /// <summary>
+        /// The CSS classes applied to the popover.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.  You can use spaces to separate multiple classes.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListAppearance)]
+        public string? PopoverClass { get; set; }
+
+        /// <summary>
+        /// The CSS classes applied to the internal list.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.  You can use spaces to separate multiple classes.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListAppearance)]
+        public string? ListClass { get; set; }
+
+        /// <summary>
+        /// The CSS classes applied to internal list items.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.  You can use spaces to separate multiple classes.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListAppearance)]
+        public string? ListItemClass { get; set; }
+
+        /// <summary>
+        /// The location where the popover will open from.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Origin.BottomLeft" />.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListAppearance)]
+        public Origin AnchorOrigin { get; set; } = Origin.BottomLeft;
+
+        /// <summary>
+        /// The transform origin point for the popover.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Origin.TopLeft"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListAppearance)]
+        public Origin TransformOrigin { get; set; } = Origin.TopLeft;
+
+        /// <summary>
+        /// Uses compact padding.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListAppearance)]
+        public bool Dense { get; set; }
+
+        /// <summary>
+        /// The "open" Autocomplete icon.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Icons.Material.Filled.ArrowDropDown"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string OpenIcon { get; set; } = Icons.Material.Filled.ArrowDropDown;
+
+        /// <summary>
+        /// The "close" Autocomplete icon.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Icons.Material.Filled.ArrowDropDown"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string CloseIcon { get; set; } = Icons.Material.Filled.ArrowDropUp;
+
+        /// <summary>
+        /// The maximum height, in pixels, of the Autocomplete when it is open.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>300</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListAppearance)]
+        public int MaxHeight { get; set; } = 300;
+
+        /// <summary>
+        /// The function used to get the display text for each item.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to the <c>ToString()</c> method of items.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListBehavior)]
+        public Func<T?, string?>? ToStringFunc { get; set; }
+
+        /// <summary>
+        /// Shows the progress indicator during searches.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.  The progress indicator uses the color specified in the <see cref="ProgressIndicatorColor"/> property.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool ShowProgressIndicator { get; set; }
+
+        /// <summary>
+        /// The color of the progress indicator.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Color.Default"/>.  This property is used when <see cref="ShowProgressIndicator"/> is <c>true</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public Color ProgressIndicatorColor { get; set; } = Color.Default;
+
+        /// <summary>
+        /// The function used to search for items.
+        /// </summary>
+        /// <remarks>
+        /// This function searches for items containing the specified <c>string</c> value, and returns items which match up to the <see cref="MaxItems"/> property.  You can use the provided <see cref="CancellationToken"/> which is marked as canceled when the user changes the search text or selects a value from the list.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListBehavior)]
+        public Func<string?, CancellationToken, Task<IEnumerable<T>>?>? SearchFunc { get; set; }
+
+        /// <summary>
+        /// The maximum number of items to display.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>10</c>.  A value of <c>null</c> will display all items.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListBehavior)]
+        public int? MaxItems { get; set; } = 10;
+
+        /// <summary>
+        /// The minimum number of characters typed to initiate a search.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>0</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public int MinCharacters { get; set; } = 0;
+
+        /// <summary>
+        /// Reset the selected value if the user deletes the text.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool ResetValueOnEmptyText { get; set; }
+
+        /// <summary>
+        /// Highlights the text when the component receives focus.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>.
+        /// Previously known as <c>SelectOnClick</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool SelectOnActivation { get; set; } = true;
+
+        /// <summary>
+        /// Selects items without resetting the <c>Value</c>.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>.  When <c>true</c>, selecting an option will trigger a <see cref="SearchFunc"/> with the current Text.  Otherwise, an empty string is passed which can make it easier to view and select other options without resetting the Value. When <c>false</c>, <c>T</c> must either be a <c>record</c> or override the <c>GetHashCode</c> and <c>Equals</c> methods.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool Strict { get; set; } = true;
+
+        /// <summary>
+        /// The debounce interval, in milliseconds.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>100</c>.  A higher value can help reduce the number of calls to <see cref="SearchFunc"/>, which can improve responsiveness.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public int DebounceInterval { get; set; } = 100;
+
+        /// <summary>
+        /// Occurs when the <see cref="DebounceInterval"/> has elapsed.
+        /// </summary>
+        /// <remarks>
+        /// The current value of <see cref="VekBaseInput{T}.Text"/> is included in this event.
+        /// </remarks>
+        [Parameter]
+        public EventCallback<string> OnDebounceIntervalElapsed { get; set; }
+
+        /// <summary>
+        /// The custom template used to display unselected items.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.  Use the <see cref="ItemSelectedTemplate"/> property to control the display of selected items.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListBehavior)]
+        public RenderFragment<T>? ItemTemplate { get; set; }
+
+        /// <summary>
+        /// The custom template used to display selected items.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.  Use the <see cref="ItemTemplate"/> property to control the display of unselected items.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListBehavior)]
+        public RenderFragment<T>? ItemSelectedTemplate { get; set; }
+
+        /// <summary>
+        /// The custom template used to display disabled items.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListBehavior)]
+        public RenderFragment<T>? ItemDisabledTemplate { get; set; }
+
+        /// <summary>
+        /// The custom template used when the number of items returned by <see cref="SearchFunc"/> is more than the value of the <see cref="MaxItems"/> property.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListBehavior)]
+        public RenderFragment? MoreItemsTemplate { get; set; }
+
+        /// <summary>
+        /// The custom template used when no items are returned by <see cref="SearchFunc"/>.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListBehavior)]
+        public RenderFragment? NoItemsTemplate { get; set; }
+
+        /// <summary>
+        /// The custom template shown above the list of items, if <see cref="SearchFunc"/> returns items to display.  Otherwise, the fragment is hidden.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.  Use the <see cref="AfterItemsTemplate"/> property to control content displayed below items.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListBehavior)]
+        public RenderFragment? BeforeItemsTemplate { get; set; }
+
+        /// <summary>
+        /// The custom template shown below the list of items, if <see cref="SearchFunc"/> returns items to display.  Otherwise, the fragment is hidden.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.  Use the <see cref="BeforeItemsTemplate"/> property to control content displayed above items.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListBehavior)]
+        public RenderFragment? AfterItemsTemplate { get; set; }
+
+        /// <summary>
+        /// The custom template used for the progress indicator when <see cref="ShowProgressIndicator"/> is <c>true</c>.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.  Use the <see cref="ProgressIndicatorInPopoverTemplate"/> property to control content displayed for the progress indicator inside the popover.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListBehavior)]
+        public RenderFragment? ProgressIndicatorTemplate { get; set; }
+
+        /// <summary>
+        /// The custom template used for the progress indicator inside the popover when <see cref="ShowProgressIndicator"/> is <c>true</c>.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.  Use the <see cref="ProgressIndicatorTemplate"/> property to control content displayed for the progress indicator.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListBehavior)]
+        public RenderFragment? ProgressIndicatorInPopoverTemplate { get; set; }
+
+        /// <summary>
+        /// Prevents interaction with background elements while this list is open.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="PopoverOptions.ModalOverlay" />.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListBehavior)]
+        public bool? Modal { get; set; }
+
+        /// <summary>
+        /// Gets the resolved modal overlay value, using the global default from <see cref="PopoverOptions"/> if not explicitly set.
+        /// </summary>
+        protected bool GetModal() => Modal ?? PopoverService.PopoverOptions.ModalOverlay;
+
+        /// <summary>
+        /// Determines the width of this Popover dropdown in relation to the parent container.
+        /// </summary>
+        /// <remarks>
+        /// <para>Defaults to <see cref="DropdownWidth.Relative" />. </para>
+        /// <para>When <see cref="DropdownWidth.Relative" />, restricts the max-width of the component to the width of the parent container</para>
+        /// <para>When <see cref="DropdownWidth.Adaptive" />, restricts the min-width of the component to the width of the parent container</para>
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Popover.Appearance)]
+        public DropdownWidth RelativeWidth { get; set; } = DropdownWidth.Relative;
+
+        /// <summary>
+        /// Overrides the <c>Text</c> property when an item is selected.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>.  When <c>true</c>, selecting a value will update the Text property.  When <c>false</c>, incomplete values for Text are allowed.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool CoerceText { get; set; } = true;
+
+        /// <summary>
+        /// Sets the <c>Value</c> property even if no match is found by <see cref="SearchFunc"/>.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.  When <c>true</c>, the user input will be applied to the Value property which allows it to be validated and show an error message.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool CoerceValue { get; set; }
+
+        /// <summary>
+        /// Displays the dropdown popover in a fixed position, even while scrolling.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Category(CategoryTypes.Popover.Behavior)]
+        [Parameter]
+        public bool PopoverFixed { get; set; }
+
+        /// <summary>
+        /// The function used to determine if an item should be disabled.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListBehavior)]
+        public Func<T, bool>? ItemDisabledFunc { get; set; }
+
+        /// <summary>
+        /// Occurs when the <see cref="Open"/> property has changed.
+        /// </summary>
+        [Parameter]
+        public EventCallback<bool> OpenChanged { get; set; }
+
+        /// <summary>
+        /// Updates the Value to the currently selected item when pressing the Tab key.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListBehavior)]
+        public bool SelectValueOnTab { get; set; }
+
+        /// <summary>
+        /// Additionally, opens the list when focus is received on the input element; otherwise only opens on click.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListBehavior)]
+        public bool OpenOnFocus { get; set; } = true;
+
+        /// <summary>
+        /// Displays the Clear icon button.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.  When <c>true</c>, an icon is displayed which, when clicked, clears the Text and Value.  Use the <c>ClearIcon</c> property to control the Clear button icon.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool Clearable { get; set; }
+
+        /// <summary>
+        /// Custom clear icon when <see cref="Clearable"/> is enabled.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string ClearIcon { get; set; } = Icons.Material.Filled.Clear;
+
+        /// <summary>
+        /// Occurs when the Clear button has been clicked.
+        /// </summary>
+        /// <remarks>
+        /// The Text and Value properties will be blank when this callback occurs.
+        /// </remarks>
+        [Parameter]
+        public EventCallback<MouseEventArgs> OnClearButtonClick { get; set; }
+
+        /// <summary>
+        /// Occurs when the number of items returned by <see cref="SearchFunc"/> has changed.
+        /// </summary>
+        /// <remarks>
+        /// The number of items returned determines when custom templates are shown.  If the number is <c>0</c>, <see cref="NoItemsTemplate"/> will be shown. If the number is beyond <see cref="MaxItems"/>, <see cref="MoreItemsTemplate"/> will be shown.
+        /// </remarks>
+        [Parameter]
+        public EventCallback<int> ReturnedItemsCountChanged { get; set; }
+
+        /// <summary>
+        /// Prevents scrolling while the dropdown is open.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListBehavior)]
+        public bool LockScroll { get; set; }
+
+        /// <summary>
+        /// Displays the search result drop-down.
+        /// </summary>
+        /// <remarks>
+        /// When this property changes, the <see cref="OpenChanged"/> event will occur.
+        /// </remarks>
+        public bool Open
+        {
+            get => _open;
+            // Note: the setter is protected because it was needed by a user who derived his own autocomplete from this class.
+            // Note: setting Open will not open or close it. Use ToggleAsync() for that.
+            protected set
+            {
+                if (_open == value)
+                    return;
+                _open = value;
+
+                OpenChanged.InvokeAsync(_open).CatchAndLog();
+            }
+        }
+
+        private bool IsLoading => _currentSearchTask is { IsCompleted: false };
+
+        private string CurrentIcon
+        {
+            get
+            {
+                if (!string.IsNullOrWhiteSpace(AdornmentIcon))
+                {
+                    return AdornmentIcon;
+                }
+
+                return _open ? CloseIcon : OpenIcon;
+            }
+        }
+
+        /// <summary>
+        /// Returns a value for the <c>autocomplete</c> attribute, either supplied by default or the one specified in the attribute overrides.
+        /// </summary>
+        protected object? GetAutocomplete() => UserAttributes.GetValueOrDefault("autocomplete", "off");
+
+        public VekAutocomplete()
+        {
+            Adornment = Adornment.End;
+            IconSize = Size.Medium;
+            Immediate = true;
+        }
+
+        /// <summary>
+        /// Changes the currently selected item to the specified value.
+        /// </summary>
+        /// <param name="value">The value to set.</param>
+        public async Task SelectOptionAsync(T value)
+        {
+            _isProcessingValue = true;
+            try
+            {
+                // A search still running for the typed text must not reopen the menu after the selection.
+                AbandonSearch();
+                // A pending debounce must stop before ValueChanged is awaited, because it can fire while an async handler runs.
+                _debounceTimer?.Dispose();
+
+                // #1 needs to close before SetValueAndUpdateTextAsync so that whatever the user puts in ValueChanged can run without the popover being in front of it
+                // #2 Use "Open" field instead of property to prevent raising multiple OpenChanged events while selecting item.
+                _open = false;
+
+                await SetValueAndUpdateTextAsync(value);
+
+                // needs to be open to run the rest of the code
+                _open = true;
+
+                if (_items != null)
+                    _selectedListItemIndex = Array.IndexOf(_items, value);
+
+                var optionText = GetItemString(value);
+
+                if (!_isCleared)
+                    await SetTextAndUpdateValueAsync(optionText, false);
+
+                _debounceTimer?.Dispose();
+
+                await BeginValidateAsync();
+
+                if (!_isCleared)
+                {
+                    await _elementReference.SetText(optionText);
+                }
+
+                Open = false;
+                StateHasChanged();
+            }
+            finally
+            {
+                _isProcessingValue = false;
+            }
+        }
+
+        protected override async Task OnInitializedAsync()
+        {
+            await base.OnInitializedAsync();
+            var text = GetItemString(ReadValue);
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                await SetTextCoreAsync(text);
+            }
+        }
+
+        protected override void OnAfterRender(bool firstRender)
+        {
+            if (_elementReference.IsClearing || _isProcessingValue)
+            {
+                //When you select a value in the popover, SelectOptionAsync will be called.
+                //When it reaches SetValueAsync, it will be awaited.
+                //Meanwhile, in parallel, the ClearAsync method will be called, which sets isCleared to true.
+                //However, by the time SetValueAsync is released and SelectOptionAsync continues its execution, an OnAfterRender event might fire, setting isCleared back to false.
+                //This can result in a race condition.
+                //https://github.com/madiseh/vek/pull/6701
+                base.OnAfterRender(firstRender);
+                return;
+            }
+
+            _isCleared = false;
+
+            base.OnAfterRender(firstRender);
+        }
+
+        protected override Task UpdateTextPropertyAsync(bool updateValue)
+        {
+            // This keeps the text from being set when ClearAsync() was called
+            if (_isCleared)
+                return Task.CompletedTask;
+
+            return base.UpdateTextPropertyAsync(updateValue);
+        }
+
+        protected override async Task UpdateValuePropertyAsync(bool updateText)
+        {
+            _debounceTimer?.Dispose();
+
+            if (ResetValueOnEmptyText && string.IsNullOrWhiteSpace(ReadText))
+                await SetValueAndUpdateTextAsync(default(T), updateText);
+            else if (Immediate)
+                await CoerceValueToTextAsync();
+
+            if (_elementReference?.IsClearing == true)
+                return;
+
+            if (DebounceInterval <= 0)
+                await OpenMenuAsync();
+            else
+                _debounceTimer = TimeProvider.CreateTimer(OnDebounceComplete, null, TimeSpan.FromMilliseconds(DebounceInterval), Timeout.InfiniteTimeSpan);
+        }
+
+        private void OnDebounceComplete(object? stateInfo)
+            => InvokeAsync(async () =>
+            {
+                await OnDebounceIntervalElapsed.InvokeAsync(ReadText);
+                await OpenMenuAsync();
+            });
+
+        private void CancelToken()
+        {
+            // Swap in a fresh source before cancelling so the next search never observes the cancelled one.
+            // The previous source must be disposed or it leaks along with its registrations on every search.
+            var previous = _cancellationTokenSrc;
+            _cancellationTokenSrc = new CancellationTokenSource();
+            try
+            {
+                previous?.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Already disposed, such as when the component was disposed mid-search.
+            }
+            finally
+            {
+                previous?.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Stops a running search from replacing the items or reopening the menu when it finishes.
+        /// </summary>
+        private void AbandonSearch()
+        {
+            // Bump the version before cancelling, because a search that observes its token can resume inside Cancel().
+            // The abandoned search returns before it clears the opening and loading state, so clear them here.
+            _searchVersion++;
+            _opening = false;
+            _currentSearchTask = null;
+            CancelToken();
+        }
+
+        private Task SetReturnedItemsCountAsync(int value)
+        {
+            _returnedItemsCount = value;
+            return ReturnedItemsCountChanged.InvokeAsync(value);
+        }
+
+        /// <summary>
+        /// Opens or closes the drop-down of items depending on whether it was closed or open.
+        /// </summary>
+        /// <remarks>
+        /// Will have no effect if the autocomplete is disabled or read-only.
+        /// </remarks>
+        public Task ToggleMenuAsync()
+        {
+            if (!Open && (GetDisabledState() || GetReadOnlyState()))
+            {
+                return Task.CompletedTask;
+            }
+
+            return Open ? CloseMenuAsync() : OpenMenuAsync();
+        }
+
+        /// <summary>
+        /// Closes the drop-down of items.
+        /// </summary>
+        public async Task CloseMenuAsync()
+        {
+            AbandonSearch();
+            _debounceTimer?.Dispose();
+            Open = false; // Before restoring position and triggering changes, make sure that we close the popover
+            StateHasChanged();
+            await RestoreScrollPositionAsync();
+            await CoerceTextToValueAsync();
+        }
+
+        /// <summary>
+        /// Opens the drop-down of items, or refreshes the list if it is already open.
+        /// </summary>
+        /// <remarks>
+        /// The drop-down stays closed when the search returns no items and no <see cref="NoItemsTemplate"/> is set.
+        /// </remarks>
+        public async Task OpenMenuAsync()
+        {
+            if (MinCharacters > 0 && (string.IsNullOrWhiteSpace(ReadText) || ReadText.Length < MinCharacters))
+            {
+                // A search still running for longer text must not reopen the menu when it finishes.
+                AbandonSearch();
+                Open = false;
+                StateHasChanged();
+                return;
+            }
+
+            _opening = true;
+
+            var searchedItems = Array.Empty<T>();
+            var searchVersion = ++_searchVersion;
+            CancelToken();
+
+            var wasFocused = _isFocused;
+            var searchingWhileSelected = false;
+            try
+            {
+                if (ProgressIndicatorInPopoverTemplate != null)
+                {
+                    // Open before searching if a progress indicator is defined.
+                    Open = true;
+                }
+
+                // Search while selected if enabled and the Text is equivalent to the Value.
+                searchingWhileSelected = !_isValueCoerced && !Strict && ReadValue != null && (ReadValue!.ToString() == ReadText || (ToStringFunc != null && ToStringFunc(ReadValue!) == ReadText));
+                _cancellationTokenSrc ??= new CancellationTokenSource();
+                var searchText = searchingWhileSelected ? string.Empty : ReadText;
+                var searchTask = SearchFunc?.Invoke(searchText, _cancellationTokenSrc.Token);
+
+                // SearchFunc can abandon its own search before returning, such as by closing the menu, and an abandoned search must not show as loading.
+                if (searchVersion == _searchVersion)
+                {
+                    _currentSearchTask = searchTask;
+                }
+
+                StateHasChanged();
+                searchedItems = searchTask switch
+                {
+                    null => [],
+                    _ => (await searchTask).ToArray()
+                };
+            }
+            catch (TaskCanceledException)
+            {
+                // Cancellation is routine when a newer search or CloseMenuAsync calls CancelToken(), so it must not be logged as a failure like the catch below.
+            }
+            catch (OperationCanceledException)
+            {
+                // Same routine cancellation, thrown by SearchFunc observing the token instead of by awaiting the cancelled task.
+            }
+            catch (Exception e)
+            {
+                Logger.LogWarning("The search function failed to return results: " + e.Message);
+            }
+
+            // Searches can finish out of order, so a search that a newer one replaced must not touch the items or the popover.
+            // The newer search owns them (#13943).
+            if (searchVersion != _searchVersion)
+            {
+                return;
+            }
+
+            await SetReturnedItemsCountAsync(searchedItems.Length);
+
+            // The consumer's ReturnedItemsCountChanged handler can yield, letting a newer search start and finish first.
+            if (searchVersion != _searchVersion)
+            {
+                return;
+            }
+
+            if (MaxItems.HasValue)
+            {
+                int startIndex = 0;
+                int length = Math.Min(MaxItems.Value, searchedItems.Length);
+
+                // Get range of items based off selected item so the selected item can be scrolled to when strict is set to false
+                if (!Strict && searchedItems.Length != 0 && !EqualityComparer<T>.Default.Equals(ReadValue, default(T)))
+                {
+                    int maxItems = MaxItems.Value;
+                    int valueIndex = Array.IndexOf(searchedItems, ReadValue);
+
+                    // Center the selected item in the list if possible
+                    int half = maxItems / 2;
+                    startIndex = valueIndex - half;
+                    int endIndex = startIndex + maxItems;
+
+                    // Adjust if out of bounds
+                    if (startIndex < 0)
+                    {
+                        startIndex = 0;
+                        endIndex = Math.Min(maxItems, searchedItems.Length);
+                    }
+                    else if (endIndex > searchedItems.Length)
+                    {
+                        endIndex = searchedItems.Length;
+                        startIndex = Math.Max(0, endIndex - maxItems);
+                    }
+
+                    length = endIndex - startIndex;
+                }
+
+                if (length < searchedItems.Length)
+                {
+                    var slicedItems = new T[length];
+                    Array.Copy(searchedItems, startIndex, slicedItems, 0, length);
+                    searchedItems = slicedItems;
+                }
+            }
+
+            var itemDisabled = new bool[searchedItems.Length];
+            var enabledItemIndices = new List<int>(searchedItems.Length);
+            for (int i = 0; i < searchedItems.Length; i++)
+            {
+                itemDisabled[i] = ItemDisabledFunc?.Invoke(searchedItems[i]) == true;
+                if (!itemDisabled[i])
+                {
+                    enabledItemIndices.Add(i);
+                }
+            }
+
+            _items = searchedItems;
+            _itemDisabled = itemDisabled;
+            _enabledItemIndices = enabledItemIndices;
+            if (searchingWhileSelected) //compute the index of the currently select value, if it exists
+            {
+                _selectedListItemIndex = Array.IndexOf(_items, ReadValue);
+            }
+            else
+            {
+                _selectedListItemIndex = _enabledItemIndices.Any() ? _enabledItemIndices[0] : -1;
+            }
+
+            // An empty result with no NoItemsTemplate would render an invisible zero-height popover, so keep the menu closed instead (#13360).
+            var hasPopoverContent = _items.Length != 0 || NoItemsTemplate is not null;
+            if (!hasPopoverContent)
+            {
+                Open = false;
+            }
+            else if (_isFocused || !wasFocused)
+            {
+                // Open after the search has finished if we're still focused (UI), or were never focused in the first place (programmatically).
+                Open = true;
+            }
+
+            _opening = false;
+            StateHasChanged();
+
+            // If not strict scroll to the selected item
+            if (!Strict && _selectedListItemIndex > 0)
+            {
+                await ScrollToListItemAsync(_selectedListItemIndex);
+            }
+        }
+
+        protected override Task SetValueAndUpdateTextAsync(T? value, bool updateText = true, bool force = false)
+        {
+            _isValueCoerced = false;
+            return base.SetValueAndUpdateTextAsync(value, updateText, force);
+        }
+
+        /// <summary>
+        /// Resets the Text and Value, and closes the drop-down if it is open.
+        /// </summary>
+        public async Task ClearAsync()
+        {
+            _elementReference.IsClearing = true;
+            try
+            {
+                _isCleared = true;
+                AbandonSearch();
+                // A pending debounce must stop before the awaits below, or it can search the cleared text and reopen the menu.
+                _debounceTimer?.Dispose();
+                Open = false;
+
+                await SetTextAndUpdateValueAsync(string.Empty, updateValue: false);
+                await SetValueAndUpdateTextAsync(default, updateText: false);
+
+                await _elementReference.ResetAsync();
+
+                _debounceTimer?.Dispose();
+                StateHasChanged();
+            }
+            finally
+            {
+                _elementReference.IsClearing = false;
+            }
+        }
+
+        protected override Task ResetValueAsync() => ClearAsync();
+
+        private string? GetItemString(T? item)
+        {
+            if (item is null)
+            {
+                return string.Empty;
+            }
+
+            try
+            {
+                return ConvertSet(item);
+            }
+            catch (NullReferenceException)
+            {
+                // ignore
+            }
+
+            return "null";
+        }
+
+        private async Task OnInputKeyDownAsync(KeyboardEventArgs args)
+        {
+            // A genuine keystroke on the input starts with keydown, so any pending stray-keyup suppression is over.
+            _skipNextEnterKeyUp = false;
+
+            switch (args.Key)
+            {
+                // We need to catch Tab here because a tab will move focus to the next element and thus we'd never get the tab key in OnInputKeyUpAsync.
+                case "Tab":
+                    if (Open)
+                    {
+                        if (SelectValueOnTab)
+                            await OnEnterKeyAsync();
+                    }
+                    await CloseMenuAsync();
+                    break;
+                case "ArrowDown":
+                    if (Open)
+                    {
+                        await SelectAdjacentItemAsync(+1);
+                    }
+                    else
+                    {
+                        await OpenMenuAsync();
+                    }
+                    break;
+                case "ArrowUp":
+                    if (args.AltKey)
+                    {
+                        await CloseMenuAsync();
+                    }
+                    else if (!Open)
+                    {
+                        await OpenMenuAsync();
+                    }
+                    else
+                    {
+                        await SelectAdjacentItemAsync(-1);
+                    }
+                    break;
+            }
+
+            await base.InvokeKeyDownAsync(args);
+        }
+
+        private async Task OnInputKeyUpAsync(KeyboardEventArgs args)
+        {
+            switch (args.Key)
+            {
+                case "Enter":
+                case "NumpadEnter":
+                    if (_skipNextEnterKeyUp || _elementReference.IsClearing)
+                    {
+                        // A stray keyup from clear-button activation; the keystroke began on the button, not the input.
+                        _skipNextEnterKeyUp = false;
+                        break;
+                    }
+
+                    if (Open)
+                    {
+                        await OnEnterKeyAsync();
+                    }
+                    else
+                    {
+                        // The menu stays closed when a search finds nothing, so Enter must coerce the value here rather than through OnEnterKeyAsync.
+                        // When Immediate is enabled the value was already coerced by TextChanged.
+                        if (!Immediate)
+                        {
+                            await CoerceValueToTextAsync();
+                        }
+                        await OpenMenuAsync();
+                    }
+                    break;
+                case "Escape":
+                    await CloseMenuAsync();
+                    break;
+                case "Backspace":
+                    if (args.CtrlKey && args.ShiftKey)
+                    {
+                        await ResetAsync();
+                    }
+                    break;
+            }
+
+            await base.InvokeKeyUpAsync(args);
+        }
+
+        /// <summary>
+        /// Selects the next or previous enabled item in the list and scrolls to it.
+        /// </summary>
+        /// <param name="direction">The direction to move, positive for down, negative for up.</param>
+        private ValueTask SelectAdjacentItemAsync(int direction)
+        {
+            if (_items == null || _items.Length == 0 || !_enabledItemIndices.Any())
+                return ValueTask.CompletedTask;
+
+            // Get the current index among enabled items
+            var currentEnabledIndex = _enabledItemIndices.IndexOf(_selectedListItemIndex);
+
+            // Determine the new index based on the direction
+            var newEnabledIndex = currentEnabledIndex + direction;
+
+            // Ensure new index is within bounds
+            if (newEnabledIndex >= 0 && newEnabledIndex < _enabledItemIndices.Count)
+            {
+                _selectedListItemIndex = _enabledItemIndices[newEnabledIndex];
+                return SelectItemAsync(_selectedListItemIndex);
+            }
+
+            return ValueTask.CompletedTask;
+        }
+
+        /// <summary>
+        /// Selects the item in the list at the specified index and scrolls to it.
+        /// </summary>
+        /// <param name="index">The index of the item to scroll to. If it's out of range then nothing will happen.</param>
+        private ValueTask SelectItemAsync(int index)
+        {
+            if (_items == null || _items.Length == 0 || !_enabledItemIndices.Any() || index < 0 || index >= _items.Length)
+                return ValueTask.CompletedTask;
+
+            _selectedListItemIndex = index;
+
+            return ScrollToListItemAsync(index);
+        }
+
+        /// <summary>
+        /// Scrolls the list of items to the item at the specified index.
+        /// </summary>
+        /// <param name="index">The index of the item to scroll to.</param>
+        public ValueTask ScrollToListItemAsync(int index)
+        {
+            var id = GetListItemId(index);
+
+            //id of the scrolled element
+            return ScrollManager.ScrollToListItemAsync(id);
+        }
+
+        /// <summary>
+        /// This restores the scroll position after closing the menu and element being 0
+        /// </summary>
+        private ValueTask RestoreScrollPositionAsync()
+        {
+            if (_selectedListItemIndex != 0)
+                return ValueTask.CompletedTask;
+
+            return ScrollManager.ScrollToListItemAsync(GetListItemId(0));
+        }
+
+        private string GetListItemId(in int index)
+        {
+            return $"{_componentId}_item{index}";
+        }
+
+        /// <summary>
+        /// Builds fallback combobox attributes for the text input so caller-supplied values still win.
+        /// </summary>
+        /// <remarks>
+        /// The suggestion list only exists in the DOM while it is open and has items, so the list and the highlighted option are referenced only then.
+        /// </remarks>
+        private Dictionary<string, object?> GetInputAttributes()
+        {
+            var attributes = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+            foreach (var userAttribute in UserAttributes)
+            {
+                attributes[userAttribute.Key] = userAttribute.Value;
+            }
+
+            var listRendered = _open && _items is { Length: > 0 };
+            attributes.TryAdd("role", "combobox");
+            attributes.TryAdd("aria-autocomplete", "list");
+            attributes.TryAdd("aria-haspopup", "listbox");
+            attributes.TryAdd("aria-expanded", listRendered ? "true" : "false");
+
+            if (listRendered)
+            {
+                attributes.TryAdd("aria-controls", _listboxId);
+
+                if (_selectedListItemIndex >= 0 && _selectedListItemIndex < _items!.Length)
+                {
+                    attributes.TryAdd("aria-activedescendant", GetListItemId(_selectedListItemIndex));
+                }
+            }
+
+            return attributes;
+        }
+
+        internal async Task OnEnterKeyAsync()
+        {
+            if (!Open || _items == null || _items.Length == 0)
+            {
+                // When Immediate is enabled, then the CoerceValue is set by TextChanged
+                // So only coerce the value on enter when Immediate is disabled
+                if (!Immediate)
+                {
+                    await CoerceValueToTextAsync();
+                }
+                return;
+            }
+
+            try
+            {
+                if (_selectedListItemIndex >= 0 && _selectedListItemIndex < _items.Length)
+                    await SelectOptionAsync(_items[_selectedListItemIndex]);
+            }
+            finally
+            {
+                if (Open)
+                    Open = false;
+            }
+        }
+
+        private Task OnInputClickedAsync()
+        {
+            if (GetDisabledState())
+            {
+                return Task.CompletedTask;
+            }
+
+            if (_elementReference.IsClearing)
+            {
+                // To avoid reacting to the clicking of the clear button, we ignore this event because it is propagated.
+                return Task.CompletedTask;
+            }
+
+            return OnInputActivatedAsync(true);
+        }
+
+        private async Task OnInputFocusedAsync()
+        {
+            if (GetDisabledState())
+            {
+                // This shouldn't be possible through the UI, but could be triggered in code.
+                return;
+            }
+
+            if (GetReadOnlyState())
+            {
+                // A readonly input doesn't trigger onblur later correctly, so we have to disable focus features for it.
+                return;
+            }
+
+            if (_elementReference.IsClearing)
+            {
+                // To avoid reacting to the clicking of the clear button, we have to disable focus features while the clearing event chain is happening.
+                return;
+            }
+
+            var wasFocused = _isFocused;
+            _isFocused = true;
+
+            // Skip features that are not meant for internal focus events.
+            if (_handleNextFocus)
+            {
+                _handleNextFocus = false;
+                return;
+            }
+
+            // Select the input text unless we're already focused or it will interfere with cursor selection.
+            if (!wasFocused && SelectOnActivation)
+            {
+                await SelectAsync();
+            }
+
+            await OnInputActivatedAsync(OpenOnFocus);
+        }
+
+        private async Task OnInputActivatedAsync(bool openMenu)
+        {
+            // The click event also triggers the focus event so we don't want to unnecessarily handle both.
+            if (openMenu && !Open && !_opening && !GetReadOnlyState())
+            {
+                await OpenMenuAsync();
+            }
+        }
+
+        internal async Task HandleClearButtonAsync(MouseEventArgs e)
+        {
+            // clear button clicked, let's make sure text is cleared and the menu has focus
+
+            // Enter activates the clear button on keydown, and the matching keyup lands on the input the clear transaction focuses.
+            // Arm the suppression before the first await so the keyup can't slip in while an asynchronous clear callback is still pending.
+            _skipNextEnterKeyUp = true;
+
+            // These lines prevent the menu from opening when OpenOnFocus is true, which is the default.
+            _debounceTimer?.Dispose();
+            if (!Open)
+            {
+                // An open menu searches again below.
+                // Abandoning its search here would show it empty, or with NoItemsTemplate, until then.
+                AbandonSearch();
+            }
+            if (_items?.Length > 0)
+                _items = [];
+            await SetValueAndUpdateTextAsync(default, false);
+            await SetTextAndUpdateValueAsync(null, false);
+            _selectedListItemIndex = 0;
+            StateHasChanged();
+            await OnClearButtonClick.InvokeAsync(e);
+            await BeginValidateAsync();
+            if (Open)
+            {
+                await OpenMenuAsync();
+            }
+        }
+        internal async Task AdornmentClickHandlerAsync()
+        {
+            if (OnAdornmentClick.HasDelegate)
+            {
+
+                await OnAdornmentClick.InvokeAsync();
+            }
+            else
+            {
+                await ToggleMenuAsync();
+                if (Open)
+                    await FocusAsync();
+            }
+        }
+
+        private async Task OnInputBlurredAsync(FocusEventArgs args)
+        {
+            _isFocused = false;
+            _handleNextFocus = false;
+
+            // When Immediate is enabled, then the CoerceValue is set by TextChanged.
+            // So only coerce the value on blur when Immediate is disabled, then fall through to the same validation path.
+            if (!Immediate)
+            {
+                await CoerceValueToTextAsync();
+            }
+
+            // A blur while the menu is open or a value is being committed is part of selecting an item: the item's mousedown blurs the input before its click lands, so validating now would flag a premature error.
+            // Only a genuine leave runs the base blur, so a required autocomplete surfaces its error on blur like other inputs (#5489).
+            // A leave while a search is still running (menu not yet open) is genuine, so the in-flight opening flag is intentionally not gated on.
+            if (Open || _isProcessingValue)
+            {
+                await OnBlur.InvokeAsync(args);
+                return;
+            }
+
+            // A genuine leave with the menu closed (such as after a search returned nothing) can't rely on the overlay close to revert the text, so coerce it here.
+            await CoerceTextToValueAsync();
+
+            await base.OnBlurredAsync(args);
+        }
+
+        private Task OnOverlayClosedAsync()
+        {
+            if (Open)
+            {
+                return CloseMenuAsync();
+            }
+
+            return Task.CompletedTask;
+        }
+
+        private Task CoerceTextToValueAsync()
+        {
+            if (!CoerceText)
+                return Task.CompletedTask;
+
+            if (ResetValueOnEmptyText && string.IsNullOrEmpty(ReadText))
+                return Task.CompletedTask;
+
+            _debounceTimer?.Dispose();
+
+            var text = ReadValue == null ? null : GetItemString(ReadValue);
+
+            // Don't update the value to prevent the popover from opening again after coercion
+            if (text != ReadText)
+                return SetTextAndUpdateValueAsync(text, updateValue: false);
+
+            return Task.CompletedTask;
+        }
+
+        private async Task CoerceValueToTextAsync()
+        {
+            if (!CoerceValue)
+                return;
+
+            _debounceTimer?.Dispose();
+
+            var value = ConvertGet(ReadText);
+            await SetValueAndUpdateTextAsync(value, updateText: false);
+
+            // We must set _isValueCoerced to true after calling SetValueAndUpdateTextAsync, as it sets it to false
+            // CoerceValue is always true at this point, so we can set the value to true rather than checking the property again
+            _isValueCoerced = true;
+        }
+
+        /// <remarks>
+        /// If <see cref="ToStringFunc"/> is set, it is used to convert the value to a string; otherwise, the base implementation is used.
+        /// </remarks>
+        /// <inheritdoc />
+        protected override string? ConvertSet(T? input)
+        {
+            return ToStringFunc is not null
+                ? ToStringFunc(input)
+                : base.ConvertSet(input);
+        }
+
+        /// <inheritdoc />
+        protected override async ValueTask DisposeAsyncCore()
+        {
+            if (_debounceTimer is not null)
+            {
+                await _debounceTimer.DisposeAsync();
+            }
+
+            if (_cancellationTokenSrc is not null)
+            {
+                try
+                {
+                    await _cancellationTokenSrc.CancelAsync();
+                }
+                catch { /*ignored*/ }
+                try
+                {
+                    _cancellationTokenSrc.Dispose();
+                }
+                catch { /*ignored*/ }
+            }
+
+            await base.DisposeAsyncCore();
+        }
+
+        /// <summary>
+        /// Sets focus to this Autocomplete.
+        /// </summary>
+        public override ValueTask FocusAsync() => FocusAsync(preventScroll: false);
+
+        /// <inheritdoc />
+        internal override ValueTask FocusAsync(bool preventScroll)
+        {
+            return _elementReference.FocusAsync(preventScroll);
+        }
+
+        /// <summary>
+        /// Releases focus from this Autocomplete.
+        /// </summary>
+        public override ValueTask BlurAsync()
+        {
+            return _elementReference.BlurAsync();
+        }
+
+        /// <summary>
+        /// Selects all the current text within the Autocomplete text box.
+        /// </summary>
+        public override ValueTask SelectAsync()
+        {
+            return _elementReference.SelectAsync();
+        }
+
+        /// <summary>
+        /// Selects a portion of the text within the Autocomplete text box.
+        /// </summary>
+        /// <param name="pos1">The index of the first character to select.</param>
+        /// <param name="pos2">The index of the last character to select.</param>
+        /// <returns>A <see cref="ValueTask"/> object.</returns>
+        public override ValueTask SelectRangeAsync(int pos1, int pos2)
+        {
+            return _elementReference.SelectRangeAsync(pos1, pos2);
+        }
+
+        private async Task OnTextChangedAsync(string? text)
+        {
+            if (text == null)
+                return;
+
+            await SetTextAndUpdateValueAsync(text, true);
+        }
+
+        private async Task ListItemOnClickAsync(T item)
+        {
+            _handleNextFocus = true; // Let the event handler know it doesn't need to do anything.
+            await FocusAsync();
+
+            await SelectOptionAsync(item);
+        }
+    }
+}

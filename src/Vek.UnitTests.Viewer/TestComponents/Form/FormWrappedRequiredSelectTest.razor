@@ -1,0 +1,15 @@
+﻿<VekPopoverProvider />
+
+<VekForm @ref="Form" ValidationDelay="0">
+    <RequiredSelectWrapper T="string" @bind-Value="_value" Required="true" RequiredError="required">
+        <VekSelectItem T="string" Value="@("1")">1</VekSelectItem>
+        <VekSelectItem T="string" Value="@("2")">2</VekSelectItem>
+    </RequiredSelectWrapper>
+</VekForm>
+
+@code {
+    public static string __description__ = "#13389: a Required VekSelect wrapped by a one-way forwarding component inside a VekForm.";
+
+    public VekForm Form { get; set; } = null!;
+    private string? _value;
+}

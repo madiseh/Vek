@@ -1,0 +1,21 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekGrid>
+    <VekItem xs="12" sm="6">
+        <VekPaper Class="pa-4">
+            <VekText><CodeInline>OnlyValidateIfDirty="false"</CodeInline> (default behavior)</VekText>
+            <VekForm >
+                <VekTextField T="string" Label="Username" Required="true" RequiredError="User name is required!"/>
+            </VekForm>
+        </VekPaper>
+    </VekItem>
+    
+    <VekItem xs="12" sm="6">
+        <VekPaper Class="pa-4">
+            <VekText><CodeInline>OnlyValidateIfDirty="true"</CodeInline></VekText>
+            <VekForm >
+                <VekTextField T="string" Label="Username" Required="true" RequiredError="User name is required!" OnlyValidateIfDirty="true"/>
+            </VekForm>
+        </VekPaper>
+    </VekItem>
+</VekGrid>

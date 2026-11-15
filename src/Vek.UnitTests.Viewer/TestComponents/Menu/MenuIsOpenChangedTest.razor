@@ -1,0 +1,24 @@
+<VekPopoverProvider />
+
+<VekMenu @ref="Menu"
+         OpenChanged="@OnOpenChanged" />
+
+@code {
+    public VekMenu Menu { get; private set; } = null!;
+
+    public int FalseInvocationCount { get; private set; }
+
+    public int TrueInvocationCount { get; private set; }
+
+    private void OnOpenChanged(bool open)
+    {
+        if (open)
+        {
+            TrueInvocationCount++;
+        }
+        else
+        {
+            FalseInvocationCount++;
+        }
+    }
+}

@@ -1,0 +1,12 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekBreadcrumbs Items="_items"></VekBreadcrumbs>
+
+@code {
+    private List<BreadcrumbItem> _items =
+    [
+        new("Home", href: "#"),
+        new("Link 1", href: "#"),
+        new("Link 2", href: null, disabled: true)
+    ];
+}

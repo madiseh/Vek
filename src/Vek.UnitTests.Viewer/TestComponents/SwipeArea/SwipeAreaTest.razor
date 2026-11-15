@@ -1,0 +1,7 @@
+﻿<VekSwipeArea OnSwipeEnd="@(e => _swipeDirection = e.SwipeDirection)" Style="width: 100%; height: 300px">
+    <VekText Typo="@Typo.body1">@_swipeDirection</VekText>
+</VekSwipeArea>
+
+@code {
+    private SwipeDirection _swipeDirection;
+}

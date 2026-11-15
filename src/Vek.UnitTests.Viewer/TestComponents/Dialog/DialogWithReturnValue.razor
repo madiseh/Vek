@@ -1,0 +1,14 @@
+﻿<VekDialog>
+    <DialogContent>
+        <VekText>This Dialog returns a string as return value</VekText>
+    </DialogContent>
+    <DialogActions>
+        <VekButton OnClick="() => VekDialog.Close(DialogResult.Cancel())">Cancel</VekButton>
+        <VekButton OnClick="@(() => VekDialog.Close("Closed via OK"))">OK</VekButton>
+    </DialogActions>
+</VekDialog>
+
+@code {
+    [CascadingParameter]
+    private IVekDialogInstance VekDialog { get; set; } = null!;
+}

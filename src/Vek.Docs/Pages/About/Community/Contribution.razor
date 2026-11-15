@@ -1,0 +1,46 @@
+﻿@page "/vek/community/contribution"
+@using Vek.Docs.Utilities
+
+<PageTitle>Contribution - Vek</PageTitle>
+
+<DocsPage DisplayFooter="true">
+    <DocsPageHeader Title="Contribution" />
+    <DocsPageContent>
+        @if (string.IsNullOrEmpty(_contribution))
+        {
+            <VekProgressCircular Color="Color.Primary" Indeterminate="true" />
+        }
+        else
+        {
+            <VekStack Spacing="2" Class="vek-typography vek-typography-body1 docs-contribution-markdown">
+                @((MarkupString)GetBody(_contribution))
+            </VekStack>
+        }
+    </DocsPageContent>
+</DocsPage>
+
+@code {
+    private string _contribution;
+
+    [Inject]
+    private HttpClient HttpClient { get; set; }
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await HttpClient.GetAsync("https://raw.githubusercontent.com/Vek/Vek/dev/CONTRIBUTING.md");
+        _contribution = await response.Content.ReadAsStringAsync();
+    }
+
+    private string GetBody(string value)
+    {
+        var html = MarkdownToHtml.Parse(
+            value,
+            new Uri(NavigationManager.Uri, UriKind.RelativeOrAbsolute),
+            MarkdownToHtml.RenderMode.ContributionPageRender);
+
+        return html;
+    }
+}

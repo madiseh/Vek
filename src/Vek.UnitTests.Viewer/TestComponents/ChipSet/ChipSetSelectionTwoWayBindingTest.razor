@@ -1,0 +1,20 @@
+﻿<VekChipSet T="int" SelectionMode="SelectionMode.MultiSelection" CheckMark @bind-SelectedValues="_selectedValues">
+    <VekChip Text="Set1 Chip1" Variant="Variant.Outlined" Color="Color.Success" Value="1"/>
+    <VekChip Text="Set1 Chip2" Variant="Variant.Outlined" Color="Color.Error" Value="2"/>
+</VekChipSet>
+
+<VekChipSet T="int" SelectionMode="SelectionMode.MultiSelection" CheckMark @bind-SelectedValues="_selectedValues">
+    <VekChip Text="Set2 Chip1" Variant="Variant.Outlined" Color="Color.Success" Value="1"/>
+    <VekChip Text="Set2 Chip2" Variant="Variant.Outlined" Color="Color.Error" Value="2"/>
+</VekChipSet>
+
+<br />
+<p class="set">
+    Selection: @(string.Join(", ", _selectedValues.OrderBy(x => x)))
+</p>
+
+@code {
+    public static string __description__ = "The chipsets should mirror their respective selections";
+
+    private IReadOnlyCollection<int> _selectedValues = [ 1 ];
+}

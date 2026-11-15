@@ -1,0 +1,26 @@
+﻿@namespace Vek.Docs.Examples
+
+
+<VekGrid Class="justify-space-between" Style="max-width: 800px;">
+    <VekItem xs="12" sm="6">
+        <VekTextField Mask="@emailMask" Label="Email Address"  HelperText="@emailMask.Mask"
+                      @bind-Value="email"  Variant="@Variant.Text" Clearable />
+    </VekItem>
+    <VekItem xs="12" sm="6">
+        <VekTextField Mask="@emailCustomMask" Label="Email Address with Custom Mask"  HelperText="@emailCustomMask.Mask"
+                      @bind-Value="email2"  Variant="@Variant.Text" Clearable />
+    </VekItem>
+    <VekItem xs="12" sm="6">
+        Email 1: <b>@email</b>
+    </VekItem>
+    <VekItem xs="12" sm="6">
+        Email 2: <b>@email2</b>
+    </VekItem>
+</VekGrid>
+
+@code {
+    public string email;
+    public string email2;
+    public IMask emailMask = RegexMask.Email();
+    public IMask emailCustomMask = RegexMask.Email("<user>@<domain.com>");
+}

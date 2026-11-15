@@ -1,0 +1,20 @@
+﻿@using Vek
+
+<div class="viewer-root">
+    <VekTooltip Inline="true" Text="Delete">
+        <VekButton Id="btn-inline-full" FullWidth="true" Variant="Variant.Filled" Color="Color.Primary">
+            Delete
+        </VekButton>
+    </VekTooltip>
+
+    <VekTooltip Inline="false" Text="Delete">
+        <VekButton Id="btn-block-full" FullWidth="true" Variant="Variant.Filled" Color="Color.Primary">
+            Delete
+        </VekButton>
+    </VekTooltip>
+</div>
+
+@code {
+    public static string __description__ =
+        "Verifies VekTooltip with Inline=true stretches a FullWidth child without changing default inline layout.";
+}

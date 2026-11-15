@@ -1,0 +1,102 @@
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Components;
+using Vek.Utilities;
+
+namespace Vek
+{
+    /// <summary>
+    /// Breadcrumbs show a navigation trail of links marking the user's current location within a page hierarchy.
+    /// </summary>
+    /// <seealso cref="BreadcrumbItem" />
+    /// <seealso cref="BreadcrumbLink" />
+    /// <seealso cref="BreadcrumbSeparator" />
+    public partial class VekBreadcrumbs : VekComponentBase
+    {
+        private string Classname => new CssBuilder("vek-breadcrumbs")
+            .AddClass("vek-typography-body1")
+            .AddClass(Class)
+            .Build();
+
+        /// <summary>
+        /// The list of items to display.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.Breadcrumbs.Behavior)]
+        public IReadOnlyList<BreadcrumbItem>? Items { get; set; }
+
+        /// <summary>
+        /// The separator shown between items.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>/</c>.  Will not be shown if <see cref="SeparatorTemplate"/> is set.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Breadcrumbs.Appearance)]
+        public string Separator { get; set; } = "/";
+
+        /// <summary>
+        /// The content shown between items.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.Breadcrumbs.Appearance)]
+        public RenderFragment? SeparatorTemplate { get; set; }
+
+        /// <summary>
+        /// The custom template used to display items.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.Breadcrumbs.Behavior)]
+        public RenderFragment<BreadcrumbItem>? ItemTemplate { get; set; }
+
+        /// <summary>
+        /// The maximum number of items to display.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.  If <see cref="Collapsed"/> is <c>true</c> and the number of items exceeds this value, the breadcrumbs will automatically collapse.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Breadcrumbs.Behavior)]
+        public byte? MaxItems { get; set; }
+
+        /// <summary>
+        /// The icon to display when items are collapsed.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Icons.Material.Filled.SettingsEthernet" />.  Displays when <see cref="Collapsed"/> and the number of items exceeds <see cref="MaxItems"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Breadcrumbs.Appearance)]
+        public string ExpanderIcon { get; set; } = Icons.Material.Filled.SettingsEthernet;
+
+        /// <summary>
+        /// Collapses items when the number of items exceeds <see cref="MaxItems"/>.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>.
+        /// </remarks>
+        public bool Collapsed { get; private set; } = true;
+
+        /// <summary>
+        /// Whether <paramref name="item"/> is the last item in the trail and therefore represents the current page.
+        /// </summary>
+        internal bool IsLastItem(BreadcrumbItem? item) => Items is { Count: > 0 } && ReferenceEquals(Items[^1], item);
+
+        internal static string GetItemClassname(BreadcrumbItem item)
+        {
+            return new CssBuilder("vek-breadcrumb-item")
+                .AddClass("vek-disabled", item.Disabled)
+                .Build();
+        }
+
+        internal void Expand()
+        {
+            if (!Collapsed)
+            {
+                return;
+            }
+
+            Collapsed = false;
+            StateHasChanged();
+        }
+    }
+}

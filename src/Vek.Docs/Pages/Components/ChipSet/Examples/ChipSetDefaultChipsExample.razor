@@ -1,0 +1,27 @@
+﻿@namespace Vek.Docs.Examples
+<VekChipSet @bind-SelectedValues="_selected" SelectionMode="SelectionMode.MultiSelection" CheckMark>
+    <VekChip Value="@("Milk")" />
+    <VekChip Value="@("Eggs")" />
+    <VekChip Value="@("Soap")" />
+    <VekChip Value="@("Cornflakes")" />
+    <VekChip Value="@("Salad")" />
+    <VekChip Value="@("Apples")" />
+    <VekChip Value="@("Red wine")" />
+</VekChipSet>
+
+<div class="d-flex justify-center">
+    @if (_selected is { Count: > 0 })
+    {
+        <VekText>You selected @string.Join(", ", _selected).</VekText>
+    }
+    else
+    {
+        <VekText>Nothing selected.</VekText>
+    }
+</div>
+
+@code
+{
+    private IReadOnlyCollection<string> _selected = ["Milk", "Cornflakes"];
+}
+

@@ -1,0 +1,30 @@
+﻿@namespace Vek
+@implements IDisposable
+@using Vek.Resources
+@inherits VekComponentBase
+@inject InternalVekLocalizer Localizer
+
+<tr class="@Classname" @onclick="@OnRowClick" style="@Style" @attributes="@UserAttributes">
+    @if (Context.DisplayApplyButtonAtStart(IgnoreEditable) || Context.DisplayEditButtonAtStart(IgnoreEditable))
+    {
+        <VekTh />
+    }
+    @if (Expandable || ((Context?.Table?.MultiSelection ?? false) && !IgnoreCheckbox))
+    {
+        <VekTh>
+            @if (Expandable)
+            {
+                <div class="ml-4 mr-5"></div>
+            }
+            @if (Checkable)
+            {
+                <VekCheckBox @bind-Value="Checked" ReadOnly="!SelectionChangeable" Disabled="!SelectionChangeable" Class="vek-table-cell-checkbox" AriaLabel="@Localizer[LanguageResource.VekTable_SelectAllRows]" />
+            }
+        </VekTh>
+    }
+    @ChildContent
+    @if (Context.DisplayApplyButtonAtEnd(IgnoreEditable) || Context.DisplayEditButtonAtEnd(IgnoreEditable))
+    {
+        <VekTh />
+    }
+</tr>

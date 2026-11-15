@@ -1,0 +1,17 @@
+﻿@namespace Vek.Docs.Examples
+
+
+<VekGrid Class="justify-space-between" Style="max-width: 800px;">
+    <VekItem xs="12" sm="6">
+        <VekTextField Mask="@zipCodeMask" Label="ZIP Code" HelperText="@zipCodeMask.Mask"
+                      @bind-Value="zipCode" Variant="@Variant.Text" Clearable />
+    </VekItem>
+    <VekItem xs="12" sm="6">
+        ZIP Code: <b>@zipCode</b>
+    </VekItem>
+</VekGrid>
+
+@code {
+    public string zipCode;
+    public IMask zipCodeMask = RegexMask.UsZipCode();
+}

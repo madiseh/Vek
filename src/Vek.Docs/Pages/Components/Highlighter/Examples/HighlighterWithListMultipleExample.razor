@@ -1,0 +1,32 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekPaper Elevation="0">
+    <VekList T="string">
+        <VekListSubheader>
+            <VekTextField @bind-Value="searchTerm" AdornmentIcon="@Icons.Material.Filled.People"
+                          Adornment="Adornment.End" Immediate="true" Variant="Variant.Outlined"
+                          Label="Names to search"/>
+        </VekListSubheader>
+
+        @{
+            string[] searchTerms = searchTerm.Split(split);
+            for (int i = 0; i < searchTerms.Length; i++)
+                searchTerms[i] = searchTerms[i].Trim();
+        }
+        @foreach (var name in names)
+        {
+            <VekListItem @key="name" Icon="@Icons.Material.Filled.Person">
+                <VekHighlighter Text="@name" HighlightedTexts="@searchTerms" />
+            </VekListItem>
+        }
+    </VekList>
+</VekPaper>
+
+@code {
+    string searchTerm = "William Jordan, Oliver";
+    IEnumerable<string> names = new List<string>
+    {
+        "William Jordan", "Oliver Jones", "William Johnson", "Daniel Williams", "Oliver Simpson"
+    };
+    static readonly char[] split = new char[] { ';', ',', '.' };
+}

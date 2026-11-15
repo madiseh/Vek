@@ -1,0 +1,43 @@
+﻿@inherits LayoutComponentBase
+@layout MainLayout
+
+<VekLayout Class="vek-docs">
+    <VekAppBar Class="docs-appbar-filter" Color="Color.Transparent" Elevation="0"></VekAppBar>
+    <VekAppBar Class="docs-appbar" Elevation="0">
+        <Appbar DrawerToggleCallback="ToggleDrawer" />
+    </VekAppBar>
+    <VekDrawer Open="@_drawerOpen" OpenChanged="OnDrawerOpenChanged" ClipMode="DrawerClipMode.Docked" Elevation="0" Breakpoint="Breakpoint.Md" aria-label="Navigation Drawer">
+        <div class="d-block d-md-none">
+            <VekToolBar Dense="true" Gutters="false" Class="docs-gray-bg">
+                <VekIconButton Icon="@Icons.Material.Rounded.Close" Color="Color.Inherit" OnClick="ToggleDrawer" aria-label="Toggle drawer" />
+                <VekSpacer />
+                <AppbarButtons />
+            </VekToolBar>
+
+            @if (_topMenuOpen == true)
+            {
+                <VekNavMenu Color="Color.Primary" Margin="Margin.Dense" Rounded="true" Class="pa-2">
+                    <VekNavLink Href="/getting-started/installation">Get Started</VekNavLink>
+                    <VekNavLink Href="/docs/overview">Docs</VekNavLink>
+                    <VekNavLink Href="/vek/project/team" Match="NavLinkMatch.All">Learn More</VekNavLink>
+                    <VekNavGroup Title="Projects" ExpandIcon="@Icons.Material.Filled.ExpandMore">
+                        <VekListSubheader Class="mt-4 pl-8 pb-2"><b>Official</b></VekListSubheader>
+                        <VekNavLink Href="https://github.com/madiseh/vek">Vek</VekNavLink>
+                        <VekNavLink Href="https://github.com/madiseh/vek/">TryVek</VekNavLink>
+                        <VekNavLink Href="https://github.com/Vek/ThemeManager">ThemeManager</VekNavLink>
+                        <VekNavLink Href="https://github.com/Vek/Templates">Templates</VekNavLink>
+                        <VekListSubheader Class="mt-4 pl-8 pb-2"><b>Community</b></VekListSubheader>
+                        <VekNavLink Href="/vek/community/extensions">CommunityExtensions</VekNavLink>
+                    </VekNavGroup>
+                </VekNavMenu>
+            }
+        </div>
+        <VekNavMenu Color="Color.Primary" Rounded="true" Dense="true" Margin="Margin.Dense" Class="pa-2 overflow-auto mb-3">
+            <NavMenu @ref="@_navMenuRef" />
+        </VekNavMenu>
+    </VekDrawer>
+    @Body
+    <VekScrollToTop TopOffset="400" Style="z-index:2000;">
+        <VekFab StartIcon="@Icons.Material.Filled.KeyboardArrowUp" Color="Color.Primary" />
+    </VekScrollToTop>
+</VekLayout>

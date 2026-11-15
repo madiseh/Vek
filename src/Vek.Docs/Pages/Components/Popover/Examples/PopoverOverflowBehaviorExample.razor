@@ -1,0 +1,16 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekPaper Outlined="true" Class="px-12 py-6">
+    <VekButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="false" OnClick="@ToggleOpen">@(_open? "Close" : "Open")</VekButton>
+    <VekPopover Open="_open" OverflowBehavior="OverflowBehavior.FlipAlways" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Paper="false">
+        <VekPaper Outlined="true" Class="px-4 py-8">
+            <VekText>Scroll your browser to see effect.</VekText>
+        </VekPaper>
+    </VekPopover>
+</VekPaper>
+
+@code {
+    private bool _open = true;
+
+    private void ToggleOpen() => _open = !_open;
+}

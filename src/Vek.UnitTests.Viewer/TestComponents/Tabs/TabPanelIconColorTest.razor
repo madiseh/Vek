@@ -1,0 +1,15 @@
+﻿<VekTabs>
+    <ChildContent>
+        <VekTabPanel Text="Panel 1" Tag="0" Class="tab-panel-icon-color-test" Icon="@Icons.Material.Filled.Terminal" IconColor="@VekTabPanelIconColor" Disabled="@DisableTab">
+            <VekText Typo="Typo.h1">Panel Content</VekText>
+        </VekTabPanel>
+    </ChildContent>
+</VekTabs>
+
+@code {
+    [Parameter]
+    public Color VekTabPanelIconColor { get; set; } = Color.Default;
+
+    [Parameter]
+    public bool DisableTab { get; set; }
+}

@@ -1,0 +1,217 @@
+﻿// Copyright (c) Vek 2021
+// Vek licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Components.Web;
+using Vek.Interfaces;
+using Vek.Utilities;
+
+namespace Vek
+{
+
+    /// <summary>
+    /// A navigation link as part of a <see cref="VekNavMenu"/>.
+    /// </summary>
+    /// <seealso cref="VekNavGroup"/>
+    /// <seealso cref="VekNavMenu"/>
+    public partial class VekNavLink : VekComponentBase
+    {
+        protected string Classname =>
+            new CssBuilder("vek-nav-item")
+                .AddClass(Class)
+                .Build();
+
+        protected string LinkClassname =>
+            new CssBuilder("vek-nav-link")
+                .AddClass($"vek-nav-link-disabled", Disabled)
+                .AddClass($"vek-ripple", Ripple && !Disabled)
+                .Build();
+
+        protected string IconClassname =>
+            new CssBuilder("vek-nav-link-icon")
+                .AddClass($"vek-nav-link-icon-default", IconColor == Color.Default)
+                .Build();
+
+        protected Dictionary<string, object?> Attributes
+        {
+            get
+            {
+                // Compared without case so a caller cannot slip navigation attributes past the disabled check by varying their casing, since HTML attribute names are case-insensitive.
+                var attributes = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+                if (!Disabled)
+                {
+                    attributes["href"] = Href;
+                    attributes["target"] = Target;
+                    attributes["rel"] = Rel ?? (!string.IsNullOrWhiteSpace(Target) ? "noopener noreferrer" : string.Empty);
+                }
+
+                foreach (var attribute in UserAttributes)
+                {
+                    attributes[attribute.Key] = attribute.Value;
+                }
+
+                if (Disabled)
+                {
+                    // UserAttributes is a parameter in its own right, so assigning it directly bypasses the per-key matching that would otherwise route these to Href and Target.
+                    // Without this a caller-supplied href leaves a disabled link fully navigable.
+                    attributes.Remove("href");
+                    attributes.Remove("target");
+                }
+
+                return attributes;
+            }
+        }
+
+        protected int TabIndex => Disabled || NavigationContext is { Disabled: true } or { Expanded: false } ? -1 : 0;
+
+        [Inject]
+        private NavigationManager UriHelper { get; set; } = null!;
+
+        [CascadingParameter]
+        private INavigationEventReceiver? NavigationEventReceiver { get; set; }
+
+        [CascadingParameter]
+        private NavigationContext? NavigationContext { get; set; }
+
+        /// <summary>
+        /// The icon displayed for this link.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.NavMenu.Behavior)]
+        public string? Icon { get; set; }
+
+        /// <summary>
+        /// The color of the icon when <see cref="Icon"/> is set.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Color.Default"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.NavMenu.Appearance)]
+        public Color IconColor { get; set; } = Color.Default;
+
+        /// <summary>
+        /// Controls when this link is highlighted.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="NavLinkMatch.Prefix"/>.  This link is compared against the current URL to determine whether it is highlighted.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.NavMenu.Behavior)]
+        public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
+
+        /// <summary>
+        /// The browser frame to open this link when <see cref="Href"/> is specified.
+        /// </summary>
+        /// <remarks>
+        /// Possible values include <c>_blank</c>, <c>_self</c>, <c>_parent</c>, <c>_top</c>, or a <i>frame name</i>. <br/>
+        /// Defaults to <c>null</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.NavMenu.ClickAction)]
+        public string? Target { get; set; }
+
+        /// <summary>
+        /// The relationship between the current document and the linked document when <see cref="Href"/> is set.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>, which applies <c>noopener noreferrer</c> whenever <see cref="Target"/> is set.
+        /// Setting this replaces that default. Common values can be found here: <see href="https://www.w3schools.com/tags/att_a_rel.asp" />
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.NavMenu.ClickAction)]
+        public string? Rel { get; set; }
+
+        /// <summary>
+        /// The CSS applied when this link is active.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>active</c>.  Multiple classes must be separated by spaces.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.ComponentBase.Common)]
+        public string ActiveClass { get; set; } = "active";
+
+        /// <summary>
+        /// Prevents the user from interacting with this link.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.General.Behavior)]
+        public bool Disabled { get; set; }
+
+        /// <summary>
+        /// Shows a ripple effect when the user clicks this link.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.General.Appearance)]
+        public bool Ripple { get; set; } = true;
+
+        /// <summary>
+        /// The URL to navigate to when this link is clicked.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.General.ClickAction)]
+        public string? Href { get; set; }
+
+        /// <summary>
+        /// Performs a full page load during navigation.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. When <c>true</c>, client-side routing is bypassed and the browser is forced to load the new page from the server.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.General.ClickAction)]
+        public bool ForceLoad { get; set; }
+
+        /// <summary>
+        /// The content within this link.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.General.Behavior)]
+        public RenderFragment? ChildContent { get; set; }
+
+        /// <summary>
+        /// Occurs when this link has been clicked.
+        /// </summary>
+        /// <remarks>
+        /// This event only occurs when the <see cref="Href"/> property has not been set.
+        /// </remarks>
+        [Parameter]
+        public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+        protected Task HandleNavigation()
+        {
+            if (!Disabled && NavigationEventReceiver != null)
+            {
+                return NavigationEventReceiver.OnNavigation();
+            }
+
+            return Task.CompletedTask;
+        }
+
+        protected async Task OnClickHandler(MouseEventArgs ev)
+        {
+            if (Disabled)
+            {
+                return;
+            }
+
+            if (Href is not null)
+            {
+                UriHelper.NavigateTo(Href, ForceLoad);
+            }
+            else
+            {
+                await OnClick.InvokeAsync(ev);
+            }
+        }
+    }
+}

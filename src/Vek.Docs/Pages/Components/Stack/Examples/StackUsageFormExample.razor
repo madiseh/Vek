@@ -1,0 +1,26 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekStack>
+    <VekPaper Class="pa-4">
+        <VekStack Row="true">
+            <VekAvatar Size="Size.Large">
+                <VekImage Src="images/mony.jpg" />
+            </VekAvatar>
+            <VekStack Justify="Justify.Center" Spacing="0">
+                <VekText Typo="Typo.body1">Mony Larsson</VekText>
+                <VekText Typo="Typo.body2">onebiteonekill@mony.dog</VekText>
+            </VekStack>
+        </VekStack>
+    </VekPaper>
+
+    <VekPaper Class="pa-4">
+        <VekStack Spacing="4">
+            <VekTextField T="string" Label="Card number" Mask="@(new PatternMask("0000 0000 0000 0000"))" />
+            <VekStack Row="true">
+                <VekTextField T="string" Label="Expires" Mask="@(new DateMask("MM/YY", 'Y', 'M'))" />
+                <VekTextField T="string" Label="CVC" Mask="@(new PatternMask("000"))" />
+            </VekStack>
+            <VekButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="false">Pay Now</VekButton>
+        </VekStack>
+    </VekPaper>
+</VekStack>

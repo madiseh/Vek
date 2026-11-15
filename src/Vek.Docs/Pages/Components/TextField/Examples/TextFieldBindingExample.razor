@@ -1,0 +1,35 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekTextField @bind-Value="element.Name" Label="Name" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+<VekTextField @bind-Value="element.Mass" Label="Mass" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+<VekTextField @bind-Value="element.Electrons" Label="Electrons" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+<VekTextField @bind-Value="element.Changed" Format="yyyy/MM/dd" Label="Last Update" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+
+<div class="d-flex align-end justify-space-between vek-width-full">
+    <div class="d-flex flex-column">
+        <VekText><b>Name:</b> @element.Name</VekText>
+        <VekText><b>Mass:</b> @element.Mass u</VekText>
+        <VekText><b>Electrons:</b> @element.Electrons</VekText>
+        <VekText><b>Last Update:</b> @element.Changed.ToShortDateString()</VekText>
+    </div>
+    <VekButton Variant="Variant.Filled" DropShadow="false" OnClick="Reset">Reset Model</VekButton>
+</div>
+
+@code {
+    Atom element = new Atom { Name = "Hydrogen", Mass = 1.00794, Electrons = 1, Changed=DateTime.Today };
+
+    // A typical POCO
+    public class Atom
+    {
+        public string Name { get; set; }
+        public double Mass { get; set; }
+        public int Electrons { get; set; }
+        public DateTime Changed { get; set; }
+    }
+
+    private void Reset()
+    {
+        element = new Atom { Name = "Hydrogen", Mass = 1.00794, Electrons = 1, Changed = DateTime.Today };
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,41 @@
+﻿@layout IframeLayout
+@namespace Vek.Docs.Examples
+@page "/iframe/docs/examples/drawer/breakpoint"
+
+<VekLayout>
+    <VekAppBar Elevation="1">
+        <VekIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+        <VekSpacer />
+        <VekIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Href="https://github.com/madiseh/vek" Target="_blank" />
+    </VekAppBar>
+    <VekDrawer @bind-Open="@_open" Breakpoint="@_breakpoint" Elevation="1" Variant="@DrawerVariant.Responsive">
+        <VekDrawerHeader>
+            <VekText Typo="Typo.h6">My App</VekText>
+        </VekDrawerHeader>
+        <VekNavMenu>
+            <VekNavLink Match="NavLinkMatch.All">Store</VekNavLink>
+            <VekNavLink Match="NavLinkMatch.All">Library</VekNavLink>
+            <VekNavLink Match="NavLinkMatch.All">Community</VekNavLink>
+        </VekNavMenu>
+    </VekDrawer>
+    <VekMainContent Class="pt-16 px-16">
+        <VekContainer Class="mt-6">
+            <VekSelect Label="Select breakpoint" @bind-Value="_breakpoint">
+                <VekSelectItem Value="@Breakpoint.Sm">Breakpoint.Sm</VekSelectItem>
+                <VekSelectItem Value="@Breakpoint.Md">Breakpoint.Md</VekSelectItem>
+                <VekSelectItem Value="@Breakpoint.Lg">Breakpoint.Lg</VekSelectItem>
+                <VekSelectItem Value="@Breakpoint.Xl">Breakpoint.Xl</VekSelectItem>
+            </VekSelect>
+        </VekContainer>
+    </VekMainContent>
+</VekLayout>
+
+@code{
+    private bool _open = false;
+    private Breakpoint _breakpoint = Breakpoint.Lg;
+
+    private void ToggleDrawer()
+    {
+        _open = !_open;
+    }
+}

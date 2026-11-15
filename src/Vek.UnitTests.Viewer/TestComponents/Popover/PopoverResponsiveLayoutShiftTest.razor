@@ -1,0 +1,112 @@
+<VekPopoverProvider />
+
+<style>
+    .popover-layout-shift-host {
+        display: flex;
+        min-height: 420px;
+        border: 1px solid var(--vek-palette-lines-default);
+        border-radius: var(--vek-default-borderradius);
+        overflow: hidden;
+        background:
+            linear-gradient(135deg, rgba(0, 0, 0, 0.02), transparent 45%),
+            var(--vek-palette-surface);
+    }
+
+    .popover-layout-shift-sidebar {
+        flex: 0 0 var(--layout-rail-width);
+        width: var(--layout-rail-width);
+        transition: width 220ms ease, flex-basis 220ms ease;
+        background:
+            linear-gradient(180deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.01)),
+            var(--vek-palette-background-grey);
+        border-right: 1px solid var(--vek-palette-lines-default);
+    }
+
+    .popover-layout-shift-sidebar.popover-layout-shift-sidebar-collapsed {
+        --layout-rail-width: 84px;
+    }
+
+    .popover-layout-shift-sidebar:not(.popover-layout-shift-sidebar-collapsed) {
+        --layout-rail-width: 272px;
+    }
+
+    .popover-layout-shift-content {
+        flex: 1 1 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px;
+    }
+
+    .popover-layout-shift-card {
+        width: min(100%, 560px);
+    }
+</style>
+
+<VekStack Spacing="2">
+    <VekText Typo="Typo.subtitle1">Responsive layout shift popover repro</VekText>
+    <VekText Typo="Typo.body2">
+        Open the select, then toggle the rail. The popover should continue to look attached while the layout animates.
+    </VekText>
+</VekStack>
+
+<div class="popover-layout-shift-host mt-4">
+    <div class="@SidebarClassname">
+        <VekStack Class="pa-4" Spacing="2">
+            <VekButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@ToggleRail">
+                Toggle Rail
+            </VekButton>
+            <VekText Typo="Typo.body2">
+                Rail width: @_railWidthLabel
+            </VekText>
+        </VekStack>
+    </div>
+
+    <div class="popover-layout-shift-content">
+        <VekPaper Class="popover-layout-shift-card pa-6" Elevation="2">
+            <VekStack Spacing="3">
+                <VekText Typo="Typo.h6">Fixed-width select inside moving layout</VekText>
+                <VekText Typo="Typo.body2">
+                    This reproduces the case where an open popover must follow its anchor while surrounding layout width changes.
+                </VekText>
+                <VekSelect T="string"
+                           Label="State"
+                           Style="width: 280px"
+                           PopoverClass="layout-shift-popover"
+                           @bind-Value="_value">
+                    @foreach (var item in _items)
+                    {
+                        <VekSelectItem T="string" Value="@item">@item</VekSelectItem>
+                    }
+                </VekSelect>
+            </VekStack>
+        </VekPaper>
+    </div>
+</div>
+
+@code {
+    public static string __description__ = "Open a fixed-width select and change surrounding layout width to verify the popover stays aligned during responsive shifts.";
+
+    private bool _collapsed;
+    private string _value = "Illinois";
+
+    private readonly string[] _items =
+    [
+        "Illinois",
+        "Iowa",
+        "Kansas",
+        "Nebraska",
+        "Wisconsin"
+    ];
+
+    private string SidebarClassname => _collapsed
+        ? "popover-layout-shift-sidebar popover-layout-shift-sidebar-collapsed"
+        : "popover-layout-shift-sidebar";
+
+    private string _railWidthLabel => _collapsed ? "84px" : "272px";
+
+    private void ToggleRail()
+    {
+        _collapsed = !_collapsed;
+    }
+}

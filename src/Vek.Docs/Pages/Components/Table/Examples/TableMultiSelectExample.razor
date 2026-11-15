@@ -1,0 +1,52 @@
+@using System.Net.Http.Json
+@using Vek.Examples.Data.Models
+@namespace Vek.Docs.Examples
+@inject HttpClient httpClient
+
+<VekText HtmlTag="span">Item: @_selectedItemText</VekText>
+<VekText>Selected items (@selectedItems?.Count): @(selectedItems == null ? "" : string.Join(", ", selectedItems.OrderBy(x => x.Sign).Select(x => x.Sign)))</VekText>
+
+<VekTable @ref="_table" T="Element" Items="@Elements" MultiSelection="true" SelectionChangeable="_selectionChangeable" Hover="true"
+          @bind-SelectedItems="selectedItems" OnRowClick="@OnRowClick" SelectOnRowClick="@_selectOnRowClick">
+    <HeaderContent>
+        <VekTh>Nr</VekTh>
+        <VekTh>Sign</VekTh>
+        <VekTh>Name</VekTh>
+        <VekTh>Position</VekTh>
+        <VekTh>Molar mass</VekTh>
+    </HeaderContent>
+    <RowTemplate>
+        <VekTd DataLabel="Nr">@context.Number</VekTd>
+        <VekTd DataLabel="Sign">@context.Sign</VekTd>
+        <VekTd DataLabel="Name">@context.Name</VekTd>
+        <VekTd DataLabel="Position">@context.Position</VekTd>
+        <VekTd DataLabel="Molar mass">@context.Molar</VekTd>
+    </RowTemplate>
+    <PagerContent>
+        <VekTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
+    </PagerContent>
+    <FooterContent>
+        <VekTd colspan="5">Select All</VekTd>
+    </FooterContent>
+</VekTable>
+<VekSwitch @bind-Value="_selectOnRowClick" Color="Color.Primary">Select on row click</VekSwitch>
+<VekSwitch @bind-Value="_selectionChangeable" Color="Color.Primary">Selection is changeable</VekSwitch>
+
+@code {
+    private HashSet<Element> selectedItems = new HashSet<Element>();
+    private IEnumerable<Element> Elements = new List<Element>();
+    private bool _selectOnRowClick = true;
+    private bool _selectionChangeable = true;
+    private VekTable<Element> _table;
+    private string _selectedItemText = "No row clicked";
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = await httpClient.GetFromJsonAsync<List<Element>>("webapi/periodictable");
+    }
+
+    void OnRowClick(TableRowClickEventArgs<Element> args)
+    {
+        _selectedItemText = $"{args.Item.Name} ({args.Item.Sign})";
+    }
+}

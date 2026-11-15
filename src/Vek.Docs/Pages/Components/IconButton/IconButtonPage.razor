@@ -1,0 +1,39 @@
+﻿@page "/components/iconbutton"
+
+<DocsPage>
+    <DocsPageHeader Title="Icon Button" Component="@nameof(VekIconButton)">
+        <Description>
+            Similar to <ApiTypeLink TypeName="VekButton" /> but with icons. For guidance and suggestions, go to <VekLink Href="/components/icons">Icons.</VekLink>
+        </Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Simple Icon Buttons">
+                <Description>With the library's preloaded icons. Check out our <VekLink Href="/features/icons">icon page</VekLink> to find out what you can use.</Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(IconButtonSimpleExample)">
+                <IconButtonSimpleExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Using Font Icons">
+                <Description>In this example, we are passing down <VekLink Href="https://fontawesome.com/icons">Font Awesome</VekLink> icon classes instead.</Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(IconButtonFontIconExample)">
+                <IconButtonFontIconExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Variant and Size">
+                <Description>If preferred, it's possible to apply the same style of a text button using the <CodeInline>Variant</CodeInline> parameter.</Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(IconButtonStyleExample)">
+                <IconButtonStyleExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

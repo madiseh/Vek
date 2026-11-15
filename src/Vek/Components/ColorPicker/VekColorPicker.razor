@@ -1,0 +1,294 @@
+﻿@namespace Vek
+@using Vek.Resources
+@using Vek.Utilities
+@inherits VekPicker<VekColor>
+@inject InternalVekLocalizer Localizer
+
+@Render
+
+@code {
+
+    protected override RenderFragment PickerContent =>
+    @<text><VekPickerToolbar ShowToolbar="@ShowToolbar" Class="vek-picker-color-toolbar">
+            @if (PickerVariant != PickerVariant.Static)
+            {
+                <VekIconButton Class="pa-1 vek-close-picker-button"
+                               Size="Size.Small"
+                               Color="Color.Inherit"
+                               Icon="@CloseIcon"
+                               OnClick="@GetEventCallback()"
+                               aria-label="@Localizer[LanguageResource.VekColorPicker_Close]" />
+            }
+            <VekSpacer />
+
+        <VekTooltip Text="@((ShowTooltips ? Localizer[LanguageResource.VekColorPicker_SpectrumView] : string.Empty))">
+            <VekIconButton Class="pa-1"
+                           Size="Size.Small"
+                           Color="GetButtonColor(ColorPickerView.Spectrum)"
+                           Icon="@SpectrumIcon"
+                           OnClick="() => ChangeViewAsync(ColorPickerView.Spectrum)"
+                           aria-label="@Localizer[LanguageResource.VekColorPicker_SpectrumView]" />
+        </VekTooltip>
+
+        <VekTooltip Text="@((ShowTooltips ? Localizer[LanguageResource.VekColorPicker_GridView] : string.Empty))">
+            <VekIconButton Class="pa-1 mx-1"
+                           Size="Size.Small"
+                           Color="GetButtonColor(ColorPickerView.Grid)"
+                           Icon="@GridIcon"
+                           OnClick="() => ChangeViewAsync(ColorPickerView.Grid)"
+                           aria-label="@Localizer[LanguageResource.VekColorPicker_GridView]" />
+        </VekTooltip>
+
+        <VekTooltip Text="@((ShowTooltips ? Localizer[LanguageResource.VekColorPicker_PaletteView] : string.Empty))">
+            <VekIconButton Class="pa-1"
+                           Size="Size.Small"
+                           Color="GetButtonColor(ColorPickerView.Palette)"
+                           Icon="@PaletteIcon"
+                           OnClick="() => ChangeViewAsync(ColorPickerView.Palette)"
+                           aria-label="@Localizer[LanguageResource.VekColorPicker_PaletteView]" />
+        </VekTooltip>
+        </VekPickerToolbar>
+        <VekPickerContent Class="vek-picker-color-content">
+            @if (ShowColorField)
+            {
+                <div class="vek-picker-color-picker">
+                    @if (_colorPickerViewState.Value == ColorPickerView.Spectrum)
+                    {
+                        <div class="vek-picker-color-overlay" style="@($"background-color: {_baseColor?.ToString(VekColorOutputFormats.RGB)}")">
+                            <div class="vek-picker-color-overlay vek-picker-color-overlay-white">
+                                <div class="vek-picker-color-overlay vek-picker-color-overlay-black">
+                                    <div class="vek-picker-color-overlay"
+                                         id="@_id"
+                                         @onpointerdown="OnColorOverlayClick"
+                                         @onpointerup="OnColorOverlayClick"
+                                         @onpointermove="@(DragEffect ? EventCallback.Factory.Create<PointerEventArgs>(this, OnPointerMoveAsync) : default)"
+                                         @onpointerleave="OnPointerLeaveAsync">
+                                        <svg class="vek-picker-color-selector"
+                                             height="26"
+                                             width="26"
+                                             style="transform: @GetSelectorLocation()">
+                                            <defs>
+                                                <filter id="vek-picker-color-selector-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                                                    <feGaussianBlur in="SourceAlpha" stdDeviation="1" />
+                                                    <feOffset dx="0" dy="5" result="offsetblur" />
+                                                    <feOffset dx="0" dy="-5" result="offsetblur" />
+                                                    <feMerge>
+                                                        <feMergeNode />
+                                                        <feMergeNode in="SourceGraphic" />
+                                                    </feMerge>
+                                                </filter>
+                                            </defs>
+                                            <circle r="10" cx="13" cy="13" stroke="white" stroke-width="1" fill="transparent" style="filter: url(#vek-picker-color-selector-shadow)" />
+                                            <circle r="11" cx="13" cy="13" stroke="white" stroke-width="1.5" fill="transparent" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (_colorPickerViewState.Value is ColorPickerView.Grid or ColorPickerView.GridCompact)
+                    {
+                        <div class="vek-picker-color-grid">
+                            @foreach (var item in _gridList)
+                            {
+                                <div class="@GetColorDotClass(item)"
+                                     style="@($"background: {item.ToString(VekColorOutputFormats.RGBA)};")"
+                                     @onclick="@GetSelectPaletteColorCallback(item)"
+                                     aria-label="@item.ToString(VekColorOutputFormats.HexA)"></div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+            @if (_colorPickerViewState.Value != ColorPickerView.GridCompact)
+            {
+                @if (ShowSliders || ShowInputs || ShowPreview)
+                {
+                    <div class="vek-picker-color-controls">
+                        @if (ShowSliders || ShowPreview)
+                        {
+                            <div class="vek-picker-color-controls-row">
+                                @if (ShowPreview)
+                                {
+                                    <div class="vek-picker-color-dot vek-picker-color-dot-current vek-ripple"
+                                         @onclick="ToggleCollection"
+                                         aria-label="@(_collectionOpen ? @Localizer[LanguageResource.VekColorPicker_HideSwatches] : @Localizer[LanguageResource.VekColorPicker_ShowSwatches])">
+                                        <div class="vek-picker-color-fill" style="@($"background: {ValueOrDefault.ToString(VekColorOutputFormats.RGBA)};")"></div>
+                                    </div>
+                                }
+                                @if (ShowSliders && !_collectionOpen)
+                                {
+                                    <div class="vek-picker-color-sliders">
+                                        @if (_colorPickerViewState.Value != ColorPickerView.Grid)
+                                        {
+                                            <VekSlider Class="vek-picker-color-slider hue"
+                                                       dir="ltr"
+                                                       T="int"
+                                                       Value="ReadHueInt"
+                                                       ValueChanged="@UpdateBaseColorSliderAsync"
+                                                       Step="1"
+                                                       Min="0"
+                                                       Max="360"
+                                                       aria-label="@Localizer[LanguageResource.VekColorPicker_HueSlider]" />
+                                        }
+                                        @if (_alphaState.Value)
+                                        {
+                                            <VekSlider Class="vek-picker-color-slider alpha"
+                                                       Value="ReadAlpha"
+                                                       ValueChanged="@SetAlphaAsync"
+                                                       T="int"
+                                                       Min="0"
+                                                       Max="255"
+                                                       Step="1"
+                                                       Style="@AlphaSliderStyle"
+                                                       aria-label="@Localizer[LanguageResource.VekColorPicker_AlphaSlider]" />
+                                        }
+                                    </div>
+                                }
+                                @if (_collectionOpen)
+                                {
+                                    <div class="vek-picker-color-collection">
+                                        @foreach (var item in Palette.Take(5))
+                                        {
+                                            <div class="@GetColorDotClass(item)"
+                                                 style="@($"background: {item.ToString(VekColorOutputFormats.RGBA)};")"
+                                                 @onclick="@GetSelectPaletteColorCallback(item)"
+                                                 aria-label="@item.ToString(VekColorOutputFormats.HexA)"></div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                        @if (ShowInputs)
+                        {
+                            <div class="vek-picker-color-controls-row">
+                                <div class="vek-picker-color-inputs">
+                                    @switch (ColorPickerMode)
+                                    {
+                                        case ColorPickerMode.RGB:
+                                            <VekNumericField T="int"
+                                                             Value="ReadRed"
+                                                             ValueChanged="@SetRedAsync"
+                                                             Class="vek-picker-color-inputfield"
+                                                             HelperText="R"
+                                                             Min="0"
+                                                             Max="255"
+                                                             Variant="Variant.Outlined"
+                                                             HideSpinButtons="true"
+                                                             Required="@Required" />
+                                            <VekNumericField T="int"
+                                                             Value="ReadGreen"
+                                                             ValueChanged="@SetGreenAsync"
+                                                             Class="vek-picker-color-inputfield"
+                                                             HelperText="G"
+                                                             Min="0"
+                                                             Max="255"
+                                                             Variant="Variant.Outlined"
+                                                             HideSpinButtons="true"
+                                                             Required="@Required" />
+                                            <VekNumericField T="int"
+                                                             Value="ReadBlue"
+                                                             ValueChanged="@SetBlueAsync"
+                                                             Class="vek-picker-color-inputfield"
+                                                             HelperText="B"
+                                                             Min="0"
+                                                             Max="255"
+                                                             Variant="Variant.Outlined"
+                                                             HideSpinButtons="true"
+                                                             Required="@Required" />
+                                            break;
+                                        case ColorPickerMode.HSL:
+                                            <VekNumericField T="double"
+                                                             Value="ReadHue"
+                                                             ValueChanged="@SetHueAsync"
+                                                             Class="vek-picker-color-inputfield"
+                                                             HelperText="H"
+                                                             Step="1"
+                                                             Min="0"
+                                                             Max="360"
+                                                             Variant="Variant.Outlined"
+                                                             HideSpinButtons="true"
+                                                             Required="@Required" />
+                                            <VekNumericField T="double"
+                                                             Value="@ReadSaturation"
+                                                             ValueChanged="@SetSaturationAsync"
+                                                             Class="vek-picker-color-inputfield"
+                                                             HelperText="S"
+                                                             Step="0.01"
+                                                             Min="0"
+                                                             Max="100"
+                                                             Variant="Variant.Outlined"
+                                                             HideSpinButtons="true"
+                                                             Required="@Required" />
+                                            <VekNumericField T="double"
+                                                             Value="ReadLightness"
+                                                             ValueChanged="@SetLightnessAsync"
+                                                             Class="vek-picker-color-inputfield"
+                                                             HelperText="L"
+                                                             Step="0.01"
+                                                             Min="0"
+                                                             Max="100"
+                                                             Variant="Variant.Outlined"
+                                                             HideSpinButtons="true"
+                                                             Required="@Required" />
+                                            break;
+                                        case ColorPickerMode.HEX:
+                                            <VekTextField T="string"
+                                                          @key="@_inputResetKey"
+                                                          Value="@GetColorTextValue(ValueOrDefault)"
+                                                          ValueChanged="SetInputStringAsync"
+                                                          Class="vek-picker-color-inputfield"
+                                                          Variant="Variant.Outlined"
+                                                          MaxLength="@GetHexColorInputMaxLength()"
+                                                          HelperText="HEX"
+                                                          Required="@Required" />
+                                            break;
+                                    }
+
+                                    @if (_alphaState.Value && ColorPickerMode != ColorPickerMode.HEX)
+                                    {
+                                        <VekNumericField T="double"
+                                                         Value="ReadAlphaPercentage"
+                                                         ValueChanged="@SetAlphaAsync"
+                                                         Class="vek-picker-color-inputfield input-field-alpha"
+                                                         HelperText="A"
+                                                         Min="0"
+                                                         Max="1"
+                                                         Step="0.01"
+                                                         Variant="Variant.Outlined"
+                                                         HideSpinButtons="true"
+                                                         Required="@Required" />
+                                    }
+                                </div>
+                                @if (ShowModeSwitch)
+                                {
+                                    <div class="vek-picker-control-switch">
+                                        <VekTooltip Text="@((ShowTooltips ? Localizer[LanguageResource.VekColorPicker_ModeSwitch] : string.Empty))">
+                                            <VekIconButton OnClick="ChangeMode"
+                                                           Icon="@ImportExportIcon"
+                                                           Class="pa-1 me-n1"
+                                                           aria-label="@Localizer[LanguageResource.VekColorPicker_ModeSwitch]" />
+                                        </VekTooltip>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+                @if (_colorPickerViewState.Value == ColorPickerView.Palette)
+                {
+                    <div class="vek-picker-color-view">
+                        <div class="vek-picker-color-view-collection">
+                            @foreach (var item in Palette)
+                            {
+                                <div class="@GetColorDotClass(item)"
+                                     style="@($"background: {item.ToString(VekColorOutputFormats.RGBA)};")"
+                                     @onclick="@GetSelectPaletteColorCallback(item)"
+                                     aria-label="@item.ToString(VekColorOutputFormats.HexA)"></div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </VekPickerContent></text>;
+}

@@ -1,0 +1,13 @@
+﻿<VekForm ValidationDelay="0">
+    <VekRadioGroup T="string" Required="true" @bind-Value="Selected">
+        <VekRadio Value="@("A")">Option A</VekRadio>
+        <VekRadio Value="@("B")">Option B</VekRadio>
+    </VekRadioGroup>
+</VekForm>
+
+@code {
+    public static string __description__ = "Clearing the value of a required radiogroup should set form's isvalid to false.";
+
+    [Parameter]
+    public string? Selected { get; set; }
+}

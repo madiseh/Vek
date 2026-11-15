@@ -1,0 +1,14 @@
+﻿<VekPopoverProvider />
+
+<VekSelect @bind-Value="_value" PopoverClass="select-popover-class">
+    <VekSelectItem Value="@("1")"/>
+    <VekSelectItem Value="@("2")"/>
+    <VekSelectItem Value="@("3")"/>
+    <VekSelectItem Value="@("4")" Disabled="true"/>
+</VekSelect>
+
+@code {
+    public static string __description__ = "Value 2 should be selected initially and highlighted.";
+
+    private string? _value = "2";
+}

@@ -1,0 +1,10 @@
+﻿@namespace Vek
+@using Microsoft.AspNetCore.Components.Sections
+@inherits VekAppBar
+
+@if (Visible)
+{
+    <SectionContent SectionId="@ContextualActionBar">
+        @ContextualContent
+    </SectionContent>
+}

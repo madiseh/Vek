@@ -1,0 +1,48 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekTabs Elevation="1" Rounded="true" @ref="_tabs">
+    <VekTabPanel Text="One" @ref="_panel01" ID="@("pn_one")" />
+    <VekTabPanel Text="Two" @ref="_panel02" ID="@("pn_two")" />
+    <VekTabPanel Text="Three" @ref="_panel03" ID="@("pn_three")" />
+</VekTabs>
+
+<VekText GutterBottom="true" Align="Align.Center" Class="mt-8"><b>Set Active by Index</b></VekText>
+<div class="d-flex justify-center">
+    <VekButton Variant="@Variant.Filled" Color="Color.Primary" OnClick="() => ActivateAsync(0)">Index 0</VekButton>
+    <VekButton Variant="@Variant.Filled" Color="Color.Primary" OnClick="() => ActivateAsync(1)" Class="mx-2">Index 1</VekButton>
+    <VekButton Variant="@Variant.Filled" Color="Color.Primary" OnClick="() => ActivateAsync(2)">Index 2</VekButton>
+</div>
+<VekText GutterBottom="true" Align="Align.Center" Class="mt-4"><b>Set Active by Instance</b></VekText>
+<div class="d-flex justify-center">
+    <VekButton Variant="@Variant.Filled" Color="Color.Primary" OnClick="() => ActivateAsync(_panel01)">Item One</VekButton>
+    <VekButton Variant="@Variant.Filled" Color="Color.Primary" OnClick="() => ActivateAsync(_panel02)" Class="mx-2">Item Two</VekButton>
+    <VekButton Variant="@Variant.Filled" Color="Color.Primary" OnClick="() => ActivateAsync(_panel03)">Item Three</VekButton>
+</div>
+<VekText GutterBottom="true" Align="Align.Center" Class="mt-4"><b>Set Active by TabPanel ID</b></VekText>
+<div class="d-flex justify-center">
+    <VekButton Variant="@Variant.Filled" Color="Color.Primary" OnClick='() => ActivateAsync("pn_one")'>Item One</VekButton>
+    <VekButton Variant="@Variant.Filled" Color="Color.Primary" OnClick='() => ActivateAsync("pn_two")' Class="mx-2">Item Two</VekButton>
+    <VekButton Variant="@Variant.Filled" Color="Color.Primary" OnClick='() => ActivateAsync("pn_three")'>Item Three</VekButton>
+</div>
+
+@code {
+    private VekTabs _tabs = null!;
+    private VekTabPanel _panel01 = null!;
+    private VekTabPanel _panel02 = null!;
+    private VekTabPanel _panel03 = null!;
+
+    private Task ActivateAsync(int index)
+    {
+        return _tabs.ActivatePanelAsync(index);
+    }
+
+    private Task ActivateAsync(VekTabPanel panel)
+    {
+        return _tabs.ActivatePanelAsync(panel);
+    }
+
+    private Task ActivateAsync(object id)
+    {
+        return _tabs.ActivatePanelAsync(id);
+    }
+}

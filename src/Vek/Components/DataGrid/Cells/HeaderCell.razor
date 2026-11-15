@@ -1,0 +1,185 @@
+﻿@namespace Vek
+@inherits VekComponentBase
+@using System.Diagnostics
+@using Vek.Resources
+@using Microsoft.JSInterop
+@typeparam T
+
+@inject InternalVekLocalizer Localizer
+@inject IJSRuntime JSRuntime
+
+@if (IsOnlyHeader)
+{
+    <th scope="col" class="vek-table-cell @Classname" style="" @attributes="@UserAttributes">
+        @ChildContent
+    </th>
+}
+else if (Column != null && !Column.HiddenState.Value)
+{
+    <th @ref=@_headerElement scope="col" class="@Classname" style="@Stylename" colspan="@Column.HeaderColSpan" aria-sort="@GetAriaSort()" @attributes="@UserAttributes">
+        @if (DataGrid.DragDropColumnReordering)
+        {
+            <VekDropZone CanDrop="@((item) => (Column.DragAndDropEnabled ?? true))" ItemDisabled="@((item) => !item.DragAndDropEnabled ?? false)" T="Column<T>" Identifier="@(Column.PropertyName ?? _id)">
+
+            </VekDropZone>
+        }
+        else
+        {
+            @TableHeader()
+        }
+        @if (resizable)
+        {
+            <div @ref="_resizerElement"
+                 @onpointerdown="this.AsNonRenderingEventHandler<PointerEventArgs>(OnResizerPointerDown)" 
+                 @onpointerdown:stopPropagation="true"
+                 @onpointermove="this.AsNonRenderingEventHandler<PointerEventArgs>(OnResizerPointerMove)" 
+                 @onpointerup="this.AsNonRenderingEventHandler<PointerEventArgs>(OnResizerPointerUp)"
+                 @onpointerover="@OnResizerPointerOver"
+                 @onpointerleave="this.AsNonRenderingEventHandler(OnResizerPointerLeave)"
+                 class="@ResizerClass" style="@ResizerStyle" />
+        }
+    </th>
+}
+
+@code {
+
+    internal RenderFragment TableHeader()
+    {
+        Debug.Assert(Column is not null);
+        Debug.Assert(DataGrid is not null);
+        var headerTemplate = Column.GetHeaderTemplate();
+
+        return
+        @<text>
+        <span class="column-header">
+            @if (sortable)
+            {
+                <span class="@SortHeaderClass" @onclick="SortChangedAsync">
+                    @if (headerTemplate != null)
+                    {
+                        @headerTemplate(Column.headerContext)
+                    }
+                    else if (IncludeHierarchyToggle)
+                    {
+                        @HierarchyToggle
+                    }
+                    else 
+                    {
+                        @computedTitle
+                    }
+                </span>
+            }
+            else
+            { 
+                @if (headerTemplate != null)
+                {
+                    @headerTemplate(Column.headerContext)
+                }
+                else if (IncludeHierarchyToggle)
+                {
+                    @HierarchyToggle
+                }
+                else 
+                {
+                    @computedTitle
+                }
+            }
+            <span class="@OptionsClass">
+                @if (sortable)
+                {
+                    <VekIconButton Icon="@DataGrid.SortIcon" Class="@sortIconClass" Size="@Size.Small" OnClick="@SortChangedAsync" aria-label="@Localizer[LanguageResource.VekDataGrid_Sort]"></VekIconButton>
+
+                    if (DataGrid.SortMode == SortMode.Multiple)
+                    {
+                        if (Column.SortIndex < 0)
+                        {
+                            <span class="vek-sort-index vek-text-disabled invisible">@(Column.SortIndex + 1)</span>
+                        }
+                        else
+                        {
+                            <span class="vek-sort-index vek-text-disabled">@(Column.SortIndex + 1)</span>
+                        }
+                    }
+                }
+
+                @if (DataGrid.FilterMode != DataGridFilterMode.ColumnFilterRow)
+                {
+                    if (hasFilter)
+                    {
+                        <VekIconButton Class="filter-button filtered" Icon="@DataGrid.FilterIconFilled" Size="@Size.Small" OnClick="@OpenFilters" aria-label="@Localizer[LanguageResource.VekDataGrid_OpenFilters]"></VekIconButton>
+                    }
+                    else if (showFilterIcon)
+                    {
+                        <VekIconButton Class="filter-button" Icon="@DataGrid.FilterIconEmpty" Size="@Size.Small" OnClick="@AddFilter" aria-label="@Localizer[LanguageResource.VekDataGrid_AddFilter]"></VekIconButton>
+                    }
+                }
+
+                @if (showColumnOptions)
+                {
+                    <VekMenu Icon="@DataGrid.ColumnOptionsIcon" Size="Size.Small" Dense="true" AriaLabel="@Localizer[LanguageResource.VekDataGrid_ShowColumnOptions]">
+                        <VekMenuItem Disabled="@(SortDirection == SortDirection.None)" OnClick="@RemoveSortAsync">@Localizer[LanguageResource.VekDataGrid_Unsort]</VekMenuItem>
+                        @if (filterable && DataGrid.FilterMode != DataGridFilterMode.ColumnFilterRow)
+                        {
+                            <VekMenuItem OnClick="@AddFilter">@Localizer[LanguageResource.VekDataGrid_Filter]</VekMenuItem>
+                        }
+                        @if (hideable)
+                        {
+                            <VekMenuItem OnClick="@HideColumnAsync">@Localizer[LanguageResource.VekDataGrid_Hide]</VekMenuItem>
+                        }
+                        @if (groupable)
+                        {
+                            if (Column?.GroupingState.Value ?? false)
+                            {
+                                <VekMenuItem OnClick="@UngroupColumnAsync">@Localizer[LanguageResource.VekDataGrid_Ungroup]</VekMenuItem>
+                            }
+                            else
+                            {
+                                <VekMenuItem OnClick="@GroupColumnAsync">@Localizer[LanguageResource.VekDataGrid_Group]</VekMenuItem>
+                            }
+                        }
+                    </VekMenu>
+                }
+                @if (DataGrid.DragDropColumnReordering && (Column.DragAndDropEnabled ?? true))
+                {
+                    <VekIconButton Icon="@DataGrid.DragIndicatorIcon" Size="@DataGrid.DragIndicatorSize" Class="drag-icon-options" aria-label="@Localizer[LanguageResource.VekDataGrid_ReorderColumn]"></VekIconButton>
+                }
+            </span>
+        </span>
+        @if (filterable && DataGrid.FilterMode == DataGridFilterMode.ColumnFilterMenu)
+        {
+            <VekOverlay @bind-Visible="@_filtersMenuVisible" AutoClose />
+            <VekPopover UserAttributes="@PositionAttributes" Open="@_filtersMenuVisible" OverflowBehavior="OverflowBehavior.FlipOnOpen" AnchorOrigin="@Origin.BottomRight" TransformOrigin="@Origin.TopRight" Class="pa-4 column-filter-popup vek-popover-position-override">
+                @* Escape from any control in the menu bubbles here, so one handler covers built-in and templated filters.
+                   It does not render, because every keystroke typed into the menu passes through it. *@
+                <div class="column-filter-popup-content d-contents" @onkeydown="this.AsNonRenderingEventHandler<KeyboardEventArgs>(OnFilterMenuKeyDownAsync)">
+                    @if (Column.FilterTemplate != null)
+                    {
+                        @Column.FilterTemplate(Column.FilterContext)
+                    }
+                    else
+                    {
+                        <VekGrid>
+                            <VekItem xs="12">
+                                @DataGrid?.Filter(Column.FilterContext.FilterDefinition!, Column)
+                            </VekItem>
+                            <VekItem xs="12" Class="d-flex justify-end">
+                                <VekButton Class="clear-filter-button" OnClick="@ClearFilterAsync">@Localizer[LanguageResource.VekDataGrid_Clear]</VekButton>
+                                <VekButton Class="apply-filter-button" Color="@Color.Primary" OnClick="@ApplyFilterAsync">@Localizer[LanguageResource.VekDataGrid_Filter]</VekButton>
+                            </VekItem>
+                        </VekGrid>
+                    }
+                </div>
+            </VekPopover>
+        }
+        </text>;
+    }
+
+    private RenderFragment HierarchyToggle =>
+        @<text>
+             <VekIconButton Icon="@GetGroupIcon()"
+                            Class="ma-n3 pa-1 vek-hierarchy-toggle-button"
+                            OnClick="@ToggleHierarchyAsync"
+                            aria-label="@(Expanded ? @Localizer[LanguageResource.VekDataGrid_CollapseAllGroups] : @Localizer[LanguageResource.VekDataGrid_ExpandAllGroups])"/>
+         </text>;
+
+}

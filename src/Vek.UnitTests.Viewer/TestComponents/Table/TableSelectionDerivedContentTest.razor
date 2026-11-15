@@ -1,0 +1,20 @@
+<VekTable @ref="_table" T="int" Items="_items" MultiSelection="true" RowClassFunc="RowClass">
+    <ToolBarContent>
+        <VekText id="selected-count">@(_table?.SelectedItems?.Count ?? 0)</VekText>
+    </ToolBarContent>
+    <HeaderContent>
+        <VekTh>#</VekTh>
+    </HeaderContent>
+    <RowTemplate>
+        <VekTd>@context</VekTd>
+    </RowTemplate>
+</VekTable>
+
+@code {
+    public static string __description__ = "a toolbar and row classes derived from the selection must follow the row checkboxes even when SelectedItems is not bound.";
+
+    private VekTable<int>? _table;
+    private readonly int[] _items = [0, 1, 2, 3];
+
+    private string RowClass(int item, int index) => _table?.SelectedItems?.Contains(item) == true ? "row-selected" : string.Empty;
+}

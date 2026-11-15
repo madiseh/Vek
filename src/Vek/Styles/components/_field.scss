@@ -1,0 +1,33 @@
+.vek-input-control.vek-field {
+  .vek-input-slot {
+    height: auto;
+    min-height: 19px;
+
+    &.vek-input-root-outlined.vek-input-adorned-start {
+      padding-left: 0;
+      padding-inline-start: 0;
+      padding-inline-end: 14px;
+    }
+
+    &.vek-input-root-filled.vek-input-adorned-start {
+      padding-left: 0;
+      padding-inline-start: 0;
+      padding-inline-end: 12px;
+    }
+
+    &.vek-input-slot-nopadding {
+      padding-top: 0px;
+      padding-bottom: 0px;
+
+      &.vek-input-root-filled {
+        padding-top: 21px;
+        padding-bottom: 2px;
+      }
+
+      &.vek-input-root-outlined {
+        padding-top: 7px;
+        padding-bottom: 2px;
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+﻿<VekPopoverProvider />
+
+<VekForm ValidationDelay="0">
+    <VekDateRangePicker Required="true" @bind-DateRange="DateRange">
+    </VekDateRangePicker>
+</VekForm>
+
+@code {
+    public static string __description__ = "Form should validate date range picker's date range.";
+
+    [Parameter]
+    public DateRange? DateRange { get; set; }
+}

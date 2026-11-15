@@ -1,0 +1,30 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekButton Variant="Variant.Text" OnClick="@(() => OpenDrawer(Anchor.Start))">Start</VekButton>
+<VekButton Variant="Variant.Text" OnClick="@(() => OpenDrawer(Anchor.End))">End</VekButton>
+<VekButton Variant="Variant.Text" OnClick="@(() => OpenDrawer(Anchor.Top))">Top</VekButton>
+<VekButton Variant="Variant.Text" OnClick="@(() => OpenDrawer(Anchor.Bottom))">Bottom</VekButton>
+<VekSwitch @bind-Value="_overlayAutoClose" Label="Overlay Autoclose" Color="Color.Secondary" />
+<VekDrawer @bind-Open="@_open" Anchor="@_anchor" Elevation="1" Variant="@DrawerVariant.Temporary" OverlayAutoClose="@_overlayAutoClose">
+    <VekDrawerHeader>
+        <VekText Typo="Typo.h6">My App</VekText>
+    </VekDrawerHeader>
+    <VekNavMenu>
+        <VekNavLink Match="NavLinkMatch.All">Store</VekNavLink>
+        <VekNavLink Match="NavLinkMatch.All">Library</VekNavLink>
+        <VekNavLink Match="NavLinkMatch.All">Community</VekNavLink>
+        <VekNavLink OnClick="_ => _open = false">Close Drawer</VekNavLink>
+    </VekNavMenu>
+</VekDrawer>
+
+@code{ 
+    private bool _open;
+    private Anchor _anchor;
+    private bool _overlayAutoClose = true;
+
+    private void OpenDrawer(Anchor anchor)
+    {
+        _open = true;
+        _anchor = anchor;
+    }
+}

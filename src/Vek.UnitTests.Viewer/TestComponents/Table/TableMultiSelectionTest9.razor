@@ -1,0 +1,51 @@
+﻿<VekText>SelectedItems { @string.Join(", ", _selectedItems) }</VekText>
+<VekTable Items="Items"
+          T="TableGroupingTest.RacingCar"
+          MultiSelection="true"
+          SelectOnRowClick="true"
+          SelectionChangeable="false"
+          @bind-SelectedItems="_selectedItems"
+          GroupBy="@_groups"
+          GroupHeaderStyle="background-color:var(--vek-palette-background-gray)"
+          RowClass="row-click-test"
+          OnRowClick="(args) => ++_count">
+    <HeaderContent>
+        <VekTh>Name</VekTh>
+    </HeaderContent>
+    <GroupHeaderTemplate>
+        <VekTh>@($"{context.GroupName}: {context.Key}")</VekTh>
+    </GroupHeaderTemplate>
+    <RowTemplate>
+        <VekTd>@context.Name</VekTd>
+    </RowTemplate>
+    <FooterContent>
+        <VekTd>F</VekTd>
+    </FooterContent>
+</VekTable>
+<VekText>Clicked: @_count</VekText>
+
+@code {
+    public static string __description__ = "The checkboxes should all be disabled on load, even the header, group headers and footer checkboxes.";
+
+    private int _count;
+    private HashSet<TableGroupingTest.RacingCar> _selectedItems = [];
+    private readonly TableGroupDefinition<TableGroupingTest.RacingCar> _groups = new()
+    {
+        GroupName = "Category",
+        Selector = rc => rc.Category,
+        InnerGroup = new TableGroupDefinition<TableGroupingTest.RacingCar>
+        {
+            GroupName = "Brand",
+            Selector = rc => rc.Brand
+        }
+    };
+
+    public IEnumerable<TableGroupingTest.RacingCar> Items { get; } =
+    [
+        new("F488", "Ferrari", "GTE"),
+        new("919 Hybrid", "Porsche", "LMP1"),
+        new("911 RSR", "Porsche", "GTE"),
+        new("911 RS", "Porsche", "GT3")
+    ];
+
+}

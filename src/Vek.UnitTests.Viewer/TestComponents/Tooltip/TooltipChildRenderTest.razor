@@ -1,0 +1,20 @@
+﻿@using Vek.UnitTests.TestComponents.Tooltip.RerenderTests
+
+<VekPopoverProvider />
+
+<VekTooltip Text="Tooltip with Object" Arrow="true" Placement="Placement.Top">
+    <MyAreaWithComplexObject MyValue="@ComplexValue" />
+</VekTooltip>
+
+<br/>
+<br/>
+<br/>
+
+<VekTooltip Text="Tooltip with integer" Arrow="true" Placement="Placement.Top">
+    <MyAreaWithSimpleValue MyValue="@SimpleValue" />
+</VekTooltip>
+
+@code {
+    public MyObject ComplexValue = new();
+    public int SimpleValue = 1;
+}

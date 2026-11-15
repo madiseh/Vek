@@ -1,0 +1,14 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekStack>
+    <VekColorPicker ThrottleInterval="Interval" DragEffect="@Draggable" PickerVariant="PickerVariant.Static" />
+
+    <VekNumericField T="int" @bind-Value="Interval" Label="Throttle interval" />
+
+    <VekCheckBox T="bool" @bind-Value="Draggable" Label="Allow dragging the pointer" />
+</VekStack>
+
+@code {
+    public int Interval { get; set; } = 100;
+    public bool Draggable { get; set; } = true;
+}

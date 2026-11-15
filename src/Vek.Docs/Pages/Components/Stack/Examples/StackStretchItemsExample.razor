@@ -1,0 +1,22 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekPaper Outlined Class="border-dashed">
+    <VekStack StretchItems="@stretch" Row>
+        <VekPaper Class="pa-3 vek-theme-primary">Item 1</VekPaper>
+        <VekPaper Class="pa-3 vek-theme-primary">Item 2</VekPaper>
+        <VekPaper Class="pa-3 vek-theme-primary">Item 3</VekPaper>
+    </VekStack>
+</VekPaper>
+
+<VekChipSet @bind-SelectedValue="@stretch" Class="mt-12" >
+    <VekChip Value="StretchItems.None" Text="Do Not Stretch" SelectedColor="Color.Primary" />
+    <VekChip Value="StretchItems.Start" Text="Stretch First" SelectedColor="Color.Primary" Default="true" />
+    <VekChip Value="StretchItems.StartAndEnd" Text="Stretch First and Last" SelectedColor="Color.Primary" />
+    <VekChip Value="StretchItems.End" Text="Stretch Last" SelectedColor="Color.Primary" />
+    <VekChip Value="StretchItems.Middle" Text="Stretch Middle" SelectedColor="Color.Primary" />
+    <VekChip Value="StretchItems.All" Text="Stretch All" SelectedColor="Color.Primary" />
+</VekChipSet>
+
+@code {
+    StretchItems stretch = StretchItems.Start;
+}

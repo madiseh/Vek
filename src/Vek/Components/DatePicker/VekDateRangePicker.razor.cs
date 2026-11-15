@@ -1,0 +1,641 @@
+﻿using Microsoft.AspNetCore.Components;
+using Vek.Extensions;
+using Vek.State;
+using Vek.Utilities;
+
+namespace Vek
+{
+    /// <summary>
+    /// Selects a start and end date range from a calendar shown in a drop-down, dialog, or inline.
+    /// </summary>
+    /// <seealso cref="DateRange" />
+    /// <seealso cref="VekDatePicker" />
+    /// <seealso cref="VekTimePicker" />
+    public partial class VekDateRangePicker : VekBaseDatePicker
+    {
+        private readonly ParameterState<int?> _minDaysState;
+        private readonly ParameterState<int?> _maxDaysState;
+        private readonly ParameterState<bool> _allowDisabledDatesInCountState;
+        private DateTime? _firstDate, _secondDate;
+        private (DateTime Start, DateTime End)? _earlierValidDates, _laterValidDates;
+        private DateRange? _dateRange;
+        private Range<string>? _rangeText;
+        private int _rangeTextEdit;
+        private int _echoPendingForEdit = -1;
+
+        /// <summary>
+        /// Creates a new instance.
+        /// </summary>
+        public VekDateRangePicker()
+        {
+            using var registerScope = CreateRegisterScope();
+            _minDaysState = registerScope.RegisterParameter<int?>(nameof(MinDays))
+                .WithParameter(() => MinDays)
+                .WithChangeHandler(RecalculateValidDays);
+            _maxDaysState = registerScope.RegisterParameter<int?>(nameof(MaxDays))
+                .WithParameter(() => MaxDays)
+                .WithChangeHandler(RecalculateValidDays);
+            _allowDisabledDatesInCountState = registerScope.RegisterParameter<bool>(nameof(AllowDisabledDatesInCount))
+                .WithParameter(() => AllowDisabledDatesInCount)
+                .WithChangeHandler(RecalculateValidDays);
+
+            DisplayMonths = 2;
+        }
+
+        /// <summary>
+        /// The maximum number of selectable days.
+        /// </summary>
+        /// <remarks>
+        /// Inclusive of the selected date.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public int? MaxDays { get; set; }
+
+        /// <summary>
+        /// The minimum number of selectable days.
+        /// </summary>
+        /// <remarks>
+        /// Inclusive of the selected date.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public int? MinDays { get; set; }
+
+        /// <summary>
+        /// Include disabled dates within the valid min/max days range.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>. Disabled days will be included in the min/max count. 
+        /// This parameter will take effect when <see cref="MinDays"/> or <see cref="MaxDays"/> is set.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Validation)]
+        public bool AllowDisabledDatesInCount { get; set; } = true;
+
+        /// <summary>
+        /// The text displayed in the start input if no date is specified.
+        /// </summary>
+        /// <remarks>
+        /// This property is typically used to give the user a hint as to what kind of input is expected.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public string? PlaceholderStart { get; set; }
+
+        /// <summary>
+        /// The text displayed in the end input if no date is specified.
+        /// </summary>
+        /// <remarks>
+        /// This property is typically used to give the user a hint as to what kind of input is expected.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public string? PlaceholderEnd { get; set; }
+
+        /// <summary>
+        /// The icon displayed between start and end dates.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Icons.Material.Filled.ArrowRightAlt"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string SeparatorIcon { get; set; } = Icons.Material.Filled.ArrowRightAlt;
+
+        /// <summary>
+        /// Occurs when <see cref="DateRange"/> has changed.
+        /// </summary>
+        [Parameter]
+        public EventCallback<DateRange?> DateRangeChanged { get; set; }
+
+        /// <summary>
+        /// The currently selected date range.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Data)]
+        public DateRange? DateRange
+        {
+            get => _dateRange;
+            // Programmatic parameter assignment; pass suppression explicitly so it cannot leak across the
+            // awaits inside SetDateRangeAsync into a concurrent user calendar pick on Blazor Server (PR #13328 review).
+            set => SetDateRangeAsync(value, updateValue: true, suppressInteraction: true).CatchAndLog();
+        }
+
+        /// <summary>
+        /// Enables capture for disabled dates within the selected date range.
+        /// </summary>
+        /// <remarks>
+        /// By default, it will always ignore disabled dates. This parameter will take effect when <see cref="VekBaseDatePicker.IsDateDisabledFunc"/> is set.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Validation)]
+        public bool AllowDisabledDatesInRange { get; set; } = false;
+
+        protected async Task SetDateRangeAsync(DateRange? range, bool updateValue, bool suppressInteraction = false)
+        {
+            // Normalize the DateRange before exception is thrown
+            range = NormalizeDateRange(range);
+
+            // Text that fails to convert leaves the range null, so a null assignment looks like a no-op and the bad text would stick.
+            // Run it anyway while text remains, as VekDatePicker does, except for the null a two-way binding hands straight back from the edit that produced it.
+            // Only the assignment right after that edit can be the echo, so consuming the marker leaves a later deliberate null free to clear.
+            var isEditEcho = _echoPendingForEdit == _rangeTextEdit;
+            _echoPendingForEdit = -1;
+
+            if (_dateRange != range || (range is null && !string.IsNullOrEmpty(Text) && !isEditEcho))
+            {
+                var doesRangeContainDisabledDates = !AllowDisabledDatesInRange && range is { Start: not null, End: not null } && Enumerable
+                    .Range(0, int.MaxValue)
+                    .Select(index => range.Start.Value.AddDays(index))
+                    .TakeWhile(date => date <= range.End.Value)
+                    .Any(date => IsDateDisabledFunc(date.Date));
+
+                if (doesRangeContainDisabledDates)
+                {
+                    _rangeText = null;
+                    await SetTextAsync(null, false);
+                    return;
+                }
+
+                if (!suppressInteraction)
+                {
+                    Touched = true;
+                }
+
+                if (range?.Start is not null && StartMonth == null)
+                    PickerMonth = new DateTime(GetCulture().Calendar.GetYear(range.Start.Value), GetCulture().Calendar.GetMonth(range.Start.Value), 1, GetCulture().Calendar);
+
+                _dateRange = range;
+                _value = range?.End;
+                HighlightedDate = range?.Start;
+
+                if (updateValue)
+                {
+                    ResetConverterErrors();
+                    if (_dateRange == null || (_dateRange.Start == null && _dateRange.End == null))
+                    {
+                        _rangeText = null;
+                        await SetTextAsync(null, false);
+                    }
+                    else
+                    {
+                        _rangeText = new Range<string>(
+                            ConvertSet(_dateRange.Start),
+                            ConvertSet(_dateRange.End));
+                        await SetTextAsync(_dateRange.ToString(GetConverter()), false);
+                    }
+                }
+
+                await DateRangeChanged.InvokeAsync(_dateRange);
+                await BeginValidateAsync();
+                if (!suppressInteraction)
+                {
+                    FieldChanged(_value);
+                }
+            }
+        }
+
+        private Range<string>? RangeText
+        {
+            get => _rangeText;
+            set
+            {
+                if (_rangeText?.Equals(value) ?? (value == null))
+                    return;
+
+                Touched = true;
+                _rangeText = value;
+                // The range input binds its Value rather than its Text, so nothing else writes VekPicker.Text on the user-input path.
+                // Without this, Text only tracked programmatic DateRange assignments and went stale on typing and on the clear button.
+                ApplyRangeTextAsync(value, ++_rangeTextEdit).CatchAndLog();
+
+                async Task ApplyRangeTextAsync(Range<string>? rangeText, int edit)
+                {
+                    // The range goes first so it lands before any consumer callback can yield, as it did before Text was written here at all.
+                    await SetDateRangeAsync(rangeText is null ? null : ParseDateRangeValue(rangeText.Start, rangeText.End), false);
+
+                    // A handler on that callback can yield long enough for a newer edit to overtake this one.
+                    // Writing Text now would leave it describing an edit the range no longer reflects.
+                    if (edit != _rangeTextEdit)
+                    {
+                        return;
+                    }
+
+                    await SetTextAsync(rangeText is null ? null : RangeUtility.Join(rangeText.Start, rangeText.End), callback: false);
+
+                    if (_dateRange is null && DateRangeChanged.HasDelegate)
+                    {
+                        _echoPendingForEdit = edit;
+                    }
+                }
+            }
+        }
+
+        private VekRangeInput<string> _rangeInput = null!;
+
+        /// <summary>
+        /// Focuses the start input.
+        /// </summary>
+        public ValueTask FocusStartAsync() => _rangeInput.FocusStartAsync();
+
+        /// <summary>
+        /// Selects the start input text.
+        /// </summary>
+        public ValueTask SelectStartAsync() => _rangeInput.SelectStartAsync();
+
+        /// <summary>
+        /// Selects a portion of the start input text.
+        /// </summary>
+        /// <param name="pos1">The index of the first character to select.</param>
+        /// <param name="pos2">The index of the last character to select.</param>
+        public ValueTask SelectRangeStartAsync(int pos1, int pos2) => _rangeInput.SelectRangeStartAsync(pos1, pos2);
+
+        /// <summary>
+        /// Focuses the end input.
+        /// </summary>
+        public ValueTask FocusEndAsync() => _rangeInput.FocusEndAsync();
+
+        /// <summary>
+        /// Selects the end input text.
+        /// </summary>
+        public ValueTask SelectEndAsync() => _rangeInput.SelectEndAsync();
+
+        public override ValueTask BlurAsync() => _rangeInput.BlurAsync();
+
+        /// <summary>
+        /// Selects a portion of the end input text.
+        /// </summary>
+        /// <param name="pos1">The index of the first character to select.</param>
+        /// <param name="pos2">The index of the last character to select.</param>
+        public ValueTask SelectRangeEndAsync(int pos1, int pos2) => _rangeInput.SelectRangeEndAsync(pos1, pos2);
+
+        protected override Task DateFormatChangedAsync(string? newFormat)
+        {
+            Touched = true;
+            _rangeText = null;
+            if (_dateRange?.Start != null || _dateRange?.End != null)
+            {
+                _rangeText = new Range<string>(
+                    ConvertSet(_dateRange.Start),
+                    ConvertSet(_dateRange.End));
+            }
+
+            return SetTextAsync(_dateRange?.ToString(GetConverter()), false);
+        }
+
+        protected override Task StringValueChangedAsync(string? value)
+        {
+            Touched = true;
+            // Update the date range property (without updating back the Value property)
+            return SetDateRangeAsync(ParseDateRangeValue(value), false);
+        }
+
+        protected override bool HasValue(DateTime? value) => value is not null;
+
+        protected override bool IsDayDisabled(DateTime date)
+        {
+            if (_firstDate is null || _secondDate is not null)
+            {
+                return base.IsDayDisabled(date);
+            }
+
+            return base.IsDayDisabled(date) || !IsWithinValidSpan(date.Date, _firstDate.Value.Date);
+        }
+
+        private bool IsWithinValidSpan(DateTime date, DateTime firstDate)
+        {
+            var minDays = _minDaysState.Value;
+            var maxDays = _maxDaysState.Value;
+            if (minDays is null && maxDays is null)
+            {
+                return true;
+            }
+
+            // An earlier second click becomes the range start, so both limits apply on either side of the first date.
+            if (_allowDisabledDatesInCountState.Value)
+            {
+                var days = Math.Abs((date - firstDate).Days) + 1;
+                return days >= (minDays ?? 1) && days <= (maxDays ?? int.MaxValue);
+            }
+
+            var validDates = date >= firstDate ? _laterValidDates : _earlierValidDates;
+            return validDates is { } range && date >= range.Start && date <= range.End;
+        }
+
+        private (DateTime Date, bool Reached) GetLastSelectableDate(DateTime startDate, int days, int step)
+        {
+            // Without a MinDate or MaxDate, the walk stops 50 years out so a calendar that disables every date in that direction cannot hang it.
+            var limit = step > 0
+                ? MaxDateState.Value?.Date ?? startDate.AddYears(Math.Min(50, DateTime.MaxValue.Year - startDate.Year)).Date
+                : MinDateState.Value?.Date ?? startDate.AddYears(-Math.Min(50, startDate.Year - DateTime.MinValue.Year)).Date;
+            var edge = step > 0 ? DateTime.MaxValue.Date : DateTime.MinValue.Date;
+            var validDayCount = 1;
+            var lastValidDate = startDate;
+            var date = startDate;
+
+            while (validDayCount < days && date.Date != edge)
+            {
+                date = date.AddDays(step);
+
+                if (!IsDateDisabledFunc(date))
+                {
+                    validDayCount++;
+                    lastValidDate = date;
+                }
+
+                if (step > 0 ? date.Date > limit : date.Date < limit)
+                    break;
+            }
+
+            return (lastValidDate, validDayCount >= days);
+        }
+
+        /// <summary>
+        /// Recalculate the valid days in relation to the <see cref="MinDays"/> and <see cref="MaxDays"/> allowed
+        /// </summary>
+        public void RecalculateValidDays()
+        {
+            if (_firstDate is null) return;
+
+            // Only the disabled-date-aware count reads these, and without MinDate or MaxDate each walk can scan 50 years of disabled dates.
+            // Changing MinDays, MaxDays, MinDate or MaxDate reruns this, but changing IsDateDisabledFunc does not.
+            // A lambda that captures state is a new delegate on every parent render, so a handler on it would rerun both walks each time.
+            var countEnabledDates = !_allowDisabledDatesInCountState.Value;
+            _laterValidDates = countEnabledDates ? GetValidDates(_firstDate.Value.Date, 1) : null;
+            _earlierValidDates = countEnabledDates ? GetValidDates(_firstDate.Value.Date, -1) : null;
+
+            StateHasChanged();
+
+            (DateTime Start, DateTime End)? GetValidDates(DateTime firstDate, int step)
+            {
+                var nearest = firstDate;
+                if (_minDaysState.Value is { } minDays)
+                {
+                    // Too few enabled dates on this side means no range on this side can reach MinDays.
+                    var (date, reached) = GetLastSelectableDate(firstDate, minDays, step);
+                    if (!reached)
+                    {
+                        return null;
+                    }
+
+                    nearest = date;
+                }
+
+                var furthest = _maxDaysState.Value is { } maxDays
+                    ? GetLastSelectableDate(firstDate, maxDays, step).Date
+                    : step > 0 ? DateTime.MaxValue : DateTime.MinValue;
+
+                return step > 0 ? (nearest, furthest) : (furthest, nearest);
+            }
+        }
+
+        internal override void OnDateLimitsChanged() => RecalculateValidDays();
+
+        internal override bool IsRangeSelectionPending => _firstDate is not null && _secondDate is null;
+
+        private DateRange? ParseDateRangeValue(string? value)
+        {
+            return DateRange.TryParse(value, GetConverter(), out var dateRange) ? dateRange : null;
+        }
+
+        private DateRange? ParseDateRangeValue(string? start, string? end)
+        {
+            return DateRange.TryParse(start, end, GetConverter(), out var dateRange) ? dateRange : null;
+        }
+
+        protected override Task OnPickerClosedAsync()
+        {
+            _firstDate = null;
+
+            return base.OnPickerClosedAsync();
+        }
+
+        private bool CheckDateRange(DateTime day, Func<DateTime, DateTime, bool> compareStart, Func<DateTime, DateTime, bool> compareEnd)
+        {
+            return _firstDate is null
+                && _dateRange is { Start: { } start, End: { } end }
+                && compareStart(start.Date, day)
+                && compareEnd(end.Date, day);
+        }
+
+        protected override string GetDayClasses(int month, DateTime day)
+        {
+            var today = TimeProvider.GetLocalNow().Date;
+            var b = new CssBuilder("vek-day");
+            b.AddClass(AdditionalDateClassesFunc?.Invoke(day) ?? string.Empty);
+            b.AddClass("vek-adjacent-month", IsAdjacentMonthDay(month, day));
+            if (IsHiddenAdjacentMonthDay(month, day))
+            {
+                return b.AddClass("vek-hidden").Build();
+            }
+
+            static bool isLessThan(DateTime date1, DateTime date2) => date1 < date2;
+            static bool isGreaterThan(DateTime date1, DateTime date2) => date1 > date2;
+            static bool isEqualTo(DateTime date1, DateTime date2) => date1 == date2;
+            static bool isNotEqualTo(DateTime date1, DateTime date2) => date1 != date2;
+
+            if ((_firstDate?.Date < day && _secondDate?.Date > day) || CheckDateRange(day, compareStart: isLessThan, compareEnd: isGreaterThan))
+            {
+                return b
+                    .AddClass("vek-range")
+                    .AddClass("vek-range-between")
+                    .AddClass($"vek-current vek-{Color.ToStringFast(true)}-text vek-button-outlined vek-button-outlined-{Color.ToStringFast(true)}", day == today)
+                    .Build();
+            }
+
+            if (_firstDate?.Date == day && _secondDate?.Date == day)
+            {
+                return b.AddClass("vek-selected")
+                    .AddClass($"vek-theme-{Color.ToStringFast(true)}")
+                    .Build();
+            }
+
+            if (_firstDate?.Date == day || CheckDateRange(day, compareStart: isEqualTo, compareEnd: isNotEqualTo))
+            {
+                return b.AddClass("vek-selected")
+                    .AddClass("vek-range")
+                    .AddClass("vek-range-start-selected")
+                    .AddClass("vek-range-selection", _firstDate != null)
+                    .AddClass("vek-range-selection-anchor", _firstDate != null && _secondDate is null)
+                    .AddClass($"vek-theme-{Color.ToStringFast(true)}")
+                    .Build();
+            }
+
+            if ((_firstDate is { } && _secondDate?.Date == day) || CheckDateRange(day, compareStart: isNotEqualTo, compareEnd: isEqualTo))
+            {
+                return b.AddClass("vek-selected")
+                    .AddClass("vek-range")
+                    .AddClass("vek-range-end-selected")
+                    .AddClass($"vek-theme-{Color.ToStringFast(true)}")
+                    .Build();
+            }
+
+            if (CheckDateRange(day, compareStart: isEqualTo, compareEnd: isEqualTo))
+            {
+                return b.AddClass("vek-selected").AddClass($"vek-theme-{Color.ToStringFast(true)}").Build();
+            }
+
+            // The first date already returned above, so any other day is a preview candidate on either side of it.
+            if (_firstDate is { } firstDate)
+            {
+                return b.AddClass("vek-range", _secondDate is null && day != today)
+                    .AddClass("vek-range-selection")
+                    .AddClass("vek-range-selection-before", day < firstDate.Date)
+                    .AddClass($"vek-range-selection-{Color.ToStringFast(true)}")
+                    .AddClass($"vek-current vek-{Color.ToStringFast(true)}-text vek-button-outlined vek-button-outlined-{Color.ToStringFast(true)}", day == today)
+                    .Build();
+            }
+
+            if (day == today)
+            {
+                return b.AddClass("vek-current")
+                    .AddClass($"vek-button-outlined vek-button-outlined-{Color.ToStringFast(true)}")
+                    .AddClass($"vek-{Color.ToStringFast(true)}-text")
+                    .Build();
+            }
+
+            return b.Build();
+        }
+
+        protected override async Task OnDayClickedAsync(DateTime dateTime)
+        {
+            if (GetReadOnlyState())
+                return;
+            if (_firstDate == null || _secondDate != null)
+            {
+                _secondDate = null;
+                _firstDate = dateTime;
+
+                RecalculateValidDays();
+
+                return;
+            }
+            if (_firstDate > dateTime)
+            {
+                _secondDate = _firstDate;
+                _firstDate = dateTime;
+            }
+            else
+            {
+                _secondDate = dateTime;
+            }
+            if (PickerActions == null || AutoClose)
+            {
+                await SubmitAsync();
+
+                if (PickerVariant != PickerVariant.Static)
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(ClosingDelay), TimeProvider);
+                    await CloseAsync(false);
+                }
+            }
+        }
+
+        protected override Task OnOpenedAsync()
+        {
+            _secondDate = null;
+            return base.OnOpenedAsync();
+        }
+
+        protected internal override async Task SubmitAsync()
+        {
+            if (GetReadOnlyState())
+                return;
+            if (_firstDate == null || _secondDate == null)
+                return;
+
+            await SetDateRangeAsync(new DateRange(_firstDate, _secondDate), true);
+
+            _firstDate = null;
+            _secondDate = null;
+        }
+
+        protected override async Task ResetValueAsync()
+        {
+            await ClearAsync();
+            // Clearing marks the picker as touched, and the base reset puts Touched back to false.
+            await base.ResetValueAsync();
+            // Clearing keeps the month the user was looking at, but a reset should reopen the calendar where an empty picker starts.
+            ResetCalendarToStart();
+        }
+
+        public override async Task ClearAsync(bool close = true)
+        {
+            await SetDateRangeAsync(null, true);
+            _firstDate = _secondDate = null;
+            await base.ClearAsync(close);
+        }
+
+        protected override string GetTitleDateString()
+        {
+            if (_firstDate != null)
+                return $"{FormatTitleDate(_firstDate)} - {FormatTitleDate(_secondDate)}";
+
+            return DateRange?.Start != null
+                ? $"{FormatTitleDate(DateRange.Start)} - {FormatTitleDate(DateRange.End)}"
+                : "";
+        }
+
+        protected override DateTime GetCalendarStartOfMonth()
+        {
+            var date = StartMonth ?? DateRange?.Start ?? TimeProvider.GetLocalNow().Date;
+            return date.StartOfMonth(GetCulture());
+        }
+
+        protected override async Task OnYearClickedAsync(int year)
+        {
+            await base.OnYearClickedAsync(year);
+
+            if (DateRange?.Start is null && _firstDate is null)
+            {
+                HighlightedDate = PickerMonth;
+            }
+        }
+
+        protected override int GetCalendarYear(DateTime yearDate)
+        {
+            var date = DateRange?.Start ?? TimeProvider.GetLocalNow().Date;
+            var diff = GetCulture().Calendar.GetYear(date) - GetCulture().Calendar.GetYear(yearDate);
+            var calenderYear = GetCulture().Calendar.GetYear(date);
+            return calenderYear - diff;
+        }
+
+        /// <summary>
+        /// Normalize a date by treating DateTime.MinValue as null
+        /// This prevents an ArgumentOutOfRangeException from happening when performing date arithmetic
+        /// </summary>
+        /// <param name="date">The date to normalize</param>
+        /// <returns>Normalized date or null</returns>
+        private static DateTime? NormalizeDate(DateTime? date)
+        {
+            if (date is null)
+                return null;
+
+            // Treat DateTime.MinValue as null
+            if (date.Value == DateTime.MinValue)
+                return null;
+
+            return date;
+        }
+
+        /// <summary>
+        /// Normalize a date range by checking the start date and end date for DateTime.MinValue
+        /// This prevents an ArgumentOutOfRangeException from happening when performing date arithmetic
+        /// </summary>
+        /// <see cref="NormalizeDate"/>
+        /// <param name="range">The date range to normalize</param>
+        /// <returns>Normalized date range or null</returns>
+        private static DateRange? NormalizeDateRange(DateRange? range)
+        {
+            if (range is null)
+                return null;
+
+            var start = NormalizeDate(range.Start);
+            var end = NormalizeDate(range.End);
+
+            return new DateRange(start, end);
+        }
+
+    }
+}

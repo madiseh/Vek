@@ -1,0 +1,16 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekDatePicker @ref="_picker" Label="With action buttons" @bind-Date="_date" AutoClose="@_autoClose">
+    <PickerActions>
+        <VekButton Class="mr-auto align-self-start" OnClick="@(() => _picker.ClearAsync())">Clear</VekButton>
+        <VekButton OnClick="@(() => _picker.CloseAsync(false))">Cancel</VekButton>
+        <VekButton Color="Color.Primary" OnClick="@(() => _picker.CloseAsync())">OK</VekButton>
+    </PickerActions>
+</VekDatePicker>
+<VekSwitch @bind-Value="_autoClose" Color="Color.Secondary">AutoClose</VekSwitch>
+
+@code {
+    private VekDatePicker _picker;
+    private DateTime? _date = DateTime.Today;
+    private bool _autoClose;
+}

@@ -1,0 +1,18 @@
+﻿<VekTabs>
+    <VekTabPanel Text="Item One" />
+    <VekTabPanel Text="Item Two" Visible="@Visible" />
+    <VekTabPanel Text="Item Three" />
+</VekTabs>
+
+<VekText>Hide first item</VekText>
+
+<VekTabs>
+    <VekTabPanel Text="Item One" Visible="false" />
+    <VekTabPanel Text="Item Two" />
+    <VekTabPanel Text="Item Three" />
+</VekTabs>
+
+@code {
+    [Parameter]
+    public bool Visible { get; set; } = true;
+}

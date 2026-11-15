@@ -1,0 +1,15 @@
+﻿@namespace Vek.Docs.Examples
+
+@inject ISnackbar SnackbarService
+
+<VekButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@OnClick">Show a snackbar with a custom component</VekButton>
+
+@code {
+    private void OnClick()
+    {
+        SnackbarService.Add<VekChip<T>>(new Dictionary<string, object>() {
+            { "Text", "This is a snackbar with a chip!" },
+            { "Color", Color.Primary }
+        });
+    }
+}

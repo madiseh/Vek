@@ -1,0 +1,14 @@
+@namespace Vek.UnitTests.TestComponents
+
+<VekList T="string" Gutters="@ListGutters">
+    <VekListItem Text="Inbox" Icon="@Icons.Material.Filled.Inbox" Gutters="@ItemGutters"/>
+</VekList>
+
+@code
+{
+    [Parameter]
+    public required bool ListGutters { get; set; }
+    
+    [Parameter]
+    public required bool? ItemGutters { get; set; }
+}

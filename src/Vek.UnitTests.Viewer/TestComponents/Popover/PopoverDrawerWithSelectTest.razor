@@ -1,0 +1,111 @@
+﻿<VekPopoverProvider />
+<VekButton Variant="Variant.Text" OnClick="@(() => OpenDrawer(Anchor.Start))">Start</VekButton>
+
+<VekDrawer @bind-Open="@_open" Anchor="@_anchor" Elevation="1" Variant="@DrawerVariant.Temporary">
+    <VekDrawerHeader>
+        <VekText Typo="Typo.h6">My App</VekText>
+    </VekDrawerHeader>
+    <VekButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@ToggleOpen">Open</VekButton>
+    <VekPopover Open="@_isOpen" Fixed="true" Class="px-4 pt-4">
+        <VekSelect @bind-Value="@_selectedValue">
+            <VekSelectItem Value="@("Item 1")">Item 1</VekSelectItem>
+            <VekSelectItem Value="@("Item 2")">Item 2</VekSelectItem>
+            <VekSelectItem Value="@("Item 3")">Item 3</VekSelectItem>
+        </VekSelect>
+        <VekButton OnClick="@ToggleOpen" Class="ml-auto mr-n3 mb-1" Color="Color.Error">Close</VekButton>
+    </VekPopover>
+</VekDrawer>
+
+<VekButton Variant="Variant.Text" OnClick="@(() => OpenDrawer2(Anchor.End))">Open Drawer</VekButton>
+
+<VekDrawer @bind-Open="@_open2" Width="@_width" Height="@_height" Anchor="@_anchor2" Elevation="1" Variant="@DrawerVariant.Temporary">
+    <VekDrawerHeader>
+        <VekText Typo="Typo.h6">My App</VekText>
+    </VekDrawerHeader>
+    <VekGrid>
+        <VekItem xs="12" md="12">
+            <VekSelect T="string" Label="US States" HelperText="Pick your favorite states"
+                       MultiSelection="true" @bind-Value="_value" @bind-SelectedValues="_options">
+                @foreach (var state in _states)
+                {
+                    <VekSelectItem T="string" Value="@state">@state</VekSelectItem>
+                }
+            </VekSelect>
+        </VekItem>
+        <VekItem xs="12" md="6">
+            <VekText Typo="Typo.body2">VekSelect.Value: "@_value"</VekText>
+        </VekItem>
+        <VekItem xs="12" md="6">
+            <VekText Typo="Typo.body2">VekSelect.SelectedValues: HashSet&lt;string&gt; { @(string.Join(", ", _options.Select(x => $"\"{x}\""))) }</VekText>
+        </VekItem>
+    </VekGrid>
+</VekDrawer>
+
+@code {
+    public static string __description__ = "Popover from Drawer with Child Select";
+
+    private bool _isOpen;
+    private bool _open;
+    private bool _open2;
+    private Anchor _anchor;
+    private Anchor _anchor2;
+    private string? _width;
+    private string? _height;
+    private string _selectedValue = string.Empty;
+    private string _value = "Nothing selected";
+    private IReadOnlyCollection<string> _options = ["Alaska"];
+    private readonly string[] _states =
+    [
+        "Alabama", "Alaska", "American Samoa", "Arizona",
+        "Arkansas", "California", "Colorado", "Connecticut",
+        "Delaware", "District of Columbia", "Federated States of Micronesia",
+        "Florida", "Georgia", "Guam", "Hawaii", "Idaho",
+        "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky",
+        "Louisiana", "Maine", "Marshall Islands", "Maryland",
+        "Massachusetts", "Michigan", "Minnesota", "Mississippi",
+        "Missouri", "Montana", "Nebraska", "Nevada",
+        "New Hampshire", "New Jersey", "New Mexico", "New York",
+        "North Carolina", "North Dakota", "Northern Mariana Islands", "Ohio",
+        "Oklahoma", "Oregon", "Palau", "Pennsylvania", "Puerto Rico",
+        "Rhode Island", "South Carolina", "South Dakota", "Tennessee",
+        "Texas", "Utah", "Vermont", "Virgin Island", "Virginia",
+        "Washington", "West Virginia", "Wisconsin", "Wyoming"
+    ];
+
+    private void ToggleOpen()
+    {
+        _isOpen = !_isOpen;
+    }
+
+    private void OpenDrawer(Anchor anchor)
+    {
+        _open = true;
+        _anchor = anchor;
+    }
+
+    private void OpenDrawer2(Anchor anchor)
+    {
+        _open2 = true;
+        _anchor2 = anchor;
+
+        switch (_anchor2)
+        {
+            case Anchor.Start:
+                _width = "300px";
+                _height = "100%";
+                break;
+            case Anchor.End:
+                _width = "400px";
+                _height = "100%";
+                break;
+            case Anchor.Bottom:
+                _width = "100%";
+                _height = "200px";
+                break;
+            case Anchor.Top:
+                _width = "100%";
+                _height = "350px";
+                break;
+        }
+    }
+}

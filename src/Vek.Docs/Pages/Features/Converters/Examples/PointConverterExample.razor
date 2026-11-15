@@ -1,0 +1,35 @@
+﻿@namespace Vek.Docs.Examples
+@using System.Drawing
+@using System.Globalization;
+@using System.Text.Json
+@using Color = Vek.Color
+
+<VekGrid>
+    <VekItem xs="12" sm="6" md="4">
+        <VekTextField Label="Point"
+                      Variant="Variant.Outlined"
+                      @bind-Value="_point"
+                      Immediate="true"
+                      Converter="_pointConverter"/>
+    </VekItem>
+    
+    <VekItem xs="12" sm="6" md="4">
+        <VekTextField Label="Mirrored point" 
+                      Variant="Variant.Outlined"  
+                      @bind-Value="_point" 
+                      Immediate="true"
+                      Converter="_pointConverter" />
+    </VekItem>
+
+</VekGrid>
+
+@code {
+    private Point _point;
+    private readonly IConverter<Point, string> _pointConverter = Conversions.From(
+        (Point x) => $"[{x.X}, {x.Y}]",
+        x =>
+        {
+            var tmp = JsonSerializer.Deserialize<int[]>(x);
+            return new Point(tmp[0], tmp[1]);
+        });
+}

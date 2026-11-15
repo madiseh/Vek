@@ -1,0 +1,13 @@
+﻿<VekNavMenu MultiExpansion="@MultiExpansion">
+    <VekNavGroup Title="Group1">
+        <VekNavLink Href="/a">A</VekNavLink>
+    </VekNavGroup>
+    <VekNavGroup Title="Group2">
+        <VekNavLink Href="/b">B</VekNavLink>
+    </VekNavGroup>
+</VekNavMenu>
+
+@code{
+    [Parameter]
+    public bool MultiExpansion { get; set; } = false;
+}

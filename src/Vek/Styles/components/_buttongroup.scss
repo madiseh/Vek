@@ -1,0 +1,367 @@
+@import '../abstracts/variables';
+
+.vek-button-group-root {
+  border-radius: var(--vek-default-borderradius);
+  display: inline-flex;
+
+  > .vek-tooltip-root {
+    display: flex;
+  }
+
+  .vek-button-root {
+    border-radius: var(--vek-default-borderradius);
+  }
+
+  &.vek-button-group-override-styles {
+    .vek-button {
+      color: var(--vek-palette-text-primary);
+      --vek-ripple-color: var(--vek-palette-text-primary);
+    }
+
+    .vek-button-root {
+      background-color: inherit;
+      box-shadow: none;
+      border: none;
+
+      @media(hover: hover) and (pointer: fine) {
+        &:hover {
+          background-color: var(--vek-palette-action-default-hover);
+        }
+      }
+
+      &:focus-visible, &:active {
+        background-color: var(--vek-palette-action-default-hover);
+      }
+
+      &:disabled {
+        border-color: var(--vek-palette-action-disabled-background) !important;
+      }
+    }
+  }
+
+  &.vek-button-group-text-size-small .vek-button-root {
+    padding: 4px 5px;
+    font-size: 0.8125rem;
+
+    &.vek-icon-button .vek-icon-root {
+      font-size: 1.422rem;
+    }
+  }
+
+  &.vek-button-group-text-size-large .vek-button-root {
+    padding: 8px 11px;
+    font-size: 0.9375rem;
+
+    &.vek-icon-button .vek-icon-root {
+      font-size: 1.641rem;
+    }
+  }
+
+  &.vek-button-group-outlined-size-small .vek-button-root {
+    padding: 3px 9px;
+    font-size: 0.8125rem;
+
+    &.vek-icon-button {
+      padding: 3px 9px;
+
+      .vek-icon-root {
+        font-size: 1.422rem;
+      }
+    }
+  }
+
+  &.vek-button-group-outlined-size-large .vek-button-root {
+    padding: 7px 21px;
+    font-size: 0.9375rem;
+
+    &.vek-icon-button {
+      padding: 7px 15px;
+
+      .vek-icon-root {
+        font-size: 1.641rem;
+      }
+    }
+  }
+
+  &.vek-button-group-filled-size-small .vek-button-root {
+    padding: 4px 10px;
+    font-size: 0.8125rem;
+
+    &.vek-icon-button {
+      padding: 4px 10px;
+
+      .vek-icon-root {
+        font-size: 1.422rem;
+      }
+    }
+  }
+
+  &.vek-button-group-filled-size-large .vek-button-root {
+    padding: 8px 22px;
+    font-size: 0.9375rem;
+
+    &.vek-icon-button {
+      padding: 8px 16px;
+
+      .vek-icon-root {
+        font-size: 1.641rem;
+      }
+    }
+  }
+
+  .vek-button-root.vek-icon-button {
+    padding-right: 12px;
+    padding-left: 12px;
+
+    .vek-icon-root {
+      font-size: 1.516rem;
+    }
+
+    &.vek-ripple-icon {
+      &:after {
+        transform: scale(10,10);
+      }
+
+      &:active:after {
+        transform: scale(0,0);
+        opacity: 0.1;
+        transition: 0s;
+      }
+    }
+  }
+}
+
+.vek-button-group-horizontal {
+  &:not(.vek-button-group-rtl) {
+    > .vek-button-root:not(:last-child), > :not(:last-child) .vek-button-root {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    > .vek-button-root:not(:first-child), > :not(:first-child) .vek-button-root {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      margin-left: -1px;
+    }
+  }
+
+  &.vek-button-group-rtl {
+    > .vek-button-root:not(:last-child), > :not(:last-child) .vek-button-root {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      margin-left: -1px;
+    }
+
+    > .vek-button-root:not(:first-child), > :not(:first-child) .vek-button-root {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+}
+
+.vek-button-group-vertical {
+  flex-direction: column;
+
+  .vek-icon-button {
+    width: 100%;
+  }
+
+  > .vek-button-root:not(:last-child), > :not(:last-child) .vek-button-root {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  > .vek-button-root:not(:first-child), > :not(:first-child) .vek-button-root {
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+    margin-top: -1px;
+  }
+}
+
+.vek-button-group-text {
+  &.vek-button-group-override-styles {
+    .vek-button-root {
+      padding: 6px 8px;
+    }
+
+    &.vek-button-group-horizontal {
+      &:not(.vek-button-group-rtl) {
+        .vek-button-root:not(:first-child), > :not(:first-child) .vek-button-root {
+          border-left: 1px solid rgba(var(--vek-palette-text-primary-rgb), var(--vek-palette-border-opacity));
+        }
+      }
+
+      &.vek-button-group-rtl {
+        .vek-button-root:not(:first-child), > :not(:first-child) .vek-button-root {
+          border-right: 1px solid rgba(var(--vek-palette-text-primary-rgb), var(--vek-palette-border-opacity));
+        }
+      }
+    }
+
+    &.vek-button-group-vertical {
+      .vek-button-root:not(:last-child), > :not(:last-child) .vek-button-root {
+        border-bottom: 1px solid rgba(var(--vek-palette-text-primary-rgb), var(--vek-palette-border-opacity));
+      }
+    }
+
+    @each $color in $vek-palette-colors {
+      &.vek-button-group-text-#{$color} {
+        .vek-button-root {
+          color: var(--vek-palette-#{$color});
+          --vek-ripple-color: var(--vek-palette-#{$color});
+
+          @media(hover: hover) and (pointer: fine) {
+            &:hover {
+              background-color: var(--vek-palette-#{$color}-hover);
+            }
+          }
+
+          &:focus-visible, &:active {
+            background-color: var(--vek-palette-#{$color}-hover);
+          }
+        }
+
+        &.vek-button-group-horizontal {
+          &:not(.vek-button-group-rtl) {
+            .vek-button-root:not(:first-child), > :not(:first-child) .vek-button-root {
+              border-left: 1px solid rgba(var(--vek-palette-#{$color}-rgb), var(--vek-palette-border-opacity));
+            }
+          }
+
+          &.vek-button-group-rtl {
+            .vek-button-root:not(:first-child), > :not(:first-child) .vek-button-root {
+              border-right: 1px solid rgba(var(--vek-palette-#{$color}-rgb), var(--vek-palette-border-opacity));
+            }
+          }
+        }
+
+        &.vek-button-group-vertical {
+          .vek-button-root:not(:last-child), > :not(:last-child) .vek-button-root {
+            border-bottom: 1px solid rgba(var(--vek-palette-#{$color}-rgb), var(--vek-palette-border-opacity));
+          }
+        }
+      }
+    }
+  }
+}
+
+.vek-button-group-outlined {
+  &.vek-button-group-override-styles {
+    .vek-button-root {
+      padding: 5px 15px;
+      border: 1px solid rgba(var(--vek-palette-text-primary-rgb), var(--vek-palette-border-opacity));
+    }
+
+    @each $color in $vek-palette-colors {
+      &.vek-button-group-outlined-#{$color} .vek-button-root {
+        color: var(--vek-palette-#{$color});
+        border: 1px solid rgba(var(--vek-palette-#{$color}-rgb), var(--vek-palette-border-opacity));
+        --vek-ripple-color: var(--vek-palette-#{$color});
+
+        @media(hover: hover) and (pointer: fine) {
+          &:hover {
+            background-color: var(--vek-palette-#{$color}-hover);
+          }
+        }
+
+        &:focus-visible, &:active {
+          background-color: var(--vek-palette-#{$color}-hover);
+        }
+      }
+    }
+  }
+}
+
+.vek-button-group-filled {
+  box-shadow: var(--vek-elevation-2);
+
+  .vek-button-root {
+    box-shadow: none;
+
+    @media(hover: hover) and (pointer: fine) {
+      &:hover {
+        box-shadow: var(--vek-elevation-4);
+      }
+    }
+
+    &:focus-visible, &:active {
+      box-shadow: var(--vek-elevation-4);
+    }
+  }
+
+  &.vek-button-group-override-styles {
+    .vek-button-root {
+      background-color: var(--vek-palette-action-default-hover);
+      padding: 6px 16px;
+    }
+
+    &.vek-button-group-horizontal {
+      &:not(.vek-button-group-rtl) {
+        .vek-button-root:not(:first-child), > :not(:first-child) .vek-button-root {
+          border-left: 1px solid rgba(var(--vek-palette-divider-rgb), var(--vek-palette-border-opacity));
+        }
+      }
+
+      &.vek-button-group-rtl {
+        .vek-button-root:not(:first-child), > :not(:first-child) .vek-button-root {
+          border-right: 1px solid rgba(var(--vek-palette-divider-rgb), var(--vek-palette-border-opacity));
+        }
+      }
+    }
+
+    &.vek-button-group-vertical {
+      .vek-button-root:not(:first-child), > :not(:first-child) .vek-button-root {
+        border-top: 1px solid rgba(var(--vek-palette-divider-rgb), var(--vek-palette-border-opacity));
+      }
+    }
+
+    @each $color in $vek-palette-colors {
+      &.vek-button-group-filled-#{$color} {
+        .vek-button-root {
+          background-color: var(--vek-palette-#{$color});
+          color: var(--vek-palette-#{$color}-text);
+          --vek-ripple-color: var(--vek-palette-#{$color}-text);
+          --vek-ripple-opacity: var(--vek-ripple-opacity-secondary);
+
+          @media(hover: hover) and (pointer: fine) {
+            &:hover {
+              background-color: var(--vek-palette-#{$color}-darken);
+            }
+          }
+
+          &:focus-visible, &:active {
+            background-color: var(--vek-palette-#{$color}-darken);
+          }
+
+          &:disabled {
+            background-color: var(--vek-palette-action-disabled-background);
+          }
+        }
+
+        &.vek-button-group-horizontal {
+          &:not(.vek-button-group-rtl) {
+            .vek-button-root:not(:first-child), > :not(:first-child) .vek-button-root {
+              border-left: 1px solid var(--vek-palette-#{$color}-lighten);
+            }
+          }
+
+          &.vek-button-group-rtl {
+            .vek-button-root:not(:first-child), > :not(:first-child) .vek-button-root {
+              border-right: 1px solid var(--vek-palette-#{$color}-lighten);
+            }
+          }
+        }
+
+        &.vek-button-group-vertical {
+          .vek-button-root:not(:first-child), > :not(:first-child) .vek-button-root {
+            border-top: 1px solid var(--vek-palette-#{$color}-lighten);
+          }
+        }
+      }
+    }
+  }
+}
+
+.vek-button-group-disable-elevation {
+  box-shadow: none;
+}

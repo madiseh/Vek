@@ -1,0 +1,30 @@
+﻿<VekGrid>
+    <VekItem xs="12" sm="6" md="4">
+        <VekSelect T="string" Label="Coffee" Strict="true">
+            <VekSelectItem Value="@("Cappuccino")" />
+            <VekSelectItem Value="@("Cafe Latte")" />
+            <VekSelectItem Value="@("Espresso")" />
+            <VekSelectItem Value="@("Irish Coffee")" />
+        </VekSelect>
+    </VekItem>
+    <VekItem xs="12" sm="6" md="4">
+        <VekSelect T="double" Label="Price" Strict="true" Variant="Variant.Outlined" Format="F2">
+            <VekSelectItem T="double" Value="4.50"/>
+            <VekSelectItem T="double" Value="4.99"/>
+            <VekSelectItem T="double" Value="3.60"/>
+            <VekSelectItem T="double" Value="21.99"/>
+        </VekSelect>
+    </VekItem>
+    <VekItem xs="12" sm="6" md="4">
+        <VekSelect T="string" Label="Pies" Variant="Variant.Filled">
+            <VekSelectItem Value="@("Apple Pie")" />
+            <VekSelectItem Value="@("Blackberry Pie")" />
+            <VekSelectItem Value="@("Rhubarb Pie")" />
+            <VekSelectItem Value="@("Lemon Pie")" />
+        </VekSelect>
+    </VekItem>
+</VekGrid>
+
+@code {
+    public static string __description__ = "The first two selects are Strict and should not crash in WASM on navigating the list with arrows.";
+}

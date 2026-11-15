@@ -1,0 +1,21 @@
+@using Vek
+
+<VekThemeProvider @bind-IsDarkMode="_isDarkMode" @bind-CurrentPalette="_currentPalette" />
+
+<VekText>Dark Mode: @_isDarkMode</VekText>
+<VekText>Current Palette Type: @_currentPalette?.GetType().Name</VekText>
+<VekText>Primary Color: @_currentPalette?.Primary</VekText>
+
+<VekButton OnClick="ToggleDarkMode">Toggle Dark Mode</VekButton>
+
+@code {
+    private bool _isDarkMode;
+    private Palette? _currentPalette;
+
+    private void ToggleDarkMode()
+    {
+        _isDarkMode = !_isDarkMode;
+    }
+
+    public Palette? GetCurrentPalette() => _currentPalette;
+}

@@ -1,0 +1,19 @@
+﻿@using Vek.Interfaces 
+@implements INavigationEventReceiver
+
+<CascadingValue Value="this" IsFixed="true">
+    <VekNavLink Disabled="@Disabled" />
+</CascadingValue>
+
+@code {
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    public bool IsNavigated { get; private set; }
+
+    public Task OnNavigation()
+    {
+        IsNavigated = true;
+        return Task.CompletedTask;
+    }
+}

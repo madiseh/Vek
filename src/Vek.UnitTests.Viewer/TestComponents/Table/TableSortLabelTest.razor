@@ -1,0 +1,33 @@
+﻿@using System.Net.Http.Json
+@using Vek.Examples.Data
+@using Vek.Examples.Data.Models
+@inject IPeriodicTableService _periodicTableService
+
+<VekTable Items="_elements" Hover="true" SortLabel="Sort By">
+    <HeaderContent>
+        <VekTh><VekTableSortLabel SortBy="new Func<Element, object>(x=>x.Number)">Nr</VekTableSortLabel></VekTh>
+        <VekTh><VekTableSortLabel SortBy="new Func<Element, object>(x=>x.Number)" Enabled="false">Unsortable Nr</VekTableSortLabel></VekTh>
+        <VekTh><VekTableSortLabel SortBy="new Func<Element, object>(x=>x.Position)">Position</VekTableSortLabel></VekTh>
+        <VekTh><VekTableSortLabel SortBy="new Func<Element, object>(x=>x.Molar)">Mass</VekTableSortLabel></VekTh>
+    </HeaderContent>
+    <RowTemplate>
+        <VekTd DataLabel="Nr">@context.Number</VekTd>
+        <VekTd DataLabel="Unsortable Nr">@context.Number</VekTd>
+        <VekTd DataLabel="Position">@context.Position</VekTd>
+        <VekTd DataLabel="Molar mass">@context.Molar</VekTd>
+    </RowTemplate>
+    <PagerContent>
+        <VekTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
+    </PagerContent>
+</VekTable>
+
+@code {
+    private IEnumerable<Element> _elements = new List<Element>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _elements = await _periodicTableService.GetElements();
+    }
+}
+
+

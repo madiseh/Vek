@@ -1,0 +1,18 @@
+﻿<VekPopoverProvider />
+
+<VekTimePicker @ref="Picker" Label="With action buttons" @bind-Time="_time" AutoClose="AutoClose">
+    <PickerActions>
+        <VekButton Class="mr-auto align-self-start" OnClick="@(() => context.ClearAsync())">Clear</VekButton>
+        <VekButton OnClick="@(() => context.CloseAsync(false))">Cancel</VekButton>
+        <VekButton Id="theCloseButton" Color="Color.Primary" OnClick="@(() => context.CloseAsync())">OK</VekButton>
+    </PickerActions>
+</VekTimePicker>
+
+@code{
+    private TimeSpan? _time = new TimeSpan(00, 45, 00);
+
+    public VekTimePicker Picker { get; private set; } = null!;
+
+    [Parameter]
+    public bool AutoClose { get; set; }
+}

@@ -1,0 +1,18 @@
+﻿@inherits VekComponentBase
+@namespace Vek.UnitTests
+
+<h3>ParameterStateTestComp</h3>
+
+<p>Parameter changes:</p>
+<div class="parameter-changes">
+    @foreach (var parameterChange in _parameterChanges)
+    {
+        <p>@parameterChange</p>
+    }
+</div>
+
+@code
+{
+    public static string __description__ = "A generic test component for the ParameterState Framework";
+}
+

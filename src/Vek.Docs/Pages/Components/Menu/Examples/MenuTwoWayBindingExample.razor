@@ -1,0 +1,21 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekMenu Label="Open menu" @bind-Open="_open">
+    <VekMenuItem Label="Item 1" />
+    <VekMenuItem Label="Item 2" />
+    <VekMenuItem Label="Item 3" />
+</VekMenu>
+
+<VekButton Color="Color.Primary" OnClick="OnOpen">Open for 1 second</VekButton>
+<VekSwitch Color="Color.Primary" @bind-Value="_open" Label="Open" />
+
+@code {
+    private bool _open;
+
+    private async Task OnOpen()
+    {
+        _open = true;
+        await Task.Delay(1000);
+        _open = false;
+    }
+}

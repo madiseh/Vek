@@ -1,0 +1,102 @@
+﻿@namespace Vek
+@using Vek.Internal
+@using Vek.Resources
+@typeparam T
+@inherits VekBaseInput<Range<T>>
+@inject InternalVekLocalizer Localizer
+
+<div class="@Classname" style="@Style">
+    @if (Adornment == Adornment.Start)
+    {
+        <VekInputAdornment Class="@AdornmentClassname"
+                           Icon="@AdornmentIcon"
+                           Color="@AdornmentColor"
+                           Size="@IconSize"
+                           Text="@AdornmentText"
+                           Placement="@Adornment.Start"
+                           AdornmentClick="@OnAdornmentClick"
+                           AriaLabel="@AdornmentAriaLabel" />
+    }
+
+    @if (InputType == InputType.Hidden && ChildContent != null)
+    {
+        <div class="@InputClassname">
+            @ChildContent
+        </div>
+    }
+
+    <input @ref="_elementReferenceStart"
+           aria-required="@Required.ToString().ToLowerInvariant()"
+           aria-invalid="@(HasErrors ? "true" : null)"
+           aria-describedby="@GetAriaDescribedByString()"
+           @attributes="UserAttributes"
+           id="@(string.IsNullOrEmpty(InputElementId) ? null : $"{InputElementId}-start")"
+           type="@InputTypeString"
+           class="@InputClassname"
+           @bind-value="@TextStart"
+           @bind-value:event="@(Immediate ? "oninput" : "onchange")"
+           placeholder="@PlaceholderStart"
+           disabled="@GetDisabledState()"
+           readonly="@GetReadOnlyState()"
+           @onblur="@OnBlurredAsync"
+           @onkeydown="@InvokeKeyDownAsync"
+           @onkeyup="@InvokeKeyUpAsync"
+           inputmode="@InputMode.ToStringFast(true)"
+           pattern="@Pattern"
+           required="@Required"
+           aria-label="@(StartInputAriaLabel ?? Localizer[LanguageResource.VekRangeInput_Start])" />
+    <VekIcon Class="vek-range-input-separator vek-flip-x-rtl" Icon="@SeparatorIcon" Color="@Color.Default" />
+    <input @ref="_elementReferenceEnd"
+           aria-required="@Required.ToString().ToLowerInvariant()"
+           aria-invalid="@(HasErrors ? "true" : null)"
+           aria-describedby="@GetAriaDescribedByString()"
+           @attributes="UserAttributes"
+           id="@(string.IsNullOrEmpty(InputElementId) ? null : $"{InputElementId}-end")"
+           type="@InputTypeString"
+           class="@InputClassname"
+           @bind-value="@TextEnd"
+           @bind-value:event="@(Immediate ? "oninput" : "onchange")"
+           inputmode="@InputMode.ToStringFast(true)"
+           pattern="@Pattern"
+           placeholder="@PlaceholderEnd"
+           disabled="@GetDisabledState()"
+           readonly="@GetReadOnlyState()"
+           @onblur="@OnBlurredAsync"
+           @onkeydown="@InvokeKeyDownAsync"
+           @onkeyup="@InvokeKeyUpAsync"
+           required="@Required"
+           aria-label="@(EndInputAriaLabel ?? Localizer[LanguageResource.VekRangeInput_End])" />
+
+    @if (IsClearable() && !GetDisabledState())
+    {
+        <VekIconButton Class="@ClearButtonClassname" Style="z-index: 2"
+                       Color="@Color.Default"
+                       Icon="@ClearIcon"
+                       Size="@Size.Small"
+                       OnClick="@ClearButtonClickHandlerAsync"
+                       aria-label="@Localizer[LanguageResource.VekInput_Clear]"
+                       tabindex="-1" />
+    }
+
+    @if (Adornment == Adornment.End)
+    {
+        <VekInputAdornment Class="@AdornmentClassname"
+                           Icon="@AdornmentIcon"
+                           Color="@AdornmentColor"
+                           Size="@IconSize"
+                           Text="@AdornmentText"
+                           Placement="@Adornment.End"
+                           AdornmentClick="@OnAdornmentClick"
+                           AriaLabel="@AdornmentAriaLabel" />
+    }
+
+    @if (Variant == Variant.Outlined)
+    {
+        <fieldset class="vek-input-outlined-border">
+            @if (!string.IsNullOrEmpty(Label))
+            {
+                <legend>@Label</legend>
+            }
+        </fieldset>
+    }
+</div>

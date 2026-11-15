@@ -1,0 +1,21 @@
+﻿<VekTimeline @bind-SelectedIndex="SelectedIndex">
+    <VekTimelineItem>
+        <VekText>Item A</VekText>
+    </VekTimelineItem>
+    <VekTimelineItem>
+        <VekText Align="Align.End">Item B</VekText>
+    </VekTimelineItem>
+    <VekTimelineItem>
+        <VekText>Item C</VekText>
+    </VekTimelineItem>
+    <VekTimelineItem>
+        <VekText>Item D</VekText>
+    </VekTimelineItem>
+    <VekTimelineItem>
+        <VekText>Item E</VekText>
+    </VekTimelineItem>
+</VekTimeline>
+
+@code {
+    public int SelectedIndex { get; private set; }
+}

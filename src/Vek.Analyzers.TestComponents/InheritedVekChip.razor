@@ -1,0 +1,13 @@
+﻿@typeparam T
+@attribute [CascadingTypeParameter(nameof(T))]
+@inherits VekChip<T>
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code
+{
+    [Parameter]
+    public string? AvatarClass { get; set; }
+}

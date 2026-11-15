@@ -1,0 +1,17 @@
+﻿<VekTable Items="@_items" CurrentPage="@_currentPage">
+    <HeaderContent>
+        <VekTh>Item</VekTh>
+    </HeaderContent>
+    <RowTemplate>
+        <VekTd DataLabel="Item">@context</VekTd>
+    </RowTemplate>
+    <PagerContent>
+        <VekTablePager />
+    </PagerContent>
+</VekTable>
+
+
+@code {
+    private int _currentPage = 2;
+    private int[] _items = Enumerable.Range(0, 100).ToArray();
+}

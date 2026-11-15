@@ -1,0 +1,8 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekCheckBox @bind-Value="Dense_CheckBox" Dense="true" Color="Color.Success"></VekCheckBox>
+<VekCheckBox @bind-Value="Dense_CheckBox" Dense="false" Color="Color.Primary"></VekCheckBox>
+
+@code {
+    public bool Dense_CheckBox { get; set; } = true;
+}

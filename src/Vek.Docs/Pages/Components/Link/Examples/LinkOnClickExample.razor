@@ -1,0 +1,11 @@
+@namespace Vek.Docs.Examples
+
+<VekLink OnClick="Count" Href="/components/link#onclick">Count and go</VekLink>
+<VekLink OnClick="Count">Count</VekLink>
+<VekText>Counter: @counter</VekText>
+
+@code {
+    private int counter = 0;
+
+    private void Count() => counter++;
+}

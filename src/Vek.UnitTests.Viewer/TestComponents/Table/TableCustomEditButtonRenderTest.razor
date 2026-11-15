@@ -1,0 +1,32 @@
+﻿<VekTable T="string" Items="_items" EditTrigger="TableEditTrigger.EditButton" EditButtonPosition="EditButtonPosition" ApplyButtonPosition="ApplyButtonPosition">
+    <HeaderContent>
+        <VekTh>#</VekTh>
+    </HeaderContent>
+    <RowTemplate>
+        <VekTd>
+            <div>
+                @context
+            </div>
+        </VekTd>
+    </RowTemplate>
+    <RowEditingTemplate>
+        <VekTd>
+            <VekTextField T="string" @bind-Value="@context"></VekTextField>
+        </VekTd>
+    </RowEditingTemplate>
+    <EditButtonContent Context="button">
+        <VekIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Class="pa-0" OnClick="button.ButtonAction" Disabled="button.ButtonDisabled" />
+    </EditButtonContent>
+</VekTable>
+
+@code {
+    public static string __description__ = "Inline Edit Table: Custom edit button content";
+
+    private readonly string[] _items = ["A", "B", "C"];
+
+    [Parameter]
+    public TableApplyButtonPosition ApplyButtonPosition { get; set; } = TableApplyButtonPosition.End;
+
+    [Parameter]
+    public TableEditButtonPosition EditButtonPosition { get; set; } = TableEditButtonPosition.End;
+}

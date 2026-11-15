@@ -1,0 +1,2027 @@
+﻿#pragma warning disable IDE1006 // leading underscore
+
+using System.Globalization;
+using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
+using AwesomeAssertions;
+using Bunit;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.DependencyInjection;
+using Vek.Extensions;
+using Vek.Resources;
+using Vek.UnitTests.TestComponents.ColorPicker;
+using Vek.Utilities;
+using NUnit.Framework;
+
+namespace Vek.UnitTests.Components
+{
+    [TestFixture]
+    public class ColorPickerTests : BunitTest
+    {
+        private const double _maxXForColorPanel = 312.0;
+        private const double _maxYForColorPanel = 250.0;
+        private const double _defaultXForColorPanel = 209.84;
+        private const double _defaultYForColorPanel = 28.43;
+
+        private static readonly VekColor _defaultColor = "#594ae2";
+        private const string _hueSliderCssSelector = ".vek-slider.vek-picker-color-slider.hue input";
+        private const string _alphaSliderCssSelector = ".vek-picker-color-slider.alpha input";
+        private const string _colorDotCssSelector = ".vek-picker-color-fill";
+        private const string _toolbarCssSelector = ".vek-toolbar";
+        private const string _vekColorPickerCssSelector = ".vek-picker-color-picker";
+        private const string _slidersControlCssSelector = ".vek-picker-color-sliders";
+        private const string _colorInputCssSelector = ".vek-picker-color-inputs";
+        private const string _colorInputModeSwitchCssSelector = ".vek-picker-control-switch";
+        private const string _alphaInputCssSelector = ".input-field-alpha";
+        private const string CssSelector = ".vek-picker-color-overlay-black .vek-picker-color-overlay";
+        private const string _vekToolbarButtonsCssSelector = ".vek-toolbar button";
+
+        private static readonly VekColor[] _vekGridDefaultColors = new VekColor[]
+        {
+            "#FFFFFF","#ebebeb","#d6d6d6","#c2c2c2","#adadad","#999999","#858586","#707070","#5c5c5c","#474747","#333333","#000000",
+            "#133648","#071d53","#0f0638","#2a093b","#370c1b","#541107","#532009","#53350d","#523e0f","#65611b","#505518","#2b3d16",
+            "#1e4c63","#0f2e76","#180b4e","#3f1256","#4e1629","#781e0e","#722f10","#734c16","#73591a","#8c8629","#707625","#3f5623",
+            "#2e6c8c","#1841a3","#280c72","#591e77","#6f223d","#a62c17","#a0451a","#a06b23","#9f7d28","#c3bc3c","#9da436","#587934",
+            "#3c8ab0","#2155ce","#331c8e","#702898","#8d2e4f","#d03a20","#ca5a24","#c8862e","#c99f35","#f3ec4e","#c6d047","#729b44",
+            "#479fd3","#2660f5","#4725ab","#8c33b5","#aa395d","#eb512e","#ed732e","#f3ae3d","#f5c944","#fefb67","#ddeb5c","#86b953",
+            "#59c4f7","#4e85f6","#5733e2","#af43eb","#d44a7a","#ed6c59","#ef8c56","#f3b757","#f6cd5b","#fef881","#e6ee7a","#a3d16e",
+            "#78d3f8","#7fa6f8","#7e52f5","#c45ff6","#de789d","#f09286","#f2a984","#f6c983","#f9da85","#fef9a1","#ebf29b","#badc94",
+            "#a5e1fa","#adc5fa","#ab8df7","#d696f8","#e8a7bf","#f4b8b1","#f6c7af","#f9daae","#fae5af","#fefbc0","#f3f7be","#d2e7ba",
+            "#d2effd","#d6e1fc","#d6c9fa","#e9cbfb","#f3d4df","#f9dcd9","#fae3d8","#fcecd7","#fdf2d8","#fefce0","#f7fade","#e3edd6"
+        };
+
+        private static readonly VekColor[] _vekGridPaletteDefaultColors = new VekColor[]
+        {
+            "#424242", "#2196f3", "#00c853", "#ff9800", "#f44336",
+            "#f6f9fb", "#9df1fa", "#bdffcf", "#fff0a3", "#ffd254",
+            "#e6e9eb", "#27dbf5", "#7ef7a0", "#ffe273", "#ffb31f",
+            "#c9cccf", "#13b8e8", "#14dc71", "#fdd22f", "#ff9102",
+            "#858791", "#0989c2", "#1bbd66", "#ebb323", "#fe6800",
+            "#585b62", "#17698e", "#17a258", "#d9980d", "#dc3f11",
+            "#353940", "#113b53", "#127942", "#bf7d11", "#aa0000"
+        };
+
+        /// <summary>
+        /// Keeps the main interaction tests focused on behavior by asserting every visible representation of a color in one place.
+        /// </summary>
+        /// <remarks>
+        /// These tests care about synchronization bugs, not just whether <see cref="VekColorPicker"/> stores the right value.
+        /// A valid picker state must keep the bound value, numeric inputs, selector position, hue slider, alpha slider,
+        /// and alpha gradient all aligned, so this helper enforces that contract consistently.
+        /// </remarks>
+        private async Task CheckColorRelatedValues(IRenderedComponent<SimpleColorPickerTest> comp, double expectedX, double expectedY, VekColor expectedColor, ColorPickerMode mode, bool checkInstanceValue = true, bool isRtl = false)
+        {
+            if (checkInstanceValue)
+            {
+                await comp.WaitForAssertionAsync(() => comp.Instance.ColorValue.Should().Be(expectedColor));
+            }
+
+            await comp.WaitForAssertionAsync(() => AssertDisplayedChannelValues(comp, expectedColor, mode));
+
+            var selector = comp.Find(".vek-picker-color-selector");
+            selector.Should().NotBeNull();
+
+            var selectorStyleAttribute = selector.GetAttribute("style");
+            selectorStyleAttribute.Should().Be($"transform: translate({expectedX.ToString(CultureInfo.InvariantCulture)}px, {expectedY.ToString(CultureInfo.InvariantCulture)}px);");
+
+            var hueSlideValue = comp.FindAll(".vek-picker-color-slider.hue input");
+            hueSlideValue.Should().ContainSingle();
+            hueSlideValue[0].Should().BeAssignableTo<IHtmlInputElement>();
+
+            ((IHtmlInputElement)hueSlideValue[0]).Value.Should().Be(((int)expectedColor.H).ToString());
+
+            var alphaSlider = comp.FindAll(_alphaSliderCssSelector);
+            alphaSlider.Should().ContainSingle();
+            alphaSlider[0].Should().BeAssignableTo<IHtmlInputElement>();
+
+            ((IHtmlInputElement)alphaSlider[0]).Value.Should().Be(((int)expectedColor.A).ToString());
+
+            var alphaSliderStyleAttribute = ((IHtmlElement)alphaSlider[0].Parent.Parent).GetAttribute("style");
+
+            if (!isRtl)
+            {
+                alphaSliderStyleAttribute.Should().Be($"background-image: linear-gradient(to right, transparent, {expectedColor.ToString(VekColorOutputFormats.RGB)});");
+            }
+            else
+            {
+                alphaSliderStyleAttribute.Should().Be($"background-image: linear-gradient(to left, transparent, {expectedColor.ToString(VekColorOutputFormats.RGB)});");
+            }
+        }
+
+        /// <summary>
+        /// Gets the visible channel inputs for the rendered picker and asserts the expected count.
+        /// </summary>
+        private static IHtmlInputElement[] GetColorInputs(IRenderedComponent<SimpleColorPickerTest> rendered, int expectedCount = 4)
+        {
+            var inputs = rendered.FindAll(".vek-picker-color-inputs input");
+
+            inputs.Should().AllBeAssignableTo<IHtmlInputElement>();
+            inputs.Should().HaveCount(expectedCount);
+
+            var castedInputs = inputs.Cast<IHtmlInputElement>().ToArray();
+
+            return castedInputs;
+        }
+
+        /// <summary>
+        /// Gets a visible channel input by index from the rendered picker.
+        /// </summary>
+        private static IHtmlInputElement GetColorInput(IRenderedComponent<SimpleColorPickerTest> rendered, int index, int expectedCount = 4) => GetColorInputs(rendered, expectedCount)[index];
+
+        /// <summary>
+        /// Reuses the same input-shape validation for tests that inspect multiple picker instances inside one rendered fragment.
+        /// </summary>
+        /// <remarks>
+        /// The regression harness renders several pickers side by side to mirror initialization bugs reported by users. Scoping
+        /// the lookup avoids cross-instance contamination while preserving the same expectations used by the single-picker helpers.
+        /// </remarks>
+        private static IHtmlInputElement[] GetColorInputs(IElement scope, int expectedCount = 4)
+        {
+            var inputs = scope.QuerySelectorAll(".vek-picker-color-inputs input");
+
+            inputs.Should().AllBeAssignableTo<IHtmlInputElement>();
+            inputs.Should().HaveCount(expectedCount);
+
+            return inputs.Cast<IHtmlInputElement>().ToArray();
+        }
+
+        /// <summary>
+        /// Asserts that the visible channel inputs match the supplied color for the selected mode.
+        /// </summary>
+        private static void AssertDisplayedChannelValues(IRenderedComponent<SimpleColorPickerTest> rendered, VekColor expectedColor, ColorPickerMode mode)
+            => AssertDisplayedChannelValuesCore(GetColorInputs(rendered, mode == ColorPickerMode.HEX ? 1 : 4), expectedColor, mode);
+
+        /// <summary>
+        /// Asserts that a picker's channel inputs match the supplied color for the selected mode.
+        /// </summary>
+        private static void AssertDisplayedChannelValuesCore(IHtmlInputElement[] castedInputs, VekColor expectedColor, ColorPickerMode mode)
+        {
+            if (mode is ColorPickerMode.RGB or ColorPickerMode.HSL)
+            {
+                if (mode == ColorPickerMode.RGB)
+                {
+                    castedInputs[0].Value.Should().Be(expectedColor.R.ToString());
+                    castedInputs[1].Value.Should().Be(expectedColor.G.ToString());
+                    castedInputs[2].Value.Should().Be(expectedColor.B.ToString());
+                    castedInputs[3].Value.Should().Be(expectedColor.APercentage.ToString(CultureInfo.CurrentUICulture));
+                }
+                else
+                {
+                    castedInputs[0].Value.Should().Be(expectedColor.H.ToString(CultureInfo.CurrentUICulture));
+                    castedInputs[1].Value.Should().Be(expectedColor.S.ToString(CultureInfo.CurrentUICulture));
+                    castedInputs[2].Value.Should().Be(expectedColor.L.ToString(CultureInfo.CurrentUICulture));
+                    castedInputs[3].Value.Should().Match(x => double.Parse(x, CultureInfo.CurrentUICulture) == Math.Round(expectedColor.A / 255.0, 2));
+                }
+
+                return;
+            }
+
+            if (mode == ColorPickerMode.HEX)
+            {
+                castedInputs[0].Value.Should().Be(expectedColor.Value);
+            }
+        }
+
+        /// <summary>
+        /// Applies the same full-state synchronization assertions to a single picker inside a larger rendered snippet.
+        /// </summary>
+        /// <remarks>
+        /// The initialization regression tests intentionally render several color pickers in one component to exercise different
+        /// timing and input combinations. This helper ensures each scoped picker is judged by the same standards as the wrapper-based tests.
+        /// </remarks>
+        private static void CheckColorRelatedValues(IElement scope, double expectedX, double expectedY, VekColor expectedColor, ColorPickerMode mode, bool isRtl = false)
+        {
+            if (mode is ColorPickerMode.RGB or ColorPickerMode.HSL)
+            {
+                var castedInputs = GetColorInputs(scope);
+
+                if (mode == ColorPickerMode.RGB)
+                {
+                    castedInputs[0].Value.Should().Be(expectedColor.R.ToString());
+                    castedInputs[1].Value.Should().Be(expectedColor.G.ToString());
+                    castedInputs[2].Value.Should().Be(expectedColor.B.ToString());
+                    castedInputs[3].Value.Should().Be(expectedColor.APercentage.ToString(CultureInfo.CurrentUICulture));
+                }
+                else
+                {
+                    castedInputs[0].Value.Should().Be(expectedColor.H.ToString(CultureInfo.CurrentUICulture));
+                    castedInputs[1].Value.Should().Be(expectedColor.S.ToString(CultureInfo.CurrentUICulture));
+                    castedInputs[2].Value.Should().Be(expectedColor.L.ToString(CultureInfo.CurrentUICulture));
+                    castedInputs[3].Value.Should().Match(x => double.Parse(x, CultureInfo.CurrentUICulture) == Math.Round(expectedColor.A / 255.0, 2));
+                }
+            }
+            else if (mode == ColorPickerMode.HEX)
+            {
+                var castedInputs = GetColorInputs(scope, 1);
+                castedInputs[0].Value.Should().Be(expectedColor.Value);
+            }
+
+            var selector = scope.QuerySelector(".vek-picker-color-selector");
+            selector.Should().NotBeNull();
+
+            var selectorStyleAttribute = selector!.GetAttribute("style");
+            selectorStyleAttribute.Should().Be($"transform: translate({expectedX.ToString(CultureInfo.InvariantCulture)}px, {expectedY.ToString(CultureInfo.InvariantCulture)}px);");
+
+            // The spectrum base color (the "color field" hue) must follow the color too. Pure hues share the
+            // same selector corner, so the transform alone cannot catch a stale base color (#13037).
+            var overlay = scope.QuerySelector(".vek-picker-color-overlay");
+            overlay.Should().NotBeNull();
+            overlay!.GetAttribute("style").Should().Be($"background-color: {GetExpectedBaseColor(expectedColor).ToString(VekColorOutputFormats.RGB)}");
+
+            var hueSlideValue = scope.QuerySelectorAll(".vek-picker-color-slider.hue input");
+            hueSlideValue.Should().ContainSingle();
+            hueSlideValue[0].Should().BeAssignableTo<IHtmlInputElement>();
+
+            ((IHtmlInputElement)hueSlideValue[0]).Value.Should().Be(((int)expectedColor.H).ToString());
+
+            var alphaSlider = scope.QuerySelectorAll(_alphaSliderCssSelector);
+            alphaSlider.Should().ContainSingle();
+            alphaSlider[0].Should().BeAssignableTo<IHtmlInputElement>();
+
+            ((IHtmlInputElement)alphaSlider[0]).Value.Should().Be(((int)expectedColor.A).ToString());
+
+            var alphaSliderStyleAttribute = ((IHtmlElement)alphaSlider[0].Parent.Parent).GetAttribute("style");
+
+            if (!isRtl)
+            {
+                alphaSliderStyleAttribute.Should().Be($"background-image: linear-gradient(to right, transparent, {expectedColor.ToString(VekColorOutputFormats.RGB)});");
+            }
+            else
+            {
+                alphaSliderStyleAttribute.Should().Be($"background-image: linear-gradient(to left, transparent, {expectedColor.ToString(VekColorOutputFormats.RGB)});");
+            }
+        }
+
+        /// <summary>
+        /// Derives the pure spectrum hue (base color) the rendered overlay should show for a given color.
+        /// </summary>
+        /// <remarks>
+        /// Mirrors <c>VekColorPicker.UpdateBaseColor</c> so the tests can assert that the spectrum hue tracks the
+        /// bound value. This is the facet that stayed stale on external value changes in #13037.
+        /// </remarks>
+        private static VekColor GetExpectedBaseColor(VekColor color)
+        {
+            var index = (int)color.H / 60;
+            if (index == 6)
+            {
+                index = 5;
+            }
+
+            var valueInDeg = (int)color.H - (index * 60);
+            var value = (int)MathExtensions.Map(0, 60, 0, 255, valueInDeg);
+
+            return index switch
+            {
+                0 => new VekColor(255, value, 0, 255),
+                1 => new VekColor(255 - value, 255, 0, 255),
+                2 => new VekColor(0, 255, value, 255),
+                3 => new VekColor(0, 255 - value, 255, 255),
+                4 => new VekColor(value, 0, 255, 255),
+                5 => new VekColor(255, 0, 255 - value, 255),
+                _ => new VekColor(255, 0, 0, 255),
+            };
+        }
+
+        /// <summary>
+        /// Derives the selector coordinates that the rendered spectrum should show for a given color.
+        /// </summary>
+        /// <remarks>
+        /// The initialization regressions are not limited to numeric fields. They also affect whether the spectrum selector is
+        /// projected into a stable, non-NaN position, so these tests need a shared way to express the expected geometry.
+        /// </remarks>
+        private static (double x, double y) GetExpectedSelectorPosition(VekColor color)
+        {
+            if (color.R is 0 && color.G is 0 && color.B is 0)
+            {
+                return (_maxXForColorPanel, _maxYForColorPanel);
+            }
+
+            var hueValue = (int)MathExtensions.Map(0, 360, 0, 6 * 255, color.H);
+            var index = hueValue / 255;
+
+            if (index == 6)
+            {
+                index = 5;
+            }
+
+            var dominantColorPart = index switch
+            {
+                0 => "rb",
+                1 => "gb",
+                2 => "gr",
+                3 => "br",
+                4 => "bg",
+                5 => "rg",
+                _ => "rb"
+            };
+
+            var colorValues = dominantColorPart switch
+            {
+                "rb" => (primary: color.R, secondary: color.B),
+                "rg" => (primary: color.R, secondary: color.G),
+                "gb" => (primary: color.G, secondary: color.B),
+                "gr" => (primary: color.G, secondary: color.R),
+                "br" => (primary: color.B, secondary: color.R),
+                "bg" => (primary: color.B, secondary: color.G),
+                _ => (primary: 255, secondary: 255)
+            };
+
+            var primaryDiff = 255 - colorValues.primary;
+            var primaryDiffDelta = colorValues.primary / 255.0;
+            var selectorY = MathExtensions.Map(0, 255, 0, _maxYForColorPanel, primaryDiff);
+            var secondaryColorX = colorValues.secondary * (1.0 / primaryDiffDelta);
+            var relation = (255 - secondaryColorX) / 255.0;
+            var selectorX = relation * _maxXForColorPanel;
+
+            return (Math.Round(selectorX, 2), Math.Round(selectorY, 2));
+        }
+
+        /// <summary>
+        /// Exercises the first-render path directly so initialization regressions can be isolated from later parameter updates.
+        /// </summary>
+        /// <remarks>
+        /// Several reported bugs happen before any user interaction occurs. Rendering a fresh picker with a bound initial value
+        /// lets the tests prove whether the component starts in a coherent visual state for that mode.
+        /// </remarks>
+        private async Task AssertInitializedColorStateAsync(VekColor expectedColor, ColorPickerMode mode)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ColorValue, expectedColor);
+                p.Add(x => x.ColorPickerMode, mode);
+            });
+
+            var (selectorX, selectorY) = GetExpectedSelectorPosition(expectedColor);
+            await CheckColorRelatedValues(comp, selectorX, selectorY, expectedColor, mode);
+        }
+
+        /// <summary>
+        /// Blurring the channel inputs under a comma-decimal UI culture keeps the color instead of re-parsing "0,5" as 5 and clamping it.
+        /// </summary>
+        [Test]
+        [SetCulture("de-DE")]
+        [SetUICulture("de-DE")]
+        [TestCase(ColorPickerMode.RGB)]
+        [TestCase(ColorPickerMode.HSL)]
+        public async Task ChannelInputs_BlurWithoutTyping_CommaDecimalCulture_KeepsColor(ColorPickerMode mode)
+        {
+            var color = new VekColor("#594ae280");
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ColorValue, color);
+                p.Add(x => x.ColorPickerMode, mode);
+            });
+
+            for (var i = 0; i < 4; i++)
+            {
+                await GetColorInput(comp, i).BlurAsync(new FocusEventArgs());
+            }
+
+            comp.Instance.ColorValue.Should().Be(color);
+
+            // The channel inputs default to invariant text, so fractional channels show a dot.
+            GetColorInputs(comp).Select(x => x.Value).Should().OnlyContain(x => !x.Contains(','));
+        }
+
+        [Test]
+        public void ColorPickerOpenButtonDefaultAriaLabel()
+        {
+            var comp = Context.Render<VekColorPicker>();
+            var openButton = comp.Find(".vek-input-adornment button");
+            openButton.Attributes.GetNamedItem("aria-label")?.Value.Should().Be("Open");
+        }
+
+        [Test]
+        public void Default()
+        {
+            var comp = Context.Render<VekColorPicker>();
+
+            comp.Instance.ShowAlpha.Should().BeTrue();
+            comp.Instance.ShowColorField.Should().BeTrue();
+            comp.Instance.ShowModeSwitch.Should().BeTrue();
+            comp.Instance.ShowInputs.Should().BeTrue();
+            comp.Instance.ShowSliders.Should().BeTrue();
+            comp.Instance.ShowPreview.Should().BeTrue();
+            comp.Instance.ColorPickerMode.Should().Be(ColorPickerMode.RGB);
+            comp.Instance.ColorPickerView.Should().Be(ColorPickerView.Spectrum);
+            comp.Instance.UpdateBindingIfOnlyHSLChanged.Should().BeFalse();
+            comp.Instance.ReadValue.Should().Be(null);
+            comp.Instance.Palette.Should().BeEquivalentTo(_vekGridPaletteDefaultColors);
+            comp.Instance.DragEffect.Should().BeTrue();
+        }
+
+        [Test]
+        [TestCase(ColorPickerMode.RGB)]
+        [TestCase(ColorPickerMode.HSL)]
+        [TestCase(ColorPickerMode.HEX)]
+        public void UnboundColorPicker_ShouldDisplayDefaultColorInAllModes(ColorPickerMode mode)
+        {
+            var comp = Context.Render<VekColorPicker>(p =>
+            {
+                p.Add(x => x.PickerVariant, PickerVariant.Static);
+                p.Add(x => x.ColorPickerMode, mode);
+            });
+
+            var expectedInputCount = mode == ColorPickerMode.HEX ? 1 : 4;
+            var inputs = comp.FindAll($"{_colorInputCssSelector} input");
+
+            inputs.Should().HaveCount(expectedInputCount);
+            inputs.Should().AllBeAssignableTo<IHtmlInputElement>();
+
+            AssertDisplayedChannelValuesCore(inputs.Cast<IHtmlInputElement>().ToArray(), _defaultColor, mode);
+        }
+
+        [Test]
+        [TestCase("#00000088", ColorPickerMode.RGB)]
+        [TestCase("#00000088", ColorPickerMode.HSL)]
+        [TestCase("#00000088", ColorPickerMode.HEX)]
+        [TestCase("#00000188", ColorPickerMode.RGB)]
+        [TestCase("#00000188", ColorPickerMode.HSL)]
+        [TestCase("#00000188", ColorPickerMode.HEX)]
+        [TestCase("#ff0000ff", ColorPickerMode.HSL)]
+        [TestCase("#ff0000ff", ColorPickerMode.HEX)]
+        [TestCase("#0f0f", ColorPickerMode.RGB)]
+        [TestCase("#0f0f", ColorPickerMode.HSL)]
+        [TestCase("#0f0f", ColorPickerMode.HEX)]
+        public async Task InitiallyBoundValue_ShouldInitializeAllVisibleControls(string colorHex, ColorPickerMode mode)
+        {
+            var expectedColor = new VekColor(colorHex);
+            await AssertInitializedColorStateAsync(expectedColor, mode);
+        }
+
+        [Test]
+        [TestCase(ColorPickerMode.RGB)]
+        [TestCase(ColorPickerMode.HSL)]
+        public async Task BoundValueSetAfterInitialRender_ShouldRefreshAllVisibleControls(ColorPickerMode mode)
+        {
+            var initialColor = new VekColor("#ff000088");
+            var expectedColor = new VekColor("#00ff");
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ColorValue, initialColor);
+                p.Add(x => x.ColorPickerMode, mode);
+            });
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ColorValue, expectedColor));
+
+            var (selectorX, selectorY) = GetExpectedSelectorPosition(expectedColor);
+            await CheckColorRelatedValues(comp, selectorX, selectorY, expectedColor, mode);
+        }
+
+        [Test]
+        [TestCase(ColorPickerMode.RGB)]
+        [TestCase(ColorPickerMode.HSL)]
+        public async Task BoundValueChangedToNewHue_ShouldRefreshSpectrumBaseColor(ColorPickerMode mode)
+        {
+            // #13037: an external Value change after first render must re-sync the spectrum base color (hue),
+            // not just the numeric inputs. The selector transform alone cannot catch this because fully
+            // saturated pure hues share the same corner, so this asserts the base-color overlay directly.
+            var initialColor = new VekColor("#ff0000ff");
+            var newColor = new VekColor("#0000ffff");
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ColorValue, initialColor);
+                p.Add(x => x.ColorPickerMode, mode);
+            });
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ColorValue, newColor));
+
+            await comp.WaitForAssertionAsync(() =>
+            {
+                var overlayStyle = comp.Find(".vek-picker-color-overlay").GetAttribute("style");
+                overlayStyle.Should().Contain($"background-color: {newColor.ToString(VekColorOutputFormats.RGB)}");
+            });
+        }
+
+        [Test]
+        [TestCase("broken", "#00000088")]
+        [TestCase("alpha", "#00000188")]
+        [TestCase("lightness", "#ff0000ff")]
+        [TestCase("pseudo", "#0f0f")]
+        [TestCase("async", "#00ff")]
+        public async Task InitializationSnippet_ShouldInitializeRgbControls(string testId, string colorHex)
+        {
+            var comp = Context.Render<ColorPickerInitializationTest>();
+            var expectedColor = new VekColor(colorHex);
+            var (selectorX, selectorY) = GetExpectedSelectorPosition(expectedColor);
+
+            await comp.WaitForAssertionAsync(() =>
+                CheckColorRelatedValues(comp.Find($"[data-testid='{testId}']"), selectorX, selectorY, expectedColor, ColorPickerMode.RGB));
+        }
+
+        [Test]
+        [TestCase("broken", "#00000088")]
+        [TestCase("alpha", "#00000188")]
+        [TestCase("lightness", "#ff0000ff")]
+        [TestCase("pseudo", "#0f0f")]
+        [TestCase("async", "#00ff")]
+        public async Task InitializationSnippet_ShouldInitializeHslControls(string testId, string colorHex)
+        {
+            var comp = Context.Render<ColorPickerInitializationTest>();
+            var expectedColor = new VekColor(colorHex);
+            var (selectorX, selectorY) = GetExpectedSelectorPosition(expectedColor);
+
+            await comp.WaitForAssertionAsync(() =>
+                CheckColorRelatedValues(comp.Find($"[data-testid='{testId}']"), selectorX, selectorY, expectedColor, ColorPickerMode.RGB));
+
+            await comp.Find($"[data-testid='{testId}']").QuerySelector(".vek-picker-control-switch button")!.ClickAsync();
+
+            await comp.WaitForAssertionAsync(() =>
+                CheckColorRelatedValues(comp.Find($"[data-testid='{testId}']"), selectorX, selectorY, expectedColor, ColorPickerMode.HSL));
+        }
+
+        [Test]
+        [TestCase(40, 256.78, _defaultYForColorPanel)]
+        public async Task SetR(byte r, double selectorXPosition, double selectorYPosition)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>();
+
+            var rInput = GetColorInput(comp, 0);
+
+            var expectedColor = comp.Instance.ColorValue.SetR(r);
+            await rInput.ChangeAsync(expectedColor.R.ToString());
+
+            await CheckColorRelatedValues(comp, selectorXPosition, selectorYPosition, expectedColor, ColorPickerMode.RGB);
+        }
+
+        [Test]
+        [TestCase(240, 196.3, 14.71)]
+        public async Task SetG(byte g, double selectorXPosition, double selectorYPosition)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>();
+
+            var gInput = GetColorInput(comp, 1);
+
+            var expectedColor = comp.Instance.ColorValue.SetG(g);
+
+            await gInput.ChangeAsync(expectedColor.G.ToString());
+
+            await CheckColorRelatedValues(comp, selectorXPosition, selectorYPosition, expectedColor, ColorPickerMode.RGB);
+        }
+
+        [Test]
+        [TestCase(90, 55.47, 161.76)]
+        public async Task SetB(byte b, double selectorXPosition, double selectorYPosition)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>();
+
+            var bInput = GetColorInput(comp, 2);
+
+            var expectedColor = comp.Instance.ColorValue.SetB(b);
+
+            await bInput.ChangeAsync(expectedColor.B.ToString());
+
+            await CheckColorRelatedValues(comp, selectorXPosition, selectorYPosition, expectedColor, ColorPickerMode.RGB);
+        }
+
+        [Test]
+        [TestCase(0.9, _defaultXForColorPanel, _defaultYForColorPanel)]
+        public async Task SetA_InRGBMode(double a, double selectorXPosition, double selectorYPosition)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>();
+
+            var aInput = GetColorInput(comp, 3);
+
+            var expectedColor = comp.Instance.ColorValue.SetAlpha(a);
+
+            await aInput.ChangeAsync(a.ToString(CultureInfo.CurrentUICulture));
+
+            await CheckColorRelatedValues(comp, selectorXPosition, selectorYPosition, expectedColor, ColorPickerMode.RGB);
+        }
+
+        [Test]
+        [TestCase(90, 208.46, _defaultYForColorPanel)]
+        public async Task SetH(int h, double selectorXPosition, double selectorYPosition)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p => p.Add(x => x.ColorPickerMode, ColorPickerMode.HSL));
+
+            var hInput = GetColorInput(comp, 0);
+
+            var expectedColor = comp.Instance.ColorValue.SetH(h);
+
+            await hInput.ChangeAsync(expectedColor.H.ToString());
+
+            await CheckColorRelatedValues(comp, selectorXPosition, selectorYPosition, expectedColor, ColorPickerMode.HSL);
+        }
+
+        [Test]
+        [TestCase(0.4, 134.88, 61.76)]
+        public async Task SetS(double s, double selectorXPosition, double selectorYPosition)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p => p.Add(x => x.ColorPickerMode, ColorPickerMode.HSL));
+
+            var sColor = GetColorInput(comp, 1);
+
+            var expectedColor = comp.Instance.ColorValue.SetS(s);
+
+            await sColor.ChangeAsync(expectedColor.S.ToString(CultureInfo.CurrentUICulture));
+
+            await CheckColorRelatedValues(comp, selectorXPosition, selectorYPosition, expectedColor, ColorPickerMode.HSL);
+        }
+
+        [Test]
+        [TestCase(0.67, 163.43, 23.53)]
+        public async Task SetL(double l, double selectorXPosition, double selectorYPosition)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p => p.Add(x => x.ColorPickerMode, ColorPickerMode.HSL));
+
+            var lColor = GetColorInput(comp, 2);
+
+            var expectedColor = comp.Instance.ColorValue.SetL(l);
+            await lColor.ChangeAsync(expectedColor.L.ToString(CultureInfo.CurrentUICulture));
+
+            await CheckColorRelatedValues(comp, selectorXPosition, selectorYPosition, expectedColor, ColorPickerMode.HSL);
+        }
+
+        [Test]
+        [TestCase(0.5, _defaultXForColorPanel, _defaultYForColorPanel)]
+        public async Task SetAlpha_AsHLS(double a, double selectorXPosition, double selectorYPosition)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p => p.Add(x => x.ColorPickerMode, ColorPickerMode.HSL));
+
+            var lColor = GetColorInput(comp, 3);
+
+            var expectedColor = comp.Instance.ColorValue.SetAlpha(a);
+            await lColor.ChangeAsync(a.ToString(CultureInfo.CurrentUICulture));
+
+            await CheckColorRelatedValues(comp, selectorXPosition, selectorYPosition, expectedColor, ColorPickerMode.HSL);
+        }
+
+        [Test]
+        [TestCase("#8cb829ff", 242.48, 69.61)]
+        public async Task SetColorInput(string colorHexString, double selectorXPosition, double selectorYPosition)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p => p.Add(x => x.ColorPickerMode, ColorPickerMode.HEX));
+
+            var lColor = GetColorInput(comp, 0, 1);
+
+            var expectedColor = colorHexString;
+            await lColor.ChangeAsync(colorHexString);
+
+            await CheckColorRelatedValues(comp, selectorXPosition, selectorYPosition, expectedColor, ColorPickerMode.HEX);
+        }
+
+        [Test]
+        [TestCase("#8qb829ff")]
+        public async Task SetColorInput_InvalidNoChange(string colorHexString)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p => p.Add(x => x.ColorPickerMode, ColorPickerMode.HEX));
+
+            var hexInput = GetColorInput(comp, 0, 1);
+
+            var expectedColor = _defaultColor;
+            await hexInput.ChangeAsync(colorHexString);
+
+            await CheckColorRelatedValues(comp, _defaultXForColorPanel, _defaultYForColorPanel, expectedColor, ColorPickerMode.HEX);
+        }
+
+        // The alpha slider does not move the spectrum selector; representative values exercise the same path
+        // the old 0..255 sweep did without 256 redundant full re-assertions.
+        [Test]
+        [TestCase(255)]
+        [TestCase(192)]
+        [TestCase(128)]
+        [TestCase(1)]
+        [TestCase(0)]
+        public async Task SetAlphaSlider(int alpha)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>();
+
+            var expectedColor = comp.Instance.ColorValue.SetAlpha((byte)alpha);
+
+            var alphaSlider = comp.FindAll(_alphaSliderCssSelector);
+            alphaSlider.Should().ContainSingle();
+            alphaSlider[0].Should().BeAssignableTo<IHtmlInputElement>();
+
+            await alphaSlider[0].InputAsync(alpha.ToString());
+
+            await CheckColorRelatedValues(comp, _defaultXForColorPanel, _defaultYForColorPanel, expectedColor, ColorPickerMode.RGB);
+        }
+
+        [Test]
+        public async Task PointerMove()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>();
+
+            const double x = 117.0;
+            const double y = 140.0;
+
+            var overlay = comp.Find(CssSelector);
+
+            await overlay.PointerDownAsync(new PointerEventArgs { OffsetX = x, OffsetY = y, Buttons = 1 });
+
+            var expectedColor = new VekColor(74, 70, 112, 255);
+
+            await CheckColorRelatedValues(comp, x, y, expectedColor, ColorPickerMode.RGB);
+
+            await overlay.PointerDownAsync(new PointerEventArgs { OffsetX = x, OffsetY = y, Buttons = 0 });
+
+            await CheckColorRelatedValues(comp, x, y, expectedColor, ColorPickerMode.RGB);
+        }
+
+        // Hue only rotates the base color; the selector stays put for the bound color's fixed S/L.
+        // Representative hues replace the old 0..360 sweep.
+        [Test]
+        [TestCase(0)]
+        [TestCase(90)]
+        [TestCase(180)]
+        [TestCase(270)]
+        [TestCase(360)]
+        public async Task SetHueSlider(int hue)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>();
+
+            var expectedColor = comp.Instance.ColorValue.SetH(hue);
+
+            var hueSlider = comp.FindAll(_hueSliderCssSelector);
+            hueSlider.Should().ContainSingle();
+            hueSlider[0].Should().BeAssignableTo<IHtmlInputElement>();
+
+            await hueSlider[0].InputAsync(hue.ToString());
+
+            await CheckColorRelatedValues(comp, 208.46, _defaultYForColorPanel, expectedColor, ColorPickerMode.RGB);
+        }
+
+        [Test]
+        public async Task SetHueSlider_ToCurrentHue_IsNoOp()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>();
+            var before = comp.Instance.ColorValue;
+            var currentHue = ((int)before.H).ToString();
+
+            // Setting the hue slider to the already-selected hue short-circuits without changing the color.
+            await comp.Find(_hueSliderCssSelector).InputAsync(currentHue);
+
+            comp.Instance.ColorValue.Should().Be(before);
+        }
+
+        [Test]
+        public async Task Click_ColorPanel()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>();
+
+            var overlay = comp.Find(CssSelector);
+
+            const double x = 99.2;
+            const double y = 200.98;
+
+            await overlay.PointerDownAsync(new PointerEventArgs { OffsetX = x, OffsetY = y });
+
+            VekColor color = "#232232ff";
+            var expectedColor = new VekColor(color.R, color.G, color.B, _defaultColor);
+
+            await CheckColorRelatedValues(comp, x, y, expectedColor, ColorPickerMode.RGB);
+        }
+
+        [Test]
+        public async Task Click_ModeButton()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>();
+
+            var color = comp.Instance.ColorValue;
+            var modeButton = comp.Find(".vek-picker-control-switch button");
+
+            //default to rgb
+            await CheckColorRelatedValues(comp, _defaultXForColorPanel, _defaultYForColorPanel, color, ColorPickerMode.RGB);
+
+            // click to switch to HSL
+            await modeButton.ClickAsync();
+            await CheckColorRelatedValues(comp, _defaultXForColorPanel, _defaultYForColorPanel, color, ColorPickerMode.HSL);
+
+            //click again to switch to hex
+            await modeButton.ClickAsync();
+            await CheckColorRelatedValues(comp, _defaultXForColorPanel, _defaultYForColorPanel, color, ColorPickerMode.HEX);
+
+            //click last time to reset to RGB
+            await modeButton.ClickAsync();
+            await CheckColorRelatedValues(comp, _defaultXForColorPanel, _defaultYForColorPanel, color, ColorPickerMode.RGB);
+        }
+
+        [Test]
+        public async Task ColorPalette_Interaction()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>();
+
+            var colorDot = comp.Find(_colorDotCssSelector);
+            // no collection
+            Assert.Throws<ElementNotFoundException>(() => comp.Find(".vek-picker-color-collection"));
+            await colorDot.ClickAsync();
+
+            // collection found
+            var colorsToSelectPanel = comp.Find(".vek-picker-color-collection");
+            colorsToSelectPanel.Children.Should().HaveCount(5);
+
+            var expectedColors = new VekColor[] { "#ff4081ff", "#2196f3ff", "#00c853ff", "#ff9800ff", "#f44336ff" };
+
+            for (var i = 0; i < 5; i++)
+            {
+                var styleAttribute = colorsToSelectPanel.Children[i].GetAttribute("style");
+                styleAttribute.Should().Be($"background: {expectedColors[i].ToString(VekColorOutputFormats.RGBA)};");
+            }
+
+            await colorDot.ClickAsync();
+
+            // again no collection visible
+            Assert.Throws<ElementNotFoundException>(() => comp.Find(".vek-picker-color-collection"));
+        }
+
+        [Test]
+        public async Task ColorPalette_CustomColors()
+        {
+            var expectedColors = new VekColor[] { "#23af3daa", "#56a23dff", "#56a85dff" };
+
+            var comp = Context.Render<SimpleColorPickerTest>(p => p.Add(x => x.Palette, expectedColors));
+
+            var colorDot = comp.Find(_colorDotCssSelector);
+            await colorDot.ClickAsync();
+
+            // collection found
+            var colorsToSelectPanel = comp.Find(".vek-picker-color-collection");
+            colorsToSelectPanel.Children.Should().HaveCount(expectedColors.Length);
+
+            for (var i = 0; i < expectedColors.Length; i++)
+            {
+                var styleAttribute = colorsToSelectPanel.Children[i].GetAttribute("style");
+                styleAttribute.Should().Be($"background: {expectedColors[i].ToString(VekColorOutputFormats.RGBA)};");
+            }
+        }
+
+        [Test]
+        public async Task ColorPalette_SelectColor()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>();
+
+            var colorDot = comp.Find(_colorDotCssSelector);
+            // no collection
+            Assert.Throws<ElementNotFoundException>(() => comp.Find(".vek-picker-color-collection"));
+            await colorDot.ClickAsync();
+
+            var expectedColors = new VekColor[] { "#ff4081ff", "#2196f3ff", "#00c853ff", "#ff9800ff", "#f44336ff" };
+
+            for (var i = 0; i < 5; i++)
+            {
+                var colorsToSelectPanel = comp.Find(".vek-picker-color-collection");
+
+                await colorsToSelectPanel.Children[i].ClickAsync();
+                colorDot = comp.Find(_colorDotCssSelector);
+
+                var styleAttribute = colorDot.GetAttribute("style");
+                styleAttribute.Should().Be($"background: {expectedColors[i].ToString(VekColorOutputFormats.RGBA)};");
+                comp.Instance.ColorValue.Should().Be(expectedColors[i]);
+
+                await colorDot.ClickAsync();
+            }
+        }
+
+        [Test]
+        public async Task Toggle_Toolbar()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p => p.Add(x => x.ShowToolbar, true));
+
+            _ = comp.Find(_toolbarCssSelector);
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ShowToolbar, false));
+
+            Assert.Throws<ElementNotFoundException>(() => comp.Find(_toolbarCssSelector));
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ShowToolbar, true));
+
+            _ = comp.Find(_toolbarCssSelector);
+        }
+
+        [Test]
+        public async Task Toggle_ColorField()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p => p.Add(x => x.ShowColorField, true));
+
+            _ = comp.Find(_vekColorPickerCssSelector);
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ShowColorField, false));
+
+            Assert.Throws<ElementNotFoundException>(() => comp.Find(_vekColorPickerCssSelector));
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ShowColorField, true));
+
+            _ = comp.Find(_vekColorPickerCssSelector);
+        }
+
+        [Test]
+        public async Task Toggle_Preview()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p => p.Add(x => x.ShowPreview, true));
+
+            _ = comp.Find(_colorDotCssSelector);
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ShowPreview, false));
+
+            Assert.Throws<ElementNotFoundException>(() => comp.Find(_colorDotCssSelector));
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ShowPreview, true));
+
+            _ = comp.Find(_colorDotCssSelector);
+        }
+
+        [Test]
+        public void ShowPreview_ShouldUseDefaultColor_WhenValueIsNull()
+        {
+            var comp = Context.Render<VekColorPicker>(p =>
+            {
+                p.Add(x => x.Value, null);
+                p.Add(x => x.ShowPreview, true);
+                p.Add(x => x.PickerVariant, PickerVariant.Static);
+            });
+
+            var colorDot = comp.Find(_colorDotCssSelector);
+            var style = colorDot.GetAttribute("style");
+            style.Should().Be($"background: {_defaultColor.ToString(VekColorOutputFormats.RGBA)};");
+        }
+
+        [Test]
+        public async Task Toggle_Sliders()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p => p.Add(x => x.ShowSliders, true));
+
+            _ = comp.Find(_slidersControlCssSelector);
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ShowSliders, false));
+
+            Assert.Throws<ElementNotFoundException>(() => comp.Find(_slidersControlCssSelector));
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ShowSliders, true));
+
+            _ = comp.Find(_slidersControlCssSelector);
+        }
+
+        [Test]
+        [TestCase(ColorPickerMode.HEX)]
+        [TestCase(ColorPickerMode.HSL)]
+        [TestCase(ColorPickerMode.RGB)]
+        public async Task Toggle_Input(ColorPickerMode mode)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ColorPickerMode, mode);
+                p.Add(x => x.DisableInput, false);
+
+            });
+
+            _ = comp.Find(_colorInputCssSelector);
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.DisableInput, true));
+
+            Assert.Throws<ElementNotFoundException>(() => comp.Find(_colorInputCssSelector));
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.DisableInput, false));
+
+            _ = comp.Find(_colorInputCssSelector);
+        }
+
+        [Test]
+        public async Task Toggle_ModeSwitch()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p => p.Add(x => x.ShowModeSwitch, true));
+
+            _ = comp.Find(_colorInputModeSwitchCssSelector);
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ShowModeSwitch, false));
+
+            Assert.Throws<ElementNotFoundException>(() => comp.Find(_colorInputModeSwitchCssSelector));
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ShowModeSwitch, true));
+
+            _ = comp.Find(_colorInputModeSwitchCssSelector);
+        }
+
+        [Test]
+        public void Tooltips_Disabled_ShouldSuppressTooltipContent()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ShowToolbar, true);
+                p.Add(x => x.ShowTooltips, false);
+            });
+
+            var tooltipRoots = comp.FindAll(".vek-tooltip-root");
+            tooltipRoots.Should().HaveCount(4);
+
+            foreach (var root in tooltipRoots)
+            {
+                root.Children.Length.Should().Be(1);
+            }
+
+            var tooltips = comp.FindComponents<VekTooltip>();
+            tooltips.Should().HaveCount(4);
+            tooltips.Should().OnlyContain(t => string.IsNullOrEmpty(t.Instance.Text));
+            comp.FindAll(".vek-tooltip").Should().BeEmpty();
+        }
+
+        [Test]
+        public void Tooltips_Enabled_ShouldDisplayLocalizedContent()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ShowToolbar, true);
+                p.Add(x => x.ShowTooltips, true);
+            });
+
+            var localizer = Context.Services.GetRequiredService<InternalVekLocalizer>();
+            var expectedTexts = new[]
+            {
+                localizer[LanguageResource.VekColorPicker_SpectrumView],
+                localizer[LanguageResource.VekColorPicker_GridView],
+                localizer[LanguageResource.VekColorPicker_PaletteView],
+                localizer[LanguageResource.VekColorPicker_ModeSwitch],
+            };
+
+            var tooltips = comp.FindComponents<VekTooltip>();
+            tooltips.Should().HaveCount(4);
+            tooltips.Select(t => t.Instance.Text).Should().Equal(expectedTexts);
+        }
+
+        [Test]
+        [TestCase(ColorPickerMode.HSL)]
+        [TestCase(ColorPickerMode.RGB)]
+        public async Task Toggle_Alpha(ColorPickerMode mode)
+        {
+            var color = new VekColor(12, 220, 124, 120);
+            var expectedColor = new VekColor(12, 220, 124, 120);
+
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ColorPickerMode, mode);
+                p.Add(x => x.ShowAlpha, true);
+                p.Add(x => x.ColorValue, color);
+            });
+
+            _ = comp.Find(_alphaInputCssSelector);
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ShowAlpha, false));
+
+            Assert.Throws<ElementNotFoundException>(() => comp.Find(_alphaInputCssSelector));
+            comp.Instance.ColorValue.Should().Be(expectedColor);
+            comp.Instance.TextValue.Should().Be(expectedColor.ToString(VekColorOutputFormats.Hex));
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ShowAlpha, true));
+
+            _ = comp.Find(_alphaInputCssSelector);
+            comp.Instance.ColorValue.Should().Be(expectedColor);
+            comp.Instance.TextValue.Should().Be(expectedColor.ToString(VekColorOutputFormats.HexA));
+        }
+
+        [Test]
+        public async Task Toggle_Alpha_HexInputMode()
+        {
+            var color = new VekColor(12, 220, 124, 120);
+            var expectedColor = new VekColor(12, 220, 124, 120);
+
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ColorPickerMode, ColorPickerMode.HEX);
+                p.Add(x => x.ShowAlpha, true);
+                p.Add(x => x.ColorValue, color);
+            });
+
+            Assert.Throws<ElementNotFoundException>(() => comp.Find(_alphaInputCssSelector));
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ShowAlpha, false));
+
+            comp.Instance.ColorValue.Should().Be(expectedColor);
+
+            var inputs = comp.FindAll(".vek-picker-color-inputfield input");
+            inputs.Should().ContainSingle();
+            inputs.Should().AllBeAssignableTo<IHtmlInputElement>();
+            ((IHtmlInputElement)inputs[0]).Value.Should().Be("#0cdc7c");
+            ((IHtmlInputElement)inputs[0]).MaxLength.Should().Be(7);
+
+            comp.Instance.TextValue.Should().Be("#0cdc7c");
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ShowAlpha, true));
+            comp.Instance.ColorValue.Should().Be(expectedColor);
+            inputs = comp.FindAll(".vek-picker-color-inputfield input");
+            inputs.Should().ContainSingle();
+            inputs.Should().AllBeAssignableTo<IHtmlInputElement>();
+            ((IHtmlInputElement)inputs[0]).Value.Should().Be("#0cdc7c78");
+            ((IHtmlInputElement)inputs[0]).MaxLength.Should().Be(9);
+
+            comp.Instance.TextValue.Should().Be("#0cdc7c78");
+        }
+
+        [Test]
+        public async Task ShowAlphaOff_WithoutValueChangedBinding_RemovesAlphaControl()
+        {
+            // A bare picker (no @bind-Value / ValueChanged) so the no-delegate alpha branch runs.
+            var comp = Context.Render<VekColorPicker>(p =>
+            {
+                p.Add(x => x.PickerVariant, PickerVariant.Static);
+                p.Add(x => x.Value, new VekColor(12, 220, 124, 120));
+                p.Add(x => x.ShowAlpha, true);
+            });
+            comp.FindAll(_alphaInputCssSelector).Count.Should().Be(1);
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ShowAlpha, false));
+
+            // The alpha control disappears; the RGB color is retained (alpha compare is RGB-only).
+            comp.FindAll(_alphaInputCssSelector).Count.Should().Be(0);
+            comp.Instance.Value.Should().Be(new VekColor(12, 220, 124, 120));
+        }
+
+        [Test]
+        public async Task ShowAlphaToggle_WithNullValue_IsNoOp()
+        {
+            var comp = Context.Render<VekColorPicker>(p =>
+            {
+                p.Add(x => x.PickerVariant, PickerVariant.Static);
+                p.Add(x => x.ShowAlpha, true);
+            });
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ShowAlpha, false));
+
+            comp.Instance.Value.Should().BeNull();
+        }
+
+        [Test]
+        public async Task ToggleViewMode()
+        {
+            var comp = Context.Render<VekColorPicker>(p =>
+            {
+                p.Add(x => x.ShowToolbar, true);
+                p.Add(x => x.PickerVariant, PickerVariant.Static);
+            });
+
+            IReadOnlyList<IElement> Buttons() => comp.FindAll(_vekToolbarButtonsCssSelector);
+
+            Dictionary<int, (ColorPickerView, string)> buttonMapper = new()
+            {
+                { 2, (ColorPickerView.Palette, ".vek-picker-color-view-collection") },
+                { 1, (ColorPickerView.Grid, ".vek-picker-color-grid") },
+                { 0, (ColorPickerView.Spectrum, ".vek-picker-color-overlay") },
+            };
+
+            foreach (var item in buttonMapper)
+            {
+                await Buttons()[item.Key].ClickAsync();
+
+                _ = comp.Find(item.Value.Item2);
+            }
+        }
+
+        [Test]
+        [TestCase(PickerVariant.Static, false)]
+        [TestCase(PickerVariant.Inline, true)]
+        [TestCase(PickerVariant.Dialog, true)]
+        public async Task CloseButtonInToolbarVisible(PickerVariant variant, bool expectedVisibility)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.Variant, variant);
+                p.Add(x => x.ShowToolbar, true);
+            });
+
+            if (variant is PickerVariant.Dialog or PickerVariant.Inline)
+            {
+                await comp.Instance.OpenPicker();
+            }
+
+            if (!expectedVisibility)
+            {
+                Assert.Throws<ElementNotFoundException>(() => comp.Find(".vek-close-picker-button"));
+            }
+            else
+            {
+                _ = comp.Find(".vek-close-picker-button");
+            }
+        }
+
+        [Test]
+        [TestCase(ColorPickerView.Spectrum, 0)]
+        [TestCase(ColorPickerView.Grid, 1)]
+        [TestCase(ColorPickerView.Palette, 2)]
+        public void ColorPickerView_Selection(ColorPickerView view, int index)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ViewMode, view);
+                p.Add(x => x.ShowToolbar, true);
+            });
+
+            var toolbarButtons = comp.FindAll(".vek-toolbar .vek-icon-button button");
+            for (var i = 0; i < toolbarButtons.Count; i++)
+            {
+                if (i == index)
+                {
+                    toolbarButtons[i].ClassList.Should().Contain(".vek-icon-button-color-primary");
+                }
+                else
+                {
+                    toolbarButtons[i].ClassList.Should().NotContain(".vek-icon-button-color-primary");
+                }
+            }
+        }
+
+        [Test]
+        public void PaletteView()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ViewMode, ColorPickerView.Palette);
+                p.Add(x => x.Palette, _vekGridPaletteDefaultColors);
+            });
+
+            var expectedColors = _vekGridPaletteDefaultColors;
+
+            var collectionView = comp.Find(".vek-picker-color-view-collection");
+
+            collectionView.Children.Should().HaveCount(expectedColors.Length);
+
+            for (var i = 0; i < collectionView.Children.Length; i++)
+            {
+                var expectedColor = expectedColors[i];
+                var colorElement = collectionView.Children[i];
+                colorElement.ClassList.Should().Contain("vek-picker-color-dot");
+
+                var style = colorElement.GetAttribute("style");
+                style.Should().Be($"background: {expectedColor.ToString(VekColorOutputFormats.RGBA)};");
+            }
+        }
+
+        [Test]
+        public async Task PaletteView_ChooseColor()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ViewMode, ColorPickerView.Palette);
+                p.Add(x => x.Palette, _vekGridPaletteDefaultColors);
+            });
+
+            var expectedColors = _vekGridPaletteDefaultColors;
+            var collectionView = comp.Find(".vek-picker-color-view-collection");
+
+            for (var i = 0; i < collectionView.Children.Length; i++)
+            {
+                var expectedColor = expectedColors[i];
+                var colorElement = collectionView.Children[i];
+                await colorElement.ClickAsync();
+
+                await comp.WaitForAssertionAsync(() => comp.Instance.ColorValue.Should().Be(expectedColor));
+                comp.Find(".vek-picker-color-view-collection").Children[i].ClassList.Should().BeEquivalentTo("vek-picker-color-dot", "selected");
+
+            }
+        }
+
+        [Test]
+        public void GridView()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ViewMode, ColorPickerView.Grid);
+            });
+
+            var expectedColors = _vekGridDefaultColors;
+
+            var collectionView = comp.Find(".vek-picker-color-grid");
+
+            collectionView.Children.Should().HaveCount(expectedColors.Length);
+
+            for (var i = 0; i < collectionView.Children.Length; i++)
+            {
+                var expectedColor = expectedColors[i];
+                var colorElement = collectionView.Children[i];
+                colorElement.ClassList.Should().Contain("vek-picker-color-dot");
+
+                var style = colorElement.GetAttribute("style");
+                style.Should().Be($"background: {expectedColor.ToString(VekColorOutputFormats.RGBA)};");
+            }
+        }
+
+        [Test]
+        public async Task GridView_ChooseColor()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ViewMode, ColorPickerView.Grid);
+            });
+
+            var expectedColors = _vekGridDefaultColors;
+
+            var collectionView = comp.Find(".vek-picker-color-grid");
+
+            for (var i = 0; i < collectionView.Children.Length; i++)
+            {
+                var expectedColor = expectedColors[i];
+                var colorElement = collectionView.Children[i];
+                colorElement.ClassList.Should().Contain("vek-picker-color-dot");
+
+                await colorElement.ClickAsync();
+                await comp.WaitForAssertionAsync(() => comp.Instance.ColorValue.Should().Be(expectedColor));
+
+                comp.Find(".vek-picker-color-grid").Children[i].ClassList.Should().BeEquivalentTo("vek-picker-color-dot", "selected");
+            }
+        }
+
+        [Test]
+        public void GridCompactView()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ViewMode, ColorPickerView.GridCompact);
+            });
+
+            var expectedColors = _vekGridDefaultColors;
+
+            var content = comp.Find(".vek-picker-content.vek-picker-color-content");
+            content.Children.Should().ContainSingle();
+
+            var gridView = comp.Find(".vek-picker-color-grid");
+
+            gridView.Children.Should().HaveCount(expectedColors.Length);
+
+            for (var i = 0; i < gridView.Children.Length; i++)
+            {
+                var expectedColor = expectedColors[i];
+                var colorElement = gridView.Children[i];
+                colorElement.ClassList.Should().Contain("vek-picker-color-dot");
+
+                var style = colorElement.GetAttribute("style");
+                style.Should().Be($"background: {expectedColor.ToString(VekColorOutputFormats.RGBA)};");
+            }
+        }
+
+        [Test]
+        public async Task GridCompactView_ChooseColor()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ViewMode, ColorPickerView.GridCompact);
+            });
+
+            var expectedColors = _vekGridDefaultColors;
+
+            var gridView = comp.Find(".vek-picker-color-grid");
+
+            gridView.Children.Should().HaveCount(expectedColors.Length);
+
+            for (var i = 0; i < gridView.Children.Length; i++)
+            {
+                var expectedColor = expectedColors[i];
+                var colorElement = gridView.Children[i];
+                colorElement.ClassList.Should().Contain("vek-picker-color-dot");
+
+                await colorElement.ClickAsync();
+                await comp.WaitForAssertionAsync(() => comp.Instance.ColorValue.Should().Be(expectedColor));
+
+                comp.Find(".vek-picker-color-grid").Children[i].ClassList.Should().BeEquivalentTo("vek-picker-color-dot", "selected");
+            }
+        }
+
+        [Test]
+        [TestCase(PickerVariant.Inline)]
+        [TestCase(PickerVariant.Dialog)]
+        public async Task GridCompact_CloseOnSelect(PickerVariant variant)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ViewMode, ColorPickerView.GridCompact);
+                p.Add(x => x.Variant, variant);
+            });
+
+            await comp.Instance.OpenPicker();
+
+            var expectedColors = _vekGridDefaultColors;
+
+            await (await comp.WaitForElementAsync(".vek-picker-color-grid")).Children[0].ClickAsync();
+            await comp.WaitForAssertionAsync(() => comp.Instance.ColorValue.Should().Be(expectedColors[0]));
+
+            Assert.Throws<ElementNotFoundException>(() => comp.Find(".vek-picker-container"));
+        }
+
+        [Test]
+        [TestCase(PickerVariant.Inline)]
+        [TestCase(PickerVariant.Dialog)]
+        public async Task Palette_CloseOnSelect(PickerVariant variant)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ViewMode, ColorPickerView.Palette);
+                p.Add(x => x.Variant, variant);
+                p.Add(x => x.Palette, _vekGridPaletteDefaultColors);
+            });
+
+            await comp.Instance.OpenPicker();
+
+            var expectedColors = _vekGridPaletteDefaultColors;
+
+            await (await comp.WaitForElementAsync(".vek-picker-color-view-collection")).Children[0].ClickAsync();
+            await comp.WaitForAssertionAsync(() => comp.Instance.ColorValue.Should().Be(expectedColors[0]));
+
+            Assert.Throws<ElementNotFoundException>(() => comp.Find(".vek-picker-container"));
+        }
+
+        [Test]
+        [TestCase(PickerVariant.Inline, ColorPickerView.Grid)]
+        [TestCase(PickerVariant.Dialog, ColorPickerView.Grid)]
+        [TestCase(PickerVariant.Inline, ColorPickerView.Spectrum)]
+        [TestCase(PickerVariant.Dialog, ColorPickerView.Spectrum)]
+        public async Task NoControls_CloseOnSelect(PickerVariant variant, ColorPickerView view)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ViewMode, view);
+                p.Add(x => x.Variant, variant);
+                p.Add(x => x.ShowPreview, false);
+                p.Add(x => x.ShowSliders, false);
+                p.Add(x => x.DisableInput, true);
+            });
+
+            await comp.Instance.OpenPicker();
+
+            var expectedColors = view == ColorPickerView.Grid ? _vekGridDefaultColors : _vekGridPaletteDefaultColors;
+
+            IElement item;
+            if (view == ColorPickerView.Grid)
+            {
+                item = comp.Find(".vek-picker-color-grid").Children[0];
+            }
+            else
+            {
+                item = comp.Find("[class=\"vek-picker-color-overlay\"][id]");
+            }
+
+            if (view == ColorPickerView.Spectrum)
+            {
+                await item.PointerDownAsync();
+            }
+            else
+            {
+                await item.ClickAsync();
+            }
+
+            await comp.WaitForAssertionAsync(() => comp.Instance.ColorValue.Should().NotBe(_defaultColor));
+
+            Assert.Throws<ElementNotFoundException>(() => comp.Find(".vek-picker-container"));
+        }
+
+        [Test]
+        [TestCase(ColorPickerView.Spectrum, false, "#78797aff")]
+        [TestCase(ColorPickerView.Grid, false, "#78797aff")]
+        [TestCase(ColorPickerView.Palette, false, "#78797a")]
+        [TestCase(ColorPickerView.GridCompact, false, "#78797a")]
+        [TestCase(ColorPickerView.Spectrum, true, "#78797a")]
+        [TestCase(ColorPickerView.Grid, true, "#78797a")]
+        [TestCase(ColorPickerView.Palette, true, "#78797a")]
+        [TestCase(ColorPickerView.GridCompact, true, "#78797a")]
+        public void TextOutput_Alpha(ColorPickerView view, bool disableAlpha, string expectedOutput)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ViewMode, view);
+                p.Add(x => x.ShowAlpha, !disableAlpha);
+                p.Add(x => x.ColorValue, new VekColor(120, 121, 122, 1.0));
+            });
+
+            comp.Instance.TextValue.Should().Be(expectedOutput);
+        }
+
+        [Test]
+        public async Task SetNullColor_NothingChanged()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ColorPickerMode, ColorPickerMode.HSL);
+            });
+
+            await comp.SetParametersAndRenderAsync(p => p.Add(x => x.ColorValue, null));
+
+            var lColor = GetColorInput(comp, 2);
+            var expectedColor = _defaultColor;
+
+            //HSL picker inputs should remain the same when the value is cleared
+            await CheckColorRelatedValues(comp, _defaultXForColorPanel, _defaultYForColorPanel, expectedColor, ColorPickerMode.HSL, false);
+            comp.FindComponent<VekColorPicker>().Instance.ReadValue.Should().Be(null);
+        }
+
+        [Test]
+        public async Task SetHLS_NotChangeRBG_ButCallbackFired()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.ColorPickerMode, ColorPickerMode.HSL);
+                p.Add(x => x.ColorValue, new VekColor(245, 0.35, 0.95, 1.0));
+            });
+
+            var sColor = GetColorInput(comp, 1);
+
+            var colorValue = comp.Instance.ColorValue.ToString(VekColorOutputFormats.HexA);
+            await CheckColorRelatedValues(comp, 11.37, 7.84, comp.Instance.ColorValue, ColorPickerMode.HSL);
+
+            var expectedColor = comp.Instance.ColorValue.SetS(comp.Instance.ColorValue.S - 0.01);
+            await sColor.ChangeAsync(expectedColor.S.ToString(CultureInfo.CurrentUICulture));
+
+            await CheckColorRelatedValues(comp, 11.37, 7.84, expectedColor, ColorPickerMode.HSL);
+            var colorValueAfterChange = comp.Instance.ColorValue.ToString(VekColorOutputFormats.HexA);
+
+            colorValue.Should().Be(colorValueAfterChange);
+            comp.Instance.ValueChangeCallbackCounter.Should().Be(1);
+        }
+
+        [Test]
+        public async Task RTL_AlphaSliderInverseStyle()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.AddCascadingValue("RightToLeft", true);
+            });
+
+            await CheckColorRelatedValues(comp, _defaultXForColorPanel, _defaultYForColorPanel, comp.Instance.ColorValue, ColorPickerMode.RGB, true, true);
+        }
+
+        [Test]
+        [TestCase(false)]
+        [TestCase(true)]
+        public async Task Spectrum_DragPointer(bool disableDragEffect)
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                //p.Add(x => x.Variant, PickerVariant.Static);
+                //p.Add(x => x.ViewMode, ColorPickerView.Spectrum);
+                p.Add(x => x.DragEffect, !disableDragEffect);
+            });
+
+            const double x1 = 99.2;
+            const double y1 = 200.98;
+            var expectedColor1 = new VekColor(35, 34, 50, _defaultColor);
+
+            var overlay = comp.Find(CssSelector);
+
+            // Color should update as soon as pointer is down.
+            await overlay.PointerDownAsync(new PointerEventArgs { OffsetX = x1, OffsetY = y1 });
+            await CheckColorRelatedValues(comp, x1, y1, expectedColor1, ColorPickerMode.RGB);
+
+            const double x2 = 117.0;
+            const double y2 = 140.0;
+            var expectedColor2 = new VekColor(74, 70, 112, 255);
+
+            if (disableDragEffect)
+            {
+                // The pointer move event is not registered at all while the drag effect is disabled,
+                Func<Task> act = () => overlay.PointerMoveAsync(new PointerEventArgs { OffsetX = x2, OffsetY = y2, Buttons = 1 });
+                await act.Should().ThrowAsync<Bunit.MissingEventHandlerException>();
+                await CheckColorRelatedValues(comp, x1, y1, expectedColor1, ColorPickerMode.RGB);
+            }
+            else
+            {
+                await overlay.PointerMoveAsync(new PointerEventArgs { OffsetX = x2, OffsetY = y2, Buttons = 1 });
+                await CheckColorRelatedValues(comp, x2, y2, expectedColor2, ColorPickerMode.RGB);
+            }
+
+            // Color should update when pointer is released regardless of drag being enabled.
+            await overlay.PointerUpAsync(new PointerEventArgs { OffsetX = x2, OffsetY = y2 });
+            await CheckColorRelatedValues(comp, x2, y2, expectedColor2, ColorPickerMode.RGB);
+        }
+
+        [Test]
+        public async Task PointerMove_WithThrottlingDisabled_UpdatesColorInstantly()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p => p.Add(x => x.DragEffect, true));
+            // ThrottleInterval = 0 disposes the throttle dispatcher, so drag moves apply on the instant path.
+            var picker = comp.FindComponent<VekColorPicker>();
+            await picker.SetParametersAndRenderAsync(p => p.Add(x => x.ThrottleInterval, 0));
+
+            var overlay = comp.Find(CssSelector);
+            await overlay.PointerMoveAsync(new PointerEventArgs { OffsetX = 117.0, OffsetY = 140.0, Buttons = 1 });
+
+            comp.Instance.ColorValue.Should().Be(new VekColor(74, 70, 112, 255));
+        }
+
+        [Test]
+        public async Task PointerLeave_DuringDrag_FlushesPendingThrottledMove()
+        {
+            // Fake clock we never advance: the throttle commits the first move (leading edge) but coalesces
+            // the second, leaving its color update pending until the leave flushes it. This makes the test
+            // fail if the flush is removed, rather than just re-asserting an already-committed color.
+            Context.AddFakeTimeProvider();
+            var comp = Context.Render<SimpleColorPickerTest>(p => p.Add(x => x.DragEffect, true));
+            var overlay = comp.Find(CssSelector);
+
+            // First drag move commits immediately.
+            await overlay.PointerMoveAsync(new PointerEventArgs { OffsetX = 99.2, OffsetY = 200.98, Buttons = 1 });
+            var firstColor = new VekColor(35, 34, 50, _defaultColor);
+            comp.Instance.ColorValue.Should().Be(firstColor);
+
+            // Second move repositions the selector but is throttle-coalesced, so the committed color stays put.
+            await overlay.PointerMoveAsync(new PointerEventArgs { OffsetX = 117.0, OffsetY = 140.0, Buttons = 1 });
+            comp.Instance.ColorValue.Should().Be(firstColor);
+
+            // A no-button leave is a no-op.
+            await overlay.PointerLeaveAsync(new PointerEventArgs { Buttons = 0 });
+            comp.Instance.ColorValue.Should().Be(firstColor);
+
+            // Leaving mid-drag flushes the pending selector, so the second move's color finally lands.
+            await overlay.PointerLeaveAsync(new PointerEventArgs { Buttons = 1 });
+            comp.Instance.ColorValue.Should().Be(new VekColor(74, 70, 112, 255));
+        }
+
+        [Test]
+        public async Task StableHue_WhenColorSpectrumClicked()
+        {
+            var comp = Context.Render<VekColorPicker>(p =>
+            {
+                p.Add(x => x.PickerVariant, PickerVariant.Static);
+                p.Add(x => x.ColorPickerView, ColorPickerView.Spectrum);
+                p.Add(x => x.Value, _defaultColor);
+            });
+
+            var expectedHue = _defaultColor.H;
+
+            for (var x = 0; x < 312; x += 5)
+            {
+                for (var y = 0; y < 250; y += 5)
+                {
+                    // Each click re-renders the picker, so re-query the overlay instead of dispatching on a detached element.
+                    await comp.Find(CssSelector).PointerDownAsync(new PointerEventArgs { OffsetX = x, OffsetY = y });
+
+                    comp.Instance.ReadValue.H.Should().Be(expectedHue);
+                }
+            }
+        }
+
+        [Test]
+        public async Task CheckPickerPopover()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(p =>
+            {
+                p.Add(x => x.Variant, PickerVariant.Inline);
+            });
+
+            await comp.Instance.OpenPicker();
+
+            var providerNode = comp.Find(".vek-popover-provider");
+            providerNode.Children.Length.Should().BeGreaterThanOrEqualTo(2);
+
+            var popoverNode = providerNode.Children
+                .FirstOrDefault(child => child.ClassList.Contains("vek-picker-popover"));
+
+            popoverNode.Should().NotBeNull();
+
+            popoverNode!.ClassList.Should().BeEquivalentTo(
+            [
+                "vek-popover",
+                "vek-popover-fixed",
+                "vek-popover-open",
+                "vek-popover-top-left",
+                "vek-popover-anchor-bottom-left",
+                "vek-popover-overflow-flip-always",
+                "vek-picker-popover",
+                "vek-elevation-8",
+            ]);
+        }
+
+        //https://github.com/madiseh/vek/issues/4899
+        [Test]
+        public async Task DistinguishBetweenInternalAndExternalView()
+        {
+            var comp = Context.Render<PickerWithFixedView>();
+
+            //open the color picker
+            var inputField = comp.Find(".vek-input-slot");
+            await inputField.ClickAsync();
+
+            //asset that the picker is open in grid mode
+            var grid = comp.Find(".vek-picker-color-grid");
+
+            //find spectrum button and click
+            var spectrumButton = comp.FindAll(_vekToolbarButtonsCssSelector)[1];
+            await spectrumButton.ClickAsync();
+
+            //find the overlay and click any position
+            var overlay = comp.Find(CssSelector);
+            await overlay.PointerDownAsync(new PointerEventArgs { OffsetX = 10.5, OffsetY = 10.5 });
+
+            //ensure that the spectrum mode is still open and not the color grid
+            _ = comp.Find(".vek-picker-color-overlay");
+            Assert.Throws<ElementNotFoundException>(() => comp.Find(".vek-picker-color-grid"));
+
+            //change the view per parameter
+            await comp.SetParametersAndRenderAsync(x => x.Add(y => y.ColorPickerView, ColorPickerView.GridCompact));
+
+            //now the grid view should be visible
+            Assert.Throws<ElementNotFoundException>(() => comp.Find(".vek-picker-color-overlay"));
+            _ = comp.Find(".vek-picker-color-grid");
+        }
+
+        /// <summary>
+        /// Ensures both the text and value update when the text is changed
+        /// </summary>
+        [Test]
+        public async Task ColorPickerValueShouldUpdateOnText()
+        {
+            var comp = Context.Render<VekColorPicker>(parameters => parameters
+                .Add(x => x.Editable, true));
+
+            await comp.Find("input").ChangeAsync("#180f6fff");
+            comp.Instance.GetState(x => x.Text).Should().Be("#180f6fff");
+            comp.Instance.GetState(x => x.Value).Should().Be(new VekColor("#180f6fff"));
+        }
+
+        [Test]
+        public void ColorPickerShouldRenderInitialTextValueWhenBoundViaText()
+        {
+            const string initialText = "#180f6fff";
+            var comp = Context.Render<VekColorPicker>(parameters => parameters
+                .Add(x => x.Editable, true)
+                .Add(x => x.Text, initialText));
+
+            var input = comp.Find("input").Should().BeAssignableTo<IHtmlInputElement>().Subject;
+            input.Value.Should().Be(initialText);
+        }
+
+        /// <summary>
+        /// A color picker with a label should auto-generate an id and use that id on the input element and the label's for attribute.
+        /// </summary>
+        [Test]
+        public void ColorPickerWithLabel_Should_GenerateIdForInputAndAccompanyingLabel()
+        {
+            var comp = Context.Render<VekColorPicker>(parameters
+                => parameters.Add(p => p.Label, "Test Label"));
+
+            comp.Find("input").Id.Should().NotBeNullOrEmpty();
+            comp.Find("label").Attributes.GetNamedItem("for").Should().NotBeNull();
+            comp.Find("label").Attributes.GetNamedItem("for")!.Value.Should().Be(comp.Find("input").Id);
+        }
+
+        /// <summary>
+        /// A color picker with a label and UserAttributesId should use the UserAttributesId on the input element and the label's for attribute.
+        /// </summary>
+        [Test]
+        public void ColorPickerWithLabelAndUserAttributesId_Should_UseUserAttributesIdForInputAndAccompanyingLabel()
+        {
+            var expectedId = "userattributes-id";
+            var comp = Context.Render<VekColorPicker>(parameters
+                => parameters
+                    .Add(p => p.Label, "Test Label")
+                    .Add(p => p.UserAttributes, new Dictionary<string, object>
+                    {
+                        { "Id", expectedId }
+                    }));
+
+            comp.Find("input").Id.Should().Be(expectedId);
+            comp.Find("label").Attributes.GetNamedItem("for").Should().NotBeNull();
+            comp.Find("label").Attributes.GetNamedItem("for")!.Value.Should().Be(expectedId);
+        }
+
+        /// <summary>
+        /// Optional RGB ColorPicker should not have required attribute and aria-required should be false.
+        /// </summary>
+        [Test]
+        public void OptionalRGBColorPicker_Should_NotHaveRequiredAttributeAndAriaRequiredShouldBeFalse()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(parameters => parameters
+                .Add(p => p.ColorPickerMode, ColorPickerMode.RGB));
+
+            comp.FindAll("input:not(.vek-slider-input)").Should().AllSatisfy(input =>
+            {
+                input.HasAttribute("required").Should().BeFalse();
+                input.GetAttribute("aria-required").Should().Be("false");
+            });
+        }
+
+        /// <summary>
+        /// Required RGB ColorPicker should have required and aria-required attributes.
+        /// </summary>
+        [Test]
+        public void RequiredRGBColorPicker_Should_HaveRequiredAndAriaRequiredAttributes()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(parameters => parameters
+                .Add(p => p.Required, true)
+                .Add(p => p.ColorPickerMode, ColorPickerMode.RGB));
+
+            comp.FindAll("input:not(.vek-slider-input)").Should().AllSatisfy(input =>
+            {
+                input.HasAttribute("required").Should().BeTrue();
+                input.GetAttribute("aria-required").Should().Be("true");
+            });
+        }
+
+        /// <summary>
+        /// Required and aria-required RGB ColorPicker attributes should be dynamic.
+        /// </summary>
+        [Test]
+        public async Task RequiredAndAriaRequiredRGBColorPickerAttributes_Should_BeDynamic()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(parameters => parameters
+                .Add(p => p.ColorPickerMode, ColorPickerMode.RGB));
+
+            comp.FindAll("input:not(.vek-slider-input)").Should().AllSatisfy(input =>
+            {
+                input.HasAttribute("required").Should().BeFalse();
+                input.GetAttribute("aria-required").Should().Be("false");
+            });
+
+            await comp.SetParametersAndRenderAsync(parameters => parameters
+                .Add(p => p.Required, true));
+
+            comp.FindAll("input:not(.vek-slider-input)").Should().AllSatisfy(input =>
+            {
+                input.HasAttribute("required").Should().BeTrue();
+                input.GetAttribute("aria-required").Should().Be("true");
+            });
+        }
+
+        /// <summary>
+        /// Optional HSL ColorPicker should not have required attribute and aria-required should be false.
+        /// </summary>
+        [Test]
+        public void OptionalHSLColorPicker_Should_NotHaveRequiredAttributeAndAriaRequiredShouldBeFalse()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(parameters => parameters
+                .Add(p => p.ColorPickerMode, ColorPickerMode.HSL));
+
+            comp.FindAll("input:not(.vek-slider-input)").Should().AllSatisfy(input =>
+            {
+                input.HasAttribute("required").Should().BeFalse();
+                input.GetAttribute("aria-required").Should().Be("false");
+            });
+        }
+
+        /// <summary>
+        /// Required HSL ColorPicker should have required and aria-required attributes.
+        /// </summary>
+        [Test]
+        public void RequiredHSLColorPicker_Should_HaveRequiredAndAriaRequiredAttributes()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(parameters => parameters
+                .Add(p => p.Required, true)
+                .Add(p => p.ColorPickerMode, ColorPickerMode.HSL));
+
+            comp.FindAll("input:not(.vek-slider-input)").Should().AllSatisfy(input =>
+            {
+                input.HasAttribute("required").Should().BeTrue();
+                input.GetAttribute("aria-required").Should().Be("true");
+            });
+        }
+
+        /// <summary>
+        /// Required and aria-required HSL ColorPicker attributes should be dynamic.
+        /// </summary>
+        [Test]
+        public async Task RequiredAndAriaRequiredHSLColorPickerAttributes_Should_BeDynamic()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(parameters => parameters
+                .Add(p => p.ColorPickerMode, ColorPickerMode.HSL));
+
+            comp.FindAll("input:not(.vek-slider-input)").Should().AllSatisfy(input =>
+            {
+                input.HasAttribute("required").Should().BeFalse();
+                input.GetAttribute("aria-required").Should().Be("false");
+            });
+
+            await comp.SetParametersAndRenderAsync(parameters => parameters
+                .Add(p => p.Required, true));
+
+            comp.FindAll("input:not(.vek-slider-input)").Should().AllSatisfy(input =>
+            {
+                input.HasAttribute("required").Should().BeTrue();
+                input.GetAttribute("aria-required").Should().Be("true");
+            });
+        }
+
+        /// <summary>
+        /// Optional HEX ColorPicker should not have required attribute and aria-required should be false.
+        /// </summary>
+        [Test]
+        public void OptionalHEXColorPicker_Should_NotHaveRequiredAttributeAndAriaRequiredShouldBeFalse()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(parameters => parameters
+                .Add(p => p.ColorPickerMode, ColorPickerMode.HEX));
+
+            comp.FindAll("input:not(.vek-slider-input)").Should().AllSatisfy(input =>
+            {
+                input.HasAttribute("required").Should().BeFalse();
+                input.GetAttribute("aria-required").Should().Be("false");
+            });
+        }
+
+        /// <summary>
+        /// Required HEX ColorPicker should have required and aria-required attributes.
+        /// </summary>
+        [Test]
+        public void RequiredHEXColorPicker_Should_HaveRequiredAndAriaRequiredAttributes()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(parameters => parameters
+                .Add(p => p.Required, true)
+                .Add(p => p.ColorPickerMode, ColorPickerMode.HEX));
+
+            comp.FindAll("input:not(.vek-slider-input)").Should().AllSatisfy(input =>
+            {
+                input.HasAttribute("required").Should().BeTrue();
+                input.GetAttribute("aria-required").Should().Be("true");
+            });
+        }
+
+        /// <summary>
+        /// Required and aria-required HEX ColorPicker attributes should be dynamic.
+        /// </summary>
+        [Test]
+        public async Task RequiredAndAriaRequiredHEXColorPickerAttributes_Should_BeDynamic()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(parameters => parameters
+                .Add(p => p.ColorPickerMode, ColorPickerMode.HEX));
+
+            comp.FindAll("input:not(.vek-slider-input)").Should().AllSatisfy(input =>
+            {
+                input.HasAttribute("required").Should().BeFalse();
+                input.GetAttribute("aria-required").Should().Be("false");
+            });
+
+            await comp.SetParametersAndRenderAsync(parameters => parameters
+                .Add(p => p.Required, true));
+
+            // must be re-fetched after re-render
+            comp.FindAll("input:not(.vek-slider-input)").Should().AllSatisfy(input =>
+            {
+                input.HasAttribute("required").Should().BeTrue();
+                input.GetAttribute("aria-required").Should().Be("true");
+            });
+        }
+
+        [Test]
+        public void ColorPickerInputId()
+        {
+            var comp = Context.Render<SimpleColorPickerTest>(parameters => parameters
+                .Add(c => c.Variant, PickerVariant.Inline)
+                .Add(c => c.InputId, "primary-color"));
+
+            comp.Find("input[id='primary-color']").Should().NotBeNull();
+        }
+
+        [Test]
+        public void ColorPicker_CustomClearIcon_Should_BeRenderedInMarkup()
+        {
+            var comp = Context.Render<VekColorPicker>(parameters => parameters
+                .Add(p => p.Value, new VekColor("#180f6fff"))
+                .Add(p => p.Editable, true)
+                .Add(p => p.Clearable, true)
+                .Add(p => p.ClearIcon, Icons.Custom.Brands.Vek));
+
+            comp.Markup.Should().Contain(comp.Instance.ClearIcon);
+        }
+
+        /// <summary>
+        /// ClearAsync clears a picker given Text without a Value, which the original value-only guard skipped.
+        /// </summary>
+        [Test]
+        public async Task ColorPicker_ClearAsync_ShouldClearTextWithoutValue()
+        {
+            var comp = Context.Render<VekColorPicker>(parameters => parameters
+                .Add(p => p.Text, "#180f6fff")
+                .Add(p => p.Clearable, true));
+            var picker = comp.Instance;
+            picker.ReadValue.Should().BeNull();
+            comp.Find("input").GetAttribute("value").Should().Be("#180f6fff");
+
+            await comp.InvokeAsync(() => picker.ClearAsync());
+
+            picker.GetState(x => x.Text).Should().BeNull();
+            comp.Find("input").GetAttribute("value").Should().BeNullOrEmpty();
+        }
+
+        /// <summary>
+        /// Calling ClearAsync programmatically clears the color, not just the popover.
+        /// </summary>
+        [Test]
+        public async Task ColorPicker_ClearAsync_ShouldClearValue()
+        {
+            var color = new VekColor("#180f6fff");
+            var comp = Context.Render<VekColorPicker>(parameters => parameters
+                .Add(p => p.Value, color)
+                .Add(p => p.Clearable, true));
+            var picker = comp.Instance;
+
+            await comp.InvokeAsync(() => picker.ClearAsync());
+
+            picker.ReadValue.Should().BeNull();
+            picker.GetState(x => x.Text).Should().BeNull();
+            comp.Find("input").GetAttribute("value").Should().BeNullOrEmpty();
+        }
+
+        /// <summary>
+        /// The clear button clears the color through the text channel rather than through ClearAsync, and reports null text where the date and time pickers report an empty string.
+        /// </summary>
+        [Test]
+        public async Task ColorPicker_ClearButton_ShouldClearValueAndReportNullText()
+        {
+            var textChanges = new List<string>();
+            var comp = Context.Render<VekColorPicker>(parameters => parameters
+                .Add(p => p.Value, new VekColor("#180f6fff"))
+                .Add(p => p.TextChanged, text => textChanges.Add(text))
+                .Add(p => p.Clearable, true));
+            var picker = comp.Instance;
+
+            await comp.Find(".vek-input-clear-button").ClickAsync();
+
+            picker.ReadValue.Should().BeNull();
+            picker.GetState(x => x.Text).Should().BeNull();
+            textChanges.Should().Equal(["#180f6fff", null]); // the initial color, then the clear
+            comp.Find("input").GetAttribute("value").Should().BeNullOrEmpty();
+        }
+    }
+}
