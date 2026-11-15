@@ -1,0 +1,63 @@
+{
+  "$schema": "./backlog.schema.json",
+  "version": "1.0",
+  "pipeline": {
+    "max_repair_attempts": 2,
+    "default_target_branch": "master",
+    "feature_branch_prefix": "feature/migration-"
+  },
+  "features": [
+    {
+      "id": "001",
+      "slug": "datagrid-search-panel",
+      "title": "DataGrid Search Panel with Live Match Highlighting",
+      "module": "DataGrid",
+      "priority": 1,
+      "status": "completed",
+      "specification": "specifications/001-datagrid-search-panel.md",
+      "dependencies": [],
+      "pr_url": "https://github.com/madiseh/Vek/pull/5",
+      "completed_at": "2026-11-15T16:44:46Z"
+    },
+    {
+      "id": "002",
+      "slug": "datagrid-data-export",
+      "title": "DataGrid Built-in Data Export (XLSX and CSV)",
+      "module": "DataGrid",
+      "priority": 2,
+      "status": "ready",
+      "specification": "specifications/002-datagrid-data-export.md",
+      "dependencies": []
+    },
+    {
+      "id": "003",
+      "slug": "datagrid-column-chooser",
+      "title": "DataGrid Column Chooser and Customization Window",
+      "module": "DataGrid",
+      "priority": 3,
+      "status": "backlog",
+      "specification": "specifications/003-datagrid-column-chooser.md",
+      "dependencies": []
+    },
+    {
+      "id": "004",
+      "slug": "datagrid-advanced-filter-row",
+      "title": "DataGrid Advanced Filter Row with Comparison Operators",
+      "module": "DataGrid",
+      "priority": 4,
+      "status": "backlog",
+      "specification": "specifications/004-datagrid-advanced-filter-row.md",
+      "dependencies": ["001"]
+    },
+    {
+      "id": "005",
+      "slug": "datagrid-fixed-columns-enhancement",
+      "title": "DataGrid Fixed/Pinned Columns Drag and Dynamic Pinning",
+      "module": "DataGrid",
+      "priority": 5,
+      "status": "backlog",
+      "specification": "specifications/005-datagrid-fixed-columns.md",
+      "dependencies": []
+    }
+  ]
+}
