@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g. 1.0.1)'
+        required: false
+        default: '1.0.1'
 
 env:
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
@@ -17,7 +23,11 @@ jobs:
       - name: Get version
         id: get-version
         run: |
-          VERSION="${{ github.ref_name }}"
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${{ github.ref_name }}"
+          fi
           echo "VERSION=${VERSION#v}" >> $GITHUB_OUTPUT
 
   deploy-nuget:
@@ -25,7 +35,8 @@ jobs:
     needs: get-version
     permissions:
       id-token: write
-      contents: read
+      contents: write
+      packages: write
     steps:
       - uses: actions/checkout@v7
 
@@ -70,6 +81,17 @@ jobs:
         with:
           user: AminSabaghi
 
-      - name: Publish nuget package
+      - name: Publish to NuGet.org
         working-directory: ./src/Vek
         run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: Publish to GitHub Packages
+        working-directory: ./src/Vek
+        run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
+
+      - name: Attach packages to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ github.ref_name }}" ./src/Vek/nupkgs/*.nupkg ./src/Vek/nupkgs/*.snupkg --clobber
