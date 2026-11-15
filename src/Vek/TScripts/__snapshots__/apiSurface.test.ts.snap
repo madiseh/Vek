@@ -6,9 +6,6 @@ exports[`window API surface is unchanged 1`] = `
   "hasDefinedParentHeight": "function(1)",
   "serializeParameter": "function(2)",
   "splitPanels": {},
-  "vekDataGridExport": {
-    "downloadFileFromStream": "function(3)",
-  },
   "vekDragAndDrop": {
     "getDropIndexOnPosition": "function(3)",
     "getDropZoneIdentifierOnPosition": "function(2)",
@@ -262,6 +259,7 @@ exports[`window API surface is unchanged 1`] = `
     "changeCssById": "function(2)",
     "changeGlobalCssVariable": "function(2)",
     "copyToClipboard": "function(1)",
+    "downloadFileFromStream": "function(3)",
     "open": "function(1)",
     "updateStyleProperty": "function(3)",
   },

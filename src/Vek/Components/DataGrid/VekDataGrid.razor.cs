@@ -1816,7 +1816,7 @@ namespace Vek
             stream.Position = 0;
 
             using var streamReference = new DotNetStreamReference(stream);
-            await JSRuntime.InvokeVoidAsync("vekDataGridExport.downloadFileFromStream", fileName, contentType, streamReference);
+            await JSRuntime.InvokeVoidAsync("vekWindow.downloadFileFromStream", fileName, contentType, streamReference);
         }
 
         /// <summary>

@@ -140,12 +140,12 @@ public class DataGridExportTests : BunitTest
         var grid = Context.Render<VekDataGrid<Person>>(parameters => parameters
             .Add(parameter => parameter.Items, People)
             .Add(parameter => parameter.Columns, RenderColumns));
-        Context.JSInterop.SetupVoid("vekDataGridExport.downloadFileFromStream");
+        Context.JSInterop.SetupVoid("vekWindow.downloadFileFromStream");
 
         await grid.Instance.ExportToCsvAsync("people.csv");
 
         var invocations = Context.JSInterop.Invocations
-            .Where(invocation => invocation.Identifier == "vekDataGridExport.downloadFileFromStream")
+            .Where(invocation => invocation.Identifier == "vekWindow.downloadFileFromStream")
             .ToArray();
         var invocation = invocations.Should().ContainSingle().Which;
         invocation.Arguments[0].Should().Be("people.csv");
