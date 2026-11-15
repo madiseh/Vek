@@ -61,6 +61,20 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Exporting Data">
+                <Description>
+                    Export the current filtered and sorted grid view to CSV or XLSX by calling <CodeInline>ExportToCsvAsync</CodeInline> or
+                    <CodeInline>ExportToXlsxAsync</CodeInline>. Both methods accept a writable <CodeInline>Stream</CodeInline> or a file name for a browser download.
+                    Hidden columns are excluded by default. Pass <CodeInline>DataGridExportOptions</CodeInline> to include headers, export unfiltered items,
+                    include hidden columns, choose a CSV delimiter, or format values by property name.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridExportExample)" Block="true" FullWidth="true">
+                <DataGridExportExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Explore Features">
                 <Description>
                     Browse specific features and usage patterns in detail:

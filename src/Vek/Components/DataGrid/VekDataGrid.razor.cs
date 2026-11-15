@@ -11,6 +11,8 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.Web.Virtualization;
+using Microsoft.JSInterop;
+using Vek.Components.DataGrid.Export;
 using Vek.Components.Highlighter;
 using Vek.State;
 using Vek.Utilities;
@@ -31,6 +33,9 @@ namespace Vek
     [CascadingTypeParameter(nameof(T))]
     public partial class VekDataGrid<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T> : VekComponentBase, IDisposable
     {
+        [Inject]
+        private IJSRuntime JSRuntime { get; set; } = null!;
+
         private VekForm? _editForm;
         internal int? _rowsPerPage;
         private int _currentPage = 0;
@@ -1725,6 +1730,93 @@ namespace Vek
                 GroupItems(noStateChange: true);
                 return _currentRenderFilteredItemsCache;
             }
+        }
+
+        /// <summary>
+        /// Writes the current grid view as comma-separated values to a stream.
+        /// </summary>
+        /// <param name="stream">The writable destination stream.</param>
+        /// <param name="options">Options that control the exported items, columns, and values.</param>
+        public Task ExportToCsvAsync(Stream stream, DataGridExportOptions? options = null)
+        {
+            ArgumentNullException.ThrowIfNull(stream);
+            if (!stream.CanWrite)
+            {
+                throw new ArgumentException("The stream must be writable.", nameof(stream));
+            }
+
+            options ??= new DataGridExportOptions();
+            return DataGridCsvExporter.WriteAsync(stream, GetExportColumns(options), GetExportItems(options), options);
+        }
+
+        /// <summary>
+        /// Writes the current grid view as an XLSX workbook to a stream.
+        /// </summary>
+        /// <param name="stream">The writable destination stream.</param>
+        /// <param name="options">Options that control the exported items, columns, and values.</param>
+        public Task ExportToXlsxAsync(Stream stream, DataGridExportOptions? options = null)
+        {
+            ArgumentNullException.ThrowIfNull(stream);
+            if (!stream.CanWrite)
+            {
+                throw new ArgumentException("The stream must be writable.", nameof(stream));
+            }
+
+            options ??= new DataGridExportOptions();
+            return DataGridXlsxExporter.WriteAsync(stream, GetExportColumns(options), GetExportItems(options), options);
+        }
+
+        /// <summary>
+        /// Downloads the current grid view as a comma-separated values file.
+        /// </summary>
+        /// <param name="fileName">The name used for the downloaded file.</param>
+        /// <param name="options">Options that control the exported items, columns, and values.</param>
+        public Task ExportToCsvAsync(string fileName, DataGridExportOptions? options = null)
+        {
+            return DownloadExportAsync(fileName, "text/csv;charset=utf-8", ExportToCsvAsync, options);
+        }
+
+        /// <summary>
+        /// Downloads the current grid view as an XLSX workbook.
+        /// </summary>
+        /// <param name="fileName">The name used for the downloaded file.</param>
+        /// <param name="options">Options that control the exported items, columns, and values.</param>
+        public Task ExportToXlsxAsync(string fileName, DataGridExportOptions? options = null)
+        {
+            return DownloadExportAsync(fileName, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ExportToXlsxAsync, options);
+        }
+
+        private IReadOnlyList<Column<T>> GetExportColumns(DataGridExportOptions options)
+        {
+            return RenderedColumns
+                .Where(column => options.ExportHiddenColumns || !column.HiddenState.Value)
+                .ToArray();
+        }
+
+        private IEnumerable<T> GetExportItems(DataGridExportOptions options)
+        {
+            if (options.OnlyFilteredItems)
+            {
+                return FilteredItems;
+            }
+
+            return HasServerData ? _serverData.Items : Items ?? Enumerable.Empty<T>();
+        }
+
+        private async Task DownloadExportAsync(
+            string fileName,
+            string contentType,
+            Func<Stream, DataGridExportOptions?, Task> export,
+            DataGridExportOptions? options)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+
+            await using var stream = new MemoryStream();
+            await export(stream, options);
+            stream.Position = 0;
+
+            using var streamReference = new DotNetStreamReference(stream);
+            await JSRuntime.InvokeVoidAsync("vekWindow.downloadFileFromStream", fileName, contentType, streamReference);
         }
 
         /// <summary>
