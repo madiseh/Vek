@@ -1,0 +1,25 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekSplitPanel Class="vek-width-full vek-height-full" Horizontal="true" Transparent="true" Rounded="true" Elevation="1">
+    <FirstPanel>
+        <VekSplitPanel Class="vek-width-full vek-height-full" Rounded="true" Elevation="1">
+            <FirstPanel>
+                <VekStack Style="height: 100%; min-height: 200px;" AlignItems="AlignItems.Center" Justify="Justify.Center">
+                    <VekText Typo="Typo.h6">Content 1</VekText>
+                </VekStack>
+            </FirstPanel>
+            <SecondPanel>
+                <VekStack Style="height: 100%; min-height: 200px;" AlignItems="AlignItems.Center" Justify="Justify.Center">
+                    <VekText Typo="Typo.h6">Content 2</VekText>
+                </VekStack>
+            </SecondPanel>
+        </VekSplitPanel>
+    </FirstPanel>
+    <SecondPanel>
+        <VekPaper Class="vek-height-full vek-width-full" Style="background-color: var(--vek-palette-surface);">
+            <VekStack Style="height: 100%; min-height: 200px;" AlignItems="AlignItems.Center" Justify="Justify.Center">
+                <VekText Typo="Typo.h6">Content 3</VekText>
+            </VekStack>
+        </VekPaper>
+    </SecondPanel>
+</VekSplitPanel>

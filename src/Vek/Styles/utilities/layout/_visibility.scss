@@ -1,0 +1,15 @@
+.visible {
+  visibility: visible;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.vek-sr-only {
+  @include sr-only;
+}

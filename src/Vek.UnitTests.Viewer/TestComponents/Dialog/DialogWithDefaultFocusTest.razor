@@ -1,0 +1,20 @@
+@namespace Vek.UnitTests.TestComponents.Dialog
+@using Vek
+
+<VekDialog>
+    <DialogContent>
+        <VekTextField T="string" @ref="_textField" Label="Test Field" />
+    </DialogContent>
+    <DialogActions>
+        <VekButton OnClick="Close">Close</VekButton>
+    </DialogActions>
+</VekDialog>
+
+@code {
+    private VekTextField<string> _textField = null!;
+
+    [CascadingParameter]
+    IVekDialogInstance VekDialog { get; set; } = null!;
+
+    void Close() => VekDialog.Close();
+}

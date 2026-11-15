@@ -1,0 +1,56 @@
+﻿@namespace Vek
+@using Vek.Resources
+@inherits VekComponentBase
+@inject InternalVekLocalizer Localizer
+
+<ul @attributes="UserAttributes" class="@Classname" style="@Style">
+    @if (ShowFirstButton)
+    {
+        <li class="@ItemClassname">
+            <VekIconButton Icon="@FirstIcon" Size="@Size" Variant="@Variant" Disabled="@(_selectedState.Value == 1 || Disabled)" OnClick="@(() => OnClickControlButtonAsync(Page.First))" aria-label="@Localizer[LanguageResource.VekPagination_FirstPage]"></VekIconButton>
+        </li>
+    }
+    @if (ShowPreviousButton)
+    {
+        <li class="@ItemClassname">
+            <VekIconButton Icon="@BeforeIcon" Size="@Size" Variant="@Variant" Disabled="@(_selectedState.Value == 1 || Disabled)" OnClick="@(() => OnClickControlButtonAsync(Page.Previous))" aria-label="@Localizer[LanguageResource.VekPagination_PreviousPage]"></VekIconButton>
+        </li>
+    }
+    @if (ShowPageButtons)
+    {
+        foreach (var state in GeneratePagination())
+        {
+            var currentPage = state;
+            if (currentPage == -1)
+            {
+                <li class="@ItemClassname">
+                    <VekText disabled="@Disabled" aria-hidden="true">…</VekText>
+                </li>
+            }
+            else if (currentPage == _selectedState.Value)
+            {
+                <li class="@SelectedItemClassname">
+                    <VekButton Variant="@(Variant == Variant.Outlined ? Variant.Outlined : Variant.Filled)" Size="@Size" Ripple="false" Disabled="@Disabled" Color="@Color" aria-current="page" aria-label="@Localizer[LanguageResource.VekPagination_CurrentPage, $"{currentPage}"]">@currentPage</VekButton>
+                </li>
+            }
+            else
+            {
+                <li class="@ItemClassname">
+                    <VekButton OnClick="@(() => SetSelectedAsync(currentPage))" Variant="@Variant" Size="@Size" Ripple="false" Disabled="@Disabled" aria-label="@Localizer[LanguageResource.VekPagination_PageIndex, $"{currentPage}"]">@currentPage</VekButton>
+                </li>
+            }
+        }
+    }
+    @if (ShowNextButton)
+    {
+        <li class="@ItemClassname">
+            <VekIconButton Icon="@NextIcon" Variant="@Variant" Size="@Size" Disabled="@(_selectedState.Value == _countState.Value || Disabled)" OnClick="@(() => OnClickControlButtonAsync(Page.Next))" aria-label="@Localizer[LanguageResource.VekPagination_NextPage]"></VekIconButton>
+        </li>
+    }
+    @if (ShowLastButton)
+    {
+        <li class="@ItemClassname">
+            <VekIconButton Icon="@LastIcon" Variant="@Variant" Size="@Size" Disabled="@(_selectedState.Value == _countState.Value || Disabled)" OnClick="@(() => OnClickControlButtonAsync(Page.Last))" aria-label="@Localizer[LanguageResource.VekPagination_LastPage]"></VekIconButton>
+        </li>
+    }
+</ul>

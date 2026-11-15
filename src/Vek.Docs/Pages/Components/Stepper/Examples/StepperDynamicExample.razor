@@ -1,0 +1,41 @@
+﻿@namespace Vek.Docs.Examples
+<VekPaper Style="width: 800px">
+    <VekStepper @bind-ActiveIndex="_index" ShowResetButton>
+        <ChildContent>
+            @foreach (var step in _steps)
+            {
+                <VekStep Title="@step">Select campaign settings content @step</VekStep>
+            }
+        </ChildContent>
+        <CompletedContent>
+            Well done!!!
+        </CompletedContent>
+    </VekStepper>
+</VekPaper>
+
+<VekDivider/>
+
+<VekButton OnClick="Remove" Color="Color.Error">Remove</VekButton>
+<VekText>@_steps.Count</VekText>
+<VekButton OnClick="Add" Color="Color.Primary">Add</VekButton>
+
+<VekDivider/>
+
+<p>Current step index: @_index</p>
+
+
+@code {
+    List<string> _steps = new() { "First" ,  "Second" };
+    int _index;
+
+    private void Add()
+    {
+        Random rnd = new Random();
+        _steps.Add( $"Step {rnd.Next(0, 10000)}" );
+    }
+
+    private void Remove()
+    {
+        _steps.Remove(_steps[^1]);
+    }
+}

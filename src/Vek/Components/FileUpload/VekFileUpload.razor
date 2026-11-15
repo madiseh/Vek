@@ -1,0 +1,92 @@
+﻿@inherits VekFormComponent<T, string>
+@typeparam T
+@namespace Vek
+@using Microsoft.AspNetCore.Components.Forms
+@{
+#pragma warning disable CS0618 // Type or member is obsolete
+}
+
+<VekInputControl Class="@Classname" Style="@Style" Error="HasErrors" ErrorId="@ErrorIdState.Value" ErrorText="@GetErrorText()" Required="@Required">
+    <InputContent>
+        @for (var index = 1; index <= _numberOfActiveFileInputs; index++)
+        {
+            var localIndex = index;
+            <InputFile @key="@localIndex"
+                       OnChange="OnChangeAsync"
+                       class="@GetInputClass(localIndex)"
+                       style="@InputStyle"
+                       hidden="@(Hidden && !_draggingState.Value ? "" : null)"
+                       multiple="@(typeof(T) == typeof(IReadOnlyList<IBrowserFile>) ? "" : null)"
+                       accept="@Accept"
+                       disabled="@(GetDisabledState())"
+                       aria-required="@Required.ToString().ToLowerInvariant()"
+                       aria-describedby="@(HasErrors ? ErrorIdState.Value : null)"
+                       @attributes="UserAttributes"
+                       @ondragenter="OnDragEnterAsync"
+                       @ondrop="OnDropAsync"
+                       @ondragleave="OnDragLeaveAsync"
+                       @ondragend="OnDragEndAsync"
+                       id="@GetInputId(localIndex)"
+                       required="@Required" />
+        }
+        @if (CustomContent == null)
+        {
+            @if (DragAndDrop)
+            {
+                <button type="button"
+                        class="@DragClass"
+                        disabled="@GetDisabledState()"
+                        @onclick="OnDragAreaClickAsync"
+                        @ondragenter="OnDragEnterAsync">
+                    <VekIcon Disabled="GetDisabledState()" Class="mb-2" Icon="@Icons.Material.Filled.Inbox" Color="Color.Primary" Size="Size.Large" />
+                    <VekText Color="@(GetDisabledState() ? Color.Inherit : Color.Primary)">@Localizer[Resources.LanguageResource.VekFileUpload_DragAndDrop]</VekText>
+                </button>
+            }
+            else
+            {
+                <VekButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.CloudUpload"
+                           Disabled="GetDisabledState()"
+                           OnClick="@OpenFilePickerAsync">
+                    @Localizer[Resources.LanguageResource.VekFileUpload_Button]
+                </VekButton>
+            }
+        }
+        else
+        {
+            <CascadingValue Name="ParentDisabled" Value="GetDisabledState()">
+                <div class="vek-file-upload-custom-content">
+                    @CustomContent(this)
+                </div>
+            </CascadingValue>
+        }
+
+        @if (SelectedTemplate != null)
+        {
+            <div class="vek-file-upload-files">
+                @SelectedTemplate(_filesState.Value)
+            </div>
+        }
+        else
+        {
+            <div class="vek-file-upload-files vek-file-upload-files-default-template">
+                <!-- Make sure there is at least one file -->
+                @if (!EqualityComparer<T>.Default.Equals(_filesState.Value, default))
+                {
+                    <span class="vek-file-upload-filelist">
+                        @foreach (var file in GetFilenames())
+                        {
+                            <VekChip T="string"
+                                     Color="Color.Secondary"
+                                     Disabled="GetDisabledState()"
+                                     Text="@file"
+                                     CloseIcon="@Icons.Material.Outlined.Close"
+                                     OnClose="@(() => OnFileChipCloseAsync(file))" />
+                        }
+                    </span>
+                }
+            </div>
+        }
+    </InputContent>
+</VekInputControl>

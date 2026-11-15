@@ -1,0 +1,20 @@
+﻿<VekPopoverProvider />
+
+<VekTooltip Color="@Color" Arrow="@Arrow">
+    <ChildContent>
+        <VekButton>My Button</VekButton>
+    </ChildContent>
+    <TooltipContent>
+        <div id="my-tooltip-content">
+            <p>Some Text</p>
+        </div>
+    </TooltipContent>
+</VekTooltip>
+
+@code {
+    [Parameter]
+    public Color Color { get; set; } = Color.Default;
+
+    [Parameter]
+    public bool Arrow { get; set; }
+}

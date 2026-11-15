@@ -1,0 +1,31 @@
+﻿@namespace Vek.Docs.Wireframes
+@inherits LayoutComponentBase
+@layout WireframeLayout
+
+<VekThemeProvider />
+
+<VekLayout>
+    <VekAppBar Elevation="1">
+        <VekIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <VekSpacer />
+        <VekIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+    </VekAppBar>
+    <VekDrawer @bind-Open="_drawerOpen" Elevation="2">
+        <VekDrawerHeader>
+            <VekText Typo="Typo.h5" Class="mt-1">Application</VekText>
+        </VekDrawerHeader>
+        @*NavMenu*@
+    </VekDrawer>
+    <VekMainContent>
+        @Body
+    </VekMainContent>
+</VekLayout>
+
+@code {
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}

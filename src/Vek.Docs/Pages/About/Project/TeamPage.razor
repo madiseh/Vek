@@ -1,0 +1,118 @@
+﻿@page "/vek/project/team"
+@inject GitHubApiClient _gitHubApiClient;
+
+<PageTitle>Meet the Team - Vek</PageTitle>
+<DocsPage DisplayFooter="true">
+
+    <VekContainer>
+        @* Preamble *@
+        <VekText Typo="Typo.h3" GutterBottom="true">Meet the Team</VekText>
+        <VekText Typo="Typo.subtitle1">
+            Vek is an open-source project powered by a growing global community of contributors.
+            What began as a small initiative has evolved into a mature UI framework, maintained by volunteers who review code, guide development, and keep the project moving forward.
+            Contributions of all kinds are welcome, from a single pull request to ongoing involvement, and the community continues to expand with every release.
+            <VekLink Href="/vek/introduction" Typo="Typo.inherit">Read more</VekLink>
+        </VekText>
+
+        @* Core Team *@
+        <VekText Typo="Typo.h4" Class="mt-16" GutterBottom="true" Color="Color.Primary">Core Team</VekText>
+        <VekText Class="mb-8">
+            Project leads who oversee development and review contributions in their free time.
+        </VekText>
+        <VekGrid>
+            @foreach (var member in TeamMemberData.GetTeam().Where(c => c.Team == Team.Core || c.Team == Team.CoreMaintainer))
+            {
+                <VekItem xs="12" md="6">
+                    <VekTeamCard Member="member" />
+                </VekItem>
+            }
+        </VekGrid>
+
+        @* Contribution Team *@
+        <VekText Typo="Typo.h4" Class="mt-16" GutterBottom="true" Color="Color.Secondary">Contribution Team</VekText>
+        <VekText Class="mb-8">
+            Community members in close collaboration, recognized for their high-quality contributions.
+        </VekText>
+        <VekGrid>
+            @foreach (var contributor in TeamMemberData.GetTeam().Where(c => c.Team == Team.Contribution))
+            {
+                <VekItem xs="12" md="6">
+                    <VekTeamCard Member="contributor" />
+                </VekItem>
+            }
+        </VekGrid>
+
+        @* Hall of Fame *@
+        <VekText Typo="Typo.h4" Class="mt-16" GutterBottom="true" Color="Color.Tertiary">Hall of Fame</VekText>
+        <VekText Class="mb-8">
+            Previous team members who are no longer active, but whose contributions should not be forgotten.
+        </VekText>
+        <VekGrid>
+            @foreach (var contributor in TeamMemberData.GetHallOfFameTeam())
+            {
+                <VekItem xs="12" md="6">
+                    <VekTeamCard Member="contributor" DisplayTeam="true" />
+                </VekItem>
+            }
+        </VekGrid>
+
+        @* Awesome Coders *@
+        <VekText Typo="Typo.h4" Class="mt-16" GutterBottom="true">Awesome coders</VekText>
+        <VekText Class="mb-8">
+            Developers who generously allowed us to reuse parts of their code.
+        </VekText>
+        <VekGrid>
+            <VekItem xs="12" md="6">
+                <VekContributor Firstname="Alessandro" Lastname="Ghidini" AvatarLink="https://avatars1.githubusercontent.com/u/251532?s=460&v=4" GitHubLink="https://github.com/sotsera/sotsera.blazor.toaster">
+                    Donated the Sotsera Blazor Toaster code
+                </VekContributor>
+            </VekItem>
+            <VekItem xs="12" md="6">
+                <VekContributor Firstname="Chris" Lastname="Sainty" AvatarLink="https://avatars2.githubusercontent.com/u/6171719?s=460&u=02c821ee398d3601618b845f28514b9ad33d4306&v=4" GitHubLink="https://github.com/Blazored/Modal">
+                    Donated the Blazored Modal source code
+                </VekContributor>
+            </VekItem>
+            <VekItem xs="12" md="6">
+                <VekContributor Firstname="Zachary" Lastname="Patten" AvatarLink="https://avatars1.githubusercontent.com/u/3385986?s=460&u=e7884f25057513e6987883867a16bc167ce4a6a6&v=4" GitHubLink="https://github.com/ZacharyPatten/Towel">
+                    Donated the XmlDoc loading code for the docs
+                </VekContributor>
+            </VekItem>
+        </VekGrid>
+
+        @* All Contributors *@
+        <VekText Typo="Typo.h4" Class="mt-16" GutterBottom="true">All contributors</VekText>
+        <VekText Class="mb-8">
+            A growing community of developers who’ve contributed code on GitHub.
+        </VekText>
+        <VekGrid>
+            @if (_githubContributors == null)
+            {
+                <VekProgressCircular Color="Color.Primary" Indeterminate="true" />
+            }
+            else
+            {
+                @foreach (var contributor in _githubContributors.OrderByDescending(x => x.Contributions))
+                {
+                    <VekItem xs="12" md="6">
+                        <VekContributor Firstname="@contributor.Login" AvatarLink="@contributor.AvatarUrl" GitHubLink="@contributor.HtmlUrl" />
+                    </VekItem>
+                }
+            }
+        </VekGrid>
+    </VekContainer>
+
+    <VekContainer>
+        <div class="my-16"></div>
+    </VekContainer>
+
+</DocsPage>
+
+@code
+{
+    private GithubContributors[] _githubContributors;
+    protected override async Task OnInitializedAsync()
+    {
+        _githubContributors = await _gitHubApiClient.GetContributorsAsync();
+        StateHasChanged();
+    }
+}

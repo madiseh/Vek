@@ -1,0 +1,13 @@
+﻿@namespace Vek.UnitTests
+
+<h3>ParameterStateEventArgsTestComponent</h3>
+<VekButton Class="increment-int-param" OnClick="@(() => _i++)">Increment IntParam</VekButton>
+<br/>
+<ParameterStateTestComp IntParam="@_i"/>
+
+@code
+{
+    public static string __description__ = "Tests the ParameterState framework's parameter change notification event args";
+
+    private int _i;
+}

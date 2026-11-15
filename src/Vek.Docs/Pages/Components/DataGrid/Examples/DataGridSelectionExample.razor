@@ -1,0 +1,44 @@
+﻿﻿@using System.Net.Http.Json
+@using Vek.Examples.Data.Models
+@using System.Linq
+@namespace Vek.Docs.Examples
+@inject HttpClient httpClient
+
+<VekDataGrid T="Element" Items="@Elements.Take(10)" MultiSelection="true" SelectedItemsChanged="@SelectedItemsChanged">
+    <Columns>
+        <SelectColumn DisabledFunc="@(item => item.Number % 5 == 0)" AriaLabelFunc="@(item => $"Select {item.Name}")" />
+        <PropertyColumn Property="x => x.Number" Title="Nr" />
+        <PropertyColumn Property="x => x.Sign" />
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Position" />
+        <PropertyColumn Property="x => x.Molar" Title="Molar mass" />
+    </Columns>
+</VekDataGrid>
+
+@if (_selectedItems != null && _selectedItems.Any())
+{
+    <VekText Typo="Typo.subtitle1" Class="mt-4">Selected Items:</VekText>
+    foreach (var item in _selectedItems)
+    {
+        <VekText Typo="Typo.body2">@item.Name</VekText>
+    }
+}
+else
+{
+    <VekText Typo="Typo.body2" Class="mt-4">No items selected.</VekText>
+}
+
+@code {
+    private IEnumerable<Element> Elements = new List<Element>();
+    private HashSet<Element> _selectedItems = new HashSet<Element>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = await httpClient.GetFromJsonAsync<List<Element>>("webapi/periodictable");
+    }
+
+    private void SelectedItemsChanged(HashSet<Element> items)
+    {
+        _selectedItems = items;
+    }
+}

@@ -1,0 +1,138 @@
+﻿<VekTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" TabPanelsClass="pa-6">
+    <VekTabPanel Text="Simple Tooltip">
+        <VekTooltip Text="Delete">
+            <VekIconButton Icon="@Icons.Material.Filled.Delete" />
+        </VekTooltip>
+        <VekTooltip Text="Add" Placement="Placement.Top" Arrow>
+            <VekFab StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" />
+        </VekTooltip>
+    </VekTabPanel>
+    <VekTabPanel Text="Grid TextField">
+        <VekGrid>
+            <VekItem xs="12">
+                <VekTextField T="string" Text="Fully expanded - No Tooltip" Variant="Variant.Outlined" HelperText="https://github.com/madiseh/vek/issues/7685#issue-1960816701" />
+            </VekItem>
+            <VekItem xs="12">
+                <VekTooltip Text="Issue 7685" Inline="true">
+                    <VekTextField T="string" Text="Tooltip - Inline True" Variant="Variant.Outlined"></VekTextField>
+                </VekTooltip>
+            </VekItem>
+            <VekItem xs="12">
+                <VekTooltip Text="Issue 7685" Inline="false">
+                    <VekTextField T="string" Text="Tooltip - Inline False" Variant="Variant.Outlined"></VekTextField>
+                </VekTooltip>
+            </VekItem>
+        </VekGrid>
+    </VekTabPanel>
+    <VekTabPanel Text="Grid DatePicker">
+        <VekGrid>
+            <VekItem xs="6">
+                <VekTooltip Text="Issue 1167" Color="Color.Primary" Arrow>
+                    <VekDatePicker Label="Tooltip - Inline True" AutoClose/>
+                </VekTooltip>
+            </VekItem>
+            <VekItem xs="6">
+                <VekDatePicker Label="End date" AutoClose />
+            </VekItem>
+        </VekGrid>
+        <VekGrid>
+            <VekItem xs="6">
+                <VekTooltip Text="Issue 1167" Color="Color.Primary" Inline="false" Arrow>
+                    <VekDatePicker Label="Tooltip - Inline False" AutoClose/>
+                </VekTooltip>
+            </VekItem>
+            <VekItem xs="6">
+                <VekDatePicker Label="End date" AutoClose HelperText="https://github.com/madiseh/vek/issues/1167#issuecomment-968830224" />
+            </VekItem>
+        </VekGrid>
+    </VekTabPanel>
+    <VekTabPanel Text="VekList Direction">
+        <VekPaper Width="fit-content">
+            <VekList T="string">
+                <VekTooltip Text="Inline False" Inline="false">
+                    <VekListItem Text="Inbox" />
+                </VekTooltip>
+                <VekTooltip Text="Inline False" Inline="false">
+                    <VekListItem Text="Sent" />
+                </VekTooltip>
+                <VekTooltip Text="Inline False" Inline="false">
+                    <VekListItem Text="Spam" />
+                </VekTooltip>
+                <VekDivider />
+                <VekTooltip Text="List renders horizontally if Inline=true" Inline="false">
+                    <VekListItem Text="Issue 3844" SecondaryText="https://github.com/madiseh/vek/issues/3844#issue-1119522527" />
+                </VekTooltip>
+            </VekList>
+        </VekPaper>
+    </VekTabPanel>
+    <VekTabPanel Text="Grid Chip">
+        <VekDataGrid Items="@([("updated", Color.Secondary), ("in progress", Color.Warning), ("submitted", Color.Info), ("approved", Color.Success)])">
+            <Columns>
+                <TemplateColumn Title="GitHub Issue">
+                    <CellTemplate>
+                        <VekText>Issue #1167</VekText>
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn Title="Inline True">
+                    <CellTemplate>
+                        <VekTooltip Text="Inline True" Color="Color.Primary" Arrow Placement="Placement.Bottom" Inline="true">
+                            <VekChip T="string" Class="vek-width-full ma-0" Color="@context.Item.Item2" Size="Size.Small">
+                                @context.Item.Item1
+                            </VekChip>
+                        </VekTooltip>
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn Title="Inline False">
+                    <CellTemplate>
+                        <VekTooltip Text="Inline False" Color="Color.Primary" Arrow Placement="Placement.Bottom" Inline="false">
+                            <VekChip T="string" Class="vek-width-full ma-0" Color="@context.Item.Item2" Size="Size.Small">
+                                @context.Item.Item1
+                            </VekChip>
+                        </VekTooltip>
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn Title="Comment">
+                    <CellTemplate>
+                        <VekLink Href="https://github.com/madiseh/vek/issues/1167#issuecomment-2611085518">VekChip inside DataGrid workaround</VekLink>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </VekDataGrid>
+    </VekTabPanel>
+    <VekTabPanel Text="Grid Stack" BadgeDot BadgeColor="Color.Error">
+        <VekGrid>
+            <VekItem xs="12">
+                <VekStack>
+                    <VekStack Row>
+                        <VekTextField T="string" Text="Fully expanded - No Tooltip" Variant="Variant.Outlined" HelperText="https://github.com/madiseh/vek/issues/1167#issuecomment-1915676589" />
+                        <VekButton>Text</VekButton>
+                    </VekStack>
+                    <VekStack Row>
+                        <VekTooltip Text="Issue 1167" RootClass="vek-width-full">
+                            <VekTextField T="string" Text="Tooltip - requires RootClass='vek-width-full'" Variant="Variant.Outlined"></VekTextField>
+                        </VekTooltip>
+                        <VekButton>Text</VekButton>
+                    </VekStack>
+                </VekStack>
+            </VekItem>
+        </VekGrid>
+    </VekTabPanel>
+    <VekTabPanel Text="Table Data" BadgeDot BadgeColor="Color.Error">
+        <VekTable T="string" Items="@(["one", "two", "three", "four"])">
+            <HeaderContent>
+                <VekTh>Issue</VekTh>
+                <VekTh>Data</VekTh>
+                <VekTh>Comment</VekTh>
+            </HeaderContent>
+            <RowTemplate>
+                <VekTd DataLabel="Issue">Discord Help</VekTd>
+                <VekTd DataLabel="Data">
+                    <VekTooltip Text="RootClass='vek-width-full'" RootClass="vek-width-full">
+                        @context
+                    </VekTooltip>
+                </VekTd>
+                <VekTd DataLabel="Comment">User was wrapping outside 'VekTd', wrap inside instead</VekTd>
+            </RowTemplate>
+        </VekTable>
+    </VekTabPanel>
+</VekTabs>

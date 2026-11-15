@@ -1,0 +1,612 @@
+﻿// Copyright (c) Vek 2021
+// Vek licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+using System.Globalization;
+using AngleSharp.Dom;
+using AwesomeAssertions;
+using Bunit;
+using Microsoft.AspNetCore.Components;
+using Vek.Charts;
+using Vek.Extensions;
+using Vek.UnitTests.Components;
+using NUnit.Framework;
+
+namespace Vek.UnitTests.Charts
+{
+    public class BarChartTests : BunitTest
+    {
+        private readonly string[] _baseChartPalette =
+        {
+            "#2979FF", "#1DE9B6", "#FFC400", "#FF9100", "#651FFF", "#00E676", "#00B0FF", "#26A69A", "#FFCA28",
+            "#FFA726", "#EF5350", "#EF5350", "#7E57C2", "#66BB6A", "#29B6F6", "#FFA000", "#F57C00", "#D32F2F",
+            "#512DA8", "#616161"
+        };
+
+        private readonly string[] _modifiedPalette =
+        {
+            "#264653", "#2a9d8f", "#e9c46a", "#f4a261", "#e76f51"
+        };
+
+        private readonly string[] _customPalette =
+        {
+            "#015482", "#CC1512", "#FFE135", "#087830", "#D70040", "#B20931", "#202E54", "#F535AA", "#017B92",
+            "#FA4224", "#062A78", "#56B4BE", "#207000", "#FF43A4", "#FB8989", "#5E9B8A", "#FFB7CE", "#C02B18",
+            "#01153E", "#2EE8BB", "#EBDDE2"
+        };
+
+        [SetUp]
+        public void Init()
+        {
+
+        }
+
+        [Test]
+        public void BarChartEmptyData()
+        {
+            var comp = Context.Render<Bar<double>>();
+            comp.Markup.Should().Contain("vek-chart");
+        }
+
+        [Test]
+        public async Task BarChartExampleData()
+        {
+            var chartSeries = new List<ChartSeries<double>>()
+            {
+                new () { Name = "United States", Data = new double[] { 40, 20, 25, 27, 46, 60, 48, 80, 15 } },
+                new () { Name = "Germany", Data = new double[] { 19, 24, 35, 13, 28, 15, -4, 16, 31 } },
+                new () { Name = "Sweden", Data = new double[] { 8, 6, -11, 13, 4, 16, 10, 16, 18 } },
+            };
+            string[] xAxisLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" };
+
+            var comp = Context.Render<VekChart<double>>(parameters => parameters
+                .Add(p => p.ChartType, ChartType.Bar)
+                .Add(p => p.Height, "350px")
+                .Add(p => p.Width, "100%")
+                .Add(p => p.ChartOptions, new BarChartOptions { ChartPalette = _baseChartPalette, FixedBarWidth = 8 })
+                .Add(p => p.ChartSeries, chartSeries)
+                .Add(p => p.ChartLabels, xAxisLabels));
+
+            comp.Instance.ChartSeries.Should().NotBeEmpty();
+
+            comp.Markup.Should().Contain("class=\"vek-charts-xaxis\"");
+            comp.Markup.Should().Contain("class=\"vek-charts-yaxis\"");
+            comp.Markup.Should().Contain("vek-chart-legend-item");
+
+            // find legend
+            var legend = comp.FindComponent<Legend<double>>();
+            const string LEGEND_CSS_SELECTOR = "div.vek-chart-legend-item";
+            legend.Should().NotBeNull(because: "we have a legend");
+            legend.FindAll(LEGEND_CSS_SELECTOR).Should().HaveCount(chartSeries.Count, because: "the number series should match the legend item count");
+            // click second item of legend (because SelectedIndex starts with 0)
+            await legend.FindAll(LEGEND_CSS_SELECTOR).Skip(1).First().ClickAsync();
+            comp.Instance.GetState(x => x.SelectedIndex).Should().Be(1, because: "second legend item was clicked");
+            // click first item of legend (to check, if get's back to 0)
+            await legend.FindAll(LEGEND_CSS_SELECTOR).Skip(0).First().ClickAsync();
+            comp.Instance.GetState(x => x.SelectedIndex).Should().Be(0, because: "first legend item was clicked");
+
+            if (chartSeries.Count <= 3)
+            {
+                comp.Markup.Should().
+                    Contain("United States").And.Contain("Germany").And.Contain("Sweden");
+            }
+
+            var bars = comp.FindAll("path.vek-chart-bar");
+            bars.Count.Should().Be(3 * 9, because: "3 series with 9 data points each");
+
+            if (chartSeries.TryGetIndexOfDataValue(0, 40, out var index))
+            {
+                bars[index].OuterHtml.Should()
+                    .Contain("d=\"M 34 261 L 34 143\"");
+            }
+
+            if (chartSeries.TryGetIndexOfDataValue(0, 80, out index))
+            {
+                bars[index].OuterHtml.Should()
+                    .Contain("d=\"M 569.5 261 L 569.5 25\"");
+            }
+
+            await comp.SetParametersAndRenderAsync(parameters => parameters
+                .Add(p => p.ChartOptions, new ChartOptions() { ChartPalette = _modifiedPalette }));
+
+            comp.Markup.Should().Contain(_modifiedPalette[0]);
+        }
+
+        [Test]
+        public async Task BarChartExampleSingleXAxis()
+        {
+            var chartSeries = new List<ChartSeries<double>>()
+            {
+                new () { Name = "United States", Data = new double[] { 40, 20, 25, 27, 46, 60, 48, 80, 15 } },
+                new () { Name = "Germany", Data = new double[] { 19, 24, 35, 13, 28, 15, -4, 16, 31 } },
+                new () { Name = "Sweden", Data = new double[] { 8, 6, -11, 13, 4, 16, 10, 16, 18 } },
+            };
+            string[] xAxisLabels = { "Jan" };
+
+            var comp = Context.Render<VekChart<double>>(parameters => parameters
+                .Add(p => p.ChartType, ChartType.Bar)
+                .Add(p => p.Height, "350px")
+                .Add(p => p.Width, "100%")
+                .Add(p => p.ChartOptions, new ChartOptions { ChartPalette = _baseChartPalette })
+                .Add(p => p.ChartSeries, chartSeries)
+                .Add(p => p.ChartLabels, xAxisLabels));
+
+            comp.Instance.ChartSeries.Should().NotBeEmpty();
+
+            comp.Markup.Should().Contain("class=\"vek-charts-xaxis\"");
+            comp.Markup.Should().Contain("class=\"vek-charts-yaxis\"");
+            comp.Markup.Should().Contain("vek-chart-legend-item");
+
+            // find legend
+            var legend = comp.FindComponent<Legend<double>>();
+            const string LEGEND_CSS_SELECTOR = "div.vek-chart-legend-item";
+            legend.Should().NotBeNull(because: "we have a legend");
+            legend.FindAll(LEGEND_CSS_SELECTOR).Should().HaveCount(chartSeries.Count, because: "the number series should match the legend item count");
+
+            if (chartSeries.Count <= 3)
+            {
+                comp.Markup.Should().
+                    Contain("United States").And.Contain("Germany").And.Contain("Sweden");
+            }
+
+            var bars = comp.FindAll("path.vek-chart-bar");
+            bars.Count.Should().Be(3 * 9, because: "3 series with 9 data points each");
+
+            if (chartSeries.TryGetIndexOfDataValue(0, 40, out var index))
+            {
+                bars[index].OuterHtml.Should()
+                    .Contain("d=\"M 34.183 261 L 34.183 143\"");
+            }
+
+            if (chartSeries.TryGetIndexOfDataValue(0, 80, out index))
+            {
+                bars[index].OuterHtml.Should()
+                    .Contain("d=\"M 569.2941 261 L 569.2941 25\"");
+            }
+
+            await comp.SetParametersAndRenderAsync(parameters => parameters.Add(p => p.ChartOptions, new ChartOptions() { ChartPalette = _modifiedPalette }));
+
+            comp.Markup.Should().Contain(_modifiedPalette[0]);
+        }
+
+        [Test]
+        public void BarChartXAxisLabelRotation90UsesRotatedLabelSpacing()
+        {
+            var chartSeries = new List<ChartSeries<double>>
+            {
+                new() { Name = "Sales", Data = new double[] { 40, 20 } },
+            };
+            string[] xAxisLabels = { "January", "February" };
+
+            var unrotated = Context.Render<VekChart<double>>(parameters => parameters
+                .Add(p => p.ChartType, ChartType.Bar)
+                .Add(p => p.Height, "350px")
+                .Add(p => p.Width, "100%")
+                .Add(p => p.ChartSeries, chartSeries)
+                .Add(p => p.ChartLabels, xAxisLabels)
+                .Add(p => p.ChartOptions, new BarChartOptions { XAxisLabelRotation = 0 }));
+
+            var rotated = Context.Render<VekChart<double>>(parameters => parameters
+                .Add(p => p.ChartType, ChartType.Bar)
+                .Add(p => p.Height, "350px")
+                .Add(p => p.Width, "100%")
+                .Add(p => p.ChartSeries, chartSeries)
+                .Add(p => p.ChartLabels, xAxisLabels)
+                .Add(p => p.ChartOptions, new BarChartOptions { XAxisLabelRotation = 90 }));
+
+            var unrotatedXAxisLabel = unrotated.Find("g.vek-charts-xaxis text");
+            var rotatedXAxisLabel = rotated.Find("g.vek-charts-xaxis text");
+
+            rotatedXAxisLabel.GetAttribute("text-anchor").Should().Be("end");
+            rotatedXAxisLabel.GetAttribute("transform").Should().StartWith("rotate(-90 ");
+            rotatedXAxisLabel.GetAttribute("y").Should().Be("320");
+
+            var unrotatedLabelY = double.Parse(unrotatedXAxisLabel.GetAttribute("y")!, CultureInfo.InvariantCulture);
+            var rotatedLabelY = double.Parse(rotatedXAxisLabel.GetAttribute("y")!, CultureInfo.InvariantCulture);
+            rotatedLabelY.Should().BeLessThan(unrotatedLabelY, because: "rotated labels need a larger bottom offset from the chart edge");
+
+            static double GetYCoordinate(string pathData)
+            {
+                var coordinates = pathData.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                return double.Parse(coordinates[2], CultureInfo.InvariantCulture);
+            }
+
+            var unrotatedPlotBottom = GetYCoordinate(unrotated.Find("g.vek-charts-gridlines-yaxis path").GetAttribute("d")!);
+            var rotatedPlotBottom = GetYCoordinate(rotated.Find("g.vek-charts-gridlines-yaxis path").GetAttribute("d")!);
+            rotatedPlotBottom.Should().BeLessThan(unrotatedPlotBottom, because: "rotated labels need more bottom plot spacing");
+        }
+
+        /// <summary>
+        /// Verifies a negative X-axis label rotation is written with an ASCII minus sign when the current culture uses U+2212.
+        /// </summary>
+        [Test]
+        [SetCulture("sv-SE")]
+        public void BarChartXAxisLabelRotationUsesInvariantMinusSign()
+        {
+            var comp = Context.Render<VekChart<double>>(parameters => parameters
+                .Add(p => p.ChartType, ChartType.Bar)
+                .Add(p => p.ChartSeries, new List<ChartSeries<double>> { new() { Name = "Sales", Data = new double[] { 40, 20 } } })
+                .Add(p => p.ChartLabels, new[] { "January", "February" })
+                .Add(p => p.ChartOptions, new BarChartOptions { XAxisLabelRotation = 45 }));
+
+            comp.Find("g.vek-charts-xaxis text").GetAttribute("transform").Should().StartWith("rotate(-45 ");
+        }
+
+        [Test]
+        public async Task BarChartColoring()
+        {
+            var chartSeries = new List<ChartSeries<double>>()
+            {
+                new ChartSeries<double>() { Name = "Deep Sea Blue", Data = new double[] { 40, 20, 25, 27, 46 } },
+                new ChartSeries<double>() { Name = "Venetian Red", Data = new double[] { 19, 24, 35, 13, 28 } },
+                new ChartSeries<double>() { Name = "Banana Yellow", Data = new double[] { 8, 6, 11, 13, 4 } },
+                new ChartSeries<double>() { Name = "La Salle Green", Data = new double[] { 18, 9, 7, 10, 7 } },
+                new ChartSeries<double>() { Name = "Rich Carmine", Data = new double[] { 9, 14, 6, 15, 20 } },
+                new ChartSeries<double>() { Name = "Shiraz", Data = new double[] { 9, 4, 11, 5, 19 } },
+                new ChartSeries<double>() { Name = "Cloud Burst", Data = new double[] { 14, 9, 20, 16, 6 } },
+                new ChartSeries<double>() { Name = "Neon Pink", Data = new double[] { 14, 8, 4, 14, 8 } },
+                new ChartSeries<double>() { Name = "Ocean", Data = new double[] { 11, 20, 13, 5, 5 } },
+                new ChartSeries<double>() { Name = "Orangey Red", Data = new double[] { 6, 6, 19, 20, 6 } },
+                new ChartSeries<double>() { Name = "Catalina Blue", Data = new double[] { 3, 2, 20, 3, 10 } },
+                new ChartSeries<double>() { Name = "Fountain Blue", Data = new double[] { 3, 18, 11, 12, 3 } },
+                new ChartSeries<double>() { Name = "Irish Green", Data = new double[] { 20, 5, 15, 16, 13 } },
+                new ChartSeries<double>() { Name = "Wild Strawberry", Data = new double[] { 15, 9, 12, 12, 1 } },
+                new ChartSeries<double>() { Name = "Geraldine", Data = new double[] { 5, 13, 19, 15, 8 } },
+                new ChartSeries<double>() { Name = "Grey Teal", Data = new double[] { 12, 16, 20, 16, 17 } },
+                new ChartSeries<double>() { Name = "Baby Pink", Data = new double[] { 1, 18, 10, 19, 8 } },
+                new ChartSeries<double>() { Name = "Thunderbird", Data = new double[] { 15, 16, 10, 8, 5 } },
+                new ChartSeries<double>() { Name = "Navy", Data = new double[] { 16, 2, 3, 5, 5 } },
+                new ChartSeries<double>() { Name = "Aqua Marina", Data = new double[] { 17, 6, 11, 19, 6 } },
+                new ChartSeries<double>() { Name = "Lavender Pinocchio", Data = new double[] { 1, 11, 4, 18, 1 } },
+                new ChartSeries<double>() { Name = "Deep Sea Blue", Data = new double[] { 1, 11, 4, 18, 1 } }
+            };
+
+            var comp = Context.Render<VekChart<double>>(parameters => parameters
+                .Add(p => p.ChartType, ChartType.Bar)
+                .Add(p => p.Height, "350px")
+                .Add(p => p.Width, "100%")
+                .Add(p => p.ChartOptions, new ChartOptions { ChartPalette = new string[] { "#1E9AB0" } })
+                .Add(p => p.ChartSeries, chartSeries));
+
+            var paths1 = comp.FindAll("path");
+
+            int count;
+            count = paths1.Count(p => p.OuterHtml.Contains($"fill=\"{"#1E9AB0"}\"") && p.OuterHtml.Contains($"stroke=\"{"#1E9AB0"}\""));
+            count.Should().Be(5 * 22);
+
+            await comp.SetParametersAndRenderAsync(parameters => parameters
+                .Add(p => p.ChartOptions, new ChartOptions() { ChartPalette = _customPalette }));
+
+            var paths2 = comp.FindAll("path");
+
+            foreach (var color in _customPalette)
+            {
+                count = paths2.Count(p => p.OuterHtml.Contains($"fill=\"{color}\"") && p.OuterHtml.Contains($"stroke=\"{color}\""));
+                if (color == _customPalette[0])
+                {
+                    count.Should().Be(5 * 2, because: "the number of series defined exceeds the number of colors in the chart palette, thus, any new defined series takes the color from the chart palette in the same fashion as the previous series starting from the beginning");
+                }
+                else
+                {
+                    count.Should().Be(5);
+                }
+            }
+        }
+
+        [Test]
+        public async Task BarChart_CanHideSeries()
+        {
+            var chartSeries = new List<ChartSeries<double>>()
+            {
+                new () { Name = "Series 1", Data = new double[] { 90, 79, 72, 69, 62, 62, 55, 65, 70 } },
+                new () { Name = "Series 2", Data = new double[] { 10, 41, 35, 51, 49, 62, 69, 91, 148 } },
+                new () { Name = "Series 3", Data = new double[] { 10, 41, 35, 51, 49, 62, 69, 91, 148 }, Visible = false } // Initially hidden
+            };
+            string[] xAxisLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" };
+
+            var comp = Context.Render<VekChart<double>>(parameters => parameters
+                .Add(p => p.ChartType, ChartType.Bar)
+                .Add(p => p.Height, "350px")
+                .Add(p => p.Width, "100%")
+                .Add(p => p.ChartSeries, chartSeries)
+                .Add(p => p.ChartLabels, xAxisLabels)
+                .Add(p => p.CanHideSeries, true) // Enable hiding series
+                .Add(p => p.ChartOptions, new BarChartOptions { ChartPalette = _baseChartPalette }));
+
+            // Initial state assertions
+            var seriesCheckboxes = comp.FindAll(".vek-checkbox-input");
+            seriesCheckboxes.Count.Should().Be(chartSeries.Count, "Number of checkboxes should match number of series");
+
+            seriesCheckboxes[0].IsChecked().Should().BeTrue("Series 1 should be initially visible");
+            seriesCheckboxes[1].IsChecked().Should().BeTrue("Series 2 should be initially visible");
+            seriesCheckboxes[2].IsChecked().Should().BeFalse("Series 3 should be initially hidden as per Visible = false");
+
+            var series1 = "[fill='#2979FF']";
+            var series2 = "[fill='#1DE9B6']";
+            var series3 = "[fill='#FFC400']";
+
+            // Check initial state of Series 3 (should be 0 bars as Visible = false)
+            comp.FindAll($"path.vek-chart-bar{series3}").Count.Should().Be(0, "Series 3 should have 0 bars initially");
+
+            // Hide Series 1
+            comp.FindAll($"path.vek-chart-bar{series1}").Count.Should().Be(chartSeries[0].Data.Count, "Series 1 bars should be visible");
+            await seriesCheckboxes[0].ChangeAsync(new ChangeEventArgs() { Value = false });
+            seriesCheckboxes = comp.FindAll(".vek-checkbox-input"); // Re-find
+            seriesCheckboxes[0].IsChecked().Should().BeFalse("Series 1 checkbox should be unchecked after hiding");
+            chartSeries[0].Visible.Should().BeFalse("Series 1 Visible property should be false");
+            comp.FindAll($"path.vek-chart-bar{series1}").Count.Should().Be(0, "Series 1 bars should be hidden after unchecking");
+
+            // Show Series 1 again
+            await seriesCheckboxes[0].ChangeAsync(new ChangeEventArgs() { Value = true });
+            seriesCheckboxes = comp.FindAll(".vek-checkbox-input"); // Re-find
+            seriesCheckboxes[0].IsChecked().Should().BeTrue("Series 1 checkbox should be checked after showing");
+            chartSeries[0].Visible.Should().BeTrue("Series 1 Visible property should be true");
+
+            comp.FindAll($"path.vek-chart-bar{series1}").Count.Should().Be(chartSeries[0].Data.Count, "Series 1 bars should be visible again after re-checking");
+
+            // Now check Series 2 (which should have been visible from the start)
+            comp.FindAll($"path.vek-chart-bar{series2}").Count.Should().Be(chartSeries[1].Data.Count, "Series 2 should have bars from the start");
+
+            // Hide Series 2
+            await seriesCheckboxes[1].ChangeAsync(new ChangeEventArgs() { Value = false });
+            seriesCheckboxes = comp.FindAll(".vek-checkbox-input"); // Re-find
+            seriesCheckboxes[1].IsChecked().Should().BeFalse("Series 2 checkbox should be unchecked after hiding");
+            chartSeries[1].Visible.Should().BeFalse("Series 2 Visible property should be false");
+            comp.FindAll($"path.vek-chart-bar{series2}").Count.Should().Be(0, "Series 2 bars should be hidden");
+            comp.FindAll($"path.vek-chart-bar{series1}").Count.Should().Be(chartSeries[0].Data.Count, "Series 1 bars should still be visible"); // Ensure other series not affected
+
+            // Show Series 3 (which was initially hidden)
+            await seriesCheckboxes[2].ChangeAsync(new ChangeEventArgs() { Value = true });
+            seriesCheckboxes = comp.FindAll(".vek-checkbox-input"); // Re-find
+            seriesCheckboxes[2].IsChecked().Should().BeTrue("Series 3 checkbox should be checked after showing");
+            chartSeries[2].Visible.Should().BeTrue("Series 3 Visible property should be true");
+            comp.FindAll($"path.vek-chart-bar{series3}").Count.Should().Be(chartSeries[2].Data.Count, "Series 3 bars should be visible");
+        }
+
+        [Test]
+        public void BarChart_Legend_HasOneFocusableControlPerSeries()
+        {
+            var chartSeries = new List<ChartSeries<double>>()
+            {
+                new () { Name = "Series 1", Data = new double[] { 10, 20, 30 } },
+                new () { Name = "Series 2", Data = new double[] { 40, 50, 60 } },
+            };
+
+            var comp = Context.Render<VekChart<double>>(parameters => parameters
+                .Add(p => p.ChartType, ChartType.Bar)
+                .Add(p => p.ChartSeries, chartSeries)
+                .Add(p => p.CanHideSeries, true));
+
+            var focusable = comp.FindAll(".vek-chart-legend input, .vek-chart-legend [tabindex]:not([tabindex='-1'])");
+            focusable.Count.Should().Be(chartSeries.Count, "each series should be a single tab stop");
+            comp.FindAll(".vek-chart-legend [role='button']").Should().BeEmpty("the checkbox already carries the toggle semantics");
+        }
+
+        [Test]
+        public void BarChart_Legend_CheckboxIsLabelledBySeriesName()
+        {
+            var chartSeries = new List<ChartSeries<double>>()
+            {
+                new () { Name = "Series 1", Data = new double[] { 10, 20, 30 } },
+                new () { Name = "Series 2", Data = new double[] { 40, 50, 60 } },
+            };
+
+            var comp = Context.Render<VekChart<double>>(parameters => parameters
+                .Add(p => p.ChartType, ChartType.Bar)
+                .Add(p => p.ChartSeries, chartSeries)
+                .Add(p => p.CanHideSeries, true));
+
+            // The name has to live inside the checkbox's own label. That is what gives the input an
+            // accessible name and what makes clicking the text toggle the series in a browser.
+            var labels = comp.FindAll(".vek-chart-legend-checkbox label.vek-checkbox");
+            labels.Count.Should().Be(chartSeries.Count);
+
+            for (var i = 0; i < chartSeries.Count; i++)
+            {
+                labels[i].TextContent.Trim().Should().Be(chartSeries[i].Name);
+                labels[i].QuerySelector("input.vek-checkbox-input").Should().NotBeNull();
+            }
+        }
+
+        [Test]
+        public async Task BarChart_Legend_SpaceKey_TogglesVisibility()
+        {
+            var chartSeries = new List<ChartSeries<double>>()
+            {
+                new () { Name = "Series 1", Data = new double[] { 10, 20, 30 } },
+                new () { Name = "Series 2", Data = new double[] { 40, 50, 60 } },
+            };
+
+            var comp = Context.Render<VekChart<double>>(parameters => parameters
+                .Add(p => p.ChartType, ChartType.Bar)
+                .Add(p => p.ChartSeries, chartSeries)
+                .Add(p => p.CanHideSeries, true));
+
+            chartSeries[0].Visible.Should().BeTrue("Series 1 should be visible initially");
+
+            comp.Find(".vek-checkbox-input").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Key = " ", Type = "keydown" });
+            await comp.WaitForAssertionAsync(() => chartSeries[0].Visible.Should().BeFalse("Space should hide Series 1"));
+
+            comp.Find(".vek-checkbox-input").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Key = " ", Type = "keydown" });
+            await comp.WaitForAssertionAsync(() => chartSeries[0].Visible.Should().BeTrue("Space again should restore Series 1"));
+        }
+
+        [Test]
+        public async Task BarChart_Legend_ToggleCheckbox_DoesNotTriggerOnLegendSelected()
+        {
+            var chartSeries = new List<ChartSeries<double>>()
+            {
+                new () { Name = "Series 1", Data = new double[] { 10, 20, 30 } },
+                new () { Name = "Series 2", Data = new double[] { 40, 50, 60 } },
+            };
+
+            var comp = Context.Render<VekChart<double>>(parameters => parameters
+                .Add(p => p.ChartType, ChartType.Bar)
+                .Add(p => p.ChartSeries, chartSeries)
+                .Add(p => p.CanHideSeries, true));
+
+            var initialSelectedIndex = comp.Instance.GetState(x => x.SelectedIndex);
+
+            await comp.Find(".vek-checkbox-input").ChangeAsync(new ChangeEventArgs { Value = false });
+
+            chartSeries[0].Visible.Should().BeFalse("the checkbox drives series visibility");
+            comp.Instance.GetState(x => x.SelectedIndex).Should().Be(initialSelectedIndex,
+                "toggling a series should not change the selected chart index");
+        }
+
+        [Test]
+        public void BarChartOverlay_RendersOverlayBars()
+        {
+            // Outer StackedBar chart with a nested Bar overlay that shares the outer axis chart.
+            var stacked = new List<ChartSeries<double>>
+            {
+                new() { Name = "S0", Data = new double[] { 40, 30, 20, 50 } },
+                new() { Name = "S1", Data = new double[] { 10, 20, 30, 15 } },
+            };
+            var overlayData = new List<ChartSeries<double>>
+            {
+                new() { Name = "Overlay", Data = new double[] { 25, 35, 45, 30 } },
+            };
+
+            var comp = Context.Render<VekChart<double>>(p => p
+                .Add(x => x.ChartType, ChartType.StackedBar)
+                .Add(x => x.ChartSeries, stacked)
+                .Add(x => x.ChartLabels, new[] { "A", "B", "C", "D" })
+                .Add(x => x.ChartOptions, new StackedBarChartOptions())
+                .AddChildContent<Bar<double>>(cp => cp
+                    .Add(b => b.ChartSeries, overlayData)
+                    .Add(b => b.ChartOptions, new BarChartOptions())));
+
+            var overlay = comp.FindComponent<Bar<double>>();
+            overlay.Instance.IsOverlayChart.Should().BeTrue(because: "the nested Bar's cascaded reference is the outer axis chart");
+
+            // The overlay child renders after the outer ChartReference is set; settle the renders so the
+            // overlay's shared-data branch emits bars into the outer chart's overlay content.
+            overlay.Render();
+            comp.Render();
+
+            var overlayBars = comp.FindAll("g.vek-charts-bar-series path.vek-chart-bar");
+            overlayBars.Count.Should().Be(overlayData[0].Data.Count, because: "the overlay renders one bar per data point");
+        }
+
+        [Test]
+        public async Task BarChartOverlay_HoverTogglesTooltip()
+        {
+            var stacked = new List<ChartSeries<double>>
+            {
+                new() { Name = "S0", Data = new double[] { 40, 30, 20, 50 } },
+                new() { Name = "S1", Data = new double[] { 10, 20, 30, 15 } },
+            };
+            var overlayData = new List<ChartSeries<double>>
+            {
+                new() { Name = "Overlay", Data = new double[] { 25, 35, 45, 30 } },
+            };
+
+            var comp = Context.Render<VekChart<double>>(p => p
+                .Add(x => x.ChartType, ChartType.StackedBar)
+                .Add(x => x.ChartSeries, stacked)
+                .Add(x => x.ChartLabels, new[] { "A", "B", "C", "D" })
+                .Add(x => x.ChartOptions, new StackedBarChartOptions())
+                .AddChildContent<Bar<double>>(cp => cp
+                    .Add(b => b.ChartSeries, overlayData)
+                    .Add(b => b.ChartOptions, new BarChartOptions())));
+
+            var overlay = comp.FindComponent<Bar<double>>();
+            overlay.Instance.IsOverlayChart.Should().BeTrue();
+
+            // Settle the renders so the overlay emits its bars before hovering.
+            overlay.Render();
+            comp.Render();
+
+            var bar = comp.Find("g.vek-charts-bar-series path.vek-chart-bar");
+
+            comp.FindComponents<ChartTooltip>().Should().BeEmpty(because: "nothing is hovered yet");
+
+            await bar.MouseOverAsync();
+            comp.FindComponents<ChartTooltip>().Should().NotBeEmpty(because: "hovering an overlay bar renders its tooltip");
+
+            await bar.MouseOutAsync();
+            comp.FindComponents<ChartTooltip>().Should().BeEmpty(because: "moving out clears the hovered bar and its tooltip");
+        }
+
+        [Test]
+        public void BarChart_TightMaxYAxisTicks_BoundsHorizontalLineCount()
+        {
+            // With YAxisTicks = 1 and a huge value range, the unbounded line count would be ~100000;
+            // the gridYUnits doubling safeguard must keep the rendered gridlines within MaxNumYAxisTicks.
+            var series = new List<ChartSeries<double>>
+            {
+                new() { Name = "S0", Data = new double[] { 1, 100000 } },
+            };
+
+            var comp = Context.Render<VekChart<double>>(p => p
+                .Add(x => x.ChartType, ChartType.Bar)
+                .Add(x => x.ChartSeries, series)
+                .Add(x => x.ChartLabels, new[] { "A", "B" })
+                .Add(x => x.ChartOptions, new BarChartOptions { YAxisTicks = 1, MaxNumYAxisTicks = 5 }));
+
+            var hLines = comp.FindAll("g.vek-charts-gridlines-yaxis path");
+            hLines.Count.Should().BeGreaterThan(0, because: "horizontal grid lines are still rendered");
+            hLines.Count.Should().BeLessThanOrEqualTo(5, because: "the doubling safeguard keeps the count within MaxNumYAxisTicks");
+
+            comp.FindAll("path.vek-chart-bar").Count.Should().Be(2, because: "both data points render as bars");
+        }
+
+        [Test]
+        public void BarChart_ShowValues_ShouldRenderValueLabels()
+        {
+            var chartSeries = new List<ChartSeries<double>>()
+            {
+                new () { Name = "Series 1", Data = new double[] { 10, 20 } },
+                new () { Name = "Series 2", Data = new double[] { 15, 25 } }
+            };
+            string[] xAxisLabels = { "A", "B" };
+
+            var comp = Context.Render<VekChart<double>>(parameters => parameters
+                .Add(p => p.ChartType, ChartType.Bar)
+                .Add(p => p.ChartSeries, chartSeries)
+                .Add(p => p.ChartLabels, xAxisLabels)
+                .Add(p => p.ChartOptions, new BarChartOptions { ShowValues = true }));
+
+            var labels = comp.FindAll("text.vek-chart-value-label");
+            labels.Should().HaveCount(4, because: "each bar renders its own value label");
+            labels.Select(l => l.TextContent).Should().ContainInOrder("10", "20", "15", "25");
+        }
+
+        [Test]
+        public void BarChart_ShowValues_Default_ShouldNotRenderValueLabels()
+        {
+            var chartSeries = new List<ChartSeries<double>>()
+            {
+                new () { Name = "Series 1", Data = new double[] { 10, 20 } }
+            };
+            string[] xAxisLabels = { "A", "B" };
+
+            var comp = Context.Render<VekChart<double>>(parameters => parameters
+                .Add(p => p.ChartType, ChartType.Bar)
+                .Add(p => p.ChartSeries, chartSeries)
+                .Add(p => p.ChartLabels, xAxisLabels));
+
+            comp.FindAll("text.vek-chart-value-label").Should().BeEmpty(because: "ShowValues defaults to false");
+        }
+
+        [Test]
+        public void BarChart_ShowValues_YAxisFormat_ShouldFormatValueLabels()
+        {
+            var chartSeries = new List<ChartSeries<double>>()
+            {
+                new () { Name = "Series 1", Data = new double[] { 1000, 2000 } }
+            };
+            string[] xAxisLabels = { "A", "B" };
+
+            var comp = Context.Render<VekChart<double>>(parameters => parameters
+                .Add(p => p.ChartType, ChartType.Bar)
+                .Add(p => p.ChartSeries, chartSeries)
+                .Add(p => p.ChartLabels, xAxisLabels)
+                .Add(p => p.ChartOptions, new BarChartOptions { ShowValues = true, YAxisFormat = "N0", YAxisTicks = 1000 }));
+
+            var labels = comp.FindAll("text.vek-chart-value-label");
+            labels.Should().HaveCount(2);
+            labels.Select(l => l.TextContent).Should().ContainInOrder(1000.ToString("N0"), 2000.ToString("N0"));
+        }
+    }
+}

@@ -1,0 +1,11 @@
+﻿<VekTreeView T="string">
+    <VekTreeViewItem Text="L1" Expanded="true">
+        <VekTreeViewItem Value="0" Text="L2" Expanded="true">
+            <VekTreeViewItem Value="1" Text="L3" Class="L3" />
+        </VekTreeViewItem>
+    </VekTreeViewItem>
+</VekTreeView>
+
+@code {
+    public static string __description__ = "Int items inside a string tree have no root, so L3 must not get the tree's ripple.";
+}

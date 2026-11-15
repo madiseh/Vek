@@ -1,0 +1,21 @@
+﻿<VekBreakpointProvider OnBreakpointChanged="@( (x) => BreakpointChangedHistory.Add(x))">
+    <VekHidden Breakpoint="@Breakpoint">
+        <VekText>VekHidden content 1</VekText>
+    </VekHidden>
+    <VekHidden Breakpoint="@Breakpoint">
+        <VekText>VekHidden content 2</VekText>
+    </VekHidden>
+    <VekHidden Breakpoint="@Breakpoint">
+        <VekText>VekHidden content 3</VekText>
+    </VekHidden>
+    <VekHidden Breakpoint="@Breakpoint">
+        <VekText>VekHidden content 4</VekText>
+    </VekHidden>
+</VekBreakpointProvider>
+
+@code {
+    [Parameter]
+    public Breakpoint Breakpoint { get; set; }
+
+    public List<Breakpoint> BreakpointChangedHistory { get; set; } = [];
+}

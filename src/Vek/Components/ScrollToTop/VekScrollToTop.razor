@@ -1,0 +1,10 @@
+﻿@namespace Vek
+@inherits VekComponentBase
+ 
+<span class="@Classname"
+      style="@Style"
+      @attributes="@UserAttributes"
+      @onclick="this.AsNonRenderingEventHandler<MouseEventArgs>(OnButtonClick)">
+    @ChildContent
+</span>
+ 

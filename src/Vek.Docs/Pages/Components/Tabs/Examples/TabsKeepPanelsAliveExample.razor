@@ -1,0 +1,45 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekTabs @key="@($"{_keepPanelsAlive}-{_lazyLoadPanels}")" Elevation="2" Rounded="true" ApplyEffectsToContainer="true" TabPanelsClass="pa-6" KeepPanelsAlive="@_keepPanelsAlive" LazyLoadPanels="@_lazyLoadPanels">
+    <VekTabPanel Text="Item One">
+        <TabsKeepAlivePanel ComponentName="Panel 1" FirstRender="@(() => _firstRenderCounts[0]++)" />
+    </VekTabPanel>
+    <VekTabPanel Text="Item Two">
+        <TabsKeepAlivePanel ComponentName="Panel 2" FirstRender="@(() => _firstRenderCounts[1]++)" />
+    </VekTabPanel>
+    <VekTabPanel Text="Item Three">
+        <TabsKeepAlivePanel ComponentName="Panel 3" FirstRender="@(() => _firstRenderCounts[2]++)" />
+    </VekTabPanel>
+</VekTabs>
+
+<VekText GutterBottom="true" Class="mt-4"><b>Number of first renders per panel:</b></VekText>
+<p>Panel 1: @_firstRenderCounts[0]</p>
+<p>Panel 2: @_firstRenderCounts[1]</p>
+<p>Panel 3: @_firstRenderCounts[2]</p>
+
+<VekSwitch T="bool" Value="@_keepPanelsAlive" ValueChanged="HandleKeepPanelsAliveChanged" Color="Color.Primary">Keep Panels Alive</VekSwitch>
+<VekSwitch T="bool" Value="@_lazyLoadPanels" ValueChanged="HandleLazyLoadPanelsChanged" Color="Color.Primary" Disabled="!_keepPanelsAlive">Lazy Load Panels</VekSwitch>
+
+
+@code {
+    private List<int> _firstRenderCounts = [0, 0, 0];
+
+    bool _keepPanelsAlive = false;
+    bool _lazyLoadPanels = false;
+
+    private void HandleKeepPanelsAliveChanged(bool value)
+    {
+        _keepPanelsAlive = value;
+        _firstRenderCounts = [0, 0, 0];
+        if (!_keepPanelsAlive)
+        {
+            _lazyLoadPanels = false;
+        }
+    }
+
+    private void HandleLazyLoadPanelsChanged(bool value)
+    {
+        _lazyLoadPanels = value;
+        _firstRenderCounts = [0, 0, 0];
+    }
+}

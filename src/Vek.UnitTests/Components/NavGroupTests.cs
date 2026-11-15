@@ -1,0 +1,120 @@
+﻿using AwesomeAssertions;
+using Bunit;
+using Vek.UnitTests.TestComponents.NavMenu;
+using NUnit.Framework;
+
+namespace Vek.UnitTests.Components
+{
+    [TestFixture]
+    public class NavGroupTests : BunitTest
+    {
+        /// <summary>
+        /// Checking the disable group button disables the group and it's children
+        /// Adding the vek-nav-group-disabled css tag to the group
+        /// </summary>
+        [Test]
+        public async Task Two_Way_Bindable_Disabled()
+        {
+            var comp = Context.Render<NavMenuGroupDisabledTest>();
+
+            comp.Markup.Should().NotContain("vek-nav-group-disabled");
+            comp.Markup.Should().NotContain("vek-expanded");
+
+            await comp.Find("input").ChangeAsync(true);
+
+            comp.Markup.Should().Contain("vek-nav-group-disabled");
+        }
+
+        /// <summary>
+        /// NavGroup should generate a nav tag with an aria-label.
+        /// </summary>
+        [Test]
+        public void NavGroup_Should_UseNavTag()
+        {
+            var expectedTitle = "navgroup-title";
+            var comp = Context.Render<VekNavGroup>(parameters =>
+                    parameters.Add(p => p.Title, expectedTitle));
+
+            comp.FindAll("nav").Should().Contain(navNode => navNode.GetAttribute("aria-label") == expectedTitle);
+        }
+
+        /// <summary>
+        /// NavGroup should expand and collapse via Expanded binding.
+        /// </summary>
+        [Test]
+        public async Task NavGroup_Should_Expand_Via_Expanded_Binding()
+        {
+            var comp = Context.Render<NavGroupWithExpandedBindingTest>();
+            GetExpandedState().Should().BeFalse();
+
+            await comp.Find("#navgroup-switch").ChangeAsync(true);
+
+            GetExpandedState().Should().BeTrue();
+
+            await comp.Find("#navgroup-switch").ChangeAsync(false);
+
+            GetExpandedState().Should().BeFalse();
+            return;
+
+            bool GetExpandedState() => comp.FindComponent<VekCollapse>().Instance.Expanded;
+        }
+
+        /// <summary>
+        /// The nav landmark takes its accessible name from Title, which a caller must be able to override.
+        /// </summary>
+        [Test]
+        public void NavGroup_Should_LetUserAttributesOverrideAriaLabel()
+        {
+            var comp = Context.Render<VekNavGroup>(parameters => parameters
+                .Add(p => p.Title, "Reports")
+                .Add(p => p.UserAttributes!, new Dictionary<string, object> { { "aria-label", "Quarterly reports" } }));
+
+            comp.Find("nav").GetAttribute("aria-label").Should().Be("Quarterly reports");
+        }
+
+        /// <summary>
+        /// Title still names the landmark when the caller does not supply an aria-label.
+        /// </summary>
+        [Test]
+        public void NavGroup_Should_UseTitleAsAriaLabel()
+        {
+            var comp = Context.Render<VekNavGroup>(parameters => parameters
+                .Add(p => p.Title, "Reports"));
+
+            comp.Find("nav").GetAttribute("aria-label").Should().Be("Reports");
+        }
+        /// <summary>
+        /// Keep the group named without creating an unnamed nested navigation landmark (#13980).
+        /// </summary>
+        [Test]
+        public void NavGroup_NestedMenu_DoesNotCreateUnnamedLandmark()
+        {
+            Context.AddFakeTimeProvider();
+            var comp = Context.Render<VekNavGroup>(parameters => parameters
+                .Add(p => p.Title, "Catalogue")
+                .Add(p => p.Expanded, true));
+
+            var group = comp.Find("nav.vek-nav-group");
+            group.GetAttribute("aria-label").Should().Be("Catalogue");
+
+            var submenu = comp.Find("nav.vek-navmenu");
+            submenu.GetAttribute("role").Should().Be("none");
+
+            var controls = comp.Find("nav.vek-nav-group > button").GetAttribute("aria-controls");
+            submenu.GetAttribute("id").Should().Be(controls);
+        }
+
+        /// <summary>
+        /// A top-level VekNavMenu must remain a native navigation landmark (#13980).
+        /// </summary>
+        [Test]
+        public void NavMenu_TopLevel_RemainsNavigationLandmark()
+        {
+            Context.AddFakeTimeProvider();
+            var comp = Context.Render<VekNavMenu>();
+
+            comp.Find("nav.vek-navmenu").HasAttribute("role").Should().BeFalse();
+        }
+    }
+}
+

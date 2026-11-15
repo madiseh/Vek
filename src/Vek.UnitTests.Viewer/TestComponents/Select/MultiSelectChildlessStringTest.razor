@@ -1,0 +1,15 @@
+<VekPopoverProvider />
+
+<VekSelect T="string" MultiSelection="true" @bind-SelectedValues="_selected">
+    @foreach (var item in _items)
+    {
+        <VekSelectItem T="string" Value="@item" />
+    }
+</VekSelect>
+
+@code {
+    public static string __description__ = "Multi-selection with childless string items should refresh checkbox state immediately without explicit item text.";
+
+    private IReadOnlyCollection<string> _selected = [];
+    private readonly string[] _items = ["Cardinale", "Diavolo", "Margarita", "Spinaci"];
+}

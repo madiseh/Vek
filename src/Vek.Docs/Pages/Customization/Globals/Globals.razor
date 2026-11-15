@@ -1,0 +1,56 @@
+﻿@page "/customization/globals"
+
+<DocsPage>
+    <DocsPageHeader Title="Globals" SubTitle="Static properties that let you control the default behavior of some parts of Vek.">
+        <Description>
+            <DocsPageSection>
+                <VekAlert Class="mt-4" Severity="Severity.Error">
+                    <b>EXPERIMENTAL:</b>
+                    This feature is under development and may not be ready for general use.
+                    Breaking changes <b>will occur</b> between releases.
+                    Use only if you are prepared to adapt your code and <VekLink Typo="Typo.inherit" Href="https://github.com/madiseh/vek/issues/new/choose">provide feedback</VekLink> or <VekLink Typo="Typo.inherit" Href="https://github.com/madiseh/vek/blob/dev/src/Vek/Services/VekGlobal.cs">contribute to its development</VekLink>.
+                </VekAlert>
+            </DocsPageSection>
+        </Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+        <DocsPageSection>
+            <SectionHeader Title="Usage">
+                <Description>
+                    You can find default setting overrides of some Vek features in the static <ApiTypeLink TypeName="VekGlobal" /> class.
+                    These defaults should be set when your application initializes, such as when adding Vek services.
+                    If they are set after the app has started, they may not take effect until the next page load, or may not take effect at all.
+
+                    <VekAlert Class="mt-4" Severity="Severity.Info">
+                        <b>Note:</b> The <CodeInline>VekGlobal</CodeInline> class is being phased out for visual and theming properties.
+                        <br /><br />
+                        Most styling should be done directly through <b>component parameters</b> (for one-off tweaks) or through the <b>theme system</b> and <b>CSS</b> (for app-wide customization).
+                        <br /><br />
+                        See the <VekLink Typo="Typo.inherit" Href="https://github.com/madiseh/vek/issues/12046">removal issue</VekLink>, or feel free to <VekLink Typo="Typo.inherit" Href="https://github.com/madiseh/vek/discussions">share feedback</VekLink> on migration or missing theme hooks.
+                    </VekAlert>
+                </Description>
+            </SectionHeader>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Exception Handler">
+                <Description>
+                    You can handle Vek component exceptions using <CodeInline>VekGlobal.UnhandledExceptionHandler</CodeInline>.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(GlobalExceptionHandlerExample)" />
+        </DocsPageSection>
+    </DocsPageContent>
+</DocsPage>
+
+@code
+{
+    private List<DocumentedType> TypesWithGlobals { get; set; }
+
+    protected override void OnInitialized()
+    {
+        // Find the types which have global settings
+        TypesWithGlobals = [.. ApiDocumentation.Types.Where(pair => pair.Value.GlobalSettings.Count > 0).Select(pair => pair.Value).OrderBy(type => type.NameFriendly)];
+        base.OnInitialized();
+    }
+}

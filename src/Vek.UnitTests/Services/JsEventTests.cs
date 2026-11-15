@@ -1,0 +1,146 @@
+﻿// Copyright (c) Vek 2021
+// Vek licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using AwesomeAssertions;
+using Microsoft.JSInterop;
+using Moq;
+using Vek.Services;
+using NUnit.Framework;
+
+namespace Vek.UnitTests.Services
+{
+    [TestFixture]
+    public class JsEventTests
+    {
+        [Test]
+        public async Task NoSubscriptionWithoutConnect()
+        {
+            var jsevent = new JsEvent(new Mock<IJSRuntime>().Object);
+            Assert.Throws<InvalidOperationException>(() => jsevent.Paste += x => Console.WriteLine(x));
+            Assert.Throws<InvalidOperationException>(() => jsevent.CaretPositionChanged += x => Console.WriteLine(x));
+            Assert.Throws<InvalidOperationException>(() => jsevent.Select += (x, y) => Console.WriteLine());
+            Assert.Throws<InvalidOperationException>(() => jsevent.Subscribe("copy"));
+            // unsubscribing before connection is ignored
+            await jsevent.Unsubscribe("copy");
+            await jsevent.Disconnect();
+            await jsevent.UnsubscribeAll();
+            await jsevent.DisposeAsync();
+        }
+
+        [Test]
+        public async Task EventSubscription()
+        {
+            var jsevent = new JsEvent(new Mock<IJSRuntime>().Object);
+            await jsevent.Connect("asdf", new JsEventOptions { });
+            // second connect is ignored
+            await jsevent.Connect("asdf", new JsEventOptions { });
+
+            // paste
+            var pasteCount = 0;
+            string pasteData = null;
+            var pasteHandler = new Action<string>(x => { pasteCount++; pasteData = x; });
+            jsevent.Paste += pasteHandler;
+            jsevent.OnPaste("Muad`Dib");
+            pasteData.Should().Be("Muad`Dib");
+            pasteCount.Should().Be(1);
+            jsevent._subscribedEvents.Should().Contain("paste");
+            jsevent.Paste -= pasteHandler;
+            // second remove is ignored
+            jsevent.Paste -= pasteHandler;
+            jsevent.OnPaste("Fremen");
+            pasteData.Should().Be("Muad`Dib");
+            pasteCount.Should().Be(1);
+            jsevent._subscribedEvents.Should().BeEmpty();
+
+            // caret position changed
+            var caretPositionChangedCount = 0;
+            int? caretPositionChangedData = null;
+            var caretPositionChangedHandler = new Action<int>(x => { caretPositionChangedCount++; caretPositionChangedData = x; });
+            jsevent.CaretPositionChanged += caretPositionChangedHandler;
+            jsevent.OnCaretPositionChanged(17);
+            caretPositionChangedData.Should().Be(17);
+            caretPositionChangedCount.Should().Be(1);
+            jsevent._subscribedEvents.Should().Contain("click");
+            jsevent._subscribedEvents.Should().Contain("keyup");
+            jsevent.CaretPositionChanged -= caretPositionChangedHandler;
+            // second remove is ignored
+            jsevent.CaretPositionChanged -= caretPositionChangedHandler;
+            jsevent.OnCaretPositionChanged(99);
+            caretPositionChangedData.Should().Be(17);
+            caretPositionChangedCount.Should().Be(1);
+            jsevent._subscribedEvents.Should().BeEmpty();
+
+            // null caret position is ignored
+            jsevent.CaretPositionChanged += caretPositionChangedHandler;
+            jsevent.OnCaretPositionChanged(null);
+            caretPositionChangedData.Should().Be(17);
+            caretPositionChangedCount.Should().Be(1);
+            jsevent.CaretPositionChanged -= caretPositionChangedHandler;
+
+            // select
+            var selectCount = 0;
+            (int, int)? selectData = null;
+            var selectHandler = new Action<int, int>((x, y) => { selectCount++; selectData = (x, y); });
+            jsevent.Select += selectHandler;
+            jsevent.OnSelect(77, 78);
+            selectData.Should().Be((77, 78));
+            selectCount.Should().Be(1);
+            jsevent._subscribedEvents.Should().Contain("select");
+            jsevent.Select -= selectHandler;
+            // second remove is ignored
+            jsevent.Select -= selectHandler;
+            jsevent.OnSelect(99, 100);
+            selectData.Should().Be((77, 78));
+            selectCount.Should().Be(1);
+            jsevent._subscribedEvents.Should().BeEmpty();
+
+            // dispose unsubscribes all
+            jsevent.Select += selectHandler;
+            jsevent.CaretPositionChanged += caretPositionChangedHandler;
+            jsevent.Paste += pasteHandler;
+            await jsevent.DisposeAsync(); ;
+            // second dispose is ignored
+            await jsevent.DisposeAsync();
+            jsevent._subscribedEvents.Should().BeEmpty();
+        }
+
+        [Test]
+        public async Task MultipleHandlers_FanOutAndShareSubscription()
+        {
+            var jsevent = new JsEvent(new Mock<IJSRuntime>().Object);
+            await jsevent.Connect("asdf", new JsEventOptions { });
+
+            var firstCount = 0;
+            var secondCount = 0;
+            var firstHandler = new Action<string>(_ => firstCount++);
+            var secondHandler = new Action<string>(_ => secondCount++);
+
+            // two handlers share a single underlying subscription
+            jsevent.Paste += firstHandler;
+            jsevent.Paste += secondHandler;
+            jsevent._subscribedEvents.Should().Contain("paste");
+
+            // a paste fans out to every handler
+            jsevent.OnPaste("spice");
+            firstCount.Should().Be(1);
+            secondCount.Should().Be(1);
+
+            // removing one handler keeps the subscription alive for the other
+            jsevent.Paste -= firstHandler;
+            jsevent._subscribedEvents.Should().Contain("paste");
+            jsevent.OnPaste("water");
+            firstCount.Should().Be(1);
+            secondCount.Should().Be(2);
+
+            // removing the last handler drops the subscription
+            jsevent.Paste -= secondHandler;
+            jsevent._subscribedEvents.Should().BeEmpty();
+            jsevent.OnPaste("sand");
+            firstCount.Should().Be(1);
+            secondCount.Should().Be(2);
+
+            await jsevent.DisposeAsync();
+        }
+    }
+}

@@ -1,0 +1,11 @@
+﻿@using Vek.Utilities
+<VekPopoverProvider />
+
+<VekColorPicker ColorPickerMode="ColorPickerMode.HEX" ColorPickerView="@ColorPickerView" ShowToolbar="true" Label="Basic Color Picker" Placeholder="Select Color" @bind-Value="@_colorValue" />
+
+@code {
+    private VekColor? _colorValue;
+
+    [Parameter]
+    public ColorPickerView ColorPickerView { get; set; } = ColorPickerView.Grid;
+}

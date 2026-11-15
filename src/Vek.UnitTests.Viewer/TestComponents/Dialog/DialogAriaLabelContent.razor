@@ -1,0 +1,15 @@
+﻿@attribute [ViewerHidden]
+
+<VekDialog AriaLabel="Spoken name">
+    <DialogContent>
+        <VekText>Named by AriaLabel instead of the title bar.</VekText>
+    </DialogContent>
+    <DialogActions>
+        <VekButton OnClick="@(() => VekDialog.Close())">Ok</VekButton>
+    </DialogActions>
+</VekDialog>
+
+@code {
+    [CascadingParameter]
+    private IVekDialogInstance VekDialog { get; set; } = null!;
+}

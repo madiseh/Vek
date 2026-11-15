@@ -1,0 +1,61 @@
+@namespace Vek.Docs.Examples
+
+<VekPaper Width="400px" Elevation="2">
+    <VekTreeView Items="@TreeItems" Hover="true">
+        <ItemTemplate Context="item">
+            <VekTreeViewItem Items="@item.Children" Icon="@item.Icon">
+                <BodyContent>
+                    <div style="display: grid; grid-template-columns: 1fr auto; align-items: center; width: 100%">
+                        <VekText Style="justify-self: start;">@item.Text</VekText>
+                        <div style="justify-self: end;">
+                            <VekIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Medium" Color="Color.Inherit" />
+                            <VekIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Medium" Color="Color.Inherit" />
+                        </div>
+                    </div>
+                </BodyContent>
+            </VekTreeViewItem>
+        </ItemTemplate>
+    </VekTreeView>
+</VekPaper>
+
+@code {
+
+    private List<TreeItemData<string>> TreeItems { get; set; } = [];
+
+    public class TreeItemData : TreeItemData<string>
+    {
+        public TreeItemData(string text, string icon) : base(text)
+        {
+            Text = text;
+            Icon = icon;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        TreeItems.Add(new TreeItemData(".github", Icons.Custom.Brands.GitHub));
+        TreeItems.Add(new TreeItemData(".vscode", Icons.Custom.Brands.MicrosoftVisualStudio));
+        TreeItems.Add(new TreeItemData("content", Icons.Custom.FileFormats.FileDocument));
+        TreeItems.Add(new TreeItemData("src", Icons.Custom.FileFormats.FileCode) {
+                Children = [
+                    new TreeItemData("Vek", Icons.Custom.Brands.Vek),
+                    new TreeItemData("Vek.Docs", Icons.Custom.FileFormats.FileDocument) {
+                        Children = [
+                            new TreeItemData("_Imports.razor", Icons.Material.Filled.AlternateEmail),
+                            new TreeItemData("compilerconfig.json", Icons.Custom.FileFormats.FileImage),
+                            new TreeItemData("Vek.Docs.csproj", Icons.Custom.Brands.MicrosoftVisualStudio),
+                            new TreeItemData("NewFilesToBuild.txt", Icons.Custom.FileFormats.FileDocument)
+                        ]
+                    },
+
+                    new TreeItemData("Vek.Docs.Client", Icons.Material.Filled.Folder),
+                    new TreeItemData("Vek.Docs.Compiler", Icons.Material.Filled.Folder),
+                    new TreeItemData("Vek.Docs.Server", Icons.Material.Filled.Folder),
+                    new TreeItemData("Vek.UnitTests", Icons.Material.Filled.Folder),
+                    new TreeItemData(".editorconfig", Icons.Custom.FileFormats.FileCode),
+                    new TreeItemData("Vek.sln", Icons.Custom.Brands.MicrosoftVisualStudio)
+                ]
+        });
+        TreeItems.Add(new TreeItemData("History", Icons.Material.Filled.Folder));
+    }
+}

@@ -1,0 +1,11 @@
+﻿@inherits VekForm
+
+@using Vek.Interfaces
+
+<CascadingValue Value="this" IsFixed="true">
+    @ChildContent
+</CascadingValue>
+
+@code {
+    public HashSet<IFormComponent> FormControls => _formControls;
+}

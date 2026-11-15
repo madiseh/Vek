@@ -1,0 +1,10 @@
+﻿<VekTable Items="_states" RowsPerPage="@_rows">
+    <RowTemplate>
+        <VekTd>@context</VekTd>
+    </RowTemplate> 
+    <PagerContent>
+        <VekTablePager />
+    </PagerContent>
+</VekTable>
+
+<VekButton Disabled="false" OnClick="@(() => ToggleRows())" Variant="Variant.Outlined">Toggle Rows</VekButton>

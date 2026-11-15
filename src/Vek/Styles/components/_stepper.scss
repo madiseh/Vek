@@ -1,0 +1,228 @@
+
+
+.vek-stepper {
+
+  .vek-stepper-nav {
+
+    .vek-step {
+      padding: 24px;
+      position: relative;
+      cursor: default;
+      pointer-events: none;
+      user-select: text;
+
+      &.vek-clickable {
+        cursor: pointer;
+        pointer-events: auto;
+        user-select: none;
+        transition: background-color 250ms cubic-bezier(.4,0,.2,1) 0ms,box-shadow 250ms cubic-bezier(.4,0,.2,1) 0ms,border 250ms cubic-bezier(.4,0,.2,1) 0ms;
+
+        @media(hover: hover) and (pointer: fine) {
+          &:hover {
+            background-color: var(--vek-palette-action-default-hover);
+          }
+        }
+
+        &:focus-visible, &:active {
+          background-color: var(--vek-palette-action-default-hover);
+        }
+      }
+
+      &:disabled {
+        .vek-step-label-icon {
+          background-color: var(--vek-palette-lines-default) !important;
+          color: var(--vek-palette-text-disabled) !important;
+        }
+
+        .vek-step-label-content {
+          color: var(--vek-palette-text-disabled) !important;
+        }
+      }
+
+      .vek-step-label {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        height: 100%;
+        gap: 8px;
+
+        .vek-step-label-icon {
+          display: flex;
+          flex-shrink: 0;
+          color: var(--vek-palette-white);
+          border-radius: 50%;
+          background-color: var(--vek-palette-text-disabled);
+          height: 24px;
+          width: 24px;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          letter-spacing: 0;
+          text-indent: 0;
+          white-space: nowrap;
+
+          .vek-typography {
+            line-height: 1;
+          }
+        }
+
+        .vek-step-label-content {
+          width: 100%;
+          color: var(--vek-palette-text-secondary);
+          --vek-ripple-color: var(--vek-palette-text-secondary);
+          text-align: start;
+        }
+
+        .vek-step-label-content-title {
+          line-height: var(--vek-typography-body2-lineheight)
+        }
+      }
+
+      &.active {
+        .vek-step-label-content {
+          color: var(--vek-palette-text-primary);
+          --vek-ripple-color: var(--vek-palette-text-primary);
+        }
+      }
+    }
+
+    &.vek-stepper-nav-scrollable {
+      overflow: auto;
+
+      .vek-step {
+        min-width: fit-content;
+      }
+
+      .vek-stepper-nav-connector {
+        min-width: 32px;
+      }
+    }
+  }
+
+  .vek-stepper-content {
+    padding: 0 24px;
+  }
+
+  .vek-stepper-nav-connector {
+    flex: 1 1 auto;
+
+    .vek-stepper-nav-connector-line {
+      display: block;
+      border-color: var(--vek-palette-lines-inputs);
+    }
+  }
+
+  &.vek-stepper__horizontal {
+
+    > .vek-stepper-nav {
+      display: flex;
+    }
+
+    &.vek-stepper__center-labels {
+
+      > .vek-stepper-nav > .vek-step {
+        flex-basis: 175px;
+      }
+
+      // Only allow steps to collapse (and titles to truncate) when the nav is
+      // not scrollable, so the scrollable nav keeps its `min-width: fit-content`
+      // and still scrolls wide enough to show full titles.
+      > .vek-stepper-nav:not(.vek-stepper-nav-scrollable) > .vek-step {
+        min-width: 0;
+      }
+
+      > .vek-stepper-nav > .vek-step > .vek-step-label {
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+
+        .vek-step-label-icon {
+          margin-inline-end: 0px !important;
+        }
+
+        .vek-step-label-content {
+          margin-top: 12px;
+          text-align: center;
+
+          .vek-step-label-content-title {
+            white-space: normal;
+            overflow-wrap: break-word;
+          }
+        }
+      }
+
+      > .vek-stepper-nav > .vek-stepper-nav-connector {
+        margin: 35px 0 0;
+        align-self: flex-start;
+      }
+    }
+
+    > .vek-stepper-nav > .vek-stepper-nav-connector {
+      align-self: center;
+      margin: 0 -16px;
+
+      .vek-stepper-nav-connector-line {
+        border-top-style: solid;
+        border-top-width: 1px;
+      }
+    }
+  }
+
+  &.vek-stepper__vertical {
+
+    > .vek-stepper-nav {
+      display: block;
+      padding: 8px 0px;
+    }
+
+    > .vek-stepper-nav > .vek-step {
+      padding: 0 16px;
+
+      .vek-step-label {
+        padding: 8px 0px;
+      }
+    }
+
+    > .vek-stepper-nav > .vek-stepper-nav-connector {
+      margin-inline-start: 28px;
+      margin-inline-end: 0;
+
+      .vek-stepper-nav-connector-line {
+        border-inline-start: 1px solid rgb(189, 189, 189);
+        border-top: none;
+        min-height: 24px;
+      }
+    }
+
+    > .vek-stepper-content {
+      margin-inline-start: 28px;
+      margin-inline-end: 0;
+      padding-inline-start: 20px;
+      padding-inline-end: 0;
+      border-inline-start: 1px solid var(--vek-palette-lines-inputs);
+    }
+  }
+}
+
+.vek-stepper-step-button {
+  display: inline-flex;
+  -moz-box-align: center;
+  align-items: center;
+  -moz-box-pack: center;
+  justify-content: center;
+  position: relative;
+  background-color: transparent;
+  outline: 0px;
+  border: 0px;
+  border-radius: 0px;
+  cursor: pointer;
+  user-select: none;
+  vertical-align: middle;
+  appearance: none;
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+  padding: 24px 16px;
+  margin: -24px -16px;
+  box-sizing: content-box;
+}

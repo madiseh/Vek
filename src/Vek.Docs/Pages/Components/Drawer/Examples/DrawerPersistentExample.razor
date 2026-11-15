@@ -1,0 +1,29 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekPaper Height="200px" Style="overflow:hidden; position:relative;">
+    <VekDrawerContainer Class="vek-height-full">
+        <VekDrawer @bind-Open="@_open" Elevation="0" Variant="@DrawerVariant.Persistent" Color="Color.Primary">
+            <VekDrawerHeader>
+                <VekText Typo="Typo.h6">My App</VekText>
+            </VekDrawerHeader>
+            <VekNavMenu>
+                <VekNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" IconColor="Color.Inherit">Dashboard</VekNavLink>
+                <VekNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.LocalLibrary" IconColor="Color.Inherit">Library</VekNavLink>
+                <VekNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.People" IconColor="Color.Inherit">Community</VekNavLink>
+            </VekNavMenu>
+        </VekDrawer>
+        <div class="d-flex justify-center align-center vek-height-full">
+            <VekButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@ToggleDrawer">Persistent drawer</VekButton>
+        </div>
+    </VekDrawerContainer>
+</VekPaper>
+
+@code
+{
+    private bool _open = false;
+
+    private void ToggleDrawer()
+    {
+        _open = !_open;
+    }
+}

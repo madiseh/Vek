@@ -1,0 +1,23 @@
+﻿<VekPopoverProvider />
+
+<VekMenu Label="Button">
+</VekMenu>
+
+<VekMenu Label="Icon Button" Icon="@Icons.Custom.Brands.Vek">
+</VekMenu>
+
+<VekMenu>
+    <ActivatorContent>
+        <VekButton OnClick="@context.ToggleAsync">Activator Content</VekButton>
+    </ActivatorContent>
+    <ChildContent>
+    </ChildContent>
+</VekMenu>
+
+<VekMenu Label="Open Nested Menu">
+    <VekMenuItem Label="Add reaction" />
+    <VekMenuItem Label="Add bookmark" />
+
+    <VekMenu Label="Format">
+    </VekMenu>
+</VekMenu>

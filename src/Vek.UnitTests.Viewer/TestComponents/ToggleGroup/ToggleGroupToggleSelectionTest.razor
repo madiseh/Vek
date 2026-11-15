@@ -1,0 +1,9 @@
+﻿<VekToggleGroup @bind-Value="_value" T="string" Color="Color.Primary" SelectionMode="SelectionMode.ToggleSelection">
+    <VekToggleItem T="string" Value="@("Item One")" Text="Item One" />
+    <VekToggleItem T="string" Value="@("Item Two")" Text="Item Two" />
+    <VekToggleItem T="string" Value="@("Item Three")" Text="Item Three" />
+</VekToggleGroup>
+
+@code {
+    private string? _value;
+}

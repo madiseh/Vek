@@ -1,0 +1,33 @@
+﻿@inject IDialogService DialogService
+
+<VekDialog>
+    <TitleContent>
+        Dialog Title
+    </TitleContent>
+    <DialogContent>
+        <VekButton id="show_messagebox_btn" @onclick="DoSomething" Variant="Variant.Filled" Color="Color.Primary">
+            Do Something
+        </VekButton>
+    </DialogContent>
+    <DialogActions>
+        <VekButton Color="Color.Primary" OnClick="Submit">OK</VekButton>
+    </DialogActions>
+</VekDialog>
+
+@code {
+
+    [CascadingParameter]
+    private IVekDialogInstance VekDialog { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var newOptions = VekDialog.Options with { CloseOnEscapeKey = true, CloseButton = true };
+        await VekDialog.SetOptionsAsync(newOptions);
+
+        await base.OnInitializedAsync();
+    }
+
+    private void Submit() => VekDialog.Close(DialogResult.Ok(true));
+
+    private Task DoSomething() => DialogService.ShowMessageBoxAsync("Warning", "Are you sure you wish to do something?", yesText: "Do it", cancelText: "Cancel");
+}

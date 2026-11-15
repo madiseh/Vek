@@ -1,0 +1,41 @@
+﻿@namespace Vek
+@using Vek.Resources
+@using Vek.Utilities
+@inherits VekComponentBase
+@inject InternalVekLocalizer Localizer
+
+@if (Items is null || Items.Count == 0)
+{
+    return;
+}
+
+@* Not fixed: separators have no parameters of their own, so the cascade is what tells them Separator or SeparatorTemplate changed. *@
+<CascadingValue Value="this">
+    <nav aria-label="@Localizer[LanguageResource.VekBreadcrumbs_Label]">
+        <ol @attributes="UserAttributes" class="@Classname" style="@Style">
+            @if (MaxItems != null && Collapsed && Items.Count > MaxItems)
+            {
+                <BreadcrumbLink Item="Items[0]"></BreadcrumbLink>
+                <BreadcrumbSeparator></BreadcrumbSeparator>
+                <li class="vek-breadcrumbs-expander" @onclick="Expand">
+                    <VekIcon Icon="@ExpanderIcon" Size="Size.Small"></VekIcon>
+                </li>
+                <BreadcrumbSeparator></BreadcrumbSeparator>
+                <BreadcrumbLink Item="Items[^1]"></BreadcrumbLink>
+            }
+            else
+            {
+                @for (var i = 0; i < Items.Count; i++)
+                {
+                    var item = Items[i];
+                    <BreadcrumbLink Item="item"></BreadcrumbLink>
+
+                    if (i != Items.Count - 1)
+                    {
+                        <BreadcrumbSeparator></BreadcrumbSeparator>
+                    }
+                }
+            }
+        </ol>
+    </nav>
+</CascadingValue>

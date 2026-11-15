@@ -1,0 +1,106 @@
+﻿// Copyright (c) Vek 2021
+// Vek licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using Microsoft.AspNetCore.Components;
+using Vek.Utilities;
+
+namespace Vek;
+
+
+/// <summary>
+/// A thin line that groups content in lists and layouts. Only use dividers if items can't be grouped with open space. Use dividers to group things, not separate individual items.
+/// </summary>
+public partial class VekDivider : VekComponentBase
+{
+    private bool HasContent => ChildContent is not null;
+
+    /// <summary>
+    /// A vertical divider of type <see cref="DividerType.FullWidth"/> must not get the "fullwidth" class, since it would force <c>width: 100%</c> on an element that is meant to be a thin vertical line.
+    /// </summary>
+    private bool ApplyDividerType => DividerType != DividerType.FullWidth || !Vertical;
+
+    /// <summary>
+    /// Return the scss class corresponding to <see cref="DividerType"/>.
+    /// </summary>
+    private string DividerTypeClass => $"vek-divider-{DividerType.ToStringFast(true)}";
+
+    protected string Classname =>
+        new CssBuilder("vek-divider")
+            .AddClass("vek-divider-light", Light)
+            .AddClass("vek-divider-vertical", Vertical)
+            .AddClass("vek-divider-with-content-line", HasContent)
+            .AddClass("vek-divider-absolute", Absolute && !HasContent)
+            .AddClass("vek-divider-flexitem", FlexItem && !HasContent)
+            .AddClass(DividerTypeClass, !HasContent && ApplyDividerType)
+            .AddClass(Class, !HasContent)
+            .Build();
+
+    protected string? WrapperClassname => HasContent ?
+        new CssBuilder("vek-divider-with-content")
+            .AddClass("vek-divider-with-content-vertical", Vertical)
+            .AddClass("vek-divider-absolute", Absolute)
+            .AddClass("vek-divider-flexitem", FlexItem)
+            .AddClass(DividerTypeClass, ApplyDividerType)
+            .AddClass(Class)
+            .Build() : null;
+
+    private readonly string _labelId = Identifier.Create("divider-label");
+
+    /// <summary>
+    /// Uses an absolute position for this divider.
+    /// </summary>
+    /// <remarks>
+    /// Defaults to <c>false</c>.
+    /// </remarks>
+    [Parameter]
+    [Category(CategoryTypes.Divider.Appearance)]
+    public bool Absolute { get; set; }
+
+    /// <summary>
+    /// For vertical dividers, uses the correct height within a flex container.
+    /// </summary>
+    /// <remarks>
+    /// Defaults to <c>false</c>.
+    /// </remarks>
+    [Parameter]
+    [Category(CategoryTypes.Divider.Appearance)]
+    public bool FlexItem { get; set; }
+
+    /// <summary>
+    /// Uses a lighter color.
+    /// </summary>
+    /// <remarks>
+    /// Defaults to <c>false</c>.
+    /// </remarks>
+    [Parameter]
+    [Category(CategoryTypes.Divider.Appearance)]
+    public bool Light { get; set; }
+
+    /// <summary>
+    /// Displays the divider vertically.
+    /// </summary>
+    /// <remarks>
+    /// Defaults to <c>false</c>.
+    /// </remarks>
+    [Parameter]
+    [Category(CategoryTypes.Divider.Appearance)]
+    public bool Vertical { get; set; }
+
+    /// <summary>
+    /// The type of divider to display.
+    /// </summary>
+    /// <remarks>
+    /// Defaults to <see cref="DividerType.FullWidth"/>.
+    /// </remarks>
+    [Parameter]
+    [Category(CategoryTypes.Divider.Appearance)]
+    public DividerType DividerType { get; set; } = DividerType.FullWidth;
+
+    /// <summary>
+    /// The content within this component.
+    /// </summary>
+    [Parameter]
+    [Category(CategoryTypes.Divider.Behavior)]
+    public RenderFragment? ChildContent { get; set; }
+}

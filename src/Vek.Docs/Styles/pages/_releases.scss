@@ -1,0 +1,157 @@
+.docs-github-releases {
+  .vek-grid-item-md-4:first-child + .vek-grid-item-md-8 {
+    h5:first-child {
+      border-top: none !important;
+    }
+  }
+
+  .docs-github-release-body {
+    padding-bottom: 24px;
+
+    &.old-releases {
+      font-size: var(--vek-typography-body1-size);
+      font-weight: var(--vek-typography-body1-weight);
+
+      h6 {
+        margin-top: 24px;
+      }
+    }
+
+    &:not(.old-releases) {
+      h6 {
+        margin-top: 24px;
+      }
+
+      p {
+        margin: 0 0 16px;
+        font-size: var(--vek-typography-body1-size);
+      }
+
+      .release-full-changelog {
+        padding: 12px 16px;
+        border: 1px solid var(--vek-palette-lines-default);
+        border-radius: var(--vek-default-borderradius);
+        background-color: var(--vek-palette-background-grey);
+      }
+
+      :not(pre) > code {
+        display: inline-block;
+        padding: 0 5px;
+        direction: ltr;
+        font-size: 0.85em;
+        font-weight: 900;
+        font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        line-height: 1.4;
+        border-radius: 2px;
+        color: var(--vek-palette-primary);
+        background-color: var(--vek-palette-primary-hover);
+      }
+
+      pre {
+        margin: 12px 0 20px;
+        padding: 16px;
+        overflow: auto;
+        border: 1px solid var(--vek-palette-lines-default);
+        border-radius: var(--vek-default-borderradius);
+        background-color: var(--vek-palette-background-grey);
+      }
+
+      pre code {
+        padding: 0;
+        border: none;
+        background-color: transparent;
+        color: var(--vek-palette-text-primary);
+        font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+
+      .markdown-alert,
+      .alert,
+      blockquote.alert {
+        margin: 0 0 16px;
+        padding: 12px 16px;
+        border: 1px solid var(--vek-palette-lines-default);
+        border-left-width: 4px;
+        border-radius: var(--vek-default-borderradius);
+        background-color: var(--vek-palette-background-grey);
+      }
+
+      .markdown-alert p,
+      .alert p,
+      blockquote.alert p {
+        margin: 0;
+      }
+
+      .markdown-alert-title,
+      .alert-title,
+      blockquote.alert > p:first-child {
+        font-weight: var(--vek-typography-subtitle2-weight);
+        margin-bottom: 6px;
+      }
+
+      .markdown-alert-note,
+      .alert-note,
+      blockquote.alert.alert-note {
+        border-left-color: var(--vek-palette-info);
+      }
+
+      .markdown-alert-tip,
+      .alert-tip,
+      blockquote.alert.alert-tip {
+        border-left-color: var(--vek-palette-success);
+      }
+
+      .markdown-alert-important,
+      .alert-important,
+      blockquote.alert.alert-important {
+        border-left-color: var(--vek-palette-primary);
+      }
+
+      .markdown-alert-warning,
+      .alert-warning,
+      blockquote.alert.alert-warning {
+        border-left-color: var(--vek-palette-warning);
+      }
+
+      .markdown-alert-caution,
+      .alert-caution,
+      blockquote.alert.alert-caution {
+        border-left-color: var(--vek-palette-error);
+      }
+    }
+
+    h5 {
+      &:first-child {
+        padding: 12px 0;
+        margin-bottom: 24px;
+        border-top: var(--vek-palette-lines-default) 1px solid;
+        border-bottom: var(--vek-palette-lines-default) 1px solid;
+        font-size: var(--vek-typography-h5-size);
+        font-weight: var(--vek-typography-h5-weight);
+      }
+    }
+
+    ul {
+      list-style: disc;
+      font-size: var(--vek-typography-body1-size);
+
+      li {
+        margin-bottom: 6px;
+      }
+
+      li:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .github-user {
+      font-weight: 700;
+      color: var(--vek-palette-text-primary);
+    }
+
+    a {
+      overflow-wrap: anywhere;
+    }
+  }
+}

@@ -1,0 +1,8 @@
+﻿@namespace Vek
+@inherits VekComponentBase
+
+<div @attributes="UserAttributes" class="@Classname" style="@Style">
+    <CascadingValue Name="RightToLeft" Value="@RightToLeft">
+        @ChildContent
+    </CascadingValue>
+</div>

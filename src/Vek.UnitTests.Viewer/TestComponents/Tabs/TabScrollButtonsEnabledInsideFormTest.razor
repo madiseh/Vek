@@ -1,0 +1,34 @@
+﻿
+<VekContainer MaxWidth="MaxWidth.ExtraSmall">
+    <VekButton OnClick="@ToggleForm" Variant="Variant.Filled" Color="Color.Primary">Toggle Form Enable/Disable</VekButton>
+    <VekForm Disabled="@FormDisabled">
+        <VekTabs ActivePanelIndex="9" AlwaysShowScrollButtons="true">
+            <VekTabPanel Text="Tab One">
+                <VekTextField T="string" Label="Username" Required="true" RequiredError="User name is required!" />
+            </VekTabPanel>
+            <VekTabPanel Text="Tab Two">
+                <VekButton Variant="Variant.Filled" Color="Color.Primary">Does nothing</VekButton>
+            </VekTabPanel>
+            <VekTabPanel Text="Three" />
+            <VekTabPanel Text="Four" />
+            <VekTabPanel Text="Five" />
+            <VekTabPanel Text="Six" />
+            <VekTabPanel Text="Seven" />
+            <VekTabPanel Text="Eight" />
+            <VekTabPanel Text="Nine" />
+            <VekTabPanel Text="Ten" />
+            <VekTabPanel Text="Eleven" />
+            <VekTabPanel Text="Thirteen" />
+        </VekTabs>
+    </VekForm>
+</VekContainer>
+
+@code {
+    public static string __description__ = "Tab scroll buttons should remain interactive even when the containing form is disabled.";
+    public bool FormDisabled { get; set; }
+
+    void ToggleForm()
+    {
+        FormDisabled = !FormDisabled;
+    }
+}

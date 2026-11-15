@@ -1,0 +1,13 @@
+<VekDropContainer T="string" Items="_items" ItemsSelector="@((item, zone) => true)">
+    <ChildContent>
+        <VekDropZone T="string" Identifier="Zone" OnlyZone="true">
+            <VekDynamicDropItem T="string" id="custom-item" Item="@("Item A")" Index="0" ZoneIdentifier="Zone">
+                <div class="dyn-item">Item A</div>
+            </VekDynamicDropItem>
+        </VekDropZone>
+    </ChildContent>
+</VekDropContainer>
+
+@code {
+    private readonly IEnumerable<string> _items = ["Item A"];
+}

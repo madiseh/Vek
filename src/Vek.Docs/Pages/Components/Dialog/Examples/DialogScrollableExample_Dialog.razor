@@ -1,0 +1,40 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekDialog Style="height: 400px">
+    <DialogContent>
+        @if (_loading)
+        {
+            <VekProgressCircular Indeterminate="true"></VekProgressCircular>
+        }
+        else
+        {
+            <VekText Style="white-space: pre-wrap;">@_licenseText</VekText>
+        }
+    </DialogContent>
+    <DialogActions>
+        <VekButton Color="Color.Primary" OnClick="Ok">Accept</VekButton>
+    </DialogActions>
+</VekDialog>
+
+
+@code {
+    private string _licenseText;
+    private bool _loading;
+
+    [CascadingParameter]
+    private IVekDialogInstance VekDialog { get; set; }
+
+    [Inject]
+    private HttpClient HttpClient { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        _loading = true;
+        var response = await HttpClient.GetAsync("https://raw.githubusercontent.com/Vek/Vek/master/LICENSE");
+        _licenseText = await response.Content.ReadAsStringAsync();
+        _loading = false;
+    }
+
+    private void Ok() => VekDialog.Close(DialogResult.Ok(true));
+}

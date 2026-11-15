@@ -1,0 +1,16 @@
+@if (FormatFirst)
+{
+    <VekDateRangePicker DateFormat="yyyy MMMM dd" DateRange="@(DateRange)"/>
+}
+else
+{
+    <VekDateRangePicker DateRange="@(DateRange)" DateFormat="yyyy MMMM dd"/>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public required DateRange DateRange { get; set; }
+
+    [Parameter]
+    public bool FormatFirst { get; set; }
+}

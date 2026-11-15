@@ -1,0 +1,51 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekDropContainer T="FileItem" ItemDisabled="@(item => item.IsLocked)" Items="_items"
+                  ItemsSelector="@((item, dropzone) => item.TransferSlot == dropzone)" ItemDropped="ItemUpdated" Class="d-flex flex-wrap">
+    <ChildContent>
+        <VekPaper Class="ma-4" Height="400px" Width="300px">
+            <VekList T="string" Class="vek-height-full">
+                <VekDropZone T="FileItem" Identifier="Company" Class="vek-height-full">
+                    <VekListSubheader>Company Files</VekListSubheader>
+                </VekDropZone>
+            </VekList>
+        </VekPaper>
+        <VekPaper Class="ma-4" Height="400px" Width="300px">
+            <VekList T="string" Class="vek-height-full">
+                <VekDropZone T="FileItem" Identifier="External" Class="vek-height-full">
+                    <VekListSubheader>External USB</VekListSubheader>
+                </VekDropZone>
+            </VekList>
+        </VekPaper>
+    </ChildContent>
+    <ItemRenderer>
+        <VekListItem T="string" Disabled="@(context.IsLocked ? true : false)" Icon="@Icons.Custom.FileFormats.FileDocument">
+            @context.Name
+        </VekListItem>
+    </ItemRenderer>
+</VekDropContainer>
+
+@code {
+
+    private void ItemUpdated(VekItemDropInfo<FileItem> dropItem)
+    {
+        dropItem.Item.TransferSlot = dropItem.DropzoneIdentifier;
+    }
+
+    private List<FileItem> _items = new()
+            {
+            new FileItem() { Name = "File1.txt", IsLocked = false, TransferSlot = "Company" },
+            new FileItem() { Name = "File2.txt", IsLocked = false, TransferSlot = "External" },
+            new FileItem() { Name = "File3.txt", IsLocked = true, TransferSlot = "Company" },
+            new FileItem() { Name = "File4.txt", IsLocked = true, TransferSlot = "Company" },
+            new FileItem() { Name = "File5.txt", IsLocked = false, TransferSlot = "External" },
+            new FileItem() { Name = "File6.txt", IsLocked = true, TransferSlot = "Company" },
+        };
+
+    public class FileItem
+    {
+        public string Name { get; init; }
+        public bool IsLocked { get; set; }
+        public string TransferSlot { get; set; }
+    }
+}

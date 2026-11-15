@@ -1,0 +1,10 @@
+﻿<VekTable T="int" @ref="Table" Items="_items" RowsPerPage="100">
+    <RowTemplate>
+        <VekTd>@context</VekTd>
+    </RowTemplate>
+    <PagerContent>
+        <VekTablePager />
+    </PagerContent>
+</VekTable>
+
+<VekButton OnClick="Rerender" Variant="Variant.Outlined">Rerender</VekButton>

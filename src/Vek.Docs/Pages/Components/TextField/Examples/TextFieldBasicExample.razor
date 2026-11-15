@@ -1,0 +1,9 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekTextField @bind-Value="TextValue" Label="Standard" Variant="Variant.Text"></VekTextField>
+<VekTextField @bind-Value="TextValue" Label="Filled" Variant="Variant.Filled"></VekTextField>
+<VekTextField @bind-Value="TextValue" Label="Outlined" Variant="Variant.Outlined"></VekTextField>
+
+@code {
+    public string TextValue { get; set; }
+}

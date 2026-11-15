@@ -1,0 +1,44 @@
+﻿<VekPaper Width="300px">
+    <VekList T="string" Dense>
+        @for (int i = 0; i < 20; i++)
+        {
+            <VekListItem Text=@($"Item {i}") OnClick="ListItem_Clicked" />
+        }
+    </VekList>
+</VekPaper>
+
+<VekMenu @ref="_contextMenu"
+         AnchorOrigin="@Origin.BottomLeft"
+         Dense
+         TransformOrigin="@Origin.BottomLeft"
+         PopoverClass="menu-popover"
+         OverflowBehavior="OverflowBehavior.FlipAlways"
+         PositionAtCursor>
+    <VekMenuItem Label="Enlist" />
+    <VekMenuItem Label="Barracks" />
+    <VekMenuItem Label="Armory" />
+    <VekMenuItem Label="Enlist" />
+    <VekMenuItem Label="Barracks" />
+    <VekMenuItem Label="Armory" />
+    <VekMenuItem Label="Enlist" />
+    <VekMenuItem Label="Barracks" />
+    <VekMenuItem Label="Armory" />
+    <VekMenuItem Label="Enlist" />
+    <VekMenuItem Label="Barracks" />
+    <VekMenuItem Label="Armory" />
+    <VekMenuItem Label="Enlist" />
+    <VekMenuItem Label="Barracks" />
+    <VekMenuItem Label="Armory" />
+</VekMenu>
+
+@code {
+    private VekMenu _contextMenu = null!;
+
+    private async Task ListItem_Clicked(MouseEventArgs e)
+    {
+        if (_contextMenu != null)
+        {
+            await _contextMenu.OpenMenuAsync(e);
+        }
+    }
+}

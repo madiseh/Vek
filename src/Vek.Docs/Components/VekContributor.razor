@@ -1,0 +1,32 @@
+﻿<VekCard>
+    <VekCardHeader>
+        <CardHeaderAvatar>
+            <VekAvatar Size="Size.Large" Class="vek-elevation-4">
+                <VekImage Src="@AvatarLink" />
+            </VekAvatar>
+        </CardHeaderAvatar>
+
+        <CardHeaderContent>
+            <VekText Typo="Typo.body1">@Firstname @Lastname</VekText>
+        </CardHeaderContent>
+
+        <CardHeaderActions>
+            <VekIconButton Icon="@Icons.Custom.Brands.GitHub" Href="@GitHubLink" Color="Color.Inherit" Target="_blank" />
+        </CardHeaderActions>
+    </VekCardHeader>
+
+    @if (ChildContent != null)
+    {
+        <VekCardContent Class="pt-0">
+            @ChildContent
+        </VekCardContent>
+    }
+</VekCard>
+
+@code {
+    [Parameter] public string AvatarLink { get; set; }
+    [Parameter] public string GitHubLink { get; set; }
+    [Parameter] public string Firstname { get; set; }
+    [Parameter] public string Lastname { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+}

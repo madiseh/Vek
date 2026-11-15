@@ -1,0 +1,13 @@
+﻿@namespace Vek
+@inherits VekComponentBase
+
+<nav id="@NavigationContext?.MenuId"
+     @attributes="UserAttributes"
+     class="@Classname"
+     style="@Style">
+    <CascadingValue Value="@this" IsFixed="true">
+        <CascadingValue Value="@NavigationContext">
+            @ChildContent
+        </CascadingValue>
+    </CascadingValue>
+</nav>

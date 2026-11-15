@@ -1,0 +1,46 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekRTLProvider RightToLeft="@_rightToLeft">
+    <VekCard Class="mb-2" Style="width: 400px">
+        <VekCardHeader>
+            <CardHeaderAvatar>
+                <VekAvatar Color="Color.Secondary">@Localizer("CardAvatarLetter")</VekAvatar>
+            </CardHeaderAvatar>
+            <CardHeaderContent>
+                <VekText Typo="Typo.body1">@Localizer("CardHeader")</VekText>
+                <VekText Typo="Typo.body2">@Localizer("CardSubHeader")</VekText>
+            </CardHeaderContent>
+            <CardHeaderActions>
+                <VekIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
+            </CardHeaderActions>
+        </VekCardHeader>
+        <VekCardMedia Image="_content/Vek.Docs/images/pilars.jpg" Height="250" />
+        <VekCardContent>
+            <VekText Typo="Typo.body2">@Localizer("CardDescription")</VekText>
+        </VekCardContent>
+        <VekCardActions>
+            <VekIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" />
+            <VekIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Default" />
+        </VekCardActions>
+    </VekCard>
+</VekRTLProvider>
+<VekSwitch @bind-Value="_rightToLeft" Label="Toggle Right to Left" Color="Color.Primary"/>
+
+@code {
+    private bool _rightToLeft = true;
+
+    //This translation is for demonstration purposes only. In a real application, you should use a IStringLocalizer etc.
+    private string Localizer(string key)
+    {
+        //This is just a google translation. If you have a better translation, feel free to share it with us  :)
+        if (key.Equals("CardAvatarLetter"))
+            return _rightToLeft ? "ا" : "I";
+        else if (key.Equals("CardHeader"))
+            return _rightToLeft ? "استريا كرواتيا" : "Istra Croatia";
+        else if (key.Equals("CardSubHeader"))
+            return _rightToLeft ? "شبه الجزيرة في أوروبا" : "Peninsula in Europe";
+        else if (key.Equals("CardDescription"))
+            return _rightToLeft ? "التقطت هذه الصورة في قرية صغيرة في استرا كرواتيا" : "This photo was taken in a small village in Istra Croatia.";
+        return "";
+    }
+}

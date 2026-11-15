@@ -1,0 +1,15 @@
+﻿<VekPopoverProvider />
+
+<VekSelect id="selectLabelTest" @bind-Value="_value" Label="RequiredTest" Required="true">
+    <VekSelectItem Value="@(string.Empty)" />
+    <VekSelectItem Value="@("1")" />
+    <VekSelectItem Value="@("2")" />
+    <VekSelectItem Value="@("3")" />
+</VekSelect>
+
+@code
+{
+    public static string __description__ = "The Select should not show required-error initially. The first (empty) item should.";
+
+    private string? _value;
+}

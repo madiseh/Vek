@@ -1,0 +1,13 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekCheckBox @bind-Value="Basic_CheckBox1" UncheckedColor="Color.Error"></VekCheckBox>
+<VekCheckBox @bind-Value="Basic_CheckBox2" Color="Color.Primary" UncheckedColor="Color.Default"></VekCheckBox>
+<VekCheckBox @bind-Value="Basic_CheckBox3" Color="Color.Secondary" UncheckedColor="Color.Default"></VekCheckBox>
+<VekCheckBox @bind-Value="Basic_CheckBox4" Disabled="true" UncheckedColor="Color.Success"></VekCheckBox>
+
+@code {
+    public bool Basic_CheckBox1 { get; set; } = true;
+    public bool Basic_CheckBox2 { get; set; } = false;
+    public bool Basic_CheckBox3 { get; set; } = false;
+    public bool Basic_CheckBox4 { get; set; } = true;
+}

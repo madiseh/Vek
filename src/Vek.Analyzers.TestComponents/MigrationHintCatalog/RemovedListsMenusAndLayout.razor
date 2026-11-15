@@ -1,0 +1,37 @@
+﻿@*each removed parameter appears once, on the component a consumer writes*@
+
+@*chips and lists*@
+<VekChipSet T="string" Filter="true">
+    <VekChip T="string" Link="/chip" DisableRipple="false" />
+</VekChipSet>
+<VekList T="string" DisablePadding="true" Clickable="@_flag" DisableGutters="true">
+    <VekListSubheader DisableGutters="true">Header</VekListSubheader>
+    <VekListItem T="string" DisableRipple="true" DisableGutters="false" AdornmentColor="Color.Primary" OnClickHandlerPreventDefault="true" InitiallyExpanded="true" />
+</VekList>
+
+@*menus*@
+<VekMenu DisableRipple="true" DisableElevation="@_flag" IsOpenChanged="@((bool open) => _flag = open)" PositionAtCurser="true">
+    <VekMenuItem Link="/menu-item">Item</VekMenuItem>
+</VekMenu>
+
+@*alerts, dialogs, tooltips, and visibility*@
+<VekAlert AlertTextPosition="AlertTextPosition.Center">Alert</VekAlert>
+<VekDialog IsVisible="@_flag" IsVisibleChanged="@((bool visible) => _flag = visible)" DisableSidePadding="true" ClassActions="actions" ClassContent="content" />
+<VekMessageBox IsVisible="@_flag" IsVisibleChanged="@((bool visible) => _flag = visible)" />
+<VekTooltip Text="Tooltip" IsVisible="@_flag" IsVisibleChanged="@((bool visible) => _flag = visible)" Delayed="0.5" />
+<VekHidden Breakpoint="Breakpoint.Sm" IsHidden="@_flag" IsHiddenChanged="@((bool hidden) => _flag = hidden)" />
+
+@*layout*@
+<VekExpansionPanels DisableBorders="true" DisableGutters="true">
+    <VekExpansionPanel Text="Panel" IsExpanded="@_flag" IsExpandedChanged="@((bool expanded) => _flag = expanded)" DisableGutters="true" IsInitiallyExpanded="true" />
+</VekExpansionPanels>
+<VekAppBar DisableGutters="true" />
+<VekToolBar DisableGutters="true" />
+<VekDrawer DisableOverlay="true" />
+
+@code
+{
+    public static string __description__ = "Removed list, menu, dialog, and layout parameters that VEK0002 explains";
+
+    private bool _flag = true;
+}

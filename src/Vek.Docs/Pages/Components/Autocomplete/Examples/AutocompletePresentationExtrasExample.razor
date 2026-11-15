@@ -1,0 +1,61 @@
+﻿@using System.Net.Http.Json
+@using Vek.Examples.Data.Models
+@using System.Threading
+@namespace Vek.Docs.Examples
+@inject HttpClient httpClient
+
+<VekGrid>
+    <VekItem xs="12" sm="6" md="4">
+        <VekAutocomplete T="Element" Label="Periodic Table Element" @bind-Value="value1"
+                         SearchFunc="@Search" ToStringFunc="@(e=> e==null?null : $"{e.Name} ({e.Sign})")">
+            <MoreItemsTemplate>
+                <VekText Align="Align.Center" Class="px-4 py-1">
+                    Only the first 10 items are shown
+                </VekText>
+            </MoreItemsTemplate>
+        </VekAutocomplete>
+    </VekItem>
+    <VekItem xs="12" sm="6" md="4">
+        <VekAutocomplete T="Element" Label="Periodic Table Element" @bind-Value="value2"
+                         SearchFunc="@SearchEmpty" ToStringFunc="@(e=> e==null?null : $"{e.Name} ({e.Sign})")">
+            <NoItemsTemplate>
+                <VekText Align="Align.Center" Class="px-4 py-1">
+                    No items found
+                </VekText>
+            </NoItemsTemplate>
+        </VekAutocomplete>
+    </VekItem>
+    <VekItem xs="12" sm="6" md="4">
+        <VekAutocomplete T="Element" Label="Periodic Table Element" @bind-Value="value3"
+                         SearchFunc="@Search" ToStringFunc="@(e=> e==null?null : $"{e.Name} ({e.Sign})")">
+            <BeforeItemsTemplate>
+                <VekText Color="Color.Primary" Class="px-4 py-1">Always Shows Before List</VekText>
+            </BeforeItemsTemplate>
+        </VekAutocomplete>
+    </VekItem>
+    <VekItem xs="12" sm="6" md="4">
+        <VekAutocomplete T="Element" Label="Periodic Table Element" @bind-Value="value4"
+                         SearchFunc="@Search" ToStringFunc="@(e=> e==null?null : $"{e.Name} ({e.Sign})")">
+            <AfterItemsTemplate>
+                <div class="pa-2">
+                    <VekButton Color="Color.Primary">Add item (does nothing)</VekButton>
+                </div>
+            </AfterItemsTemplate>
+        </VekAutocomplete>
+    </VekItem>
+</VekGrid>
+
+@code {
+    private Element value1, value2, value3, value4;
+
+    private async Task<IEnumerable<Element>> Search(string value, CancellationToken token)
+    {
+        return await httpClient.GetFromJsonAsync<List<Element>>($"webapi/periodictable/{value}", token);
+    }
+
+    private async Task<IEnumerable<Element>> SearchEmpty(string value, CancellationToken token)
+    {
+        await Task.Delay(5, token);
+        return Array.Empty<Element>();
+    }
+}

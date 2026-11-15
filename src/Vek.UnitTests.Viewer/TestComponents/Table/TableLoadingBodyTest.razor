@@ -1,0 +1,85 @@
+﻿<VekTable Items="@_elements" Hover="true" Breakpoint="Breakpoint.Sm"
+          Loading="@_isLoading" Filter="new Func<Element, bool>(FilterFunc)" Striped>
+    <ToolBarContent>
+        <VekTextField id="searchString" @bind-Value="_searchString" Placeholder="Search" Immediate="true"></VekTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <VekTh>Nr</VekTh>
+        <VekTh>Sign</VekTh>
+        <VekTh>Name</VekTh>
+        <VekTh>Position</VekTh>
+        <VekTh>Molar mass</VekTh>
+    </HeaderContent>
+    <RowTemplate>
+        <VekTd DataLabel="Nr">@context.Number</VekTd>
+        <VekTd DataLabel="Sign">@context.Sign</VekTd>
+        <VekTd DataLabel="Name">@context.Name</VekTd>
+        <VekTd DataLabel="Position">@context.Position</VekTd>
+        <VekTd DataLabel="Molar mass">@context.Molar</VekTd>
+    </RowTemplate>
+    <NoRecordsContent>No matching records found</NoRecordsContent>
+    <LoadingContentBody>
+        @for (int r = 0; r < 4; r++) // 4 fake rows
+        {
+            <VekTr>
+                @for (int c = 0; c < 5; c++) // 5 columns as above
+                {
+                    <VekTd><VekSkeleton /></VekTd>
+                }
+            </VekTr>
+        }
+    </LoadingContentBody>
+</VekTable>
+
+<VekSwitch id="switch" @bind-Value="_isLoading">Show Loading</VekSwitch>
+
+ @code {
+    public static string __description__ = @"
+                                                   When loading is set to true, a progress bar should appear in the table header,
+                                                   which would not affect the striped table.
+                                                   Dynamically added columns should not affect number of cells in the loader row.
+                                           ";
+
+    private bool _isLoading = true;
+    private string? _searchString = "ABC";
+    private IEnumerable<Element> _elements = new List<Element>();
+
+    protected override void OnInitialized()
+    {
+        _elements = new List<Element>
+        {
+            new() { Molar = "A", Sign = "A", Name = "A", Number = "A", Position = "A"},
+            new() { Molar = "B", Sign = "B", Name = "B", Number = "B", Position = "B"},
+        };
+    }
+
+    private bool FilterFunc(Element element)
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+        if (element.Number.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Sign.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Position.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Molar.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    public class Element
+    {
+        public required string Number { get; set; }
+
+        public required string Sign { get; set; }
+
+        public required string Name { get; set; }
+
+        public required string Position { get; set; }
+
+        public required string Molar { get; set; }
+    }
+}

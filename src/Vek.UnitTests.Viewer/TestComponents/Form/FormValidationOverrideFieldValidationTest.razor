@@ -1,0 +1,33 @@
+﻿<VekForm Model="@_model" Validation=@("v")>
+    <VekTextField @bind-Value="_model.Name" For=@(() => _model.Name)/> @*Should set validation*@
+    <VekNumericField T="int" @bind-Value="_model.Age" For="() => _model.Age"/> @*Should override validation*@
+    
+    <VekForm Model="@_model" Validation=@("v") OverrideFieldValidation="false">
+        <VekTextField @bind-Value="_model.Name" For="() => _model.Name"/> @*Should set validation*@
+        <VekNumericField @bind-Value="_model.Age" For="() => _model.Age"/> @*Should keep default validation*@
+    </VekForm>
+    
+    <VekForm Model="@_model" Validation=@("v") OverrideFieldValidation="true">
+        <VekTextField @bind-Value="_model.Name" Validation=@("a") For="() => _model.Name"/> @*Should override validation*@
+        <VekNumericField @bind-Value="_model.Age" Validation=@("b") For="() => _model.Age"/> @*Should override validation*@
+    </VekForm>
+    
+    <VekForm Model="@_model">
+        <VekTextField @bind-Value="_model.Name" Validation=@("a") For="() => _model.Name"/> @*Should keep validation*@
+        <VekNumericField @bind-Value="_model.Age" Validation=@("b") For="() => _model.Age"/> @*Should keep validation*@
+    </VekForm>
+</VekForm>
+
+Name: @_model.Name
+Age: @_model.Age.ToString()
+
+@code {
+    private readonly VM _model = new();
+
+    private class VM
+    {
+        public string? Name { get; set; }
+
+        public int Age { get; set; }
+    }
+}

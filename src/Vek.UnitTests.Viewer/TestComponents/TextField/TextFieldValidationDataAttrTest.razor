@@ -1,0 +1,22 @@
+﻿@using System.ComponentModel.DataAnnotations
+
+<VekGrid>
+    <VekItem xs="12" sm="6" md="4">
+        <EditForm Model="_model">
+            <DataAnnotationsValidator />
+            <VekTextField For="@(() => _model.Value)" Label="Short string" @bind-Value="_model.Value" />
+        </EditForm>
+    </VekItem>
+</VekGrid>
+
+@code {
+    public static string __description__ = "Test use of data attributes accessible using `For` bound expression.";
+
+    private readonly TestModel _model = new();
+
+    private class TestModel
+    {
+        [StringLength(3, ErrorMessage = "Should not be longer than 3")]
+        public string? Value { get; set; }
+    }
+}

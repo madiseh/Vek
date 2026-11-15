@@ -1,0 +1,32 @@
+﻿@using Vek.Docs.Extensions
+
+@if (_nonnullableType.IsEnum)
+{
+    <VekTooltip>
+        <ChildContent>@Type.GetTypeDisplayName()</ChildContent>
+        <TooltipContent>
+            enumeration type
+            <VekText Align="Align.Left" Typo="Typo.body2">
+                @foreach (var name in Enum.GetNames(_nonnullableType))
+                {
+                    @(_nonnullableType.Name + "." + name)<br />
+                }
+            </VekText>
+        </TooltipContent>
+    </VekTooltip>
+}
+else
+{
+    @Type.GetTypeDisplayName()
+}
+
+@code {
+    [Parameter] public Type Type { get; set; }
+
+    private Type _nonnullableType;
+
+    protected override void OnInitialized()
+    {
+        _nonnullableType = Nullable.GetUnderlyingType(Type) ?? Type;
+    }
+}

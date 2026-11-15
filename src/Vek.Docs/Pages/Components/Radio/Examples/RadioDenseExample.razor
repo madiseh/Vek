@@ -1,0 +1,11 @@
+﻿@namespace Vek.Docs.Examples
+
+
+<VekRadioGroup @bind-Value="Dense_Radio">
+    <VekRadio Value="true" Color="Color.Primary" Dense="true">Dense</VekRadio>
+    <VekRadio Value="false" Color="Color.Secondary" Dense="false">Normal</VekRadio>
+</VekRadioGroup>
+
+@code {
+    public bool Dense_Radio { get; set; } = true;
+}

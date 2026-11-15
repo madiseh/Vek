@@ -1,0 +1,22 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekContainer Class="mt-8" Style="justify-items: center">
+    <VekPaper Class="pa-4" MaxWidth="400px">
+        <VekStack Spacing="2">
+            <VekButton OnClick="Update">@(_isExpanded ? "Collapse" : "Expand")</VekButton>
+            <VekDivider />
+            <VekCollapse @bind-Expanded="@_isExpanded">
+                This content is collapsible.
+            </VekCollapse>
+        </VekStack>
+    </VekPaper>
+</VekContainer>
+
+@code {
+    private bool _isExpanded;
+
+    private void Update()
+    {
+        _isExpanded = !_isExpanded;
+    }
+}

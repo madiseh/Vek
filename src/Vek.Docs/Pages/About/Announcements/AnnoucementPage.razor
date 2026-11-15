@@ -1,0 +1,34 @@
+﻿@page "/vek/announcements/{Id}"
+
+<DocsPage DisplayFooter="true">
+    <VekContainer Class="announcement-container" MaxWidth="MaxWidth.Medium">
+        @if (_message == null)
+        {
+            <VekProgressCircular Color="Color.Default" Indeterminate="true" />
+        }
+        else
+        {
+            <DocsPageHeader Title="@_message.Title" SubTitle="@_message.Except">
+                <SpecialHeaderContent>
+                    <VekText Typo="Typo.h2" Class="docs-title">@_message.Title&nbsp;</VekText>
+                    <VekText Typo="Typo.subtitle1" Class="docs-title-description">@_message.Except</VekText>
+                    <VekToolBar Gutters="false">
+                        @foreach (var author in _message.Authors)
+                        {
+                            <div class="d-flex justify-start align-center mx-1">
+                                <VekAvatar Style="background: transparent">
+                                    <VekImage Src="@author.AvatarUrl" Alt="Avatar" />
+                                </VekAvatar>
+                                <VekText Typo="Typo.subtitle2" Class="mx-2">@author.DisplayName</VekText>
+                            </div>
+                        }
+                    </VekToolBar>
+                    <VekText Typo="Typo.subtitle2" Class="vek-text-secondary">@_message.PublishDate.ToString("MMM dd, yyyy")</VekText>
+                </SpecialHeaderContent>
+            </DocsPageHeader>
+            <DocsPageContent>
+                <DynamicComponent Type="@_message.ContentComponent" />
+            </DocsPageContent>
+        }
+    </VekContainer>
+</DocsPage>

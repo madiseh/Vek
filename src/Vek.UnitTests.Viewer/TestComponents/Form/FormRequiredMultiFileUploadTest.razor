@@ -1,0 +1,12 @@
+﻿<VekForm @ref="Form" @bind-IsValid="IsValid" ValidationDelay="0">
+    <VekFileUpload T="IReadOnlyList<IBrowserFile>" @bind-Files="Files" Required="true" RequiredError="Files are required" />
+</VekForm>
+
+@code {
+    public static string __description__ = "#13421 review: a required multi-file VekFileUpload bound to an empty (non-null) list must be invalid on load; a non-empty list is valid.";
+
+    public VekForm Form { get; set; } = null!;
+    public bool IsValid { get; set; }
+
+    [Parameter] public IReadOnlyList<IBrowserFile> Files { get; set; } = new List<IBrowserFile>();
+}

@@ -1,0 +1,11 @@
+﻿<VekRadioGroup @bind-Value="@_option">
+    <VekRadio Value="@("1")" />
+    <VekRadio Value="@("2")" />
+    <VekRadio Value="@("3")" />
+</VekRadioGroup>
+
+@code {
+    public static string __description__ = "Radio 2 should be pre-selected.";
+
+    private string _option = "2";
+}

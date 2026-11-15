@@ -1,0 +1,22 @@
+﻿@namespace Vek
+@using Vek.Utilities
+
+<li class="@Classname">
+    @if (Parent?.ItemTemplate is null)
+    {
+        <a href="@(Item?.Href ?? "#")" aria-current="@(IsCurrentPage ? "page" : null)">
+            @if (Item?.Icon != null)
+            {
+                <VekIcon Icon="@Item?.Icon" Size="Size.Small" />
+            }
+            @Item?.Text
+        </a>
+    }
+    else
+    {
+        if (Parent.ItemTemplate is not null && Item is not null)
+        {
+            @Parent.ItemTemplate(Item)
+        }
+    }
+</li>

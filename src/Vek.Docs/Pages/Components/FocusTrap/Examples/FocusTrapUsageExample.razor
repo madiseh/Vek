@@ -1,0 +1,30 @@
+﻿@namespace Vek.Docs.Examples
+
+<div class="d-flex mb-4">
+    <VekCheckBox @bind-Value="Disabled" Label="Disabled"></VekCheckBox>
+    <VekSelect @bind-Value="DefaultFocus" Label="Default Focus" Dense="true" Class="ml-4">
+        <VekSelectItem Value="DefaultFocus.None">None</VekSelectItem>
+        <VekSelectItem Value="DefaultFocus.Element">Element</VekSelectItem>
+        <VekSelectItem Value="DefaultFocus.FirstChild">FirstChild</VekSelectItem>
+        <VekSelectItem Value="DefaultFocus.LastChild">LastChild</VekSelectItem>
+    </VekSelect>
+</div>
+
+<VekTextField T="string" Variant="Variant.Outlined"></VekTextField>
+
+<VekPaper Class="pa-4">
+    <VekFocusTrap Disabled="Disabled" DefaultFocus="DefaultFocus">
+        <VekTextField T="string" Variant="Variant.Outlined"></VekTextField>
+        <VekTextField T="string" Variant="Variant.Outlined"></VekTextField>
+        <VekTextField T="string" Variant="Variant.Outlined"></VekTextField>
+    </VekFocusTrap>
+</VekPaper>
+
+<VekTextField T="string" Variant="Variant.Outlined"></VekTextField>
+
+@code {
+
+    bool Disabled { get; set; }
+
+    DefaultFocus DefaultFocus { get; set; } = DefaultFocus.FirstChild;
+ }

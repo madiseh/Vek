@@ -1,0 +1,28 @@
+﻿<VekPopoverProvider />
+
+<VekGrid>
+    <VekItem>
+        <VekDatePicker @ref="@Picker"
+                       Style="max-width: 300px"
+                       Placeholder="dd-MM-yyyy"
+                       Editable="true"
+                       Required="false"
+                       Mask="@(new DateMask("dd-MM-yyyy"))"
+                       DateFormat="dd-MM-yyyy"
+                       Variant="Variant.Outlined"
+                       @bind-Date="SelectedDate">
+        </VekDatePicker>
+    </VekItem>
+    <VekItem Class="align-self-center">
+        <VekText>@Picker?.Text</VekText>
+    </VekItem>
+</VekGrid>
+
+@code {
+
+    public static string __description__ = "Selected date should show in input on first selection";
+
+    public DateTime? SelectedDate { get; set; }
+
+    public VekDatePicker Picker { get; set; } = null!;
+}

@@ -1,0 +1,151 @@
+﻿@using Vek.Internal
+@using Vek.Resources
+@namespace Vek
+@inherits VekPicker<DateTime?>
+@inject InternalVekLocalizer Localizer
+
+@Render
+
+@code {
+
+    protected override RenderFragment PickerContent =>
+    @<text><VekPickerToolbar Class="vek-picker-datepicker-toolbar" ShowToolbar="@ShowToolbar" Orientation="@Orientation" PickerVariant="@PickerVariant" Color="@Color" @onmousedown:preventDefault="true">
+            <VekButton Variant="Variant.Text" Color="Color.Inherit" Class="vek-button-year" OnClick="GoToSelectedYear">@GetFormattedYearString()</VekButton>
+            <VekButton Variant="Variant.Text" Color="Color.Inherit" Class="vek-button-date" OnClick="OnFormattedDateClick">@GetTitleDateString()</VekButton>
+        </VekPickerToolbar>
+        <VekPickerContent>
+            <div id="@_vekPickerCalendarContentElementId" class="vek-picker-calendar-content @($"vek-picker-calendar-content-{MaxMonthColumns ?? DisplayMonths}")" @onmousedown:preventDefault="true">
+                @{
+                    int dayId = 0; 
+                    var culture = GetCulture();
+                    var calendar = culture.Calendar;
+                    @if (_picker_month.HasValue && calendar.GetYear(_picker_month.Value) == 1 && calendar.GetMonth(_picker_month.Value) == 1)
+                    {
+                        dayId = -1;
+                    }
+                }
+                @for (int displayMonth = 0; displayMonth < DisplayMonths; ++displayMonth)
+                {
+                    int tempMonth = displayMonth; //without local variable month names are wrong
+
+                    <div class="vek-picker-calendar-container">
+                        @if (tempMonth == 0 && CurrentView == OpenTo.Year)
+                        {
+                            <div id="pickerYears" class="vek-picker-year-container">
+                                @for (int i = GetMinYear(); i <= GetMaxYear(); i++)
+                                {
+                                    var year = i;
+                                    <div class="vek-picker-year" id="@(_componentId + year)" @onclick="@(async () => await OnYearClickedAsync(year))" @onclick:stopPropagation="true">
+                                        @VekText.RenderText(GetYearTypo(year), GetYearClasses(year), year.ToString(System.Globalization.CultureInfo.InvariantCulture))
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else if (tempMonth == 0 && CurrentView == OpenTo.Month)
+                        {
+                            var calendarYear = GetCalendarYear(PickerMonth ?? TimeProvider.GetLocalNow().Date);
+
+                            <div class="vek-picker-calendar-header">
+                                <div class="vek-picker-calendar-header-switch">
+                                    @if (!FixYear.HasValue)
+                                    {
+                                        <VekIconButton aria-label="@Localizer[LanguageResource.VekBaseDatePicker_PrevYear, $"({calendarYear - 1})"]" Icon="@PreviousIcon" OnClick="OnPreviousYearClick" Class="vek-flip-x-rtl" />
+                                        <button type="button" class="vek-picker-slide-transition vek-picker-calendar-header-transition" @onclick="OnYearClick" @onclick:stopPropagation="true">
+                                            <VekText Typo="Typo.body1" Align="Align.Center">@calendarYear</VekText>
+                                        </button>
+                                        <VekIconButton aria-label="@Localizer[LanguageResource.VekBaseDatePicker_NextYear, $"({calendarYear + 1})"]" Icon="@NextIcon" OnClick="OnNextYearClick" Class="vek-flip-x-rtl" />
+                                    }
+                                    else
+                                    {
+                                        <VekText Class="vek-picker-calendar-header-transition" Typo="Typo.body1" Align="Align.Center">@calendarYear</VekText>
+                                    }
+                                </div>
+                            </div>
+                            <div class="vek-picker-month-container">
+                                @foreach (var month in GetAllMonths())
+                                {
+                                    <button type="button" aria-label="@GetMonthName(month)" disabled="@IsMonthDisabled(month)"
+                                    class="vek-picker-month vek-button-root" @onclick="@(async () => await OnMonthSelectedAsync(month))" @onclick:stopPropagation="true">
+                                        <VekText Typo="@GetMonthTypo(month)" Class="@GetMonthClasses(month)">@GetAbbreviatedMonthName(month)</VekText>
+                                    </button>
+                                }
+                            </div>
+                        }
+                        else if (CurrentView == OpenTo.Date || tempMonth > 0)
+                        {
+                            <div class="@GetCalendarHeaderClasses(tempMonth)">
+                                <div class="vek-picker-calendar-header-switch">
+                                    @if (!FixMonth.HasValue)
+                                    {
+                                        <VekIconButton aria-label="@Localizer[LanguageResource.VekBaseDatePicker_PrevMonth, $"({GetMonthName((tempMonth - 1) % 12)})"]" Class="vek-picker-nav-button-prev vek-flip-x-rtl" Icon="@PreviousIcon" OnClick="@OnPreviousMonthClick" />
+                                        <button type="button" class="vek-picker-slide-transition vek-picker-calendar-header-transition vek-button-month" @onclick="(() => OnMonthClicked(tempMonth))" @onclick:stopPropagation="true">
+                                            <VekText Typo="Typo.body1" Align="Align.Center">@GetMonthName(tempMonth)</VekText>
+                                        </button>
+                                        <VekIconButton aria-label="@Localizer[LanguageResource.VekBaseDatePicker_NextMonth, $"({GetMonthName((tempMonth + 1) % 12)})"]" Class="vek-picker-nav-button-next vek-flip-x-rtl" Icon="@NextIcon" OnClick="@OnNextMonthClick" />
+                                    }
+                                    else
+                                    {
+                                        <VekText Class="vek-picker-calendar-header-transition" Typo="Typo.body1" Align="Align.Center">@GetMonthName(tempMonth)</VekText>
+                                    }
+                                </div>
+                                <div class="vek-picker-calendar-header-day">
+                                    @if (ShowWeekNumbers)
+                                    {
+                                        <div class="vek-picker-calendar-week">
+                                            <VekText Typo="Typo.caption" Class="vek-picker-calendar-week-text"></VekText>
+                                        </div>
+                                    }
+                                    @foreach (var dayName in GetAbbreviatedDayNames())
+                                    {
+                                        <VekText Typo="Typo.caption" Class="vek-day-label">@dayName</VekText>
+                                    }
+                                </div>
+                            </div>
+                            <div class="vek-picker-calendar-transition vek-picker-slide-transition">
+                                <div class="vek-picker-calendar">
+                                    @for (int week = 0; week < 6; week++)
+                                    {
+                                        int tempWeek = week;
+                                        var firstMonthFirstYear = _picker_month.HasValue && calendar.GetYear(_picker_month.Value) == 1 && calendar.GetMonth(_picker_month.Value) == 1;
+
+                                        @if (ShowWeekNumbers)
+                                        {
+                                            <div class="vek-picker-calendar-week">
+                                                <VekText class="vek-picker-calendar-week-text" Typo="Typo.caption">@GetWeekNumber(tempMonth, tempWeek)</VekText>
+                                            </div>
+                                        }
+                                        var wasMaxValue = false;
+                                        @foreach (var day in GetWeek(tempMonth, tempWeek))
+                                        {
+                                            var tempId = ++dayId;
+
+                                            @if ((tempId != 0 || !firstMonthFirstYear) && !wasMaxValue)
+                                            {
+                                                var selectedDay = !firstMonthFirstYear ? day : day.AddDays(-1);
+                                                <button @key="@(!firstMonthFirstYear ? selectedDay : tempId)" type="button" style="--day-id: @(!firstMonthFirstYear ? tempId : tempId + 1);"
+                                                        class="vek-button-root vek-icon-button vek-ripple vek-ripple-icon vek-picker-calendar-day @(!firstMonthFirstYear || day.Day == _picker_month!.Value.Day ? GetDayClasses(tempMonth, day) : GetDayClasses(tempMonth, selectedDay))"
+                                                        @onclick="@(async () => { var d = selectedDay; await HandleDayButtonClickAsync(d, !firstMonthFirstYear ? tempId : tempId + 1); })"
+                                                        @onclick:stopPropagation="true"
+                                                        onpointerover="@(async () => await HandleMouseoverOnPickerCalendarDayButton(!firstMonthFirstYear ? tempId : tempId + 1))"
+                                                        disabled="@IsDayDisabled(selectedDay)">
+                                                    <p class="vek-typography vek-typography-body2 vek-inherit-text">@GetCalendarDayOfMonth(selectedDay)</p>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button @key="0" type="button" disabled style="--day-id: 1;"
+                                                        class="vek-button-root vek-icon-button vek-ripple vek-ripple-icon vek-picker-calendar-day vek-day">
+                                                    <p class="vek-typography vek-typography-body2 vek-inherit-text"></p>
+                                                </button>
+                                            }
+                                            wasMaxValue = day == calendar.MaxSupportedDateTime;
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </VekPickerContent></text>;
+}

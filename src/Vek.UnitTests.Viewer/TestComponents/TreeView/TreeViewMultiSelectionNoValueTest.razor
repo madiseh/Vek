@@ -1,0 +1,49 @@
+﻿<VekTreeView T="string" SelectionMode="SelectionMode.MultiSelection" AutoSelectParent="@AutoSelectParent" @bind-SelectedValues="SelectedValues">
+    <VekTreeViewItem Class="group" Expanded="true">
+        <BodyContent>Group</BodyContent>
+        <ChildContent>
+            <VekTreeViewItem Class="group-child-1" Value='"group-child-1"' />
+            <VekTreeViewItem Class="group-child-2" Value='"group-child-2"' />
+        </ChildContent>
+    </VekTreeViewItem>
+    <VekTreeViewItem Class="parent" Value='"parent"' Expanded="true">
+        <VekTreeViewItem Class="parent-child" Value='"parent-child"' />
+        <VekTreeViewItem Class="parent-note">
+            <BodyContent>Note</BodyContent>
+        </VekTreeViewItem>
+    </VekTreeViewItem>
+    <VekTreeViewItem Class="note">
+        <BodyContent>Note</BodyContent>
+    </VekTreeViewItem>
+</VekTreeView>
+
+<p class="selected-values">@string.Join(", ", SelectedValues.Order())</p>
+
+@* The item template doesn't pass the data's value to the items *@
+<VekTreeView T="string" Items="@_treeItems" SelectionMode="SelectionMode.MultiSelection" @bind-SelectedValues="TemplateSelectedValues">
+    <ItemTemplate Context="item">
+        <VekTreeViewItem Class="@item.Value">
+            <BodyContent>@item.Text</BodyContent>
+        </VekTreeViewItem>
+    </ItemTemplate>
+</VekTreeView>
+
+<p class="template-selected-values">@string.Join(", ", TemplateSelectedValues.Order())</p>
+
+@code {
+    private readonly List<TreeItemData<string>> _treeItems =
+    [
+        new() { Value = "template-item-1", Text = ".github" },
+        new() { Value = "template-item-2", Text = ".vscode", Children = [] },
+        new() { Value = "template-item-3", Text = "content" },
+    ];
+
+    [Parameter]
+    public bool AutoSelectParent { get; set; }
+
+    [Parameter]
+    public IReadOnlyCollection<string> SelectedValues { get; set; } = [];
+
+    [Parameter]
+    public IReadOnlyCollection<string> TemplateSelectedValues { get; set; } = [];
+}

@@ -1,0 +1,16 @@
+﻿@*based on a bugreport*@
+<VekContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-16 mb-16">
+
+    <VekTextField T="string" @bind-Value="text" Label="First edit here"
+                  Variant="Variant.Outlined" Immediate="true"></VekTextField>
+
+    <VekTextField T="string" Lines="2" @bind-Value="text" Label="Then edit here"
+                  Variant="Variant.Outlined" Immediate="true"></VekTextField>
+
+    <p>Then edit the first TF again to see how the binding breaks down for the second</p>
+</VekContainer>
+
+@code
+{
+    private string? text;
+}

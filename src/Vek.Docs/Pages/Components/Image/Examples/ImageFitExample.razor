@@ -1,0 +1,22 @@
+﻿@namespace Vek.Docs.Examples
+
+<div class="d-flex justify-center">
+    <VekImage ObjectFit="@ImageFit" Height="200" Width="400" Src="images/castle.jpg" Alt="Örebro Slott"  Elevation="25" Class="rounded-lg"/>
+</div>
+
+<VekChipSet T="string" CheckMark Class="mt-12">
+    <VekChip Text="None" OnClick="@(() => SetImageFit(ObjectFit.None))" SelectedColor="Color.Primary" />
+    <VekChip Text="Cover" OnClick="@(() => SetImageFit(ObjectFit.Cover))" SelectedColor="Color.Primary" Default="true"/>
+    <VekChip Text="Contain" OnClick="@(() => SetImageFit(ObjectFit.Contain))" SelectedColor="Color.Primary" />
+    <VekChip Text="Fill" OnClick="@(() => SetImageFit(ObjectFit.Fill))" SelectedColor="Color.Primary" />
+    <VekChip Text="ScaleDown" OnClick="@(() => SetImageFit(ObjectFit.ScaleDown))" SelectedColor="Color.Primary" />
+</VekChipSet>
+
+@code {
+    ObjectFit ImageFit = ObjectFit.Cover;
+
+    void SetImageFit(ObjectFit value)
+    {
+        ImageFit = value;
+    }
+}

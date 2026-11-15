@@ -1,0 +1,18 @@
+﻿<VekCard>
+    <VekCardHeader>
+        <ChildContent>
+            <VekNumericField @bind-Value="_value" />
+            <VekButton OnClick="TestClick">Click</VekButton>
+        </ChildContent>
+    </VekCardHeader>
+</VekCard>
+
+@code
+{
+    public static string __description__ = "Badge test";
+    private int _value = 0;
+    private void TestClick()
+    {
+        _value = 1;
+    }
+}

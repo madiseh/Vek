@@ -1,0 +1,24 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekForm>
+    <VekRadioGroup @bind-Value="SelectedOption">
+        <VekRadio Value="@("Radio 1")" Color="Color.Primary">Primary</VekRadio>
+        <VekRadio Value="@("Radio 2")" Color="Color.Secondary">Secondary</VekRadio>
+        <VekRadio Value="@("Radio 3")">Default</VekRadio>
+        <VekRadio Value="@("Radio 4")" Color="Color.Primary" Disabled="true">Disabled</VekRadio>
+    </VekRadioGroup>
+</VekForm>
+
+<div class="d-flex align-center">
+    <VekButton Variant="Variant.Outlined" OnClick="Reset">Reset</VekButton>
+    <VekText Class="ml-4">Selected Option: @SelectedOption</VekText>
+</div>
+
+@code {
+    public string SelectedOption { get; set; }
+
+    private void Reset()
+    {
+        SelectedOption = null;
+    }
+}

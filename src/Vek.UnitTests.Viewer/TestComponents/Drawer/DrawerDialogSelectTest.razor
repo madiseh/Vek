@@ -1,0 +1,35 @@
+﻿<VekButton @onclick="@(() => _dialogOpen = !_dialogOpen)" Variant="Variant.Filled" Color="Color.Primary">
+    Open simple dialog
+</VekButton>
+
+<VekDialog @bind-Visible="_dialogOpen" Style="width: 80%; height: 80%;">
+    <DialogContent>
+        <VekButton Variant="Variant.Text" OnClick="@(() => OpenDrawer(Anchor.End))">Open Drawer</VekButton>
+        <VekDrawer @bind-Open="@_open" Anchor="@_anchor" Elevation="1" Variant="@DrawerVariant.Temporary" OverlayAutoClose="@OverlayAutoClose">
+            <VekDrawerHeader>
+                <VekText Typo="Typo.h6">My App</VekText>
+            </VekDrawerHeader>
+            <VekSelect T="int" Label="Label">
+                <VekSelectItem T="int" Value="1">1</VekSelectItem>
+                <VekSelectItem T="int" Value="2">2</VekSelectItem>
+                <VekSelectItem T="int" Value="3">3</VekSelectItem>
+                <VekSelectItem T="int" Value="4">4</VekSelectItem>
+                <VekSelectItem T="int" Value="5">5</VekSelectItem>
+            </VekSelect>
+        </VekDrawer>
+    </DialogContent>
+</VekDialog>
+
+@code {
+    public static string __description__ = "Drawer inside a Dialog with a Select inside the Drawer make sure z-index is not overridden by css.";
+    private bool _dialogOpen;
+    private bool _open;
+    private Anchor _anchor;
+    private const bool OverlayAutoClose = true;
+
+    private void OpenDrawer(Anchor anchor)
+    {
+        _open = true;
+        _anchor = anchor;
+    }
+}

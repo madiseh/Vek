@@ -1,0 +1,27 @@
+@using Vek
+
+<VekTabs KeepPanelsAlive="true">
+    <VekTabPanel Text="Tab 1">
+        <VekDrawer @ref="@Drawer" @bind-Open="@_open" Variant="@Variant" Anchor="@Anchor">
+            <div>Drawer Content</div>
+        </VekDrawer>
+        <button id="toggle-drawer-button" @onclick="@ToggleDrawer">Toggle Drawer</button>
+    </VekTabPanel>
+    <VekTabPanel Text="Tab 2">
+        <div>Tab 2 Content</div>
+    </VekTabPanel>
+</VekTabs>
+
+@code {
+    private bool _open;
+
+    public VekDrawer Drawer { get; private set; } = null!;
+
+    [Parameter]
+    public DrawerVariant Variant { get; set; } = DrawerVariant.Temporary;
+
+    [Parameter]
+    public Anchor Anchor { get; set; } = Anchor.End;
+
+    private void ToggleDrawer() => _open = !_open;
+}

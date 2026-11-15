@@ -1,0 +1,26 @@
+﻿@namespace Vek.Docs.Examples
+
+@inject ISnackbar Snackbar
+
+<VekButton Variant="Variant.Filled" Color="Color.Primary" @onclick="@AddCloseAfterNavSnackbar">
+   Closes after navigation
+</VekButton>
+
+<VekButton Variant="Variant.Filled" Color="Color.Primary" @onclick="@AddSnackbar">
+    Default snackbar
+</VekButton>
+
+@code{
+    public void AddSnackbar()
+    {
+        Snackbar.Add("Remains open after navigation.", Severity.Normal);
+    }
+
+    public void AddCloseAfterNavSnackbar()
+    {
+        Snackbar.Add("Will close after navigation.", Severity.Normal, (options) =>
+        {
+            options.CloseAfterNavigation = true;
+        });
+    }
+}
