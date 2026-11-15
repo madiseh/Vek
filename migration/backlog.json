@@ -47,7 +47,9 @@
       "priority": 4,
       "status": "backlog",
       "specification": "specifications/004-datagrid-advanced-filter-row.md",
-      "dependencies": ["001"]
+      "dependencies": [
+        "001"
+      ]
     },
     {
       "id": "005",
@@ -58,6 +60,17 @@
       "status": "backlog",
       "specification": "specifications/005-datagrid-fixed-columns.md",
       "dependencies": []
+    },
+    {
+      "id": "006",
+      "slug": "datagrid-column-autofit",
+      "title": "DataGrid Column Widths Auto-Fit to Content",
+      "module": "DataGrid",
+      "priority": 6,
+      "status": "ready",
+      "specification": "specifications/006-datagrid-column-autofit.md",
+      "dependencies": [],
+      "discovered_at": "2026-11-15 15:08:53Z"
     }
   ]
 }
