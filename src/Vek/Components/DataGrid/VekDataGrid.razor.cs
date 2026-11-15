@@ -7,9 +7,11 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.Web.Virtualization;
+using Vek.Components.Highlighter;
 using Vek.State;
 using Vek.Utilities;
 using Vek.Utilities.Clone;
@@ -59,6 +61,15 @@ namespace Vek
         private readonly ParameterState<T?> _selectedItemState;
         private readonly ParameterState<HashSet<T>?> _selectedItemsState;
         private readonly ParameterState<bool> _expandSingleRowState;
+        internal readonly ParameterState<bool> _showSearchBoxState;
+        internal readonly ParameterState<string?> _searchTextState;
+        internal readonly ParameterState<DataGridSearchTextParseMode> _searchTextParseModeState;
+        internal readonly ParameterState<int> _searchBoxInputDelayState;
+        internal readonly ParameterState<string?> _searchBoxPlaceholderState;
+        internal readonly ParameterState<bool> _highlightSearchResultsState;
+
+        internal IReadOnlyList<string> CurrentSearchTokens { get; private set; } = Array.Empty<string>();
+        internal ParameterState<bool> HighlightSearchResultsState => _highlightSearchResultsState;
 
         private const string PrePrefix = "__vek_dg_pre__:";
         private const string PostPrefix = "__vek_dg_post__:";
@@ -112,6 +123,27 @@ namespace Vek
             registerScope.RegisterParameter<IEqualityComparer<T>?>(nameof(Comparer))
                 .WithParameter(() => Comparer)
                 .WithChangeHandler(OnComparerChanged);
+
+            _showSearchBoxState = registerScope.RegisterParameter<bool>(nameof(ShowSearchBox))
+                .WithParameter(() => ShowSearchBox);
+
+            _searchTextState = registerScope.RegisterParameter<string?>(nameof(SearchText))
+                .WithParameter(() => SearchText)
+                .WithEventCallback(() => SearchTextChanged)
+                .WithChangeHandler(OnSearchTextChangedAsync);
+
+            _searchTextParseModeState = registerScope.RegisterParameter<DataGridSearchTextParseMode>(nameof(SearchTextParseMode))
+                .WithParameter(() => SearchTextParseMode)
+                .WithChangeHandler(OnSearchTextParseModeChangedAsync);
+
+            _searchBoxInputDelayState = registerScope.RegisterParameter<int>(nameof(SearchBoxInputDelay))
+                .WithParameter(() => SearchBoxInputDelay);
+
+            _searchBoxPlaceholderState = registerScope.RegisterParameter<string?>(nameof(SearchBoxPlaceholder))
+                .WithParameter(() => SearchBoxPlaceholder);
+
+            _highlightSearchResultsState = registerScope.RegisterParameter<bool>(nameof(HighlightSearchResults))
+                .WithParameter(() => HighlightSearchResults);
         }
 
         protected string Classname =>
@@ -482,6 +514,82 @@ namespace Vek
         #endregion
 
         #region Parameters
+        /// <summary>
+        /// Shows the search box in the data grid toolbar.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public bool ShowSearchBox { get; set; }
+
+        /// <summary>
+        /// The current search text used to filter rows.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public string? SearchText { get; set; }
+
+        /// <summary>
+        /// Occurs when the <see cref="SearchText"/> has changed.
+        /// </summary>
+        [Parameter]
+        public EventCallback<string?> SearchTextChanged { get; set; }
+
+        /// <summary>
+        /// The parse mode used to split and evaluate the search text.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="DataGridSearchTextParseMode.GroupWordsByAnd"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public DataGridSearchTextParseMode SearchTextParseMode { get; set; } = DataGridSearchTextParseMode.GroupWordsByAnd;
+
+        /// <summary>
+        /// The debounce interval in milliseconds for user input in the search box.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>300</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public int SearchBoxInputDelay { get; set; } = 300;
+
+        /// <summary>
+        /// The placeholder text for the search box.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Appearance)]
+        public string? SearchBoxPlaceholder { get; set; }
+
+        /// <summary>
+        /// Custom template for rendering the search box in the toolbar.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Appearance)]
+        public RenderFragment<DataGridSearchBoxContext<T>>? SearchBoxTemplate { get; set; }
+
+        /// <summary>
+        /// Whether matching search terms are highlighted in searchable cells.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Appearance)]
+        public bool HighlightSearchResults { get; set; } = true;
+
         /// <summary>
         /// Attributes for the HTML table element, such as <c>aria-label</c> and <c>aria-labelledby</c>.
         /// </summary>
@@ -1588,6 +1696,18 @@ namespace Vek
                     items = items.Where(QuickFilter);
                 }
 
+                var searchTokens = CurrentSearchTokens;
+                if (searchTokens.Count == 0 && !string.IsNullOrWhiteSpace(_searchTextState.Value))
+                {
+                    UpdateSearchTokens();
+                    searchTokens = CurrentSearchTokens;
+                }
+
+                if (searchTokens.Count > 0)
+                {
+                    items = items.Where(item => DataGridSearchEngine.MatchesRow(item, RenderedColumns, searchTokens, _searchTextParseModeState.Value, Culture));
+                }
+
                 if (!HasServerData)
                 {
                     foreach (var filterDefinition in FilterDefinitions)
@@ -2210,6 +2330,113 @@ namespace Vek
         }
 
         internal Task NotifyFilterChangedAsync() => FilterChanged.InvokeAsync(FilterDefinitions.AsReadOnly());
+
+        private (string Pattern, Regex Regex)? _cachedHighlightRegex;
+
+        private void UpdateSearchTokens()
+        {
+            CurrentSearchTokens = DataGridSearchEngine.ParseTokens(_searchTextState.Value, _searchTextParseModeState.Value);
+            _cachedHighlightRegex = null;
+        }
+
+        private async Task OnSearchTextChangedAsync()
+        {
+            UpdateSearchTokens();
+            _currentRenderFilteredItemsCache = null;
+            GroupItems();
+            await InvokeServerLoadFunc();
+            if (!HasServerData)
+            {
+                StateHasChanged();
+            }
+        }
+
+        private async Task OnSearchTextParseModeChangedAsync()
+        {
+            UpdateSearchTokens();
+            _currentRenderFilteredItemsCache = null;
+            GroupItems();
+            await InvokeServerLoadFunc();
+            if (!HasServerData)
+            {
+                StateHasChanged();
+            }
+        }
+
+        internal Task OnSearchInputChangedAsync(string? text)
+        {
+            return SetSearchTextAsync(text);
+        }
+
+        /// <summary>
+        /// Sets the search text used to filter rows in the data grid.
+        /// </summary>
+        /// <param name="searchText">The search text to apply, or <c>null</c> to clear the search.</param>
+        public async Task SetSearchTextAsync(string? searchText)
+        {
+            var changed = !string.Equals(_searchTextState.Value, searchText, StringComparison.Ordinal);
+            await _searchTextState.SetValueAsync(searchText);
+            if (!changed && SearchTextChanged.HasDelegate)
+            {
+                await SearchTextChanged.InvokeAsync(searchText);
+            }
+
+            UpdateSearchTokens();
+            _currentRenderFilteredItemsCache = null;
+            GroupItems();
+            await InvokeServerLoadFunc();
+            if (!HasServerData)
+            {
+                StateHasChanged();
+            }
+        }
+
+        private Regex GetOrCreateHighlightRegex(string pattern)
+        {
+            var cached = _cachedHighlightRegex;
+            if (cached.HasValue && string.Equals(cached.Value.Pattern, pattern, StringComparison.Ordinal))
+            {
+                return cached.Value.Regex;
+            }
+
+            var regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.NonBacktracking, RegexDefaults.MatchTimeout);
+            _cachedHighlightRegex = (pattern, regex);
+            return regex;
+        }
+
+        internal RenderFragment RenderCellHighlightedText(string? text, Column<T> column)
+        {
+            if (string.IsNullOrEmpty(text) || !column.AllowSearchState.Value || !_highlightSearchResultsState.Value || CurrentSearchTokens.Count == 0)
+            {
+                return builder => builder.AddContent(0, text);
+            }
+
+            var fragments = Splitter.GetFragments(text, null, CurrentSearchTokens, out var regex, caseSensitive: false);
+            if (fragments.Length == 0 || string.IsNullOrEmpty(regex))
+            {
+                return builder => builder.AddContent(0, text);
+            }
+
+            var compiledRegex = GetOrCreateHighlightRegex(regex);
+
+            return builder =>
+            {
+                foreach (var fragment in fragments.Span)
+                {
+                    if (compiledRegex.IsMatch(fragment))
+                    {
+                        builder.OpenElement(0, "mark");
+                        builder.AddAttribute(1, "class", "vek-table-cell-highlight");
+                        builder.AddContent(2, fragment);
+                        builder.CloseElement();
+                    }
+                    else
+                    {
+                        builder.AddContent(3, fragment);
+                    }
+                }
+            };
+        }
 
         internal async Task SetSelectedItemAsync(bool value, T item)
         {

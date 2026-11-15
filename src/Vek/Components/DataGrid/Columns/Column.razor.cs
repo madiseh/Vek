@@ -29,6 +29,9 @@ namespace Vek
         internal ParameterState<bool> GroupingState { get; }
         internal ParameterState<bool> _groupExpandedState;
         internal ParameterState<int> _groupByOrderState;
+        private readonly ParameterState<bool> _allowSearchState;
+
+        internal ParameterState<bool> AllowSearchState => _allowSearchState;
 
         /// <summary>
         /// The data grid which owns this column.
@@ -224,6 +227,16 @@ namespace Vek
         /// </remarks>
         [Parameter]
         public virtual bool? DragAndDropEnabled { get; set; }
+
+        /// <summary>
+        /// Whether this column is included in data grid search operations and highlighting.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Filtering)]
+        public bool AllowSearch { get; set; } = true;
 
         /// <summary>
         /// Allows filters to be used on this column.
@@ -643,6 +656,8 @@ namespace Vek
         protected Column()
         {
             using var registerScope = CreateRegisterScope();
+            _allowSearchState = registerScope.RegisterParameter<bool>(nameof(AllowSearch))
+                .WithParameter(() => AllowSearch);
             HiddenState = registerScope.RegisterParameter<bool>(nameof(Hidden))
                 .WithParameter(() => Hidden)
                 .WithEventCallback(() => HiddenChanged);

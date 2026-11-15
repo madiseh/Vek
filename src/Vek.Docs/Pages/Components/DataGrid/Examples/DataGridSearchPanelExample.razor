@@ -1,0 +1,37 @@
+﻿@using System.Net.Http.Json
+@using Vek.Examples.Data.Models
+@namespace Vek.Docs.Examples
+@inject HttpClient httpClient
+
+<div class="d-flex flex-wrap align-center gap-4 mb-4">
+    <VekSwitch T="bool" Value="@_highlightResults" ValueChanged="@((bool val) => _highlightResults = val)" Color="Color.Primary">Highlight search results</VekSwitch>
+    <VekSelect T="DataGridSearchTextParseMode" Label="Search Parse Mode" Value="@_parseMode" ValueChanged="@((DataGridSearchTextParseMode val) => _parseMode = val)" Dense="true" Margin="Margin.Dense" Style="max-width: 260px;">
+        <VekSelectItem T="DataGridSearchTextParseMode" Value="@DataGridSearchTextParseMode.GroupWordsByAnd">Group Words by AND</VekSelectItem>
+        <VekSelectItem T="DataGridSearchTextParseMode" Value="@DataGridSearchTextParseMode.GroupWordsByOr">Group Words by OR</VekSelectItem>
+        <VekSelectItem T="DataGridSearchTextParseMode" Value="@DataGridSearchTextParseMode.ExactMatch">Exact Match</VekSelectItem>
+    </VekSelect>
+</div>
+
+<VekDataGrid T="Element" Items="@Elements" ShowSearchBox="true" SearchBoxPlaceholder="Search elements (name, sign, mass)..." SearchTextParseMode="@_parseMode" HighlightSearchResults="@_highlightResults">
+    <Columns>
+        <PropertyColumn Property="x => x.Number" Title="Nr" AllowSearch="false" />
+        <PropertyColumn Property="x => x.Sign" />
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Position" />
+        <PropertyColumn Property="x => x.Molar" Title="Molar mass" />
+    </Columns>
+    <PagerContent>
+        <VekDataGridPager T="Element" />
+    </PagerContent>
+</VekDataGrid>
+
+@code {
+    private IEnumerable<Element> Elements = new List<Element>();
+    private bool _highlightResults = true;
+    private DataGridSearchTextParseMode _parseMode = DataGridSearchTextParseMode.GroupWordsByAnd;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = await httpClient.GetFromJsonAsync<List<Element>>("webapi/periodictable") ?? [];
+    }
+}
