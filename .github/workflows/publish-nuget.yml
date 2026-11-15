@@ -51,13 +51,16 @@ jobs:
         with:
           dotnet-version: '11.0.x'
 
+      - name: Enable .NET 11 SDK
+        run: rm -f global.json
+
       - name: Restore dependencies
         working-directory: src/Vek
-        run: dotnet restore
+        run: dotnet restore /p:IncludeNet11=true
 
       - name: Pack nuget package
         working-directory: ./src/Vek
-        run: dotnet pack -c Release --no-restore --output nupkgs /p:Version=${{ needs.get-version.outputs.VERSION }}
+        run: dotnet pack -c Release --no-restore --output nupkgs /p:Version=${{ needs.get-version.outputs.VERSION }} /p:IncludeNet11=true
 
       - name: Upload NuGet packages as artifact
         uses: actions/upload-artifact@v7
@@ -112,8 +115,8 @@ jobs:
         run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
 
       - name: Attach packages to GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload "${{ github.ref_name }}" ./src/Vek/nupkgs/*.nupkg ./src/Vek/nupkgs/*.snupkg --clobber
+          gh release upload "v${{ needs.get-version.outputs.VERSION }}" ./src/Vek/nupkgs/*.nupkg ./src/Vek/nupkgs/*.snupkg --clobber
