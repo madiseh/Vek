@@ -14,11 +14,11 @@ using Bunit;
 using Bunit.Rendering;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using NUnit.Framework;
 using Vek.Extensions;
 using Vek.Interfaces;
 using Vek.UnitTests.TestComponents.DataGrid;
 using Vek.Utilities.Clone;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {
