@@ -2,14 +2,23 @@
 """
 Autonomous Feature Migration Pipeline Orchestrator for Vek.
 Selects the next ready feature from backlog.json, validates dependencies,
-manages isolated worktrees, and coordinates the Planner -> Implementer -> Gate -> Reviewer lifecycle.
+triggers autonomous feature discovery when needed, manages isolated worktrees,
+and coordinates the Planner -> Implementer -> Gate -> Reviewer lifecycle.
 """
 
+import argparse
 import json
 import os
 import subprocess
 import sys
 from pathlib import Path
+
+# Add script directory to sys.path for local discovery import
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from discovery import discover_next_feature
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
 MIGRATION_DIR = ROOT_DIR / "migration"
@@ -80,11 +89,25 @@ def verify_quality_gates(worktree_dir):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Autonomous Feature Migration Pipeline Orchestrator")
+    parser.add_argument("--discover", action="store_true", help="Force discovery and planning of next feature gap")
+    args = parser.parse_args()
+
     backlog = load_backlog()
-    feature = get_next_ready_feature(backlog)
-    
+    feature = None
+
+    if not args.discover:
+        feature = get_next_ready_feature(backlog)
+
+    if not feature or args.discover:
+        print("[Orchestrator] No ready feature in queue or --discover requested. Initiating Auto-Discovery...")
+        discovered = discover_next_feature()
+        if discovered:
+            backlog = load_backlog()
+            feature = get_next_ready_feature(backlog)
+
     if not feature:
-        print("No features currently ready for migration.")
+        print("No features ready and no new features discovered.")
         sys.exit(0)
         
     print(f"\n=======================================================")

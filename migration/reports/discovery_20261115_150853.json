@@ -1,0 +1,16 @@
+{
+  "discovered_feature": {
+    "id": "006",
+    "slug": "datagrid-column-autofit",
+    "title": "DataGrid Column Widths Auto-Fit to Content",
+    "module": "DataGrid",
+    "priority": 6,
+    "status": "ready",
+    "specification": "specifications/006-datagrid-column-autofit.md",
+    "dependencies": [],
+    "discovered_at": "2026-11-15 15:08:53Z"
+  },
+  "timestamp": "2026-11-15 15:08:53Z",
+  "reference_analyzed": true,
+  "reference_path": "C:\\Users\\madis\\.gemini\\antigravity\\brain\\402edce2-5543-47e7-b999-a3938ad94a00\\scratch\\DevExpress.Blazor.Grid.v26.1.dll"
+}
