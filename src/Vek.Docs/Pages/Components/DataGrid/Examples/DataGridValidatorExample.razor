@@ -1,0 +1,66 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekForm @ref="_form" ValidationDelay="0">
+    <VekDataGrid T="Item"
+                 Items="_items"
+                 Validator="@(_bindValidatorToForm ? _form : _defaultValidator)">
+        <Columns>
+            <TemplateColumn Title="Name">
+                <CellTemplate>
+                    <VekTextField @bind-Value="context.Item.Name"
+                                  Immediate="true"
+                                  Validation="(string name) => ValidateName(name)" />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </VekDataGrid>
+</VekForm>
+
+<VekStack Row>
+    <VekSwitch Color="Color.Primary" @bind-Value="_bindValidatorToForm">Bind VekDataGrid.Validator to VekForm?</VekSwitch>
+    <VekSwitch ReadOnly="true" Value="_form?.IsTouched">VekForm.IsTouched</VekSwitch>
+    <VekSwitch ReadOnly="true" Value="_form?.IsValid">VekForm.IsValid</VekSwitch>
+</VekStack>
+
+@code
+{
+    private readonly Interfaces.IForm _defaultValidator = new DataGridRowValidator();
+    private VekForm _form;
+    private bool _bindValidatorToForm = true;
+
+    private Item[] _items =
+    [
+        new() { Name = "valid" },
+        new() { Name = "invalid" }
+    ];
+
+    private static string ValidateName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return "Name is required";
+        }
+
+        if (name == "invalid")
+        {
+            return "Name must not be 'invalid'";
+        }
+
+        return null;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnParametersSetAsync();
+        if (firstRender)
+        {
+            await _form.ValidateAsync();
+            _form.ResetTouched();
+        }
+    }
+
+    public class Item
+    {
+        public string Name { get; set; }
+    }
+}

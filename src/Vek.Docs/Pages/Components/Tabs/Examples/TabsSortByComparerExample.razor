@@ -1,0 +1,25 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekTabs SortComparer="_customComparer" Elevation="2" Rounded="true" ApplyEffectsToContainer="true" TabPanelsClass="pa-6">
+    <VekTabPanel Text="Tab 2 (Tag=C)" Tag="@( "C" )">
+        <VekText>Content Two</VekText>
+    </VekTabPanel>
+    <VekTabPanel Text="Tab 1 (Tag=B)" Tag="@( "B" )">
+        <VekText>Content One</VekText>
+    </VekTabPanel>
+    <VekTabPanel Text="Tab 3 (Tag=A)" Tag="@( "A" )">
+        <VekText>Content Three</VekText>
+    </VekTabPanel>
+</VekTabs>
+
+@code {
+    private readonly IComparer<VekTabPanel> _customComparer = new CompareByTagAscending();
+
+    private class CompareByTagAscending : IComparer<VekTabPanel>
+    {
+        public int Compare(VekTabPanel x, VekTabPanel y)
+        {
+            return Comparer<string>.Default.Compare( x?.Tag as string, y?.Tag as string );
+        }
+    }
+}

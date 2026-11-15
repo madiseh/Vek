@@ -1,0 +1,10 @@
+﻿<VekPopoverProvider />
+
+<VekTooltip Text="Visible Property" @bind-Visible="TooltipVisible">
+    <VekButton Variant="Variant.Filled" Color="Color.Secondary">My Button</VekButton>
+</VekTooltip>
+
+@code {
+    [Parameter]
+    public bool TooltipVisible { get; set; } = true;
+}

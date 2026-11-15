@@ -1,0 +1,558 @@
+.vek-input {
+  position: relative;
+  color: var(--vek-palette-text-primary);
+  cursor: text;
+  display: inline-flex;
+  box-sizing: border-box;
+  align-items: center;
+  color-scheme: var(--vek-native-html-color-scheme);
+  line-height: 1.1876em;
+
+  &.vek-input-full-width {
+    width: 100%;
+  }
+
+  &.vek-disabled {
+    color: var(--vek-palette-text-disabled);
+    cursor: default;
+  }
+
+  &.vek-disabled > .vek-input-adornment {
+    color: var(--vek-palette-text-disabled);
+    pointer-events: none;
+  }
+
+  &.vek-input-underline {
+    &:before {
+      left: 0;
+      right: 0;
+      bottom: 0;
+      content: "\00a0";
+      position: absolute;
+      transition: border-bottom 0.2s, background-color 0.2s;
+      border-bottom: 1px solid var(--vek-palette-lines-inputs);
+      pointer-events: none;
+    }
+
+    @media(hover: hover) and (pointer: fine) {
+      &:hover:not(.vek-disabled):before {
+        border-bottom: 1px solid var(--vek-palette-action-default);
+      }
+    }
+
+    &:after {
+      left: 0;
+      right: 0;
+      bottom: 0;
+      content: "";
+      position: absolute;
+      transform: scaleX(0);
+      transition: transform 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+      border-bottom: 2px solid var(--vek-palette-primary);
+      pointer-events: none;
+    }
+
+    &.vek-disabled:before {
+      border-bottom-style: dotted;
+    }
+
+    &.vek-input-error:after {
+      transform: scaleX(1);
+      border-bottom-color: var(--vek-palette-error);
+    }
+  }
+
+  &.vek-input-filled {
+    position: relative;
+    transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+    background-color: rgba(0, 0, 0, 0.09);
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+
+    @media(hover: hover) and (pointer: fine) {
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.13);
+      }
+    }
+
+    &.vek-focused {
+      background-color: rgba(0, 0, 0, 0.09);
+    }
+
+    &.vek-disabled {
+      background-color: rgba(0, 0, 0, 0.12);
+    }
+
+    &.vek-input-adorned-start {
+      padding-left: 12px;
+      padding-inline-start: 12px;
+      padding-inline-end: unset;
+    }
+
+    &.vek-input-adorned-end {
+      padding-right: 12px;
+      padding-inline-end: 12px;
+      padding-inline-start: unset;
+    }
+
+    &.vek-input-underline {
+      &:before {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        content: "\00a0";
+        position: absolute;
+        transition: border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+        border-bottom: 1px solid var(--vek-palette-lines-inputs);
+        pointer-events: none;
+      }
+
+      &:after {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        content: "";
+        position: absolute;
+        transform: scaleX(0);
+        transition: transform 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+        border-bottom: 2px solid var(--vek-palette-primary);
+        pointer-events: none;
+      }
+
+      @media(hover: hover) and (pointer: fine) {
+        &:hover:before {
+          border-bottom: 1px solid var(--vek-palette-action-default);
+        }
+      }
+
+      &.vek-disabled:before {
+        border-bottom-style: dotted;
+      }
+
+      &.vek-input-error:after {
+        transform: scaleX(1);
+        border-bottom-color: var(--vek-palette-error);
+      }
+    }
+  }
+
+  &.vek-input-outlined {
+    position: relative;
+    border-width: 0px;
+
+    & .vek-input-outlined-border {
+      display: flex;
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0%;
+      height: 100%;
+      text-align: start;
+      pointer-events: none;
+      border-radius: var(--vek-default-borderradius);
+      border-color: var(--vek-palette-lines-inputs);
+      border-width: 1px;
+      border-style: solid;
+      transition: border-width,border-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    }
+
+    & > .vek-input-outlined-border {
+      legend {
+        float: none;
+        visibility: hidden;
+        font-size: 1rem * 0.75;
+        font-weight: inherit;
+        width: 0;
+        height: 0;
+        margin: 0 11px 0 11px;
+        padding: 0;
+        position: relative;
+        overflow: hidden;
+      }
+    }
+
+    @media(hover: hover) and (pointer: fine) {
+      &:not(.vek-disabled):not(:focus-within):hover .vek-input-outlined-border {
+        border-color: var(--vek-palette-action-default);
+      }
+    }
+
+    // Autofill must open the label notch too since vek-shrink is not set (#9050).
+    &.vek-shrink > .vek-input-outlined-border,
+    &:has(:-webkit-autofill) > .vek-input-outlined-border {
+      legend {
+        width: auto;
+        padding: 0 5px;
+      }
+    }
+
+    &:focus-within > .vek-input-outlined-border, &:focus-within .vek-shrink > .vek-input-outlined-border {
+      legend {
+        width: auto;
+        padding: 0 5px;
+      }
+
+      border-width: 2px;
+      border-color: var(--vek-palette-primary);
+    }
+
+    &.vek-disabled .vek-input-outlined-border {
+      border-color: var(--vek-palette-action-disabled);
+    }
+
+    &.vek-input-adorned-start {
+      padding-left: 14px;
+      padding-inline-start: 14px;
+      padding-inline-end: unset;
+    }
+
+    &.vek-input-adorned-end {
+      padding-right: 14px;
+      padding-inline-end: 14px;
+      padding-inline-start: unset;
+    }
+  }
+}
+
+.vek-input-error .vek-input-outlined-border {
+  border-color: var(--vek-palette-error) !important;
+}
+
+.vek-input:focus-within.vek-input-underline:after {
+  transform: scaleX(1);
+}
+
+.vek-input > input, div.vek-input-slot {
+  &.vek-input-root {
+    font: inherit;
+    color: currentColor;
+    width: 100%;
+    border: 0;
+    height: 1lh;
+    margin: 0;
+    display: block;
+    padding: 6px 0 7px;
+    min-width: 0;
+    background: none;
+    position: relative;
+    box-sizing: content-box;
+    -webkit-tap-highlight-color: transparent;
+
+    @include inputplaceholder {
+      color: currentColor;
+      opacity: 0.42;
+      transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    }
+
+    &.vek-input-root-margin-dense {
+      padding-top: 3px;
+    }
+
+    &.vek-input-root-multiline {
+      height: auto;
+      resize: none;
+      padding: 0;
+    }
+
+    &.vek-input-root-type-search {
+      appearance: textfield;
+    }
+
+    &:focus, &:active {
+      outline: 0;
+    }
+
+    &:invalid {
+      box-shadow: none;
+    }
+
+    &:disabled {
+      opacity: 1;
+    }
+
+    &.vek-input-root-filled {
+      padding: 27px 12px 10px;
+
+      &.vek-input-root-margin-dense {
+        padding-top: 23px;
+        padding-bottom: 6px;
+      }
+
+      &:-webkit-autofill {
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
+      }
+
+      &.vek-input-root-hidden-label {
+        padding-top: 18px;
+        padding-bottom: 19px;
+
+        &.vek-input-root-margin-dense {
+          padding-top: 10px;
+          padding-bottom: 11px;
+        }
+      }
+
+      &.vek-input-root-multiline {
+        padding: 0;
+      }
+
+      &.vek-input-root-adorned-start {
+        padding-left: 0;
+        padding-inline-start: 0;
+        padding-inline-end: 12px;
+      }
+
+      &.vek-input-root-adorned-end {
+        padding-right: 0;
+        padding-inline-end: 0;
+        padding-inline-start: 12px;
+      }
+    }
+  }
+
+  &.vek-input-root-outlined {
+    padding: 18.5px 14px;
+
+
+    &.vek-input-root:-webkit-autofill {
+      border-radius: inherit;
+    }
+
+    &.vek-input-root-margin-dense {
+      padding-top: 10.5px;
+      padding-bottom: 10.5px;
+    }
+
+    &.vek-input-root-adorned-start {
+      padding-left: 0;
+      padding-inline-start: 0;
+      padding-inline-end: 14px;
+    }
+
+    &.vek-input-root-adorned-end {
+      padding-right: 0;
+      padding-inline-end: 0;
+      padding-inline-start: 14px;
+    }
+  }
+
+  &::-ms-reveal, &::-ms-clear {
+    display: none !important;
+  }
+}
+
+.vek-input > textarea {
+  &.vek-input-root {
+    font: inherit;
+    color: currentColor;
+    width: 100%;
+    border: 0;
+    height: auto;
+    margin: 6px 0 7px;
+    padding: 0;
+    display: block;
+    min-width: 0;
+    background: none;
+    position: relative;
+    box-sizing: content-box;
+    letter-spacing: inherit;
+    -webkit-tap-highlight-color: transparent;
+    resize: none;
+    cursor: auto;
+
+    @include inputplaceholder {
+      color: currentColor;
+      opacity: 0.42;
+      transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    }
+
+    &.vek-input-root-margin-dense {
+      margin-top: 0;
+      padding-top: 3px;
+    }
+
+    &.vek-input-root-type-search {
+      appearance: textfield;
+    }
+
+    &:focus, &:active {
+      outline: 0;
+    }
+
+    &:invalid {
+      box-shadow: none;
+    }
+
+    &:disabled {
+      opacity: 1;
+    }
+
+    &.vek-input-root-filled {
+      box-sizing: border-box;
+      margin-top: 27px;
+      margin-bottom: 0;
+      padding: 0px 12px 10px;
+
+      &.vek-input-root-margin-dense {
+        padding-top: 23px;
+        padding-bottom: 6px;
+        mask-image: linear-gradient(to bottom,
+          transparent 23px,
+          black 23px);
+      }
+
+      &:-webkit-autofill {
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
+      }
+
+      &.vek-input-root-hidden-label {
+        padding-top: 18px;
+        padding-bottom: 19px;
+        mask-image: linear-gradient(to bottom,
+          transparent 18px,
+          black 18px);
+
+        &.vek-input-root-margin-dense {
+          padding-top: 10px;
+          padding-bottom: 11px;
+          mask-image: linear-gradient(to bottom,
+            transparent 10px,
+            black 10px);
+        }
+      }
+
+      &.vek-input-root-adorned-start {
+        padding-left: 0;
+        padding-inline-start: 0;
+        padding-inline-end: 12px;
+      }
+
+      &.vek-input-root-adorned-end {
+        padding-right: 0;
+        padding-inline-end: unset;
+        padding-inline-start: 12px;
+      }
+    }
+
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+      z-index: 1;
+      cursor: crosshair;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--vek-palette-lines-inputs);
+      border-radius: 1px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  }
+
+  &.vek-input-root-outlined {
+    box-sizing: border-box;
+    margin-top: 18.5px;
+    margin-bottom: 0;
+    padding: 0px 14px 18.5px;
+
+    &.vek-input-root:-webkit-autofill {
+      border-radius: inherit;
+    }
+
+    &.vek-input-root-margin-dense {
+      margin-top: 0px;
+      padding-top: 10.5px;
+      padding-bottom: 10.5px;
+      mask-image: linear-gradient(to bottom,
+        transparent 10.5px,
+        black 10.5px);
+    }
+
+    &.vek-input-root-adorned-start {
+      padding-left: 0;
+      padding-inline-start: 0;
+      padding-inline-end: 14px;
+    }
+
+    &.vek-input-root-adorned-end {
+      padding-right: 0;
+      padding-inline-end: 0;
+      padding-inline-start: 14px;
+    }
+  }
+}
+
+.vek-input.vek-input-sizing-auto > textarea.vek-input-root.vek-input-root-text {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 6px 0 7px;
+
+  &.vek-input-root-margin-dense {
+    padding-top: 3px;
+  }
+}
+
+.vek-input-adornment {
+  height: 0.01em;
+  display: flex;
+  max-height: 2em;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.vek-input-adornment-start {
+  margin-right: 8px;
+  margin-inline-end: 8px;
+  margin-inline-start: unset;
+
+  &.vek-input-root-filled-shrink {
+    margin-top: 16px;
+  }
+}
+
+.vek-input-adornment-end {
+  margin-left: 8px;
+  margin-inline-start: 8px;
+  margin-inline-end: unset;
+}
+
+.vek-input-number-control.vek-input-showspin .vek-input-adornment-end {
+  margin-right: 12px;
+  margin-inline-end: 12px;
+  margin-inline-start: unset;
+}
+
+.vek-input-number-control.vek-input-showspin .vek-input-underline:not(.vek-input-filled) .vek-input-adornment-end {
+  margin-right: 24px;
+  margin-inline-end: 24px;
+  margin-inline-start: unset;
+}
+
+.vek-input-adornment-disable-pointerevents {
+  pointer-events: none;
+}
+
+.vek-range-input-separator {
+  visibility: hidden;
+  margin: 0 4px;
+}
+
+.vek-input:focus-within .vek-range-input-separator {
+  visibility: visible;
+}
+
+.vek-picker .vek-shrink .vek-range-input-separator {
+  visibility: visible;
+}
+
+.vek-input-input-control {
+  user-select: none;
+}

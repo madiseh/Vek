@@ -1,0 +1,689 @@
+﻿@namespace Vek
+@inherits VekComponentBase
+@typeparam T
+@using Vek.Extensions
+@using Vek.Resources
+@inject InternalVekLocalizer Localizer
+
+@{
+    _currentRenderFilteredItemsCache = null;
+}
+
+<CascadingValue IsFixed="true" Value="this">@Columns</CascadingValue>
+
+<CascadingValue IsFixed="true" Value="this">
+    <div @attributes="UserAttributes" class="@Classname" style="@Stylename">
+        @if (Items != null || HasServerData)
+        {
+            @if (ToolBarContent != null)
+            {
+                <VekToolBar Class="vek-table-toolbar" Style="@HeaderFooterStyle" WrapContent="@ToolBarWrapContent">
+                    @ToolBarContent
+                    @if (ShowMenuIcon)
+                    {
+                        @ToolbarMenu(this)
+                    }
+                </VekToolBar>
+            }
+            else
+            {
+                @if (ShowMenuIcon)
+                {
+                    @*Add the default toolbar.*@
+                    <VekToolBar Class="vek-table-toolbar" Style="@HeaderFooterStyle" WrapContent="@ToolBarWrapContent">
+                        <VekSpacer />
+                        @ToolbarMenu(this)
+                    </VekToolBar>
+                }
+            }
+            <div @ref=_gridElement class="@TableClass" style="@TableStyle">
+                <VekDropContainer @ref="_dropContainer" T="Column<T>" Items="@RenderedColumns" ItemsSelector="(item, dropzone) => RenderedColumnsItemsSelector(item, dropzone)" ItemDropped="ItemUpdatedAsync" CanDropClass="@DropAllowedClass" NoDropClass="@DropNotAllowedClass" ApplyDropClassesOnDragStarted="@ApplyDropClassesOnDragStarted">
+                    <ChildContent>
+                        <table @attributes="TableAttributes" class="vek-table-root" style="@TableRootStyle">
+                            @if (ColGroup != null)
+                            {
+                                <colgroup>
+                                    @ColGroup
+                                </colgroup>
+                            }
+                            <thead class="@HeadClassname">
+                                <CascadingValue Name="IsOnlyHeader" IsFixed="true" Value="true">
+                                    @Header
+                                </CascadingValue>
+                                <tr class="vek-table-row">
+                                    @foreach (var column in RenderedColumns)
+                                    {
+                                        <HeaderCell @key="column" SortDirection="@(GetColumnSortDirection(column.PropertyName))" T="T" Column="@column"></HeaderCell>
+                                    }
+                                </tr>
+                                @if (_filtersMenuVisible && FilterMode == DataGridFilterMode.Simple)
+                                {
+                                    <VekOverlay @bind-Visible="@_filtersMenuVisible" AutoClose OnClosed="@OnFiltersPanelClosed"></VekOverlay>
+                                    <tr class="vek-table-row" style="visibility: collapse; opacity: 0;overflow: hidden;">
+                                        <th colspan="@RenderedColumns.Count" class="vek-table-cell vek-filter-panel-cell">
+                                            <VekPopover UserAttributes="@FiltersPositionAttributes" Open="@_filtersMenuVisible" Paper="true" Class="filters-panel pa-2 vek-popover-position-override" OverflowBehavior="OverflowBehavior.FlipOnOpen" AnchorOrigin="Origin.TopLeft"
+                                                        TransformOrigin="Origin.TopLeft" Elevation="4" Style="width:700px;max-width:700px;" MaxHeight="400">
+                                                @* Escape from any control in the panel bubbles here, so one handler covers built-in and templated filters.
+                                                   It does not render, because every keystroke typed into the panel passes through it. *@
+                                                <div class="filters-panel-content d-contents" @onkeydown="this.AsNonRenderingEventHandler<KeyboardEventArgs>(OnFiltersPanelKeyDownAsync)">
+                                                    @if (FilterTemplate == null)
+                                                    {
+                                                        <VekStack>
+                                                            @foreach (var f in FilterDefinitions)
+                                                            {
+                                                                @Filter(f, null, f.Id == _filterDefinitionIdToFocus)
+                                                            }
+                                                        </VekStack>
+                                                        <VekButton Class="mt-2" StartIcon="@Icons.Material.Filled.Add" OnClick="@AddFilter" Color="@Color.Primary">@Localizer[LanguageResource.VekDataGrid_AddFilter]</VekButton>
+                                                        @if (HasServerData)
+                                                        {
+                                                            <VekButton Class="mt-2" StartIcon="@Icons.Material.Filled.Add" OnClick="@ApplyFiltersAsync" Color="@Color.Primary">@Localizer[LanguageResource.VekDataGrid_Apply]</VekButton>
+                                                        }
+                                                        <VekButton Class="mt-2" StartIcon="@Icons.Material.Filled.Remove" OnClick="@ClearFiltersAsync" Color="@Color.Primary">@Localizer[LanguageResource.VekDataGrid_Clear]</VekButton>
+                                                    }
+                                                    else
+                                                    {
+                                                        @FilterTemplate(this)
+                                                    }
+                                                </div>
+                                            </VekPopover>
+                                        </th>
+                                    </tr>
+                                }
+                                @if (_columnsPanelVisible)
+                                {
+                                    <VekOverlay @bind-Visible="_columnsPanelVisible" AutoClose></VekOverlay>
+                                    <tr class="vek-table-row" style="visibility: collapse; opacity: 0; overflow: hidden;">
+                                        <th colspan="@RenderedColumns.Count" class="vek-table-cell vek-filter-panel-cell">
+                                            <VekPopover UserAttributes="@ColumnsPanelPositionAttributes" Open="@_columnsPanelVisible" Paper="true" Class="@ColumnsPanelClassname" OverflowBehavior="OverflowBehavior.FlipOnOpen"
+                                                        AnchorOrigin="Origin.TopLeft"
+                                                        TransformOrigin="Origin.TopLeft" Elevation="4"
+                                                        Style="max-width:700px;" MaxHeight="400">
+                                                <VekStack Row="true" Justify="Justify.FlexEnd">
+                                                    <div style="min-width:250px">
+                                                        <VekTextField DebounceInterval="500" @bind-Value="@_columnsPanelSearch" OnDebounceIntervalElapsed="@(() => _columnsPanelDropContainer?.Refresh())"
+                                                        Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" Margin="Margin.Dense" FullWidth="true" />
+                                                    </div>
+                                                </VekStack>
+
+                                                <VekDropContainer @ref="_columnsPanelDropContainer" T="Column<T>" Items="@RenderedColumns" ItemsSelector="(item, dropzone) => true"
+                                                ItemDisabled="@((item) => !this.ColumnsPanelReordering)" ItemDropped="ColumnOrderUpdated">
+                                                    <ChildContent>
+                                                        <VekDropZone T="Column<T>" Class="flex-grow-1" AllowReorder=this.ColumnsPanelReordering />
+                                                    </ChildContent>
+                                                    <ItemRenderer>
+                                                        @if (string.IsNullOrEmpty(_columnsPanelSearch) || context.Title?.Contains(_columnsPanelSearch, StringComparison.InvariantCultureIgnoreCase) == true)
+                                                        {
+                                                            <VekStack Row="true" Spacing="@(Dense ? 1 : 2)" AlignItems="AlignItems.Center" Style="border-bottom: 1px solid var(--vek-palette-table-lines);">
+                                                                @if (ColumnsPanelReordering)
+                                                                {
+                                                                    <VekStack Spacing="0">
+                                                                        @if (RenderedColumns.IndexOf(context) != 0)
+                                                                        {
+                                                                            <VekIconButton Ripple="false" Icon="@Icons.Material.Filled.ArrowDropUp" Size="@Size.Small" title=@Localizer[LanguageResource.VekDataGrid_MoveUp] Disabled="@(RenderedColumns.IndexOf(context) == 0)" OnClick="@(e => ColumnUp(context))"></VekIconButton>
+                                                                        }
+                                                                        @if (RenderedColumns.IndexOf(context) != RenderedColumns.Count - 1)
+                                                                        {
+                                                                            <VekIconButton Ripple="false" Icon="@Icons.Material.Filled.ArrowDropDown" Size="@Size.Small" title=@Localizer[LanguageResource.VekDataGrid_MoveDown] Disabled="@(RenderedColumns.IndexOf(context) == RenderedColumns.Count - 1)" OnClick="@(e => ColumnDown(context))"></VekIconButton>
+                                                                        }
+                                                                    </VekStack>
+                                                                }
+
+                                                                @if (context.GroupingState.Value)
+                                                                {
+                                                                    <VekIconButton Ripple="false" Icon="@Icons.Material.Filled.AccountTree" Size="@Size.Small" title=@Localizer[LanguageResource.VekDataGrid_Ungroup] Disabled="!context.groupable" OnClick="@(e => context.HeaderCell.UngroupColumnAsync())"></VekIconButton>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <VekIconButton Ripple="false" Icon="@Icons.Material.Filled.TableRows" Size="@Size.Small" title=@Localizer[LanguageResource.VekDataGrid_Group] Disabled="!context.groupable" OnClick="@(e => context.HeaderCell.GroupColumnAsync())"></VekIconButton>
+                                                                }
+                                                                <VekSwitch T="bool" Ripple="false" Class="flex-grow-1" Color="Color.Primary" Disabled="@(!context.hideable)" Value="@context.HiddenState.Value" ValueChanged="@context.ToggleAsync" Converter="_oppositeBoolConverter" Label="@context.Title" Size="@(Dense ? Size.Small : Size.Medium)" />
+                                                                <VekSpacer />
+
+                                                                <div>
+                                                                    <VekIconButton Ripple="false" Icon="@context.DataGrid.SortIcon" Class="@context.HeaderCell.sortIconClass" Size="@Size.Small" title=@Localizer[LanguageResource.VekDataGrid_Sort] Disabled="!context.sortable" OnClick="@(e => context.HeaderCell.SortChangedAsync(e))"></VekIconButton>
+                                                                    @if (context.DataGrid.SortMode == SortMode.Multiple)
+                                                                    {
+                                                                        if (context.SortIndex < 0)
+                                                                        {
+                                                                            <span class="vek-sort-index vek-text-disabled invisible">@(context.SortIndex + 1)</span>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <span class="vek-sort-index vek-text-disabled">@(context.SortIndex + 1)</span>
+                                                                        }
+                                                                    }
+                                                                </div>
+
+                                                                @if (context.HeaderCell.hasFilter)
+                                                                {
+                                                                    <VekIconButton Ripple="false" Class="filter-button filtered" Icon="@context.DataGrid.FilterIconFilled" Size="@Size.Small" title=@Localizer[LanguageResource.VekDataGrid_Filter] Disabled="!context.filterable" OnClick="@context.HeaderCell.OpenFilters"></VekIconButton>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <VekIconButton Ripple="false" Class="filter-button" Icon="@context.DataGrid.FilterIconEmpty" Size="@Size.Small" title=@Localizer[LanguageResource.VekDataGrid_Filter] Disabled="!context.filterable" OnClick="@context.HeaderCell.AddFilter"></VekIconButton>
+                                                                }
+
+                                                                @if (ColumnsPanelReordering)
+                                                                {
+                                                                    <VekIconButton Ripple="false" Icon="@context.DataGrid.DragIndicatorIcon" Size="@Size.Small" Class="drag-icon-options" aria-label="@Localizer[LanguageResource.VekDataGrid_ReorderColumn]"></VekIconButton>
+                                                                }
+                                                            </VekStack>
+                                                        }
+                                                    </ItemRenderer>
+                                                </VekDropContainer>
+                                                <VekStack Row="true">
+                                                    @if (Groupable)
+                                                    {
+                                                        <VekButton OnClick="@CollapseAllGroupsAsync" Color="@Color.Primary">@Localizer[LanguageResource.VekDataGrid_CollapseAllGroups]</VekButton>
+                                                        <VekButton OnClick="@ExpandAllGroupsAsync" Color="@Color.Primary">@Localizer[LanguageResource.VekDataGrid_ExpandAllGroups]</VekButton>
+                                                    }
+                                                    <VekSpacer />
+
+                                                    <VekButton OnClick="@HideAllColumnsAsync" Color="@Color.Primary">@Localizer[LanguageResource.VekDataGrid_HideAll]</VekButton>
+                                                    <VekButton OnClick="@ShowAllColumnsAsync" Color="@Color.Primary">@Localizer[LanguageResource.VekDataGrid_ShowAll]</VekButton>
+                                                </VekStack>
+                                            </VekPopover>
+                                        </th>
+                                    </tr>
+                                }
+                                @if (Filterable && FilterMode == DataGridFilterMode.ColumnFilterRow)
+                                {
+                                    <tr class="vek-table-row">
+                                        @foreach (var column in RenderedColumns)
+                                        {
+                                            <FilterHeaderCell T="T" Column="@column" />
+                                        }
+                                    </tr>
+                                }
+                                @if (Loading)
+                                {
+                                    <tr>
+                                        <th colspan="1000" class="vek-table-loading">
+                                            <VekProgressLinear Color="@LoadingProgressColor" Class="vek-table-loading-progress" Indeterminate="true" aria-label="@Localizer[LanguageResource.VekDataGrid_Loading]" />
+                                        </th>
+                                    </tr>
+                                }
+                            </thead>
+                            <tbody class="@BodyClassname">
+                                @{
+                                    // Reading CurrentPageItems refreshes FilteredItems, and with it the grouping state, so it has to happen before IsGrouped picks which body to render.
+                                    var hasCurrentPageItems = CurrentPageItems.Any();
+                                }
+                                @if (Virtualize || hasCurrentPageItems)
+                                {
+                                    if (IsGrouped)
+                                    {
+                                        var groupItemsPage = GroupItemsPage;
+                                        var groupDefinitions = GetGroupDefinitions(_groupDefinition!, groupItemsPage);
+                                        if (!groupItemsPage.Any())
+                                        {
+                                            <tr>
+                                                <th colspan="1000" class="vek-table-empty-row">
+                                                    <div Class="my-3">
+                                                        @NoRecordsContent
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        }
+                                        foreach (var g in groupDefinitions)
+                                        {
+                                            <DataGridGroupRow T="T" Items="@g.Grouping" 
+                                            GroupDefinition="@g"                                                             
+                                            GroupClass="@GroupClass"
+                                            GroupStyle="@GroupStyle"
+                                            GroupClassFunc="@GroupClassFunc"
+                                            GroupStyleFunc="@GroupStyleFunc"
+                                            DataGrid="this"
+                                            RowClick="@(args => OnRowClickedAsync(args.args, args.item, args.index))"
+                                            ContextRowClick="@(args => OnContextMenuClickedAsync(args.args, args.item, args.index))" />
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <DataGridVirtualizeRow T="T" DataGrid="this" 
+                                        RowClick="@(args => OnRowClickedAsync(args.args, args.item, args.index))" 
+                                        ContextRowClick="@(args => OnContextMenuClickedAsync(args.args, args.item, args.index))" />
+                                    }
+                                }
+                                else if (Loading ? LoadingContent != null : NoRecordsContent != null)
+                                {
+                                    <tr>
+                                        <th colspan="1000" class="vek-table-empty-row">
+                                            <div Class="my-3">
+                                                @if (Loading)
+                                                {
+                                                    @LoadingContent
+                                                }
+                                                else
+                                                {
+                                                    @NoRecordsContent
+                                                }
+                                            </div>
+                                        </th>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot class="@FootClassname">
+                                <tr class="vek-table-row">
+                                    @FooterCells(CurrentPageItems)
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </ChildContent>
+                    <ItemRenderer>
+                        @if (DragDropColumnReordering && ColumnReorderMode == DataGridDragAndDropColumnReorderMode.Insert)
+                        {
+                            var currentIndex = RenderedColumns.IndexOf(context);
+                            var isFirst = currentIndex == 0;
+                            var previousColumn = !isFirst ? RenderedColumns[currentIndex - 1] : null;
+                            var isPreZoneAllowed = (context.DragAndDropEnabled ?? true) && (previousColumn?.DragAndDropEnabled ?? true);
+
+                            <div class="d-flex position-relative" style="width: 100%; height: 100%;">
+                                <VekDropZone T="Column<T>"
+                                             Identifier="@($"{PrePrefix}{context.PropertyName}")"
+                                             AllowReorder="@isPreZoneAllowed"
+                                             Class="grid-dropzone dropzone-pre"
+                                             CanDrop="@(item => isPreZoneAllowed)" />
+                                <div style="width: 100%">
+                                    @context.HeaderCell.TableHeader()
+                                </div>
+                                @if (currentIndex == RenderedColumns.Count - 1)
+                                {
+                                    <VekDropZone T="Column<T>"
+                                                 Identifier="@($"{PostPrefix}{context.PropertyName}")"
+                                                 AllowReorder="@(context.DragAndDropEnabled ?? true)"
+                                                 Class="grid-dropzone dropzone-post"
+                                                 CanDrop="@(item => context.DragAndDropEnabled != false)" />
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            @context.HeaderCell.TableHeader()
+                        }
+                    </ItemRenderer>
+                </VekDropContainer>
+            </div>
+            @if (PagerContent != null)
+            {
+                <div class="vek-table-pagination" style="@HeaderFooterStyle">
+                    @PagerContent
+                </div>
+            }
+        }
+    </div>
+    <CascadingValue Value="true" IsFixed Name="IsNested">
+        <VekDialog Options="EditDialogOptions" @bind-Visible="_isEditFormOpen" DefaultFocus="DefaultFocus.FirstChild">
+            <DialogContent>
+                <VekForm @ref="_editForm" FieldChanged="FormFieldChanged">
+                    @foreach (var column in RenderedColumns)
+                    {
+                        var cell = new Cell<T>(this, column, _editingItem!, _editingSourceItem!);
+
+                        if (column.EditTemplate != null)
+                        {
+                            @column.EditTemplate(cell.Context)
+                        }
+                        else
+                        {
+                            var propertyType = column.PropertyType;
+
+                            if (propertyType == typeof(string))
+                            {
+                                <VekTextField T="string" Label="@column.Title" Value="@cell._valueString" ValueChanged="@cell.StringValueChangedAsync" Margin="@Margin.Dense"
+                                Required="@column.Required" Variant="@Variant.Outlined" Disabled="@(!column.Editable || ReadOnly)" Class="mt-4" Culture="@column.Culture" />
+                            }
+                            else if (TypeIdentifier.IsNumber(propertyType))
+                            {
+                                <VekNumericField T="double?" Label="@column.Title" Value="@cell._valueNumber" ValueChanged="@cell.NumberValueChangedAsync" Margin="@Margin.Dense"
+                                Required="@column.Required" Variant="@Variant.Outlined" Disabled="@(!column.Editable || ReadOnly)" Class="mt-4" Culture="@column.Culture" Format="@column.ContentFormat" />
+                            }
+                        }
+                    }
+                </VekForm>
+            </DialogContent>
+            <DialogActions>
+                <VekButton Variant="Variant.Filled" Color="Color.Default" OnClick="@CancelEditingItemAsync" Class="px-10">@Localizer[LanguageResource.VekDataGrid_Cancel]</VekButton>
+                <VekButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@CommitItemChangesAsync" Class="px-10">@Localizer[LanguageResource.VekDataGrid_Save]</VekButton>
+            </DialogActions>
+        </VekDialog>
+    </CascadingValue>
+</CascadingValue>
+
+@code {
+
+    internal RenderFragment ToolbarMenu(VekDataGrid<T> dataGrid) =>
+    @<text>
+        <VekMenu Icon="@Icons.Material.Outlined.Settings" Size="Size.Small" Dense="true" AriaLabel="@Localizer[LanguageResource.VekDataGrid_Columns]">
+            <VekMenuItem OnClick="@dataGrid.ShowColumnsPanel">@Localizer[LanguageResource.VekDataGrid_Columns]</VekMenuItem>
+                @if (dataGrid.IsGrouped)
+                {
+                    <VekMenuItem OnClick="@dataGrid.ExpandAllGroupsAsync">@Localizer[LanguageResource.VekDataGrid_ExpandAllGroups]</VekMenuItem>
+                    <VekMenuItem OnClick="@dataGrid.CollapseAllGroupsAsync">@Localizer[LanguageResource.VekDataGrid_CollapseAllGroups]</VekMenuItem>
+                }
+                @if (dataGrid.HasHierarchyColumn)
+                {
+                    <VekMenuItem OnClick="@dataGrid.ExpandAllHierarchy">@Localizer[LanguageResource.VekDataGrid_ExpandAllGroups]</VekMenuItem>
+                    <VekMenuItem OnClick="@dataGrid.CollapseAllHierarchy">@Localizer[LanguageResource.VekDataGrid_CollapseAllGroups]</VekMenuItem>
+                }
+                @if (dataGrid.HasServerData)
+                {
+                    <VekMenuItem OnClick="@dataGrid.InvokeServerLoadFunc">@Localizer[LanguageResource.VekDataGrid_RefreshData]</VekMenuItem>
+                }
+            </VekMenu>
+         </text>
+    ;
+
+
+
+    internal RenderFragment FooterCells(IEnumerable<T> currentItems, IEnumerable<T>? groupItems = null) =>
+        @<text>
+             @if (currentItems is not null)
+             {
+                 foreach (var column in RenderedColumns)
+                 {
+                     if (!column.HiddenState.Value)
+                     {
+                         if (column.AggregateDefinition is not null || column.GetFooterTemplate() is not null || HasFooter)
+                         {
+                             <FooterCell T="T" Column="@column" CurrentItems="@currentItems" GroupItems="@groupItems"></FooterCell>
+                         }
+                     }
+                 }
+             }
+         </text>;
+
+
+    internal RenderFragment Cell(Column<T> column, T item, int rowIndex, int colIndex) =>
+        @<text>
+             @{
+                 // For inline editing, use the editing copy if this row is being edited
+                 var effectiveItem = GetEditingItemOrSource(item);
+                 var cell = new Cell<T>(this, column, effectiveItem, item);
+                 var isInlineEditing = EditMode == DataGridEditMode.Inline && IsEditingItem(item);
+                 var cellTemplate = column.GetCellTemplate();
+                 // Determine if we should show edit mode controls:
+                 // - Column must be Editable AND not ReadOnly
+                 // - Either in Cell edit mode OR this row is being inline edited
+                 // - Must have an EditTemplate OR be a supported type (string/number)
+                 // If we have only a CellTemplate (like action buttons), always use CellTemplate
+                 var hasEditableContent = column.EditTemplate is not null ||
+                                          column.PropertyType == typeof(string) ||
+                                          column.isNumber;
+                 var showEditMode = column.Editable && !ReadOnly &&
+                                    (EditMode == DataGridEditMode.Cell || isInlineEditing) &&
+                                    hasEditableContent;
+                 var cellClickCallback = GetCellClickCallback(item, rowIndex, colIndex, column);
+                 var cellContextMenuClickCallback = GetCellContextMenuClickCallback(item, rowIndex, colIndex, column);
+             }
+             <td data-label="@column.Title" class="@cell.ComputedClass" style="@cell.ComputedStyle"
+                 @onclick="cellClickCallback"
+                 @onclick:stopPropagation="@CellClick.HasDelegate"
+                 @oncontextmenu="cellContextMenuClickCallback"
+                 @oncontextmenu:stopPropagation="@CellContextMenuClick.HasDelegate"
+                 @oncontextmenu:preventDefault="@CellContextMenuClick.HasDelegate">
+
+                 @if (showEditMode)
+                 {
+                     if (isInlineEditing)
+                     {
+                         @* An inline editor registers with the grid's own validator, which forwards it to Validator but keeps a commit scoped to the row being edited. *@
+                         <CascadingValue TValue="Interfaces.IForm" Value="@_inlineEditValidator" IsFixed="true">
+                             @EditCell(column, cell)
+                         </CascadingValue>
+                     }
+                     else
+                     {
+                         @* Cell edit mode reuses the row-level Validator cascade so a grid full of editors does not double the component count. *@
+                         @EditCell(column, cell)
+                     }
+                 }
+                 else
+                 {
+                     if (cellTemplate is not null)
+                     {
+                         @cellTemplate(cell.Context)
+                     }
+                     else if (column.Culture is not null && column.isNumber)
+                     {
+                         if (column.ContentFormat is not null)
+                         {
+                             @(((IFormattable?)cell._valueNumber)?.ToString(column.ContentFormat, column.Culture))
+                         }
+                         else
+                         {
+                             @cell._valueNumber?.ToString(column.Culture)
+                         }
+                     }
+                     else
+                     {
+                         if (column.ContentFormat is not null)
+                         {
+                             @(((IFormattable?)cell.ComputedValue)?.ToString(column.ContentFormat, column.Culture))
+                         }
+                         else
+                         {
+                             @cell.ComputedValue
+                         }
+                     }
+                 }
+             </td>
+         </text>;
+
+    internal RenderFragment EditCell(Column<T> column, Cell<T> cell) =>
+        @<text>
+             @if (column.EditTemplate is not null)
+             {
+                 @column.EditTemplate(cell.Context)
+             }
+             else if (column.PropertyType == typeof(string))
+             {
+                 <VekTextField T="string"
+                               Value="@cell._valueString"
+                               ValueChanged="@cell.StringValueChangedAsync"
+                               Margin="@Margin.Dense" Style="margin-top:0"
+                               Required="@column.Required"
+                               Variant="@Variant.Text" Culture="@column.Culture" />
+             }
+             else if (column.isNumber)
+             {
+                 <VekNumericField T="double?"
+                                  Value="@cell._valueNumber"
+                                  ValueChanged="@cell.NumberValueChangedAsync"
+                                  Margin="@Margin.Dense" Style="margin-top:0"
+                                  Required="@column.Required"
+                                  Variant="@Variant.Text" Culture="@column.Culture"
+                                  Format="@column.ContentFormat" />
+             }
+         </text>;
+
+    internal RenderFragment Filter(IFilterDefinition<T> filterDefinition, Column<T>? column, bool autoFocus = false) =>
+        @<text>
+            @{
+                var filter = new Filter<T>(this, filterDefinition, column);
+                var fieldType = filterDefinition.FieldType;
+            }
+            @if (column is null)
+            {
+                <VekGrid Spacing="0">
+                    <VekItem xs="1" Class="d-flex">
+                        <VekIconButton Class="remove-filter-button" Icon="@Icons.Material.Filled.Close" OnClick="@filter.RemoveFilterAsync" Size="@Size.Small" Style="align-self: flex-end" aria-label="@Localizer[LanguageResource.VekDataGrid_RemoveFilter]"></VekIconButton>
+                    </VekItem>
+                    <VekItem xs="4">
+                        <VekSelect T="Column<T>" 
+                                   Value="@filter.FilterColumn"
+                                   ValueChanged="@filter.FieldChanged"
+                                   FullWidth="true" 
+                                   Label="@Localizer[LanguageResource.VekDataGrid_Column]" 
+                                   Dense="true" 
+                                   Margin="@Margin.Dense"
+                                   Class="filter-field"
+                                   AutoFocus="@autoFocus">
+                            @foreach (var renderColumn in RenderedColumns.Where(x => x.Filterable != false))
+                            {
+                                <VekSelectItem T="Column<T>" Value="@renderColumn">@renderColumn.Title</VekSelectItem>
+                            }
+                        </VekSelect>
+                    </VekItem>
+                    @if (filterDefinition.Column?.FilterTemplate != null)
+                    {
+                        var filterContext = CreateFilterContext(filterDefinition.Column, filterDefinition);
+                        <VekItem xs="7">
+                            @filterDefinition.Column.FilterTemplate(filterContext)
+                        </VekItem>
+                    }
+                    else
+                    {
+                        <VekItem xs="3">
+                            <VekSelect T="string" Value="@filterDefinition.Operator" ValueChanged="@filter.OperatorChanged" FullWidth="true" Label="@Localizer[LanguageResource.VekDataGrid_Operator]" Dense="true" Margin="@Margin.Dense"
+                                       Class="filter-operator">
+                                @foreach (var fieldOperator in filterDefinition.Column!.GetFilterOperators(fieldType))
+                                {
+                                    <VekSelectItem Value="@fieldOperator">@Localizer[FilterOperator.GetTranslationKeyByOperatorName(fieldOperator)]</VekSelectItem>
+                                }
+                            </VekSelect>
+                        </VekItem>
+                        <VekItem xs="4">
+                            @if (fieldType.IsString && !(filterDefinition.Operator ?? "").EndsWith("empty"))
+                            {
+                                <VekTextField T="string" Value="@filter._valueString" ValueChanged="@filter.StringValueChanged" FullWidth="true" Label="@Localizer[LanguageResource.VekDataGrid_Value]" Placeholder="@Localizer[LanguageResource.VekDataGrid_FilterValue]" Margin="@Margin.Dense"
+                                              Immediate="true" Class="filter-input" />
+                            }
+                            else if (fieldType.IsNumber && !(filterDefinition.Operator ?? "").EndsWith("empty"))
+                            {
+                                <VekNumericField T="double?" Value="@filter._valueNumber" ValueChanged="@filter.NumberValueChanged" FullWidth="true" Label="@Localizer[LanguageResource.VekDataGrid_Value]" Placeholder="@Localizer[LanguageResource.VekDataGrid_FilterValue]" Margin="@Margin.Dense"
+                                                 Immediate="true" Class="filter-input" Culture="@filter.FilterColumn?.Culture"/>
+                            }
+                            else if (fieldType.IsEnum && filterDefinition.Operator == FilterOperator.Enum.IsAnyOf)
+                            {
+                                <VekSelect T="Enum" MultiSelection="true" SelectedValues="@filter._valueEnums" SelectedValuesChanged="@filter.EnumValuesChanged" FullWidth="true" Label="@Localizer[LanguageResource.VekDataGrid_Value]" Placeholder="@Localizer[LanguageResource.VekDataGrid_FilterValue]" Dense="true" Margin="@Margin.Dense"
+                                           Class="filter-input">
+                                    @foreach (var item in EnumExtensions.GetSafeEnumValues(fieldType.InnerType))
+                                    {
+                                        <VekSelectItem T="Enum" Value="@item">@Localizer[item]</VekSelectItem>
+                                    }
+                                </VekSelect>
+                            }
+                            else if (fieldType.IsEnum)
+                            {
+                                <VekSelect T="Enum" Value="@filter._valueEnum" ValueChanged="@filter.EnumValueChanged" FullWidth="true" Label="@Localizer[LanguageResource.VekDataGrid_Value]" Placeholder="@Localizer[LanguageResource.VekDataGrid_FilterValue]" Dense="true" Margin="@Margin.Dense"
+                                           Class="filter-input">
+                                    <VekSelectItem T="Enum" Value="@(null)"></VekSelectItem>
+                                    @foreach (var item in EnumExtensions.GetSafeEnumValues(fieldType.InnerType))
+                                    {
+                                        <VekSelectItem T="Enum" Value="@item">@Localizer[item]</VekSelectItem>
+                                    }
+                                </VekSelect>
+                            }
+                            else if (fieldType.IsBoolean)
+                            {
+                                <VekSelect T="bool?" Value="@filter._valueBool" ValueChanged="@filter.BoolValueChanged" FullWidth="true" Label="@Localizer[LanguageResource.VekDataGrid_Value]" Placeholder="@Localizer[LanguageResource.VekDataGrid_FilterValue]" Dense="true" Margin="@Margin.Dense"
+                                           Class="filter-input">
+                                    <VekSelectItem T="bool?" Value="@(null)"></VekSelectItem>
+                                    <VekSelectItem T="bool?" Value="@(true)">@Localizer[LanguageResource.VekDataGrid_True]</VekSelectItem>
+                                    <VekSelectItem T="bool?" Value="@(false)">@Localizer[LanguageResource.VekDataGrid_False]</VekSelectItem>
+                                </VekSelect>
+                            }
+                            else if (fieldType.IsDateOnly && !(filterDefinition.Operator ?? "").EndsWith("empty"))
+                            {
+                                <VekDatePicker Date="@filter._valueDateOnlyForPicker" DateChanged="@filter.DateOnlyValueChanged" Label="@Localizer[LanguageResource.VekDataGrid_Value]" Placeholder="@Localizer[LanguageResource.VekDataGrid_FilterValue]" Margin="@Margin.Dense" Class="filter-input-date"/>
+                            }
+                            else if (fieldType.IsDateTime && !(filterDefinition.Operator ?? "").EndsWith("empty"))
+                            {
+                                <VekGrid Spacing="0">
+                                    <VekItem xs="7">
+                                        <VekDatePicker Date="@filter._valueDateTimeForPicker" DateChanged="@filter.DateValueChanged" Label="@Localizer[LanguageResource.VekDataGrid_Value]" Placeholder="@Localizer[LanguageResource.VekDataGrid_FilterValue]" Margin="@Margin.Dense" Class="filter-input-date"/>
+                                    </VekItem>
+                                    <VekItem xs="5">
+                                        <VekTimePicker Time="@filter._valueTime" TimeChanged="@filter.TimeValueChanged" Label="@Localizer[LanguageResource.VekDataGrid_Value]" Placeholder="@Localizer[LanguageResource.VekDataGrid_FilterValue]" Margin="@Margin.Dense" Class="filter-input-time" />
+                                    </VekItem>
+                                </VekGrid>
+                            }
+                            else if (fieldType.IsGuid)
+                            {
+                                <VekTextField T="Guid?" Value="@filter._valueGuid" ValueChanged="@filter.GuidValueChanged" FullWidth="true" Label="@Localizer[LanguageResource.VekDataGrid_Value]" Placeholder="@Localizer[LanguageResource.VekDataGrid_FilterValue]" Margin="@Margin.Dense"
+                                              Immediate="true" Class="filter-input"/>
+                            }
+                        </VekItem>
+                    }
+                </VekGrid>
+            }
+            else
+            {
+                <VekGrid Spacing="0">
+                    <VekItem xs="12">
+                        <VekSelect T="string" Value="@filterDefinition.Operator" ValueChanged="@filter.SetOperator" FullWidth="true" Dense="true" Margin="@Margin.Dense"
+                                   Class="filter-operator">
+                            @foreach (var o in column.GetFilterOperators(fieldType))
+                            {
+                                <VekSelectItem Value="@o">@Localizer[FilterOperator.GetTranslationKeyByOperatorName(o)]</VekSelectItem>
+                            }
+                        </VekSelect>
+                    </VekItem>
+                    <VekItem xs="12">
+                        @if (fieldType.IsString && !(filterDefinition.Operator ?? "").EndsWith("empty"))
+                        {
+                            <VekTextField T="string" Value="@filter._valueString" ValueChanged="@filter.StringValueChanged" FullWidth="true" Placeholder="@Localizer[LanguageResource.VekDataGrid_FilterValue]" Margin="@Margin.Dense"
+                                          Immediate="true" Class="filter-input" AutoFocus="true" OnKeyDown="@filter.KeyDown"/>
+                        }
+                        else if (fieldType.IsNumber && !(filterDefinition.Operator ?? "").EndsWith("empty"))
+                        {
+                            <VekNumericField T="double?" Value="@filter._valueNumber" ValueChanged="@filter.NumberValueChanged" FullWidth="true" Placeholder="@Localizer[LanguageResource.VekDataGrid_FilterValue]" Margin="@Margin.Dense"
+                                             Immediate="true" Class="filter-input" Culture="@filter.FilterColumn?.Culture" AutoFocus="true" OnKeyDown="@filter.KeyDown"/>
+                        }
+                        else if (fieldType.IsEnum && filterDefinition.Operator == FilterOperator.Enum.IsAnyOf)
+                        {
+                            <VekSelect T="Enum" MultiSelection="true" SelectedValues="@filter._valueEnums" SelectedValuesChanged="@filter.EnumValuesChanged" FullWidth="true" Placeholder="@Localizer[LanguageResource.VekDataGrid_FilterValue]" Dense="true" Margin="@Margin.Dense"
+                                       Class="filter-input">
+                                @foreach (var item in EnumExtensions.GetSafeEnumValues(fieldType.InnerType))
+                                {
+                                    <VekSelectItem T="Enum" Value="@item">@Localizer[item]</VekSelectItem>
+                                }
+                            </VekSelect>
+                        }
+                        else if (fieldType.IsEnum)
+                        {
+                            <VekSelect T="Enum" Value="@filter._valueEnum" ValueChanged="@filter.EnumValueChanged" FullWidth="true" Placeholder="@Localizer[LanguageResource.VekDataGrid_FilterValue]" Dense="true" Margin="@Margin.Dense"
+                                       Class="filter-input">
+                                <VekSelectItem T="Enum" Value="@(null)"></VekSelectItem>
+                                @foreach (var item in EnumExtensions.GetSafeEnumValues(fieldType.InnerType))
+                                {
+                                    <VekSelectItem T="Enum" Value="@item">@Localizer[item]</VekSelectItem>
+                                }
+                            </VekSelect>
+                        }
+                        else if (fieldType.IsBoolean)
+                        {
+                            <VekSelect T="bool?" Value="@filter._valueBool" ValueChanged="@filter.BoolValueChanged" FullWidth="true" Placeholder="@Localizer[LanguageResource.VekDataGrid_FilterValue]" Dense="true" Margin="@Margin.Dense"
+                                       Class="filter-input">
+                                <VekSelectItem T="bool?" Value="@(null)"></VekSelectItem>
+                                <VekSelectItem T="bool?" Value="@(true)">@Localizer[LanguageResource.VekDataGrid_True]</VekSelectItem>
+                                <VekSelectItem T="bool?" Value="@(false)">@Localizer[LanguageResource.VekDataGrid_False]</VekSelectItem>
+                            </VekSelect>
+                        }
+                        else if (fieldType.IsDateOnly && !(filterDefinition.Operator ?? "").EndsWith("empty"))
+                        {
+                            <VekDatePicker Date="@filter._valueDateOnlyForPicker" DateChanged="@filter.DateOnlyValueChanged" Placeholder="@Localizer[LanguageResource.VekDataGrid_FilterValue]" Margin="@Margin.Dense" Class="filter-input-date"/>
+                        }
+                        else if (fieldType.IsDateTime && !(filterDefinition.Operator ?? "").EndsWith("empty"))
+                        {
+                            <VekGrid Spacing="0">
+                                <VekItem xs="7">
+                                    <VekDatePicker Date="@filter._valueDateTimeForPicker" DateChanged="@filter.DateValueChanged" Placeholder="@Localizer[LanguageResource.VekDataGrid_FilterValue]" Margin="@Margin.Dense" Class="filter-input-date"/>
+                                </VekItem>
+                                <VekItem xs="5">
+                                    <VekTimePicker Time="@filter._valueTime" TimeChanged="@filter.TimeValueChanged" Placeholder="@Localizer[LanguageResource.VekDataGrid_FilterValue]" Margin="@Margin.Dense" Class="filter-input-time"/>
+                                </VekItem>
+                            </VekGrid>
+                        }
+                        else if (fieldType.IsGuid)
+                        {
+                            <VekTextField T="Guid?" Value="@filter._valueGuid" ValueChanged="@filter.GuidValueChanged" FullWidth="true" Placeholder="@Localizer[LanguageResource.VekDataGrid_FilterValue]" Margin="@Margin.Dense"
+                                          Immediate="true" Class="filter-input" AutoFocus="true" OnKeyDown="@filter.KeyDown"/>
+                        }
+                    </VekItem>
+                </VekGrid>
+            }
+         </text>;
+}

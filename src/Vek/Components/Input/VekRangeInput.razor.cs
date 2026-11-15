@@ -1,0 +1,240 @@
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Vek.Utilities;
+
+namespace Vek
+{
+    /// <summary>
+    /// Collects start and end values that define a range using two input fields, as used by the <see cref="VekDateRangePicker"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of object managed by this input.</typeparam>
+    /// <seealso cref="VekBaseInput{T}" />
+    /// <seealso cref="VekDateRangePicker" />
+    /// <seealso cref="VekInput{T}" />
+    public partial class VekRangeInput<T> : VekBaseInput<Range<T>>
+    {
+        private string? _textStart;
+        private string? _textEnd;
+        private ElementReference _elementReferenceStart;
+        private ElementReference _elementReferenceEnd;
+
+        /// <summary>
+        /// Creates a new instance.
+        /// </summary>
+        public VekRangeInput()
+        {
+            Value = new Range<T>();
+        }
+
+        protected string Classname => VekInputCssHelper.GetClassname(this,
+            () => !string.IsNullOrEmpty(ReadText)
+                  || Adornment == Adornment.Start
+                  || !string.IsNullOrWhiteSpace(PlaceholderStart)
+                  || !string.IsNullOrWhiteSpace(PlaceholderEnd)
+                  || ShrinkLabel);
+
+        protected internal override InputType GetInputType() => InputType;
+
+        protected string InputClassname => VekInputCssHelper.GetInputClassname(this);
+
+        protected string AdornmentClassname => VekInputCssHelper.GetAdornmentClassname(this);
+
+        protected string ClearButtonClassname =>
+            new CssBuilder("vek-input-clear-button")
+                .AddClass(Adornment is Adornment.Start ? "me-0" : "me-n4")
+                .Build();
+
+        /// <summary>
+        /// The type of input collected by this component.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="InputType.Text"/>.  Represents a valid HTML5 input type.
+        /// </remarks>
+        [Parameter]
+        public InputType InputType { get; set; } = InputType.Text;
+
+        /// <summary>
+        /// The hint displayed before the user enters a starting value.
+        /// </summary>
+        [Parameter]
+        public string? PlaceholderStart { get; set; }
+
+        /// <summary>
+        /// The hint displayed before the user enters an ending value.
+        /// </summary>
+        [Parameter]
+        public string? PlaceholderEnd { get; set; }
+
+        /// <summary>
+        /// The accessible name for the starting input field.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to a localized <c>Start</c> label when <c>null</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public string? StartInputAriaLabel { get; set; }
+
+        /// <summary>
+        /// The accessible name for the ending input field.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to a localized <c>End</c> label when <c>null</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public string? EndInputAriaLabel { get; set; }
+
+        /// <summary>
+        /// Occurs when the Clear button is clicked.
+        /// </summary>
+        /// <remarks>
+        /// When clicked, the <see cref="VekBaseInput{T}.Text"/> and <see cref="VekBaseInput{T}.Value"/> properties are reset.
+        /// </remarks>
+        [Parameter]
+        public EventCallback<MouseEventArgs> OnClearButtonClick { get; set; }
+
+        /// <summary>
+        /// Shows a button at the end of the input to clear the value.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// When <c>true</c>, an icon is displayed which, when clicked, clears the Text and Value.  Use the <see cref="ClearIcon"/> property to control the Clear button icon.
+        /// </remarks>
+        [Parameter]
+        public bool Clearable { get; set; }
+
+        /// <summary>
+        /// Custom clear icon when <see cref="Clearable"/> is enabled.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Icons.Material.Filled.Clear"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string ClearIcon { get; set; } = Icons.Material.Filled.Clear;
+
+        /// <summary>
+        /// The content within this input component.
+        /// </summary>
+        /// <remarks>
+        /// Will only display if <see cref="InputType"/> is <see cref="InputType.Hidden"/>.
+        /// </remarks>
+        [Parameter]
+        public RenderFragment? ChildContent { get; set; }
+
+        /// <summary>
+        /// The icon shown in between start and end values.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Icons.Material.Filled.ArrowRightAlt"/>.
+        /// </remarks>
+        [Parameter]
+        public string SeparatorIcon { get; set; } = Icons.Material.Filled.ArrowRightAlt;
+
+        /// <summary>
+        /// Moves the cursor to the starting input component.
+        /// </summary>
+        public ValueTask FocusStartAsync() => _elementReferenceStart.FocusAsync();
+
+        public override async ValueTask BlurAsync()
+        {
+            await _elementReferenceStart.VekBlurAsync();
+            await _elementReferenceEnd.VekBlurAsync();
+        }
+
+        /// <summary>
+        /// Selects the text in the starting input.
+        /// </summary>
+        public ValueTask SelectStartAsync() => _elementReferenceStart.VekSelectAsync();
+
+        /// <summary>
+        /// Selects the text in the start value.
+        /// </summary>
+        /// <param name="pos1">The index of the first character to select.</param>
+        /// <param name="pos2">The index of the last character to select.</param>
+        public ValueTask SelectRangeStartAsync(int pos1, int pos2) => _elementReferenceStart.VekSelectRangeAsync(pos1, pos2);
+
+        /// <summary>
+        /// Moves the cursor to the ending input component.
+        /// </summary>
+        public ValueTask FocusEndAsync() => _elementReferenceEnd.FocusAsync();
+
+        /// <summary>
+        /// Selects the text in the ending input.
+        /// </summary>
+        public ValueTask SelectEndAsync() => _elementReferenceEnd.VekSelectAsync();
+
+        /// <summary>
+        /// Selects the text in the end value.
+        /// </summary>
+        /// <param name="pos1">The index of the first character to select.</param>
+        /// <param name="pos2">The index of the last character to select.</param>
+        public ValueTask SelectRangeEndAsync(int pos1, int pos2) => _elementReferenceEnd.VekSelectRangeAsync(pos1, pos2);
+
+        /// <summary>
+        /// The text of the start of the range.
+        /// </summary>
+        public string? TextStart
+        {
+            get => _textStart;
+            set
+            {
+                if (_textStart == value)
+                    return;
+                _textStart = value;
+                SetTextAndUpdateValueAsync(RangeUtility.Join(_textStart, _textEnd)).CatchAndLog();
+            }
+        }
+
+        /// <summary>
+        /// The text of the end of the range.
+        /// </summary>
+        public string? TextEnd
+        {
+            get => _textEnd;
+            set
+            {
+                if (_textEnd == value)
+                    return;
+                _textEnd = value;
+                SetTextAndUpdateValueAsync(RangeUtility.Join(_textStart, _textEnd)).CatchAndLog();
+            }
+        }
+
+        protected string InputTypeString => InputType.ToStringFast(true);
+
+        protected bool IsClearable() => Clearable && ReadValue is not null;
+
+        /// <inheritdoc />
+        protected override IConverter<Range<T>?, string?> GetDefaultConverter()
+        {
+            return new RangeConverter<T>
+            {
+                Culture = GetCulture,
+                Format = GetFormat
+            };
+        }
+
+        protected override async Task UpdateTextPropertyAsync(bool updateValue)
+        {
+            await base.UpdateTextPropertyAsync(updateValue);
+
+            RangeUtility.Split(ReadText, out _textStart, out _textEnd);
+        }
+
+        protected override async Task UpdateValuePropertyAsync(bool updateText)
+        {
+            await base.UpdateValuePropertyAsync(updateText);
+
+            RangeUtility.Split(ReadText, out _textStart, out _textEnd);
+        }
+
+        protected virtual async Task ClearButtonClickHandlerAsync(MouseEventArgs e)
+        {
+            await SetTextAndUpdateValueAsync(string.Empty, updateValue: true);
+            await _elementReferenceStart.FocusAsync();
+            await OnClearButtonClick.InvokeAsync(e);
+        }
+    }
+}

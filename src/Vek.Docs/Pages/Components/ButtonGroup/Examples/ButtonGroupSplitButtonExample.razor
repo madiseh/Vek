@@ -1,0 +1,32 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
+    <VekButton>@_buttonText</VekButton>
+    <VekMenu Icon="@Icons.Material.Filled.ArrowDropDown" Style="align-self: auto;">
+        <VekMenuItem OnClick="() => SetButtonText(0)">Reply</VekMenuItem>
+        <VekMenuItem OnClick="() => SetButtonText(1)">Reply All</VekMenuItem>
+        <VekMenuItem OnClick="() => SetButtonText(2)">Forward</VekMenuItem>
+        <VekMenuItem OnClick="() => SetButtonText(3)">Reply & Delete</VekMenuItem>
+    </VekMenu>
+</VekButtonGroup>
+@code {
+    private string _buttonText = "Reply";
+
+    private void SetButtonText(int id)
+    {
+        switch (id)
+        {
+            case 0: _buttonText = "Reply";
+                break;
+            case 1:
+                _buttonText = "Reply All";
+                break;
+            case 2:
+                _buttonText = "Forward";
+                break;
+            case 3:
+                _buttonText = "Reply & Delete";
+                break;
+        }
+    }
+}

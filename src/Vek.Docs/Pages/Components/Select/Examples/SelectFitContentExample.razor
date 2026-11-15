@@ -1,0 +1,50 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekSelect @bind-Value="_selectedState" Label="Select a State" FullWidth="_fullWidth" FitContent="_fitContent" Variant="Variant.Outlined" ShrinkLabel>
+    @foreach (var state in _states)
+    {
+        <VekSelectItem Value="@state">@state</VekSelectItem>
+    }
+</VekSelect>
+
+<VekSelect @bind-Value="_selectedState" Label="Select a State"  FullWidth="_fullWidth" FitContent="_fitContent" Variant="Variant.Outlined" Clearable>
+    @foreach (var state in _states)
+    {
+        <VekSelectItem Value="@state">@state</VekSelectItem>
+    }
+</VekSelect>
+
+<VekSelect @bind-Value="_selectedState" Label="Select a State"  FullWidth="_fullWidth" FitContent="_fitContent" Variant="Variant.Outlined" Clearable Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.LocationOn">
+    @foreach (var state in _states)
+    {
+        <VekSelectItem Value="@state">@state</VekSelectItem>
+    }
+</VekSelect>
+
+<VekStack Class="align-center vek-width-full" Row>
+    <VekSwitch @bind-Value="_fullWidth" Label="Full Width" Color="Color.Primary" />
+    <VekSwitch @bind-Value="_fitContent" Label="Fit Content" Color="Color.Primary" />
+</VekStack>
+
+@code {
+    private bool _fullWidth;
+    private bool _fitContent;
+    private string _selectedState;
+    private readonly string[] _states =
+    [
+        "Alabama", "Alaska", "American Samoa", "Arizona",
+        "Arkansas", "California", "Colorado", "Connecticut",
+        "Delaware", "District of Columbia", "Federated States of Micronesia",
+        "Florida", "Georgia", "Guam", "Hawaii", "Idaho",
+        "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky",
+        "Louisiana", "Maine", "Marshall Islands", "Maryland",
+        "Massachusetts", "Michigan", "Minnesota", "Mississippi",
+        "Missouri", "Montana", "Nebraska", "Nevada",
+        "New Hampshire", "New Jersey", "New Mexico", "New York",
+        "North Carolina", "North Dakota", "Northern Mariana Islands", "Ohio",
+        "Oklahoma", "Oregon", "Palau", "Pennsylvania", "Puerto Rico",
+        "Rhode Island", "South Carolina", "South Dakota", "Tennessee",
+        "Texas", "Utah", "Vermont", "Virgin Island", "Virginia",
+        "Washington", "West Virginia", "Wisconsin", "Wyoming"
+    ];
+}

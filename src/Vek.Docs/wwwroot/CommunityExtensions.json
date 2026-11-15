@@ -1,0 +1,115 @@
+[
+  {
+    "CategoryComment": "// Valid Categories are Components, Utility, Style, Other,",
+    "Category": "Invalid selections are ignored, Valid options are: Components, Utility, Style, or Other",
+    "Name": "The name of your extension, avoid super long names if possible.",
+    "Description": "A brief description of what the extension does for Vek users",
+    "Link": "Your preferred landing page, users will have this link and a link to github automatically generated",
+    "GitHubUserPath": "Your github user",
+    "GitHubRepoPath": "Your github repo"
+  },
+  {
+    "Category": "Style",
+    "Name": "VekX Theme Creator",
+    "Description": "Blazor Theme Creator site for Vek library. This app is designed to be used to create and export themes for Vek, not as part of your application.",
+    "Link": "https://themes.vekx.org",
+    "GitHubUserPath": "VekXtra",
+    "GitHubRepoPath": "VekXThemeCreator"
+  },
+  {
+    "Category": "Components",
+    "Name": "Vek Markdown",
+    "Description": "A Markdown Component for Vek.",
+    "Link": "https://github.com/MyNihongo/Vek.Markdown",
+    "GitHubUserPath": "MyNihongo",
+    "GitHubRepoPath": "Vek.Markdown"
+  },
+  {
+    "Category": "Components",
+    "Name": "CodeBeam Vek Extensions",
+    "Description": "VekExtensions has 30+ components and utilities from the core library contributors. There are both unique and extended components that add additional features on current Vek components.",
+    "Link": "https://vekextensions.codebeam.org/",
+    "GitHubUserPath": "CodeBeamOrg",
+    "GitHubRepoPath": "CodeBeam.Vek.Extensions"
+  },
+  {
+    "Category": "Components",
+    "Name": "Fgilde Vek Extensions",
+    "Description": "Vek.Extensions is a convenient package that extends the capabilities of the Vek component library. There are both unique and extended components and utilities that add additional features on current Vek components.",
+    "Link": "https://vek-extensions.pages.dev/",
+    "GitHubUserPath": "fgilde",
+    "GitHubRepoPath": "Vek.Extensions"
+  },
+  {
+    "Category": "Components",
+    "Name": "Fgilde VekEx RichTextEditor",
+    "Description": "VekExRichTextEditor is a custom reusable control that allows us to easily consume Quill combining in a Vek project Features with Vek Theme Support. This compnent also works without a Vek Project.",
+    "Link": "https://github.com/fgilde/VekExRichTextEditor",
+    "GitHubUserPath": "fgilde",
+    "GitHubRepoPath": "VekExRichTextEditor"
+  },
+  {
+    "Category": "Components",
+    "Name": "Static Input (for SSR)",
+    "Description": "Tailored specifically for Static Server-Side Rendered (static SSR) pages. It offers seamless integration for some of Vek's Component design into your static application pages. Focusing particularly on components designed for forms and edit forms, in situations where interactive components are not feasible.",
+    "Link": "https://github.com/0phois/Vek.StaticInput",
+    "GitHubUserPath": "0phois",
+    "GitHubRepoPath": "Vek.StaticInput"
+  },
+  {
+    "Category": "Components",
+    "Name": "Heron VekCalendar",
+    "Description": "A simple but powerful calendar component for Vek. Calendar includes multiple views (month, week, work week, and day), customizable events, and easy integration with your existing Vek project.",
+    "Link": "https://github.com/danheron/Heron.VekCalendar",
+    "GitHubUserPath": "danheron",
+    "GitHubRepoPath": "Heron.VekCalendar"
+  },
+  {
+    "Category": "Style",
+    "Name": "VekBlocks",
+    "Description": "A collection of Vek blocks. Predefined, reusable UI elements or layouts designed to simplify development by combining multiple components into cohesive sections; such as headers, footers, forms, cards, or dashboards.",
+    "Link": "https://github.com/mouse0270/VekBlocks",
+    "GitHubUserPath": "mouse0270",
+    "GitHubRepoPath": "vekblocks"
+  },
+  {
+    "Category": "Components",
+    "Name": "Vek PdfViewer",
+    "Description": "A component for displaying and manipulating PDF documents.",
+    "Link": "https://vekpdf.info",
+    "GitHubUserPath": "tgothorp",
+    "GitHubRepoPath": "Vek.PdfViewer"
+  },
+  {
+    "Category": "Utility",
+    "Name": "FormCraft",
+    "Description": "A powerful, type-safe dynamic form library for Blazor applications with fluent API design. Provides seamless integration with Vek components, enabling developers to build complex forms with minimal code.",
+    "Link": "https://phmatray.github.io/FormCraft",
+    "GitHubUserPath": "phmatray",
+    "GitHubRepoPath": "FormCraft"
+  },
+  {
+    "Category": "Components",
+    "Name": "VekX Extensions",
+    "Description": "A collection of components designed for Vek. SecurityCode for seamless verification code input, Outline for scrollspy navigation, CodeBlock for Prism.js highlighting, and more.",
+    "Link": "https://vekx.org",
+    "GitHubUserPath": "VekXtra",
+    "GitHubRepoPath": "VekX"
+  },
+  {
+    "Category": "Utility",
+    "Name": "Vek MCP",
+    "Description": "A local MCP (Model Context Protocol) server that lets AI assistants query Vek documentation (components, parameters, examples) through structured tools.",
+    "Link": "https://github.com/mcbodge/VekMCP",
+    "GitHubUserPath": "mcbodge",
+    "GitHubRepoPath": "VekMCP"
+  },
+  {
+    "Category": "Components",
+    "Name": "VekKeyboard",
+    "Description": "A pure Blazor on-screen virtual keyboard for Vek applications. Includes full QWERTY, numpad, and a pence-first pricepad. Automatic dark and light mode via Vek CSS variables. AOT and trim-friendly with no JavaScript dependency.",
+    "Link": "https://vekkeyboard.pages.dev",
+    "GitHubUserPath": "sardar97",
+    "GitHubRepoPath": "vekkeyboard"
+  }
+]

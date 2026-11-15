@@ -1,0 +1,53 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekPaper Outlined="true" Class="border-dashed">
+    <VekStack Justify="@justify" AlignItems="@align" StretchItems="@stretch" Row="@row" Reverse="@reverse" Spacing="@spacing" Style="height:300px;">
+        <VekPaper Class="py-1 px-3 vek-theme-primary">Item 1</VekPaper>
+        <VekPaper Class="py-3 px-3 vek-theme-primary">Item 2</VekPaper>
+        <VekPaper Class="py-5 px-3 vek-theme-primary">Item 3</VekPaper>
+    </VekStack>
+</VekPaper>
+
+<VekStack Row="true" AlignItems="AlignItems.Center">
+    <VekSwitch @bind-Value="row" Label="Row" Color="Color.Primary" />
+    <VekSwitch @bind-Value="reverse" Label="Reverse" Color="Color.Primary" />
+    <VekText>Spacing:</VekText>
+    <VekSlider @bind-Value="spacing" Min="0" Max="16"/>
+</VekStack>
+
+<VekStack>
+    <VekChipSet @bind-SelectedValue="@justify" CheckMark>
+        <VekChip Value="Justify.FlexStart" Text="Justify Start" SelectedColor="Color.Primary" Variant="Variant.Text" />
+        <VekChip Value="Justify.Center" Text="Justify Center" SelectedColor="Color.Primary" Variant="Variant.Text" Default="true" />
+        <VekChip Value="Justify.FlexEnd" Text="Justify End" SelectedColor="Color.Primary" Variant="Variant.Text" />
+        <VekChip Value="Justify.SpaceAround" Text="Justify Space Around" SelectedColor="Color.Primary" Variant="Variant.Text" />
+        <VekChip Value="Justify.SpaceBetween" Text="Justify Space Between" SelectedColor="Color.Primary" Variant="Variant.Text" />
+        <VekChip Value="Justify.SpaceEvenly" Text="Justify Space Evenly" SelectedColor="Color.Primary" Variant="Variant.Text" />
+    </VekChipSet>
+
+    <VekChipSet @bind-SelectedValue="@align" CheckMark>
+        <VekChip Value="AlignItems.Start" Text="Align Start" SelectedColor="Color.Secondary" Variant="Variant.Text" />
+        <VekChip Value="AlignItems.Center" Text="Align Center" SelectedColor="Color.Secondary" Variant="Variant.Text" Default="true" />
+        <VekChip Value="AlignItems.End" Text="Align End" SelectedColor="Color.Secondary" Variant="Variant.Text" />
+        <VekChip Value="AlignItems.Stretch" Text="Align Stretch" SelectedColor="Color.Secondary" Variant="Variant.Text" />
+        <VekChip Value="AlignItems.Baseline" Text="Align Baseline" SelectedColor="Color.Secondary" Variant="Variant.Text" />
+    </VekChipSet>
+
+    <VekChipSet @bind-SelectedValue="@stretch" CheckMark>
+        <VekChip Value="StretchItems.None" Text="Do Not Stretch" SelectedColor="Color.Tertiary" Variant="Variant.Text" Default="true" />
+        <VekChip Value="StretchItems.Start" Text="Stretch First" SelectedColor="Color.Tertiary" Variant="Variant.Text" />
+        <VekChip Value="StretchItems.End" Text="Stretch Last" SelectedColor="Color.Tertiary" Variant="Variant.Text" />
+        <VekChip Value="StretchItems.StartAndEnd" Text="Stretch First and Last" SelectedColor="Color.Tertiary" Variant="Variant.Text" />
+        <VekChip Value="StretchItems.Middle" Text="Stretch Middle" SelectedColor="Color.Tertiary" Variant="Variant.Text" />
+        <VekChip Value="StretchItems.All" Text="Stretch All" SelectedColor="Color.Tertiary" Variant="Variant.Text" />
+    </VekChipSet>
+</VekStack>
+
+@code {
+    Justify justify = Justify.Center;
+    AlignItems align = AlignItems.Center;
+    StretchItems stretch = StretchItems.None;
+    bool row = false;
+    bool reverse = false;
+    int spacing = 3;
+}

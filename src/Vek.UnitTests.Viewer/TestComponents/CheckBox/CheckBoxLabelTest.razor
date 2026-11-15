@@ -1,0 +1,10 @@
+﻿<VekCheckBox @bind-Value="_labelCheckBox1" Label="Default"></VekCheckBox>
+<VekCheckBox @bind-Value="_labelCheckBox2" Label="Primary" Color="Color.Primary"></VekCheckBox>
+<VekCheckBox @bind-Value="_labelCheckBox3" Label="Secondary" LabelPlacement="Placement.Start" Color="Color.Secondary"></VekCheckBox>
+<VekCheckBox @bind-Value="_labelCheckBox1" Disabled="true" Label="Disabled" LabelPlacement="Placement.Start"></VekCheckBox>
+
+@code {
+    private bool _labelCheckBox1  = true;
+    private bool _labelCheckBox2 = false;
+    private bool _labelCheckBox3 = false;
+}

@@ -1,0 +1,20 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekTable T="string" Items="@_items" TableAttributes="TableAttributes" Hover="true" Breakpoint="Breakpoint.Sm">
+    <HeaderContent>
+        <VekTh>Fruit</VekTh>
+    </HeaderContent>
+    <RowTemplate>
+        <VekTd DataLabel="Fruit">@context</VekTd>
+    </RowTemplate>
+</VekTable>
+
+@code {
+    private readonly string[] _items = new[] { "Apple", "Banana", "Cherry" };
+
+    private Dictionary<string, object> TableAttributes { get; set; } = new()
+    {
+        ["aria-label"] = "Fruits table"
+    };
+
+}

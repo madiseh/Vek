@@ -1,0 +1,20 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekPaper Width="250px" Class="d-inline-flex py-3" Elevation="0">
+    <VekNavMenu Class="vek-width-full">
+        <VekText Typo="Typo.h6" Class="px-4">My Application</VekText>
+        <VekText Typo="Typo.body2" Class="px-4 vek-text-secondary">Secondary Text</VekText>
+        <VekDivider Class="my-2" />
+        <VekNavLink Href="/dashboard" Icon="@Icons.Material.Filled.Dashboard">Dashboard</VekNavLink>
+        <VekNavGroup Title="Level 0" Icon="@Icons.Material.Filled.Settings" Expanded="true">
+            <VekNavGroup Title="Level 1" Icon="@Icons.Material.Filled.AdminPanelSettings" Expanded="true">
+                <VekNavGroup Title="Level 2" Icon="@Icons.Material.Filled.People" Expanded="true">
+                    <VekNavGroup Title="Level 3" Icon="@Icons.Material.Filled.Lock" Expanded="true">
+                        <VekNavLink Href="/delete" Icon="@Icons.Material.Filled.DeleteForever">Delete Password</VekNavLink>
+                    </VekNavGroup>
+                </VekNavGroup>
+            </VekNavGroup>
+        </VekNavGroup>
+        <VekNavLink Href="/billing" Icon="@Icons.Material.Filled.Receipt">Billing</VekNavLink>
+    </VekNavMenu>
+</VekPaper>

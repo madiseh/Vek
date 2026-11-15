@@ -1,0 +1,9 @@
+﻿@namespace Vek
+@inherits VekComponentBase
+
+@if (ShowToolbar)
+{
+    <VekToolBar @attributes="UserAttributes" Class="@Classname" Style="@Style">
+        @ChildContent
+    </VekToolBar>
+}

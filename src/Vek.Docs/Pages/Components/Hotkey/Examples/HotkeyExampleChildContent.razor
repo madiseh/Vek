@@ -1,0 +1,37 @@
+﻿@namespace Vek.Docs.Examples
+
+@using Vek.Utilities
+
+<VekStack>
+    <VekStack Row="true">
+        <VekSelect Label="Key" @bind-Value="@_selectedKey" Style="width: 200px;">
+            @foreach (var key in Enum.GetValues<JsKey>())
+            {
+                <VekSelectItem Value="@key">@Enum.GetName(typeof(JsKey), key)</VekSelectItem>
+            }
+        </VekSelect>
+        <VekSelect T="JsKeyModifier" Label="Modifier" @bind-SelectedValues="@_selectedKeyModifiers" MultiSelection="true" Style="min-width: 200px;">
+            @foreach (var keyModifier in Enum.GetValues<JsKeyModifier>())
+            {
+                <VekSelectItem T="JsKeyModifier" Value="@keyModifier">@Enum.GetName(typeof(JsKeyModifier), keyModifier)</VekSelectItem>
+            }
+        </VekSelect>
+        <VekStack Spacing="0">
+            <VekCheckBox @bind-Value="@_hideChildContentOnRepress" Label="Hide child content on repress" Class="mt-n3"/>
+            <VekCheckBox @bind-Value="@_disabled" Label="Disabled" Class="mt-n5"/>
+        </VekStack>
+    </VekStack>
+    <VekAlert Severity="Severity.Info">Press the selected key-combination to toggle the button.</VekAlert>
+    <VekHotkey Key="@_selectedKey" KeyModifiers="@_selectedKeyModifiers" HideChildContentOnRepress="@_hideChildContentOnRepress" Disabled="@_disabled">
+        <VekButton EndIcon="@Icons.Material.Outlined.EmojiEmotions" Color="Color.Primary" Variant="Variant.Filled">
+            I'm a button
+        </VekButton>
+    </VekHotkey>
+</VekStack>
+
+@code {
+    private bool _disabled;
+    private JsKey _selectedKey = JsKey.KeyA;
+    private bool _hideChildContentOnRepress = true;
+    private IReadOnlyCollection<JsKeyModifier> _selectedKeyModifiers = [JsKeyModifier.ControlLeft];
+}

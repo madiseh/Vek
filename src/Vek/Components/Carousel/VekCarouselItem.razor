@@ -1,0 +1,9 @@
+﻿@namespace Vek
+@inherits VekComponentBase
+
+@if (Visible)
+{
+    <div @attributes="UserAttributes" class="@Classname" style="@Style">
+        @ChildContent
+    </div>
+}

@@ -1,0 +1,179 @@
+﻿<VekPaper Class="py-3" Elevation="0">
+        <VekAppBar Fixed="false">
+            Test Application
+            <VekMenu Class="ml-4" Dense PositionAtCursor>
+                <ActivatorContent>
+                    @{
+                        var priority = "1";
+                        switch (priority)
+                        {
+                            case "1":
+                                <VekChip T="string" Size="Size.Small" Label="true" Variant="Variant.Filled" style="font-weight: normal; color: black; background-color: #FED6D3" tabindex="0">Priority 1</VekChip>
+                                break;
+                            case "2":
+                                <VekChip T="string" Size="Size.Small" Label="true" Variant="Variant.Filled" style="font-weight: normal; color: black; background-color: #FDDFCA" tabindex="0">Priority 2</VekChip>
+                                break;
+                            case "3":
+                                <VekChip T="string" Size="Size.Small" Label="true" Variant="Variant.Filled" style="font-weight: normal; color: black; background-color: #F6E8A7" tabindex="0">Priority 3</VekChip>
+                                break;
+                            case "4":
+                                <VekChip T="string" Size="Size.Small" Label="true" Variant="Variant.Filled" style="font-weight: normal; color: black; background-color: #C8ECFA" tabindex="0">Priority 4</VekChip>
+                                break;
+                            case "5":
+                                <VekChip T="string" Size="Size.Small" Label="true" Variant="Variant.Filled" style="font-weight: normal; color: black; background-color: #CEDFFD" tabindex="0">Priority 5</VekChip>
+                                break;
+                            case null:
+                                <VekChip T="string" Size="Size.Small" Label="true" Variant="Variant.Filled" tabindex="0">None</VekChip>
+                                break;
+                        }
+                    }
+                </ActivatorContent>
+                <ChildContent>
+                    <div style="min-width: 100px">
+                        <VekMenuItem style="font-weight: normal; color: black; background-color: #FED6D3">Priority 1</VekMenuItem>
+                        <VekMenuItem style="font-weight: normal; color: black; background-color: #FDDFCA">Priority 2</VekMenuItem>
+                        <VekMenuItem style="font-weight: normal; color: black; background-color: #F6E8A7">Priority 3</VekMenuItem>
+                        <VekMenuItem style="font-weight: normal; color: black; background-color:#C8ECFA">Priority 4</VekMenuItem>
+                        <VekMenuItem style="font-weight: normal; color: black; background-color:#CEDFFD">Priority 5</VekMenuItem>
+                        <VekMenuItem>None</VekMenuItem>
+                    </div>
+                </ChildContent>
+            </VekMenu>
+            <VekMenu Class="ml-4" Dense PositionAtCursor>
+                <ActivatorContent>
+                    @{
+                        var priority = "1";
+                        switch (priority)
+                        {
+                            case "1":
+                                <VekChip T="string" Size="Size.Small" Label="true" Variant="Variant.Filled" style="font-weight: normal; color: black; background-color: #FED6D3" tabindex="0">Priority 1</VekChip>
+                                break;
+                            case "2":
+                                <VekChip T="string" Size="Size.Small" Label="true" Variant="Variant.Filled" style="font-weight: normal; color: black; background-color: #FDDFCA" tabindex="0">Priority 2</VekChip>
+                                break;
+                            case "3":
+                                <VekChip T="string" Size="Size.Small" Label="true" Variant="Variant.Filled" style="font-weight: normal; color: black; background-color: #F6E8A7" tabindex="0">Priority 3</VekChip>
+                                break;
+                            case "4":
+                                <VekChip T="string" Size="Size.Small" Label="true" Variant="Variant.Filled" style="font-weight: normal; color: black; background-color: #C8ECFA" tabindex="0">Priority 4</VekChip>
+                                break;
+                            case "5":
+                                <VekChip T="string" Size="Size.Small" Label="true" Variant="Variant.Filled" style="font-weight: normal; color: black; background-color: #CEDFFD" tabindex="0">Priority 5</VekChip>
+                                break;
+                            case null:
+                                <VekChip T="string" Size="Size.Small" Label="true" Variant="Variant.Filled" tabindex="0">None</VekChip>
+                                break;
+                        }
+                    }
+                </ActivatorContent>
+                <ChildContent>
+                    <div style="min-width: 100px">
+                        <VekMenuItem style="font-weight: normal; color: black; background-color: #FED6D3">Priority 1</VekMenuItem>
+                        <VekMenuItem style="font-weight: normal; color: black; background-color: #FDDFCA">Priority 2</VekMenuItem>
+                        <VekMenuItem style="font-weight: normal; color: black; background-color: #F6E8A7">Priority 3</VekMenuItem>
+                        <VekMenuItem style="font-weight: normal; color: black; background-color:#C8ECFA">Priority 4</VekMenuItem>
+                        <VekMenuItem style="font-weight: normal; color: black; background-color:#CEDFFD">Priority 5</VekMenuItem>
+                        <VekMenuItem>None</VekMenuItem>
+                    </div>
+                </ChildContent>
+            </VekMenu>
+        </VekAppBar>
+        <VekPaper style="width: 70px;">
+            @* On initial load these don't respect the mouseover leave event only activating and not deactivating *@
+            <VekNavMenu>
+                @foreach (var menu in _menuList)
+                {
+                    <VekMenu Icon="@Icons.Material.Filled.Mouse" FullWidth="true" ActivationEvent="@MouseEvent.MouseOver"
+                             AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.CenterLeft">
+                        <ChildContent>
+                            <VekText Class="d-flex justify-center">@($"Menu {menu}")</VekText>
+                            <VekDivider Class="mb-2" />
+                            <VekMenuItem Icon="@Icons.Material.Outlined.Dashboard" Label="Sub item 1" />
+                            <VekMenuItem Icon="@Icons.Material.Outlined.Dashboard" Label="Sub item 2" />
+                            <VekMenuItem Icon="@Icons.Material.Outlined.Dashboard" Label="Sub item 3" />
+                            <VekMenuItem Icon="@Icons.Material.Outlined.Dashboard" Label="Sub item 4" />
+                            <VekMenuItem Icon="@Icons.Material.Outlined.Dashboard" Label="Sub item 5" />
+                            <VekMenuItem Icon="@Icons.Material.Outlined.Dashboard" Label="Sub item 6" />
+                        </ChildContent>
+                    </VekMenu>
+                }
+            </VekNavMenu>
+        </VekPaper>
+        <div class="d-flex justify-center align-center vek-height-full">
+            <VekButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => _visible = !_visible)">Click</VekButton>
+            <VekMenu Label="Open Nested Menu" Variant="@Variant.Filled" Class="ml-2" Dense>
+                <VekMenuItem Label="Add reaction" />
+                <VekMenuItem Label="Add bookmark" />
+                <VekMenu Label="Format">
+                    <VekMenu Label="Text" StartIcon="@Icons.Material.Filled.FormatBold">
+                        <VekMenuItem Label="Bold" Icon="@Icons.Material.Filled.FormatBold" />
+                        <VekMenuItem Label="Italic" Icon="@Icons.Material.Filled.FormatItalic" />
+                        <VekMenuItem Label="Underline" Icon="@Icons.Material.Filled.FormatUnderlined" />
+                        <VekMenu Label="Size">
+                            <VekMenuItem Label="Increase font size" />
+                            <VekMenuItem Label="Decrease font size" />
+                        </VekMenu>
+                    </VekMenu>
+                    <VekMenu Label="Points">
+                        <VekMenuItem Label="Bullet" Icon="@Icons.Material.Filled.FormatListBulleted" IconColor="Color.Secondary" />
+                        <VekMenuItem Label="Number" Icon="@Icons.Material.Filled.FormatListNumbered" IconColor="Color.Secondary" />
+                    </VekMenu>
+                    <VekMenu Label="Alignment">
+                        <VekMenuItem Label="Left" Icon="@Icons.Material.Filled.FormatAlignLeft" IconColor="Color.Tertiary" />
+                        <VekMenuItem Label="Right" Icon="@Icons.Material.Filled.FormatAlignRight" IconColor="Color.Tertiary" />
+                    </VekMenu>
+                    <VekMenuItem Label="Clear formatting" />
+                    <VekMenuItem Label="Headers and footers" />
+                </VekMenu>
+            </VekMenu>
+        </div>
+</VekPaper>
+
+<VekDialog Visible="_visible" Style="height: 100%">
+    <DialogContent>
+        <VekMenu Dense PositionAtCursor>
+            <ActivatorContent>
+                @{
+                    var priority = "1";
+                    switch (priority)
+                    {
+                        case "1":
+                            <VekChip T="string" Size="Size.Small" Label="true" Variant="Variant.Filled" style="font-weight: normal; color: black; background-color: #FED6D3">Priority 1</VekChip>
+                            break;
+                        case "2":
+                            <VekChip T="string" Size="Size.Small" Label="true" Variant="Variant.Filled" style="font-weight: normal; color: black; background-color: #FDDFCA">Priority 2</VekChip>
+                            break;
+                        case "3":
+                            <VekChip T="string" Size="Size.Small" Label="true" Variant="Variant.Filled" style="font-weight: normal; color: black; background-color: #F6E8A7">Priority 3</VekChip>
+                            break;
+                        case "4":
+                            <VekChip T="string" Size="Size.Small" Label="true" Variant="Variant.Filled" style="font-weight: normal; color: black; background-color: #C8ECFA">Priority 4</VekChip>
+                            break;
+                        case "5":
+                            <VekChip T="string" Size="Size.Small" Label="true" Variant="Variant.Filled" style="font-weight: normal; color: black; background-color: #CEDFFD">Priority 5</VekChip>
+                            break;
+                        case null:
+                            <VekChip T="string" Size="Size.Small" Label="true" Variant="Variant.Filled">None</VekChip>
+                            break;
+                    }
+                }
+            </ActivatorContent>
+            <ChildContent>
+                <div style="min-width: 100px">
+                    <VekMenuItem style="font-weight: normal; color: black; background-color: #FED6D3">Priority 1</VekMenuItem>
+                    <VekMenuItem style="font-weight: normal; color: black; background-color: #FDDFCA">Priority 2</VekMenuItem>
+                    <VekMenuItem style="font-weight: normal; color: black; background-color: #F6E8A7">Priority 3</VekMenuItem>
+                    <VekMenuItem style="font-weight: normal; color: black; background-color:#C8ECFA">Priority 4</VekMenuItem>
+                    <VekMenuItem style="font-weight: normal; color: black; background-color:#CEDFFD">Priority 5</VekMenuItem>
+                    <VekMenuItem>None</VekMenuItem>
+                </div>
+            </ChildContent>
+        </VekMenu>
+    </DialogContent>
+</VekDialog>
+
+@code {
+    public static string __description__ = "4 menu edge cases for visual testing, initial load, in appbar, nested, and in dialog.";
+    private readonly string[] _menuList = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+    private bool _visible;
+}

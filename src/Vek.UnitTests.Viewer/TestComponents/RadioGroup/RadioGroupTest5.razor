@@ -1,0 +1,19 @@
+﻿<VekRadioGroup @bind-Value="@_option" @bind-Value:after="BindAfter">
+    <VekRadio Value="@("1")" />
+    <VekRadio Value="@("2")" />
+    <VekRadio Value="@("3")" />
+</VekRadioGroup>
+
+<VekButton OnClick="OnClick" />
+
+@code {
+    public static string __description__ = "RadioGroup should be resettable";
+
+    private string? _option;
+
+    public int BindAfterCount { get; private set; }
+
+    private void OnClick() => _option = null;
+
+    private void BindAfter() => BindAfterCount++;
+}

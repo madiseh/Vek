@@ -1,0 +1,13 @@
+<VekPopoverProvider />
+
+<VekMenu Label="Full Menu Width" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" PopoverClass="menu-popover-class" Disabled="DisableMenu">
+    <VekMenuItem Class="test-class">1</VekMenuItem>
+    <VekMenuItem Href="https://www.test.com">2</VekMenuItem>
+    <VekMenuItem Href="https://www.test.com" Target="_blank">3</VekMenuItem>
+    <VekMenuItem AutoClose="false">4 (AutoClose is false)</VekMenuItem>
+</VekMenu>
+
+@code {
+    [Parameter]
+    public bool DisableMenu { get; set; }
+}

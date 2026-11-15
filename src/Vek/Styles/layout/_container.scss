@@ -1,0 +1,87 @@
+@import '../abstracts/variables';
+
+.vek-container {
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.vek-container--gutters {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+@media (min-width:$breakpoint-sm) {
+  .vek-container--gutters {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+@media (min-width:$breakpoint-sm) {
+  .vek-container-fixed {
+    max-width: $breakpoint-sm;
+  }
+}
+
+@media (min-width:$breakpoint-md) {
+  .vek-container-fixed {
+    max-width: $breakpoint-md;
+  }
+}
+
+@media (min-width:$breakpoint-lg) {
+  .vek-container-fixed {
+    max-width: $breakpoint-lg;
+  }
+}
+
+@media (min-width:$breakpoint-xl) {
+  .vek-container-fixed {
+    max-width: $breakpoint-xl;
+  }
+}
+
+@media (min-width:$breakpoint-xxl) {
+  .vek-container-fixed {
+    max-width: $breakpoint-xxl;
+  }
+}
+
+@media (min-width:$breakpoint-xs) {
+  .vek-container-maxwidth-xs {
+    max-width: 444px;
+  }
+}
+
+@media (min-width:$breakpoint-sm) {
+  .vek-container-maxwidth-sm {
+    max-width: $breakpoint-sm;
+  }
+}
+
+@media (min-width:$breakpoint-md) {
+  .vek-container-maxwidth-md {
+    max-width: $breakpoint-md;
+  }
+}
+
+@media (min-width:$breakpoint-lg) {
+  .vek-container-maxwidth-lg {
+    max-width: $breakpoint-lg;
+  }
+}
+
+@media (min-width:$breakpoint-xl) {
+  .vek-container-maxwidth-xl {
+    max-width: $breakpoint-xl;
+  }
+}
+
+@media (min-width:$breakpoint-xxl) {
+  .vek-container-maxwidth-xxl {
+    max-width: $breakpoint-xxl;
+  }
+}

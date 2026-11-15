@@ -1,0 +1,37 @@
+﻿@namespace Vek.Docs.Examples
+
+
+<VekGrid>
+    <VekItem xs="12" sm="6" md="4">
+        <VekTextField @bind-Value="intValue" Label="Enter an int" />
+    </VekItem>
+    <VekItem xs="12" sm="6" md="4">
+        <VekTextField @bind-Value="doubleValue" Label="Enter a double" Format="F1"/>
+    </VekItem>
+    <VekItem xs="12" sm="6" md="4">
+        <VekTextField @bind-Value="enumValue" Label="Enum (Yes|No|Maybe)" />
+    </VekItem>
+</VekGrid>
+<VekGrid>
+    <VekItem xs="12" sm="6" md="4">
+        <VekTextField @bind-Value="nullableInt" HelperText="Enter an int" />
+    </VekItem>
+    <VekItem xs="12" sm="6" md="4">
+        <VekTextField @bind-Value="nullableDouble" HelperText="Enter a double" Format="F1" />
+    </VekItem>
+    <VekItem xs="12" sm="6" md="4">
+        <VekTextField @bind-Value="nullableEnum" HelperText="Enum (Yes|No|Maybe)" />
+    </VekItem>
+</VekGrid>
+
+
+@code { 
+    int intValue;
+    double doubleValue;
+    YesNoMaybe enumValue;
+    int? nullableInt;
+    double? nullableDouble;
+    YesNoMaybe? nullableEnum;
+
+    public enum YesNoMaybe { Maybe, Yes, No }
+}

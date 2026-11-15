@@ -1,0 +1,30 @@
+﻿@namespace Vek.Docs.Examples
+
+
+<VekMenu PositionAtCursor="true">
+    <ActivatorContent>
+        <div @onclick="@context.ToggleAsync" style="cursor: pointer">
+            <VekCard>
+                <VekCardMedia Image="images/door.jpg" Height="200" />
+                <VekCardContent>
+                    <VekText Typo="Typo.h5">Old Paint</VekText>
+                    <VekText Typo="Typo.body2">Old paint found on a stone house door.</VekText>
+                    <VekText Typo="Typo.body2">This photo was taken in a small village in Istra Croatia.</VekText>
+                </VekCardContent>
+            </VekCard>
+        </div>
+    </ActivatorContent>
+    <ChildContent>
+        <VekMenuItem Label="Undo" />
+        <VekMenuItem Label="Redo" Disabled />
+        <VekDivider />
+        <VekMenuItem Label="Cut" />
+        <VekMenuItem Label="Copy" />
+        <VekMenuItem Label="Paste" />
+    </ChildContent>
+</VekMenu>
+
+
+
+
+

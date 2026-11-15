@@ -1,0 +1,11 @@
+﻿<VekPopoverProvider />
+
+<VekTooltip Text="@TooltipTextContent" ShowOnClick="true" Placement="Placement.Start">
+    <VekButton id="my-tooltip-content">My Button</VekButton>
+</VekTooltip>
+
+@code {
+    [Parameter]
+    public string? TooltipTextContent { get; set; }
+}
+

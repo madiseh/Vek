@@ -1,0 +1,29 @@
+﻿<VekDialog Class="test-class" ContentClass="content-class" OnKeyDown="OnKeyDown" OnKeyUp="OnKeyUp">
+    <DialogContent>
+        <VekText>Wabalabadubdub!</VekText>
+    </DialogContent>
+    <DialogActions>
+        <VekButton OnClick="Cancel">Cancel</VekButton>
+        <VekButton Color="Color.Primary" OnClick="Submit">OK</VekButton>
+        <VekButton Color="Color.Secondary" OnClick="CloseDefault">OK Default</VekButton>
+    </DialogActions>
+</VekDialog>
+
+@code {
+    [CascadingParameter]
+    public IVekDialogInstance VekDialog { get; set; } = null!;
+
+    public KeyboardEventArgs? LastKeyDown { get; private set; }
+
+    public KeyboardEventArgs? LastKeyUp { get; private set; }
+
+    private void Submit() => VekDialog.Close(DialogResult.Ok(true));
+
+    private void CloseDefault() => VekDialog.Close();
+
+    private void Cancel() => VekDialog.Cancel();
+
+    private void OnKeyDown(KeyboardEventArgs arg) => LastKeyDown = arg;
+
+    private void OnKeyUp(KeyboardEventArgs arg) => LastKeyUp = arg;
+}

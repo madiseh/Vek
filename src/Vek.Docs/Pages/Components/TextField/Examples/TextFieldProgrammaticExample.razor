@@ -1,0 +1,29 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekTextField @ref="_textField" T="string" Label="Programmatic control" Lines="3" Variant="Variant.Outlined" Text="@SampleText" HelperText="@($"Caret position: {_caretPosition}")" />
+<VekStack Row="true" Wrap="Wrap.Wrap" Class="mt-2">
+    <VekButton OnClick="FocusFieldAsync" Color="Color.Primary">Focus</VekButton>
+    <VekButton OnClick="SelectAllAsync" Color="Color.Primary">Select all</VekButton>
+    <VekButton OnClick="SelectRangeAsync" Color="Color.Primary">Select 5-10</VekButton>
+    <VekButton OnClick="GetCaretPositionAsync" Color="Color.Primary">Get caret</VekButton>
+    <VekButton OnClick="InsertAtCaretAsync" Color="Color.Primary">Insert at caret</VekButton>
+    <VekButton OnClick="InsertAtPositionAsync" Color="Color.Primary">Insert at 56</VekButton>
+</VekStack>
+
+@code {
+    private const string SampleText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    private VekTextField<string> _textField;
+    private int _caretPosition = -1;
+
+    private async Task FocusFieldAsync() => await _textField.FocusAsync();
+
+    private async Task SelectAllAsync() => await _textField.SelectAsync();
+
+    private async Task SelectRangeAsync() => await _textField.SelectRangeAsync(5, 10);
+
+    private async Task GetCaretPositionAsync() => _caretPosition = await _textField.GetCurrentCaretPositionAsync();
+
+    private async Task InsertAtCaretAsync() => await _textField.InsertTextAtCurrentCaretPositionAsync(" [inserted at caret] ");
+
+    private async Task InsertAtPositionAsync() => await _textField.InsertTextAsync(" [inserted at position 56] ", 56);
+}

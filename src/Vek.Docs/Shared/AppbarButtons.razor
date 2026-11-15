@@ -1,0 +1,38 @@
+﻿@using Vek.Docs.Enums
+
+<VekTooltip Text="Notifications">
+    <VekBadge Color="Color.Secondary" Dot="true" Overlap="true" Visible="_newNotificationsAvailable">
+        <VekMenu Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter" PopoverClass="docs-layout-menu-shadow" ListClass="pa-2 docs-menu-list" LockScroll="true" AriaLabel="Notifications">
+            <div class="d-flex justify-space-between align-center px-2">
+                <VekText Typo="Typo.subtitle2">Notifications</VekText>
+                <VekButton Disabled="@(_newNotificationsAvailable == false)" OnClick="MarkNotificationAsReadAsync" StartIcon="@Icons.Material.Filled.DoneAll" Variant="Variant.Text" Color="Color.Primary" Class="ml-16 mr-n2">Mark as read</VekButton>
+            </div>
+            @if (_messages != null)
+            {
+                @foreach (var (message, read) in _messages.Take(5))
+                {
+                    <VekMenuItem Class="px-2 py-0 rounded" Href="@($"/vek/announcements/{message.Id}")">
+                        <VekText Typo="Typo.subtitle2">@message.Title</VekText>
+                        <VekText Typo="Typo.body2">@($"{message.Authors.FirstOrDefault()?.DisplayName} • {message.PublishDate.ToString("MM/dd/yyyy")}")</VekText>
+                    </VekMenuItem>
+                    <VekDivider Class="my-2" />
+                }
+            }
+            else
+            {
+                <div class="d-flex justify-center align-center px-2 py-8 relative">
+                    <VekText Class="vek-text-secondary my-12">Nothing new :(</VekText>
+                    <VekLogo Class="docs-logo-filter mx-16 absolute" />
+                </div>
+            }
+        </VekMenu>
+    </VekBadge>
+</VekTooltip>
+
+<VekTooltip Text="@RtlButtonText">
+    <VekIconButton OnClick="@LayoutService.ToggleRightToLeftAsync" Icon="@RtlButtonIcon" Color="Color.Inherit" aria-label="@RtlButtonText" />
+</VekTooltip>
+
+<VekTooltip Text="@DarkLightModeButtonText">
+    <VekIconButton OnClick="@LayoutService.CycleDarkLightModeAsync" Icon="@DarkLightModeButtonIcon" Color="Color.Inherit" aria-label="@DarkLightModeButtonText" />
+</VekTooltip>

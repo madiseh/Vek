@@ -1,0 +1,23 @@
+@namespace Vek.UnitTests.TestComponents.Dialog
+
+<VekDialog>
+    <DialogContent>
+        Inner dialog instance @InstanceId
+    </DialogContent>
+</VekDialog>
+
+@code {
+    // Incremented every time a new instance of this component is constructed/initialized.
+    public static int InitCount;
+
+    private int InstanceId;
+
+    [CascadingParameter]
+    public IVekDialogInstance VekDialog { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        InstanceId = ++InitCount;
+    }
+}

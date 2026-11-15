@@ -1,0 +1,132 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekTable Items="@People" Hover="true" Breakpoint="Breakpoint.Sm">
+    <ColGroup>
+        <col style="width:300px;" />
+        <col style="width:100px;" />
+        <col />
+        <col style="width:100px;" />
+    </ColGroup>
+    <HeaderContent>
+        <VekTh></VekTh>
+        <VekTh>Nr</VekTh>
+        <VekTh>Name</VekTh>
+        <VekTh>Age</VekTh>
+    </HeaderContent>
+    <RowTemplate>
+        <VekTd><VekButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => ShowBtnPress(context.Number))">@((context.ShowDetails == true)? "Hide" : "Show") Address Details</VekButton></VekTd>
+        <VekTd DataLabel="Nr">@context.Number</VekTd>
+        <VekTd DataLabel="Name">@context.Name</VekTd>
+        <VekTd DataLabel="Age">@context.Age</VekTd>
+    </RowTemplate>
+    <ChildRowContent>
+        @if (context.ShowDetails)
+        {
+            <VekTr>
+                <td colspan="4">
+                    <VekCard Elevation="0">
+                        <VekCardHeader>
+                            <CardHeaderContent>
+                                <VekText Typo="Typo.body1">Address Details for <strong>@context.Name</strong></VekText>
+                            </CardHeaderContent>
+                        </VekCardHeader>
+                        <VekCardContent Class="pa-0">
+                            <VekTable Items="@context.Addresses" Context="AddressContext" Hover="true" Breakpoint="Breakpoint.Sm" Elevation="0">
+                                <ColGroup>
+                                    <col />
+                                    <col />
+                                    <col style="width:200px;" />
+                                </ColGroup>
+                                <HeaderContent>
+                                    <VekTh>Address Line 1</VekTh>
+                                    <VekTh>Address Line 2</VekTh>
+                                    <VekTh>Postal Code</VekTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <VekTd DataLabel="Address Line 1">@AddressContext.Address_Line_1</VekTd>
+                                    <VekTd DataLabel="Address Line 2">@AddressContext.Address_Line_2</VekTd>
+                                    <VekTd DataLabel="Postal Code">@AddressContext.Postal_Code</VekTd>
+                                </RowTemplate>
+                            </VekTable>
+                        </VekCardContent>
+                    </VekCard>
+                </td>
+            </VekTr>
+        }
+    </ChildRowContent>
+</VekTable>
+
+@code
+{
+    protected override void OnInitialized()
+    {
+        FillPeople();
+    }
+
+    public class Address
+    {
+        public string Address_Line_1 { get; set; }
+        public string Address_Line_2 { get; set; }
+        public int Postal_Code { get; set; }
+    }
+
+    public class Person
+    {
+        public bool ShowDetails { get; set; }
+        public int Number { get; set; }
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public IList<Address> Addresses { get; set; }
+    }
+
+    private void FillPeople()
+    {
+        IList<Person> people = new List<Person>();
+        IList<Address> addresses = new List<Address>();
+        addresses.Add(new Address { Address_Line_1 = "4 Privet Drive", Address_Line_2 = "Little Whinging", Postal_Code = 111 });
+        addresses.Add(new Address { Address_Line_1 = "12 Grimmauld Place", Address_Line_2 = "The Burrow", Postal_Code = 333 });
+        people.Add(new Person
+        {
+            ShowDetails = false,
+            Number = 1,
+            Name = "Harry Potter",
+            Age = 11,
+            Addresses = addresses
+        });
+
+        addresses = new List<Address>();
+        addresses.Add(new Address { Address_Line_1 = "123 Pikachu Lane", Address_Line_2 = "Pallet Town", Postal_Code = 777 });
+        addresses.Add(new Address { Address_Line_1 = "456 Mew Street", Address_Line_2 = "Pallet Town", Postal_Code = 999 });
+        people.Add(new Person
+        {
+            ShowDetails = false,
+            Number = 2,
+            Name = "Ash Ketchum",
+            Age = 18,
+            Addresses = addresses
+        });
+        People = people;
+
+        addresses = new List<Address>();
+        addresses.Add(new Address { Address_Line_1 = "123 Shire Lane", Address_Line_2 = "Bag End", Postal_Code = 223 });
+        addresses.Add(new Address { Address_Line_1 = "456 Shire Street", Address_Line_2 = "Bag End", Postal_Code = 445 });
+        addresses.Add(new Address { Address_Line_1 = "789 Shire Avenue", Address_Line_2 = "Bag End", Postal_Code = 667 });
+        people.Add(new Person
+        {
+            ShowDetails = true,
+            Number = 3,
+            Name = "Frodo Baggins",
+            Age = 24,
+            Addresses = addresses
+        });
+        People = people;
+    }
+
+    private static IEnumerable<Person> People { get; set; }
+
+    private void ShowBtnPress(int nr)
+    {
+        Person tmpPerson = People.First(f => f.Number == nr);
+        tmpPerson.ShowDetails = !tmpPerson.ShowDetails;
+    }
+}

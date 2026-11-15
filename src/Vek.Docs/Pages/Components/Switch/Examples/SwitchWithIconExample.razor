@@ -1,0 +1,11 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekSwitch @bind-Value="_checked1" ThumbIcon="@Icons.Custom.Brands.Vek">Basic</VekSwitch>
+<VekSwitch @bind-Value="_checked2" ThumbIcon="@Icons.Custom.Brands.Vek" ThumbIconColor="Color.Info">Colored</VekSwitch>
+<VekSwitch @bind-Value="_checked3" ThumbIcon="@(_checked3==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_checked3==true ? Color.Success : Color.Error)">Changing</VekSwitch>
+
+@code{
+    bool _checked1 = false;
+    bool _checked2 = false;
+    bool _checked3 = false;
+}

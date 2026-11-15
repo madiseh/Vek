@@ -1,0 +1,47 @@
+﻿<VekSelect @bind-Value="_selectedState" Label="Select a State"  FullWidth="FullWidth" FitContent="FitContent" Variant="Variant.Outlined" Clearable>
+    @foreach (var state in _states)
+    {
+        <VekSelectItem Value="@state">@state</VekSelectItem>
+    }
+</VekSelect>
+
+<VekSelect @bind-Value="_selectedState" Label="Select a State" FullWidth="FullWidth" FitContent="FitContent" Variant="Variant.Outlined" Clearable Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.LocationOn">
+    @foreach (var state in _states)
+    {
+        <VekSelectItem Value="@state">@state</VekSelectItem>
+    }
+</VekSelect>
+
+<VekStack Class="align-center vek-width-full" Row>
+    <VekSwitch @bind-Value="FullWidth" Label="Full Width" Color="Color.Primary" />
+    <VekSwitch @bind-Value="FitContent" Label="Fit Content" Color="Color.Primary" />
+</VekStack>
+
+@code {
+    public static string __description__ = "FullWidth should override FitContent";
+
+    [Parameter]
+    public bool FullWidth { get; set; }
+
+    [Parameter]
+    public bool FitContent { get; set; }
+    
+    private string? _selectedState;
+    private readonly string[] _states =
+        [
+        "Alabama", "Alaska", "American Samoa", "Arizona",
+        "Arkansas", "California", "Colorado", "Connecticut",
+        "Delaware", "District of Columbia", "Federated States of Micronesia",
+        "Florida", "Georgia", "Guam", "Hawaii", "Idaho",
+        "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky",
+        "Louisiana", "Maine", "Marshall Islands", "Maryland",
+        "Massachusetts", "Michigan", "Minnesota", "Mississippi",
+        "Missouri", "Montana", "Nebraska", "Nevada",
+        "New Hampshire", "New Jersey", "New Mexico", "New York",
+        "North Carolina", "North Dakota", "Northern Mariana Islands", "Ohio",
+        "Oklahoma", "Oregon", "Palau", "Pennsylvania", "Puerto Rico",
+        "Rhode Island", "South Carolina", "South Dakota", "Tennessee",
+        "Texas", "Utah", "Vermont", "Virgin Island", "Virginia",
+        "Washington", "West Virginia", "Wisconsin", "Wyoming"
+    ];
+}

@@ -1,0 +1,50 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekDropContainer T="DropItem" DraggingClass="vek-alert-text-warning" ItemDraggingClass="vek-alert-text-warning" Items="_items" ItemsSelector="@((item,dropzone) => item.Identifier == dropzone)" NoDropClass="vek-border-error" ItemDropped="ItemUpdated" Class="d-flex flex-wrap flex-grow-1">
+    <ChildContent>
+        <VekDropZone T="DropItem" Identifier="Enterprise" DraggingClass="vek-alert-text-info" ItemDraggingClass="vek-alert-text-info" Class="rounded-lg border-2 border-dashed vek-border-lines-default pa-6 ma-8" CanDrop="@((item) => item.Team == "BLUE")">
+            <VekText Typo="Typo.h6" Class="mb-4">USS Enterprise</VekText>
+         </VekDropZone>
+        <VekDropZone T="DropItem" Identifier="Air Zone 1" Class="rounded-lg border-2 border-dashed vek-border-lines-default pa-6 ma-8 flex-grow-1">
+            <VekText Typo="Typo.h6" Class="mb-4">Air Zone 1</VekText>
+        </VekDropZone>
+        <VekDropZone T="DropItem" Identifier="Air Zone 2" Class="rounded-lg border-2 border-dashed vek-border-lines-default pa-6 ma-8 flex-grow-1">
+            <VekText Typo="Typo.h6" Class="mb-4">Air Zone 2</VekText>
+        </VekDropZone>
+        <VekDropZone T="DropItem" Identifier="Danger Zone" DraggingClass="vek-alert-text-error" ItemDraggingClass="vek-alert-text-error" CanDrop="@((item) => item.Team == "RED")" Class="rounded-lg border-2 border-dashed vek-border-lines-default pa-6 ma-8">
+            <VekText Typo="Typo.h6" Class="mb-4">Danger Zone</VekText>
+        </VekDropZone>
+    </ChildContent>
+    <ItemRenderer>
+        <VekStack Row Class="vek-elevation-25 pa-4 my-4">
+            <VekDragHandle T="DropItem">
+                <VekIcon Icon="@Icons.Material.Filled.DragHandle" Color="Color.Inherit" Class="mr-2" />
+            </VekDragHandle>
+            @context.Name
+        </VekStack>
+    </ItemRenderer>
+</VekDropContainer>
+
+@code {
+    private void ItemUpdated(VekItemDropInfo<DropItem> dropItem)
+    {
+        dropItem.Item.Identifier = dropItem.DropzoneIdentifier;
+    }
+    
+    private List<DropItem> _items = new()
+    {
+        new DropItem(){ Name = "Grumman", Team = "BLUE", Identifier = "Enterprise" },
+        new DropItem(){ Name = "Tomcat", Team = "BLUE", Identifier = "Enterprise" },
+        new DropItem(){ Name = "McDonnell", Team = "BLUE", Identifier = "Enterprise" },
+        new DropItem(){ Name = "Frogfoot", Team = "RED", Identifier = "Danger Zone" },
+        new DropItem(){ Name = "Fulcrum", Team = "RED", Identifier = "Danger Zone" },
+        new DropItem(){ Name = "Fullback", Team = "RED", Identifier = "Danger Zone" },
+    };
+    
+    public class DropItem
+    {
+        public string Name { get; init; }
+        public string Team { get; init; }
+        public string Identifier { get; set; }
+    }
+}

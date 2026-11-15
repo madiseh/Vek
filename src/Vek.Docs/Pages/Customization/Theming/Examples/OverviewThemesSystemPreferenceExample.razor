@@ -1,0 +1,17 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekThemeProvider @ref="_vekThemeProvider" @bind-IsDarkMode="_isDarkMode"/>
+
+@code {
+    private bool _isDarkMode;
+    private VekThemeProvider _vekThemeProvider;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _isDarkMode = await _vekThemeProvider.GetSystemDarkModeAsync();
+            StateHasChanged();
+        }
+    }
+}

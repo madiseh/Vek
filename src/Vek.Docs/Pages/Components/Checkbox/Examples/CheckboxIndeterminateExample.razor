@@ -1,0 +1,12 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekCheckBox @bind-Value="value" Color="@Color.Primary">
+    Value: @(value == null ? "null" : value.ToString())
+</VekCheckBox>
+<VekButton OnClick="@(()=>value=null)">Reset</VekButton>
+<VekCheckBox @bind-Value="anotherValue" Color="@Color.Secondary" TriState="true">Checkbox with TriState. Value: @(anotherValue == null ? "null" : anotherValue.ToString())</VekCheckBox>
+
+@code {
+    public bool? value { get; set; } = null;
+    public bool? anotherValue { get; set;} = null;
+}

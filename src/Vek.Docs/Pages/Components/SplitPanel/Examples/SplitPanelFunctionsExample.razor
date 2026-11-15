@@ -1,0 +1,42 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekStack Class="vek-width-full vek-height-full" Justify="Justify.Center" AlignItems="AlignItems.Center" Style="height: 500px;">
+    <VekSplitPanel @ref="_splitPanel" Class="vek-width-full vek-height-full">
+        <FirstPanel>
+            <VekStack Justify="Justify.Center" AlignItems="AlignItems.Center" Class="vek-width-full vek-height-full">
+                <VekText Typo="Typo.h6">First Panel</VekText>
+            </VekStack>
+        </FirstPanel>
+        <SecondPanel>
+            <VekStack Justify="Justify.Center" AlignItems="AlignItems.Center" Class="vek-width-full vek-height-full">
+                <VekText Typo="Typo.h6">Second Panel</VekText>
+            </VekStack>
+        </SecondPanel>
+    </VekSplitPanel>
+    <VekNumericField @bind-Value="_size" Label="Size [px]"/>
+    <VekStack Row="true">
+        <VekButton OnClick="@GetPositionAsync" Variant="Variant.Filled" EndIcon="@Icons.Material.Outlined.Download">Get Pos.</VekButton>
+        <VekButton OnClick="@SetPositionAsync" Variant="Variant.Filled" EndIcon="@Icons.Material.Outlined.Upload">Set Pos.</VekButton>
+        <VekButton OnClick="@ResetPositionAsync" Variant="Variant.Filled" EndIcon="@Icons.Material.Outlined.Replay">Reset Pos.</VekButton>
+    </VekStack>
+</VekStack>
+
+@code {
+    private VekSplitPanel _splitPanel;
+    private int _size;
+
+    private async Task GetPositionAsync()
+    {
+        _size = await _splitPanel.GetDividerPositionAsync();
+    }
+
+    private async Task SetPositionAsync()
+    {
+        await _splitPanel.SetDividerPositionAsync(_size);
+    }
+
+    private async Task ResetPositionAsync()
+    {
+        await _splitPanel.ResetDividerPositionAsync();
+    }
+}

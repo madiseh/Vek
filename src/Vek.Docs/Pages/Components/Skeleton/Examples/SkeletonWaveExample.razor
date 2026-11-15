@@ -1,0 +1,45 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekCard>
+    <VekCardHeader>
+        <CardHeaderAvatar>
+            <VekSkeleton SkeletonType="SkeletonType.Circle" Animation="Animation.Wave" Height="40px" Width="40px"/>
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <VekSkeleton Animation="Animation.Wave" Width="40%" />
+            <VekSkeleton Animation="Animation.Wave" Width="60%" />
+        </CardHeaderContent>
+    </VekCardHeader>
+    <VekSkeleton SkeletonType="SkeletonType.Rectangle" Animation="Animation.Wave" Height="250px" />
+    <VekCardContent>
+        <VekSkeleton Animation="Animation.Wave" />
+    </VekCardContent>
+    <VekCardActions>
+        <VekSkeleton SkeletonType="SkeletonType.Circle" Animation="Animation.Wave" Height="30px" Width="30px" Class="ml-2 mb-2" />
+        <VekSkeleton SkeletonType="SkeletonType.Circle" Animation="Animation.Wave" Height="30px" Width="30px" Class="ml-3 mb-2" />
+    </VekCardActions>
+</VekCard>
+
+
+<VekCard>
+    <VekCardHeader>
+        <CardHeaderAvatar>
+            <VekAvatar>I</VekAvatar>
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <VekText Typo="Typo.body1">Istra Croatia</VekText>
+            <VekText Typo="Typo.body2">Peninsula in Europe</VekText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <VekIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
+        </CardHeaderActions>
+    </VekCardHeader>
+    <VekCardMedia Image="images/pilars.jpg" Height="250" />
+    <VekCardContent>
+        <VekText Typo="Typo.body2">This photo was taken in a small village in Istra Croatia.</VekText>
+    </VekCardContent>
+    <VekCardActions>
+        <VekIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" />
+        <VekIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Default" />
+    </VekCardActions>
+</VekCard>

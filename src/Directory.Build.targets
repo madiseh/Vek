@@ -1,0 +1,7 @@
+<Project>
+  <ItemGroup>
+    <CompilerVisibleProperty Include="VekDebugAnalyzer" />
+    <CompilerVisibleProperty Include="VekAllowedAttributePattern" />
+    <CompilerVisibleProperty Include="VekAllowedAttributeList" />
+  </ItemGroup>
+</Project>

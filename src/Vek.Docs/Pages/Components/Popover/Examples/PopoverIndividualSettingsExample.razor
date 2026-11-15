@@ -1,0 +1,133 @@
+@namespace Vek.Docs.Examples
+
+<VekGrid>
+    <VekItem md="4">
+        <VekSelect T="string"
+                   Label="VekSelect"
+                   PopoverFixed="@_fixed"
+                   AnchorOrigin="@_anchor"
+                   TransformOrigin="@_transform"
+                   RelativeWidth="_dropdownWidth"
+                   Variant="Variant.Outlined"
+                   AdornmentIcon="@Icons.Material.Filled.Search"
+                   AdornmentColor="Color.Primary">
+            <VekSelectItem Value="@("foo")">Foo</VekSelectItem>
+            <VekSelectItem Value="@("bar")">Bar</VekSelectItem>
+            <VekSelectItem Value="@("bar")">Lorem ipsum dolor sit amet, consectetur adipiscing elit</VekSelectItem>
+        </VekSelect>
+    </VekItem>
+
+    <VekItem md="4"
+             Class="d-flex justify-center align-center">
+        <VekMenu Label="VekMenu"
+                 Variant="Variant.Filled"
+                 Color="Color.Primary"
+                 PopoverFixed="@_fixed"
+                 AnchorOrigin="@_anchor"
+                 TransformOrigin="@_transform"
+                 RelativeWidth="_dropdownWidth">
+            <VekMenuItem Label="Enlist" />
+            <VekMenuItem Label="Barracks" />
+            <VekMenuItem Label="Armory" />
+            <VekMenuItem Label="The quick brown fox jumps over the lazy dog" />
+        </VekMenu>
+    </VekItem>
+
+    <VekItem md="4">
+        <VekAutocomplete SearchFunc="Search"
+                         Variant="Variant.Outlined"
+                         Label="VekAutocomplete"
+                         PopoverFixed="@_fixed"
+                         AnchorOrigin="@_anchor"
+                         TransformOrigin="@_transform"
+                         RelativeWidth="_dropdownWidth" />
+    </VekItem>
+
+    <VekItem md="1" />
+
+    <VekItem md="2"
+             Class="d-flex align-center justify-center">
+        <VekSwitch @bind-Value="@_fixed"
+                   Label="Fixed"
+                   LabelPlacement="Placement.Right" />
+    </VekItem>
+
+    <VekItem md="2">
+        <VekSelect T="Origin"
+                   Label="Anchor Origin"
+                   @bind-Value="@_anchor"
+                   PopoverFixed="@_fixed">
+            <VekSelectItem Value="@Origin.TopLeft">Top Left</VekSelectItem>
+            <VekSelectItem Value="@Origin.TopCenter">Top Center</VekSelectItem>
+            <VekSelectItem Value="@Origin.TopRight">Top Right</VekSelectItem>
+            <VekSelectItem Value="@Origin.BottomLeft">Bottom Left</VekSelectItem>
+            <VekSelectItem Value="@Origin.BottomCenter">Bottom Center</VekSelectItem>
+            <VekSelectItem Value="@Origin.BottomRight">Bottom Right</VekSelectItem>
+            <VekSelectItem Value="@Origin.CenterLeft">Center Left</VekSelectItem>
+            <VekSelectItem Value="@Origin.CenterCenter">Center Center</VekSelectItem>
+            <VekSelectItem Value="@Origin.CenterRight">Center Right</VekSelectItem>
+        </VekSelect>
+    </VekItem>
+
+    <VekItem md="2">
+        <VekSelect T="Origin"
+                   Label="Transform Origin"
+                   @bind-Value="@_transform">
+            <VekSelectItem Value="@Origin.TopLeft">Top Left</VekSelectItem>
+            <VekSelectItem Value="@Origin.TopCenter">Top Center</VekSelectItem>
+            <VekSelectItem Value="@Origin.TopRight">Top Right</VekSelectItem>
+            <VekSelectItem Value="@Origin.BottomLeft">Bottom Left</VekSelectItem>
+            <VekSelectItem Value="@Origin.BottomCenter">Bottom Center</VekSelectItem>
+            <VekSelectItem Value="@Origin.BottomRight">Bottom Right</VekSelectItem>
+            <VekSelectItem Value="@Origin.CenterLeft">Center Left</VekSelectItem>
+            <VekSelectItem Value="@Origin.CenterCenter">Center Center</VekSelectItem>
+            <VekSelectItem Value="@Origin.CenterRight">Center Right</VekSelectItem>
+        </VekSelect>
+    </VekItem>
+
+    <VekItem md="2">
+        <VekSelect T="DropdownWidth"
+                   Label="Dropdown Width"
+                   @bind-Value="@_dropdownWidth">
+            <VekSelectItem Value="@DropdownWidth.Relative">Relative (equal to activator width)</VekSelectItem>
+            <VekSelectItem Value="@DropdownWidth.Adaptive">Adaptive (min = activator width)</VekSelectItem>
+            <VekSelectItem Value="@DropdownWidth.Ignore">Ignore (independent width)</VekSelectItem>
+        </VekSelect>
+    </VekItem>
+
+</VekGrid>
+
+
+@code {
+
+    private Origin _anchor = Origin.BottomLeft;
+    private Origin _transform = Origin.TopLeft;
+    private bool _fixed = false;
+    private DropdownWidth _dropdownWidth = DropdownWidth.Relative;
+
+    private string[] _states =
+    {
+        "Alabama", "Alaska", "Arizona", "Arkansas", "California",
+        "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
+        "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas",
+        "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts",
+        "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana",
+        "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico",
+        "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma",
+        "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota",
+        "Tennessee", "Texas", "Utah", "Vermont", "Virginia",
+        "Washington", "West Virginia", "Wisconsin", "Wyoming"
+    };
+
+    private async Task<IEnumerable<string>> Search(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return _states;
+
+        return _states.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+}

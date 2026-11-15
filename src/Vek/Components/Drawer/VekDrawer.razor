@@ -1,0 +1,11 @@
+﻿@namespace Vek
+@inherits VekComponentBase
+
+<aside @onpointerenter="@PointerEnterCallback" @onpointerleave="@PointerLeaveCallback" @attributes="UserAttributes" class="@Classname" style="@Stylename">
+    <div @ref="_contentRef" class="vek-drawer-content">
+        <CascadingValue Value="this" IsFixed="true">
+            @ChildContent
+        </CascadingValue>
+    </div>
+</aside>
+<VekOverlay Visible="@OverlayVisible" AutoClose="@OverlayAutoClose" OnClosed="CloseDrawerAsync" Class="@OverlayClass" DarkBackground="true" LockScroll="false" />

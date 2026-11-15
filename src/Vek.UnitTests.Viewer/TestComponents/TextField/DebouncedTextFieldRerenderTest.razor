@@ -1,0 +1,34 @@
+<VekTextField T="string"
+              @bind-Value="@Value"
+              Immediate="@true"
+              DebounceInterval="@DebounceInterval"
+              Required="@true"
+              RequiredError="Enter a star" />
+
+<VekText>
+    RenderCount: @_renderCount
+</VekText>
+
+<VekText>
+    Value: @Value
+</VekText>
+
+@code {
+    public static string __description__ = "Test user input retention on component refresh before debounce.";
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    public int DebounceInterval => 500;
+
+    private int _renderCount;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        _renderCount++;
+
+        base.OnAfterRender(firstRender);
+    }
+
+    public void TriggerExternalRerender() => StateHasChanged();
+}

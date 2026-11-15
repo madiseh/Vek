@@ -1,0 +1,18 @@
+﻿@namespace Vek.Docs.Examples
+
+@inject IDialogService DialogService
+
+
+<VekButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
+    Open dialog
+</VekButton>
+
+@code {
+
+    private Task OpenDialogAsync()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+
+        return DialogService.ShowAsync<DialogFocusExample_Dialog>("Last element focused", options);
+    }
+}

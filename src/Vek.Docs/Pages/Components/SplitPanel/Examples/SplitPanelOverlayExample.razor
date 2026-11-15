@@ -1,0 +1,36 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekPaper Class="vek-width-full vek-height-full relative">
+    <VekSplitPanel Class="vek-height-full"
+                   UseAsOverlay="true"
+                   Elevation="8"
+                   FirstPanelInitialSize="150"
+                   MinPanelSize="150"
+                   Padding="4"
+                   Rounded="true">
+        <FirstPanel>
+            <div style="display: grid; grid-template-rows: auto 1fr;" class="vek-height-full">
+                <VekText Typo="Typo.h6">Toolbox</VekText>
+                <VekStack Row="true" Wrap="Wrap.Wrap" Class="overflow-y-auto mt-2" AlignItems="AlignItems.Start" Style="align-content: flex-start;">
+                    @for (var i = 0; i < 20; i++)
+                    {
+                        var iLocal = i;
+                        <VekText>Some item @iLocal</VekText>
+                    }
+                </VekStack>
+            </div>
+        </FirstPanel>
+    </VekSplitPanel>
+    <VekStack Class="pa-4" Style="margin-left: 150px;">
+        <VekText Typo="Typo.h6">Content</VekText>
+        <VekText>
+            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo
+            duo
+            dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+            tempor
+            invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem
+            ipsum
+            dolor sit amet.
+        </VekText>
+    </VekStack>
+</VekPaper>

@@ -1,0 +1,18 @@
+﻿<VekDialog OnBackdropClick="@OnBackdropClick">
+    <TitleContent>
+        Title: @_textTest
+    </TitleContent>
+</VekDialog>
+
+@code {
+    private string? _textTest;
+
+    [CascadingParameter]
+    private IVekDialogInstance VekDialog { get; set; } = null!;
+
+    private void OnBackdropClick()
+    {
+        _textTest = "Backdrop clicked";
+        VekDialog.StateHasChanged();
+    }
+}

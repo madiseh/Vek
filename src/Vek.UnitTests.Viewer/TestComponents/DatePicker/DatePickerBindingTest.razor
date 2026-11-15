@@ -1,0 +1,13 @@
+﻿<VekPopoverProvider />
+
+<VekDatePicker Label="Date Picker" @bind-Date="ExpiresOn" />
+<VekButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ButtonOnClick">Set Date</VekButton>
+
+@code {
+    public DateTime? ExpiresOn { get; set; } = DateTime.Now.Date;
+
+    void ButtonOnClick()
+    {
+        ExpiresOn = DateTime.Now.Date.AddMonths(10);
+    }
+}

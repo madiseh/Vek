@@ -1,0 +1,14 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekExitPrompt Disabled="!_enabled" UseNativePrompt="_useNativePrompt"/>
+
+<VekStack Spacing="2">
+    <VekSwitch Label="Enabled" @bind-Value="_enabled" Color="Color.Primary"/>
+    <VekSwitch Label="Use native prompt" @bind-Value="_useNativePrompt" Color="Color.Primary"/>
+    <VekButton Variant="Variant.Outlined" Color="Color.Primary" Href="/components/exitprompt">Test navigation</VekButton>
+</VekStack>
+
+@code {
+    private bool _enabled;
+    private bool _useNativePrompt;
+}

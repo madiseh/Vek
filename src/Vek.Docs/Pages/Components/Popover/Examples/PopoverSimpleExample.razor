@@ -1,0 +1,18 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@ToggleOpen">Open</VekButton>
+<VekSwitch @bind-Value="_open" Color="Color.Primary" />
+<VekToggleIconButton @bind-Toggled="@_open" Icon="@Icons.Material.Filled.Fullscreen" Color="@Color.Primary" ToggledIcon="@Icons.Material.Filled.FullscreenExit" ToggledColor="@Color.Secondary" />
+
+<VekPopover Open="@_open" Fixed="true" Class="px-4 pt-4">
+    <div class="d-flex flex-column">
+        <VekText>Content of the popover can be anything.</VekText>
+        <VekButton OnClick="@ToggleOpen" Class="ml-auto mr-n3 mb-1" Color="Color.Error">Close</VekButton>
+    </div>
+</VekPopover>
+
+@code{
+    private bool _open;
+
+    private void ToggleOpen() => _open = !_open;
+}

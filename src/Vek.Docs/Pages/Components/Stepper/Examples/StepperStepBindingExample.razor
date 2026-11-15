@@ -1,0 +1,28 @@
+﻿@namespace Vek.Docs.Examples
+<VekPaper Style="width: 800px">
+    <VekStepper @bind-ActiveIndex="_index" ShowResetButton>
+        <VekStep Title="Select campaign settings" HasError="_error">Select campaign settings content</VekStep>
+        <VekStep Title="Create an ad group" @bind-Completed="_completed">Create an ad group content</VekStep>
+        <VekStep Title="Create an ad" Disabled="_disabled">Create an ad content</VekStep>
+    </VekStepper>
+</VekPaper>
+
+<VekDivider/>
+
+<p>_index: @_index</p>
+
+<VekDivider/>
+
+<VekSwitch @bind-Value="@_error" Color="Color.Primary" Label="Step 1 error"></VekSwitch>
+<VekSwitch @bind-Value="@_completed" Color="Color.Primary" Label="Step 2 completed"></VekSwitch>
+<VekSwitch @bind-Value="@_disabled" Color="Color.Primary" Label="Step 3 disabled" />
+
+<VekNumericField @bind-Value="_index" Label="Current index" Variant="Variant.Text" Min="0" Max="5" />
+
+@code {
+    private bool _error;
+    private bool _completed;
+    private bool _disabled;
+
+    private int _index;
+}

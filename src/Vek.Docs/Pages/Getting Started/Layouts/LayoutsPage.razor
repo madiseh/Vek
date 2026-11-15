@@ -1,0 +1,87 @@
+﻿@page "/getting-started/layouts"
+
+<DocsPage DisplayFooter="true">
+    <DocsPageHeader Title="Layouts" SubTitle="Getting started with Vek for faster and easier web development." />
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <VekAlert Severity="Severity.Info">
+                <VekText>The following sections assume you have installed Vek and completed the steps on our <VekLink Href="/getting-started/installation">Installation page</VekLink>.</VekText>
+            </VekAlert>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Basic Layout">
+                <Description>
+                    Vek comes with many components of varying functions and behaviours. Some are built to control the layout of your application, and others may be used to provide other key functions, behaviours and operations for these components.
+                    <br /><br />
+                    Notably, the four most important providers are <CodeInline>@nameof(VekThemeProvider)</CodeInline>, <CodeInline>@nameof(VekPopoverProvider)</CodeInline>, <CodeInline>@nameof(VekDialogProvider)</CodeInline> and <CodeInline>@nameof(VekSnackbarProvider)</CodeInline>. If you have followed the installation guide, these will already be in your MainLayout page.
+                    <br /><br />
+                    <CodeInline>VekThemeProvider</CodeInline> is the component which provides your app with theme settings such as colors, fonts, shadows and other layout properties. It provides the Vek theme by default. There should only exist one instance of the <CodeInline>VekThemeProvider</CodeInline> in your project.
+                    <br /><br />
+                    Another two notable layout components are <CodeInline>VekLayout</CodeInline> and <CodeInline>VekMainContent</CodeInline>. <CodeInline>VekLayout</CodeInline> should be placed in the root of your application within the MainLayout page. Directly inside <CodeInline>VekLayout</CodeInline> you can place <CodeInline>VekMainContent</CodeInline> - this is where your page body will reside.
+                    <br />
+                    To better illustrate this, let's open the <CodeInline>MainLayout.razor</CodeInline> page and create a basic Vek layout.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(LayoutBasicVekExample)" />
+        </DocsPageSection>
+        
+        <DocsPageSection>
+            <SectionHeader Title="Appbar & Drawer">
+                <Description>
+                    Before <CodeInline>VekMainContent</CodeInline> we can add <CodeInline>VekAppBar</CodeInline> and <CodeInline>VekDrawer</CodeInline> components so they are included in all pages using this layout.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(LayoutBasicAppbarExample)" />
+        </DocsPageSection>
+        
+        <DocsPageSection>
+            <SectionHeader Title="Functionality">
+                <Description>
+                    Because we added the components directly inside <CodeInline>VekLayout</CodeInline>, <CodeInline>VekMainContent</CodeInline> takes the height of our <CodeInline>VekAppBar</CodeInline> and uses that as top padding. If <CodeInline>VekDrawer</CodeInline> is open, the main content has the correct left or right margin applied.<br /><br />
+                    Now to add some basic functionality. Adding a <CodeInline>VekIconButton</CodeInline> will open and close the drawer, whilst adding a <CodeInline>NavMenu</CodeInline> will provide some basic navigation.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(LayoutBasicFunctionalityExample)" />
+        </DocsPageSection>
+        
+        <DocsPageSection>
+            <SectionHeader Title="Navigation Menu">
+                <Description>
+                    And our <CodeInline>MyNavMenu.razor</CodeInline> looks like this.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(LayoutBasicNavMenuExample)" />
+        </DocsPageSection>
+        
+        <DocsPageSection>
+            <SectionHeader Title="Content & Containers">
+                <Description>
+                    Before you go on and add content to your pages, depending on what you are building you may want to make use of the <CodeInline>VekContainer</CodeInline> component to center some content and add some gutters to your page. This can be done either directly in your <CodeInline>MainLayout.razor</CodeInline> page, or, alternatively, do this in each individual page.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(LayoutBasicContainerExample)" />
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Ready for More?">
+            </SectionHeader>
+            <div class="d-flex flex-row flex-wrap vek-width-full">
+                <VekList T="string" Class="flex-grow-1 flex-shrink-0 vek-paper-outlined rounded py-0 mr-2">
+                    <VekListItem Icon="@Icons.Material.Filled.FileDownloadDone" IconColor="Color.Success" Class="pl-6" Href="/getting-started/installation">
+                        <VekText Typo="Typo.body1">Installation</VekText>
+                        <VekText Typo="Typo.body2">Getting Started</VekText>
+                    </VekListItem>
+                </VekList>
+                <VekList T="string" Class="flex-grow-1 flex-shrink-0 vek-paper-outlined rounded py-0 ml-2">
+                    <VekListItem Icon="@Icons.Material.Filled.FilterFrames" IconColor="Color.Secondary" Class="pl-6" Href="/getting-started/wireframes">
+                        <VekText Typo="Typo.body1">Wireframes</VekText>
+                        <VekText Typo="Typo.body2">Copy, paste layouts</VekText>
+                    </VekListItem>
+                </VekList>
+            </div>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

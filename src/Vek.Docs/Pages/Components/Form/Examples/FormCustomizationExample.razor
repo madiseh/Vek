@@ -1,0 +1,31 @@
+﻿@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@namespace Vek.Docs.Examples
+
+<VekGrid>
+    <VekItem xs="12" sm="7">
+        <VekPaper Class="pa-4">
+            <VekForm Spacing="spacing">
+                <VekTextField T="string" Label="Username" />
+                <VekTextField T="string" Label="Email" />
+                <VekTextField T="string" Label="Password" HelperText="Choose a strong password" InputType="InputType.Password" />
+                <VekTextField T="string" Label="Password" HelperText="Repeat the password" InputType="InputType.Password" />
+                <div class="d-flex">
+                    <VekRadioGroup T="string">
+                        <VekRadio Value="@("Personal")">Personal</VekRadio>
+                        <VekRadio Value="@("Professional")">Professional</VekRadio>
+                    </VekRadioGroup>
+                </div>
+            </VekForm>
+        </VekPaper>
+    </VekItem>
+    <VekItem xs="12" sm="5">
+        <VekPaper Class="pa-4 vek-height-full">
+            <VekSlider @bind-Value="spacing" Min="0" Max="16" ValueLabel>Spacing between items</VekSlider>
+        </VekPaper>
+    </VekItem>
+</VekGrid>
+
+@code {
+    int spacing;
+}

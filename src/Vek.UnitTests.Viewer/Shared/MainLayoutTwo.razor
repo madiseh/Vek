@@ -1,0 +1,11 @@
+﻿@inherits LayoutComponentBase
+
+<VekDialogProvider/>
+<VekSnackbarProvider/>
+<VekThemeProvider Theme="@_customTheme" IsDarkMode="@false"  />
+
+@Body
+
+@code {
+    private readonly VekTheme _customTheme = new();
+}

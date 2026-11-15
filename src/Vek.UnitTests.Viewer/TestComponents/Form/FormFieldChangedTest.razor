@@ -1,0 +1,18 @@
+﻿@using Vek.Utilities
+
+<VekForm FieldChanged="v => FormFieldChangedEventArgs = v">
+    <VekTextField T="string" />
+    <VekNumericField T="int" />
+    <div class="d-flex">
+        <VekRadioGroup T="string" Required="true" RequiredError="Account type is required!">
+            <VekRadio Value="@("1")">Personal</VekRadio>
+            <VekRadio Value="@("2")">Professional</VekRadio>
+        </VekRadioGroup>
+    </div>
+
+    <VekFileUpload T="IBrowserFile"></VekFileUpload>
+</VekForm>
+
+@code {
+    public FormFieldChangedEventArgs? FormFieldChangedEventArgs { get; private set; }
+}

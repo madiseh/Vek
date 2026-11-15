@@ -1,0 +1,14 @@
+﻿@namespace Vek
+@inherits VekComponentBase
+
+<a @attributes="Attributes" @onclick="this.AsNonRenderingEventHandler<MouseEventArgs>(OnClickHandler)" class="@Classname" style="@Style">
+    @if (!string.IsNullOrWhiteSpace(StartIcon))
+    {
+        <VekIcon Icon="@StartIcon" Class="@StartIconClassname" />
+    }
+    @ChildContent
+    @if (!string.IsNullOrWhiteSpace(EndIcon))
+    {
+        <VekIcon Icon="@EndIcon" Class="@EndIconClassname" />
+    }
+</a>

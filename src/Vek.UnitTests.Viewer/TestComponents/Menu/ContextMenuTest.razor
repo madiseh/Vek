@@ -1,0 +1,46 @@
+﻿<VekCard Elevation="16" Style="max-width: 400px;">
+    <div @onclick="@(OpenContextMenu)" @oncontextmenu="@(OpenContextMenu)" @oncontextmenu:preventDefault>
+        <VekCardContent>
+            <VekText>Click me</VekText>
+        </VekCardContent>
+    </div>
+</VekCard>
+
+@if (ActivatorContent is null)
+{
+    <VekMenu PositionAtCursor @ref="_contextMenu" Label="@Label">
+        <VekMenuItem Label="Cut" />
+        <VekMenuItem Label="Copy" />
+        <VekMenuItem Label="Paste" />
+        <VekMenuItem Label="Delete" />
+    </VekMenu>
+}
+else
+{
+    <VekMenu PositionAtCursor @ref="_contextMenu" Label="@Label">
+        <ActivatorContent>@ActivatorContent(context)</ActivatorContent>
+        <ChildContent>
+            <VekMenuItem Label="Cut" />
+            <VekMenuItem Label="Copy" />
+            <VekMenuItem Label="Paste" />
+            <VekMenuItem Label="Delete" />
+        </ChildContent>
+    </VekMenu>
+}
+
+@code {
+    public static string __description__ = "Left or right clicking the card should open a context menu. The padding above and below the card must be the same size.";
+
+    private VekMenu _contextMenu = null!;
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public RenderFragment<MenuContext>? ActivatorContent { get; set; }
+
+    private async Task OpenContextMenu(MouseEventArgs args)
+    {
+        await _contextMenu.OpenMenuAsync(args);
+    }
+}

@@ -1,0 +1,17 @@
+﻿<VekTable Items="@_examples" T="string">
+    <HeaderContent>
+        <VekTh><VekTableSortLabel SortBy="new Func<string, object>(x=>x)">#</VekTableSortLabel></VekTh>
+    </HeaderContent>
+    <RowTemplate>
+        <VekTd DataLabel="Nr">@context</VekTd>
+    </RowTemplate>
+</VekTable>
+
+@code {
+    private IEnumerable<string> _examples = new List<string>();
+
+    protected override void OnInitialized()
+    {
+        _examples = new List<string> { "B", "A", "C" };
+    }
+}

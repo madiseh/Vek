@@ -1,0 +1,13 @@
+﻿<VekPopoverProvider />
+
+<VekSelect @bind-Value="_value">
+    <VekSelectItem T="int" Value="1"/>
+    <VekSelectItem T="int" Value="2"/>
+    <VekSelectItem T="int" Value="3"/>
+</VekSelect>
+
+@code {
+    public static string __description__ = "The items have no render fragments, so instead of RF the select must display the converted string value";
+
+    private int _value = 1;
+}

@@ -1,0 +1,61 @@
+﻿@using System.Threading
+@using Vek
+
+<VekPopoverProvider />
+
+<VekMenu Label="Open Menu">
+    <ActivatorContent>
+        <VekButton Variant="Variant.Filled" Color="Color.Primary" id="menu-open" OnClick="@context.ToggleAsync">OPEN MENU</VekButton>
+    </ActivatorContent>
+    <ChildContent>
+        <VekMenuItem AutoClose="false">
+            <VekAutocomplete Class="autocomplete" OpenOnFocus="true" Label="Autocomplete" @bind-Value="_value" SearchFunc="Search" />
+        </VekMenuItem>
+        <VekMenuItem AutoClose="false">
+            <VekSelect T="int" Label="Select">
+                <VekSelectItem Value="1">
+                    one
+                </VekSelectItem>
+                <VekSelectItem Value="2">
+                    two
+                </VekSelectItem>
+                <VekSelectItem Value="3">
+                    three
+                </VekSelectItem>
+            </VekSelect>
+        </VekMenuItem>
+        <VekMenuItem>Sign out</VekMenuItem>
+    </ChildContent>
+</VekMenu>
+
+@code {
+    public static string __description__ = "Opening the menu, opening the autocomplete, closing the autocomplete, ** Trying to open it again should open autocomplete and not close the menu **";
+    
+    string? _value;
+    private string[] _states =
+    {
+        "Alabama", "Alaska", "Arizona", "Arkansas", "California",
+        "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
+        "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas",
+        "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts",
+        "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana",
+        "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico",
+        "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma",
+        "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota",
+        "Tennessee", "Texas", "Utah", "Vermont", "Virginia",
+        "Washington", "West Virginia", "Wisconsin", "Wyoming"
+    };
+
+    private async Task<IEnumerable<string?>> Search(string? value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an API.
+        await Task.Yield();
+
+        // If text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return _states;
+
+        // Filter the states
+        return _states.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+}

@@ -1,0 +1,11 @@
+﻿<VekForm ValidationDelay="0">
+    <VekDatePicker Required="true" @bind-Date="Date">
+    </VekDatePicker>
+</VekForm>
+
+@code {
+    public static string __description__ = "Form should validate date picker's date.";
+
+    [Parameter]
+    public DateTime? Date { get; set; }
+}

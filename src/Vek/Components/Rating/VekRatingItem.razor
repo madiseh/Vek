@@ -1,0 +1,19 @@
+﻿@namespace Vek
+@inherits VekComponentBase
+
+<span class="@ClassName"
+      style="@Style"
+      @onpointerover="HandlePointerOverAsync"
+      @onpointerout="HandlePointerOutAsync"
+      @onclick="HandleClickAsync">
+    <input @attributes="UserAttributes"
+           class="vek-rating-input"
+           type="radio"
+           tabindex="-1"
+           value="@ItemValue"
+           name="@Rating?.Name"
+           disabled="@Disabled"
+           checked="@Checked" />
+
+    <VekIcon Icon="@ItemIcon" Color="@ItemColor" Size="@Size" />
+</span>

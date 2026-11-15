@@ -1,0 +1,12 @@
+﻿<VekProgressCircular Color="Color.Default" Indeterminate="true" StrokeWidth="@_width" Size="Size.Large">
+    <ChildContent>
+        @_width
+    </ChildContent>
+</VekProgressCircular>
+<VekSlider Class="mt-4" @bind-Value="@_width" Min="0" Max="20">@($"Stroke-Width: {_width}")</VekSlider>
+
+@code {
+    public static string __description__ = "Circle should render correctly with increasing stroke width";
+
+    int _width = 2;
+}

@@ -1,0 +1,51 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekStack Class="vek-width-full vek-height-full" Justify="Justify.Center" AlignItems="AlignItems.Center" Style="height: 500px;">
+    <VekSplitPanel @ref="_splitPanel"
+                   Class="vek-width-full vek-height-full"
+                   Horizontal="_horizontal"
+                   ResetOnDoubleClick="_resetOnDoubleClick"
+                   Rounded="_rounded"
+                   Transparent="_transparent"
+                   Elevation="@(_elevation ? 1 : 0)">
+        <FirstPanel>
+            <VekStack Justify="Justify.Center" AlignItems="AlignItems.Center" Class="vek-width-full vek-height-full">
+                <VekText Typo="Typo.h6">First Panel</VekText>
+            </VekStack>
+        </FirstPanel>
+        <SecondPanel>
+            <VekStack Justify="Justify.Center" AlignItems="AlignItems.Center" Class="vek-width-full vek-height-full">
+                <VekText Typo="Typo.h6">Second Panel</VekText>
+            </VekStack>
+        </SecondPanel>
+    </VekSplitPanel>
+    <VekButtonGroup Variant="Variant.Filled">
+        <VekTooltip Text="Toggle orientation">
+            <VekToggleIconButton @bind-Toggled="_horizontal" Icon="@Icons.Material.Outlined.Pause" ToggledIcon="@Icons.Material.Outlined.DragHandle" ToggledColor="@Color.Info"/>
+        </VekTooltip>
+        <VekTooltip Text="Reset on double click">
+            <VekToggleIconButton @bind-Toggled="_resetOnDoubleClick" Icon="@Icons.Material.Outlined.RestartAlt" ToggledColor="@Color.Info"/>
+        </VekTooltip>
+        <VekTooltip Text="Rounded">
+            <VekToggleIconButton @bind-Toggled="_rounded" Icon="@Icons.Material.Outlined.RoundedCorner" ToggledColor="@Color.Info"/>
+        </VekTooltip>
+        <VekTooltip Text="Elevation">
+            <VekToggleIconButton @bind-Toggled="_elevation" Icon="@Icons.Material.Outlined.Landscape" ToggledColor="@Color.Info"/>
+        </VekTooltip>
+        <VekTooltip Text="Transparent">
+            <VekToggleIconButton @bind-Toggled="_transparent" Icon="@Icons.Material.Outlined.Visibility" ToggledColor="@Color.Info"/>
+        </VekTooltip>
+        <VekTooltip Text="Reset sizes">
+            <VekIconButton OnClick="@_splitPanel.ResetDividerPositionAsync" Icon="@Icons.Material.Outlined.Replay" Variant="Variant.Filled"/>
+        </VekTooltip>
+    </VekButtonGroup>
+</VekStack>
+
+@code {
+    private VekSplitPanel _splitPanel;
+    private bool _horizontal;
+    private bool _resetOnDoubleClick = true;
+    private bool _rounded = true;
+    private bool _elevation = true;
+    private bool _transparent;
+}

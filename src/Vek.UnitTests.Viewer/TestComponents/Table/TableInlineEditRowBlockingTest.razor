@@ -1,0 +1,20 @@
+﻿<VekTable T="string" Items="_items" @bind-SelectedItem="_selectedItem" IsEditRowSwitchingBlocked="true">
+    <HeaderContent>
+        <VekTh>#</VekTh>
+    </HeaderContent>
+    <RowTemplate>
+        <VekTd>@context</VekTd>
+    </RowTemplate>
+    <RowEditingTemplate>
+        <VekTd>
+            <VekTextField T="string" @bind-Value="@context"></VekTextField>
+        </VekTd>
+    </RowEditingTemplate>
+</VekTable>
+
+@code {
+    public static string __description__ = "Inline Edit Table w/ Blocked Row Switching";
+
+    private string? _selectedItem = null;
+    private readonly string[] _items = ["A", "B", "C"];
+}

@@ -1,0 +1,45 @@
+﻿<div class="d-flex">
+    <VekButton OnClick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
+        Show Dialog
+    </VekButton>
+</div>
+
+<VekDialog @bind-Visible="DialogVisible" Options="_dialogOptions">
+    <TitleContent>
+        <VekText Typo="Typo.h6">
+            @DialogTitle
+        </VekText>
+    </TitleContent>
+    <DialogContent>
+        <VekProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Class="my-7" Value="@DialogProgress" />
+    </DialogContent>
+</VekDialog>
+
+@code {
+    public static string __description__ = "Dialog title should update along with Progress Bar content";
+
+    private readonly DialogOptions _dialogOptions = new() { FullWidth = true };
+    private int DialogProgress { get; set; } = 0;
+    private bool DialogVisible { get; set; } = false;
+    private string DialogTitle { get; set; } = "Initial state";
+
+    private async Task OpenDialog()
+    {
+        DialogVisible = true;
+
+        for (int i = 0; i <= 10; i++)
+        {
+            await Task.Delay(150); // Simulate some work
+            DialogProgress = i * 10; // Simulate progress update
+            DialogTitle = $"Progress: {DialogProgress}%";
+            StateHasChanged();
+        }
+
+        // Keep dialog open for a bit to observe final title
+        await Task.Delay(2000);
+
+        DialogVisible = false;
+        DialogProgress = 0;
+        DialogTitle = "Initial state";
+    }
+}

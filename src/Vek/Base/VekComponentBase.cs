@@ -1,0 +1,126 @@
+﻿// Copyright (c) Vek 2021
+// Vek licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
+using Microsoft.JSInterop;
+using Vek.Interfaces;
+
+namespace Vek
+{
+    /// <summary>
+    /// Base class for every Vek component, supplying the shared <c>Class</c>, <c>Style</c>, <c>Tag</c>, and <c>UserAttributes</c> parameters.
+    /// </summary>
+    public abstract class VekComponentBase : ComponentBaseWithState, IVekStateHasChanged
+    {
+        private ILogger? _logger;
+        private string? _generatedId;
+
+        // Only inputs ever read this, so generating it per component instance would be wasted on most of the library.
+        private string Id => _generatedId ??= Identifier.Create("vekinput");
+
+        [Inject]
+        private ILoggerFactory LoggerFactory { get; set; } = null!;
+
+        protected ILogger Logger => _logger ??= LoggerFactory.CreateLogger(GetType());
+
+        /// <summary>
+        /// The CSS classes applied to this component.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.  You can use spaces to separate multiple classes.  Use the <see cref="Style"/> property to apply custom CSS styles.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.ComponentBase.Common)]
+        public string? Class { get; set; }
+
+        /// <summary>
+        /// The CSS styles applied to this component.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.  Use the <see cref="Class"/> property to apply CSS classes.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.ComponentBase.Common)]
+        public string? Style { get; set; }
+
+        /// <summary>
+        /// The arbitrary object to link to this component.
+        /// </summary>
+        /// <remarks>
+        /// This property is typically used to associate additional information with this component, such as a model containing data for this component.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.ComponentBase.Common)]
+        public object? Tag { get; set; }
+
+        /// <summary>
+        /// The additional HTML attributes to apply to this component.
+        /// </summary>
+        /// <remarks>
+        /// This property is typically used to provide additional HTML attributes during rendering such as ARIA accessibility tags or a custom ID.
+        /// </remarks>
+        [Parameter(CaptureUnmatchedValues = true)]
+        [Category(CategoryTypes.ComponentBase.Common)]
+        public Dictionary<string, object?> UserAttributes { get; set; } = new Dictionary<string, object?>();
+
+        /// <summary>
+        /// Whether the component has executed OnAfterRender at least once.
+        /// </summary>
+        protected bool HasRendered { get; private set; }
+
+        /// <summary>
+        /// Whether the <see cref="JSRuntime" /> is available.
+        /// </summary>
+        /// <remarks>
+        /// When <c>true</c>, JavaScript interop calls can be made.
+        /// </remarks>
+        protected bool IsJSRuntimeAvailable => HasRendered;
+
+        /// <summary>
+        /// If the UserAttributes contain an ID make it accessible for WCAG labelling of input fields
+        /// </summary>
+        public string FieldId => UserAttributes.TryGetValue("id", out var id) && id is not null
+            ? id.ToString() ?? Id
+            : Id;
+
+        /// <summary>
+        /// Resolves the element ID to use for JavaScript interop, honoring a consumer-supplied <c>id</c>.
+        /// </summary>
+        /// <param name="fallbackId">The internally generated ID used when no <c>id</c> is supplied via <see cref="UserAttributes"/>.</param>
+        /// <returns>The non-empty <c>id</c> from <see cref="UserAttributes"/> when present; otherwise <paramref name="fallbackId"/>.</returns>
+        /// <remarks>
+        /// When a consumer sets <c>id="..."</c> in Razor it is captured into <see cref="UserAttributes"/> and, depending on
+        /// attribute order, can override the generated ID on the rendered element. Components that subscribe JavaScript handlers
+        /// (such as the key interceptor) by element ID must target this effective ID so the subscription, dispatch, and disposal
+        /// all reference the element that is actually rendered, avoiding "no element found for id" lookup mismatches.
+        /// </remarks>
+        protected string GetEffectiveElementId(string fallbackId)
+        {
+            if (UserAttributes.TryGetValue("id", out var id) && id is not null)
+            {
+                var userId = id.ToString();
+                if (!string.IsNullOrWhiteSpace(userId))
+                {
+                    return userId;
+                }
+            }
+
+            return fallbackId;
+        }
+
+        /// <inheritdoc />
+        protected override void OnAfterRender(bool firstRender)
+        {
+            if (firstRender)
+            {
+                HasRendered = true;
+            }
+            base.OnAfterRender(firstRender);
+        }
+
+        /// <inheritdoc />
+        void IVekStateHasChanged.StateHasChanged() => StateHasChanged();
+    }
+}

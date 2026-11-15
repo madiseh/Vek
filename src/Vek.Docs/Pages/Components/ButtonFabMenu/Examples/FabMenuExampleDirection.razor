@@ -1,0 +1,23 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Style="width:400px;" Breakpoint="Breakpoint.SmAndDown">
+    <VekStack>
+        <VekText>Direction: @_direction</VekText>
+        <VekToggleGroup T="Direction" SelectionMode="SelectionMode.SingleSelection" @bind-Value="_direction" Color="Color.Primary" CheckMark FixedContent Vertical>
+            <VekToggleItem Value="@Direction.Top" Text="Top" />
+            <VekToggleItem Value="@Direction.Right" Text="Right" />
+            <VekToggleItem Value="@Direction.Bottom" Text="Bottom" />
+            <VekToggleItem Value="@Direction.Left" Text="Left" />
+        </VekToggleGroup>
+    </VekStack>
+    <VekFabMenu StartIcon="@Icons.Material.Outlined.Send" Color="Color.Primary" Direction="@_direction">
+        <VekFabMenuItem StartIcon="@Icons.Custom.Brands.Slack" Color="Color.Secondary" />
+        <VekFabMenuItem StartIcon="@Icons.Custom.Brands.Discord" Color="Color.Secondary" />
+        <VekFabMenuItem StartIcon="@Icons.Custom.Brands.Gmail" Color="Color.Secondary" />
+    </VekFabMenu>
+</VekStack>
+
+
+@code {
+    private Direction _direction = Direction.Top;
+}

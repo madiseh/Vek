@@ -1,0 +1,22 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekPaper Outlined="true" Class="border-dashed">
+    <VekStack AlignItems="_align" Row="true" Style="height:200px;">
+        <VekPaper Class="py-1 px-3 vek-theme-primary">Item 1</VekPaper>
+        <VekPaper Class="py-3 px-3 vek-theme-primary">Item 2</VekPaper>
+        <VekPaper Class="py-5 px-3 vek-theme-primary">Item 3</VekPaper>
+    </VekStack>
+</VekPaper>
+
+<VekChipSet T="string" CheckMark Class="d-flex justify-center mt-12">
+    <VekChip Text="Start" OnClick="@(() => _align = AlignItems.Start)" SelectedColor="Color.Primary" Default="true" />
+    <VekChip Text="Center" OnClick="@(() => _align = AlignItems.Center)" SelectedColor="Color.Primary" />
+    <VekChip Text="End" OnClick="@(() => _align = AlignItems.End)" SelectedColor="Color.Primary" />
+    <VekChip Text="Stretch" OnClick="@(() => _align = AlignItems.Stretch)" SelectedColor="Color.Primary" />
+    <VekChip Text="Baseline" OnClick="@(() => _align = AlignItems.Baseline)" SelectedColor="Color.Primary" />
+</VekChipSet>
+
+
+@code {
+    AlignItems _align = AlignItems.Start;
+}

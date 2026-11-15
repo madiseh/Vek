@@ -1,0 +1,9 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekTimePicker Label="12 hours" AmPm="true" @bind-Time="_time" ReadOnly="@_readOnly" />
+<VekSwitch @bind-Value="_readOnly" Color="Color.Tertiary">ReadOnly</VekSwitch>
+
+@code{
+    private TimeSpan? _time = new TimeSpan(00, 45, 00);
+    private bool _readOnly;
+}

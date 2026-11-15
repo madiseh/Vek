@@ -1,0 +1,18 @@
+﻿<VekVirtualize Items="_list" Enabled="true">
+    <div class="d-flex vek-width-full">
+        @foreach (var s in _list)
+        {
+            <VekText>@s</VekText>
+        }
+    </div>
+</VekVirtualize>
+
+@code {
+    private readonly List<string> _list = [];
+
+    protected override void OnInitialized()
+    {
+        _list.Add("a");
+        base.OnInitialized();
+    }
+}

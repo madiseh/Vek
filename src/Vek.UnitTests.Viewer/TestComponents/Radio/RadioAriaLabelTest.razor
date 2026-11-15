@@ -1,0 +1,16 @@
+
+<VekRadioGroup @bind-Value="SelectedValue" T="string">
+    <VekRadio Class="r1" Value="@("1")" Label="Radio One" />
+    <VekRadio Class="r2" Value="@("2")" Color="Color.Primary" AriaLabel="Option Two" Label="Radio Two" />
+    <VekRadio Class="r3" Value="@("3")" Color="Color.Secondary">
+        <span>Misc Content</span>
+    </VekRadio>
+    <VekRadio Class="r4" Value="@("4")" Color="Color.Secondary" AriaLabel="Option Four">
+        <span>Misc Content</span>
+    </VekRadio>
+    <VekRadio Class="r5" Value="@("5")" Disabled="true" AriaLabel="Option Five" />
+</VekRadioGroup>
+
+@code {
+    public string SelectedValue { get; set; } = "1";
+}

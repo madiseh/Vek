@@ -1,0 +1,20 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekPaper Class="pa-8" Style="height: 300px; position: relative;">
+    <VekButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(e => ToggleOverlay(true))">Show overlay</VekButton>
+
+    <VekOverlay Visible="visible" DarkBackground="true" Absolute="true">
+        <VekButton Variant="Variant.Filled" Color="Color.Primary"  OnClick="@(e => ToggleOverlay(false))">Hide overlay</VekButton>
+    </VekOverlay>
+</VekPaper>
+
+
+
+@code {
+    private bool visible;
+
+    public void ToggleOverlay(bool value)
+    {
+        visible = value;
+    }
+} 

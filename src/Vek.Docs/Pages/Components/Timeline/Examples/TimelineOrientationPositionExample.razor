@@ -1,0 +1,90 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekGrid>
+    <VekItem xs="12" sm="5">
+        <VekSelect T="TimelineOrientation" ValueChanged="OnOrientationChange" Label="TimelineOrientation" Dense="true" Variant="Variant.Outlined">
+            <VekSelectItem T="TimelineOrientation" Value="TimelineOrientation.Vertical">Vertical</VekSelectItem>
+            <VekSelectItem T="TimelineOrientation" Value="TimelineOrientation.Horizontal">Horizontal</VekSelectItem>
+        </VekSelect>
+    </VekItem>
+    <VekItem xs="12" sm="5">
+        <VekSelect T="TimelinePosition" @bind-Value="_position" Label="TimelinePosition" Dense="true" Variant="Variant.Outlined">
+            @if(_orientation == TimelineOrientation.Vertical)
+            {
+                <VekSelectItem T="TimelinePosition" Value="TimelinePosition.Start">Start</VekSelectItem>
+                <VekSelectItem T="TimelinePosition" Value="TimelinePosition.Left">Left</VekSelectItem>
+                <VekSelectItem T="TimelinePosition" Value="TimelinePosition.Alternate">Alternate</VekSelectItem>
+                <VekSelectItem T="TimelinePosition" Value="TimelinePosition.Right">Right</VekSelectItem>
+                <VekSelectItem T="TimelinePosition" Value="TimelinePosition.End">End</VekSelectItem>
+            }
+            else if(_orientation == TimelineOrientation.Horizontal)
+            {
+                <VekSelectItem T="TimelinePosition" Value="TimelinePosition.Top">Top</VekSelectItem>
+                <VekSelectItem T="TimelinePosition" Value="TimelinePosition.Alternate">Alternate</VekSelectItem>
+                <VekSelectItem T="TimelinePosition" Value="TimelinePosition.Bottom">Bottom</VekSelectItem>
+            }
+        </VekSelect>
+    </VekItem>
+    <VekItem xs="12" sm="2">
+        <VekSwitch Label="Reverse" @bind-Value="_reverse" Disabled="IsSwitchDisabled()" Color="Color.Primary" />
+    </VekItem>
+</VekGrid>
+
+<VekTimeline TimelineOrientation="_orientation" TimelinePosition="_position" Reverse="_reverse">
+    <VekTimelineItem Color="Color.Success" Variant="Variant.Filled">
+        <ItemContent>
+            <VekAlert Severity="Severity.Success">The reactor is running at optimum temperature</VekAlert>
+        </ItemContent>
+        <ItemOpposite>
+            <VekText Color="Color.Success">13:37</VekText>
+        </ItemOpposite>
+    </VekTimelineItem>
+    <VekTimelineItem Color="Color.Warning" Variant="Variant.Filled">
+        <ItemContent>
+            <VekAlert Severity="Severity.Warning">The reactor temperature exceeds the optimal range</VekAlert>
+        </ItemContent>
+        <ItemOpposite>
+            <VekText Color="Color.Warning">14:08</VekText>
+        </ItemOpposite>
+    </VekTimelineItem>
+    <VekTimelineItem Color="Color.Error" Variant="Variant.Filled">
+        <ItemContent>
+            <VekAlert Severity="Severity.Error">Meltdown is imminent</VekAlert>
+        </ItemContent>
+        <ItemOpposite>
+            <VekText Color="Color.Error">15:00</VekText>
+        </ItemOpposite>
+    </VekTimelineItem>
+</VekTimeline>
+
+
+@code {
+    private TimelinePosition _position { get; set; } = TimelinePosition.Start;
+    private TimelineOrientation _orientation { get; set; } = TimelineOrientation.Vertical;
+    private bool _reverse { get; set; }
+
+    private void OnOrientationChange(TimelineOrientation value)
+    {
+        _orientation = value;
+        switch (value)
+        {
+            case TimelineOrientation.Vertical:
+                if (_position is TimelinePosition.Top or TimelinePosition.Bottom)
+                    _position = TimelinePosition.Start;
+                break;
+            case TimelineOrientation.Horizontal:
+                if (_position is TimelinePosition.Start or TimelinePosition.Left or TimelinePosition.Right or TimelinePosition.End)
+                    _position = TimelinePosition.Top;
+                break;
+        }
+    }
+
+    bool IsSwitchDisabled()
+    {
+        if (_position == TimelinePosition.Alternate)
+            return false;
+        else
+            _reverse = false;
+        return true;
+    }
+}

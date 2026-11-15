@@ -1,0 +1,21 @@
+﻿@namespace Vek
+@inherits VekComponentBase
+
+<div @attributes="UserAttributes" class="@Classname" style="@Style">
+    @if (CardHeaderAvatar is not null)
+    {
+        <div class="vek-card-header-avatar">@CardHeaderAvatar</div>
+    }
+    @if (CardHeaderContent is not null)
+    {
+        <div class="vek-card-header-content">@CardHeaderContent</div>
+    }
+    @if (CardHeaderActions is not null)
+    {
+        <div class="vek-card-header-actions">@CardHeaderActions</div>
+    }
+    @if (ChildContent is not null)
+    {
+        @ChildContent
+    }
+</div>

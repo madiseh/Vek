@@ -1,0 +1,16 @@
+﻿<VekStack>
+    <VekField Label="What am I? (0)" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Outlined.Info" />            
+    <VekField Label="What am I? (1)" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Info" />
+    <VekField Label="What am I? (2)" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Outlined.Info">
+        <VekText>Some Content Here</VekText>
+    </VekField> 
+    <VekField Label="What am I? (3)" Adornment="Adornment.Start" ShrinkLabel="true" AdornmentIcon="@Icons.Material.Outlined.Info" />
+    <VekField Label="What am I? (4)" Adornment="Adornment.End" ShrinkLabel="true" AdornmentIcon="@Icons.Material.Outlined.Info">
+        <VekText>Some Content Here</VekText>
+    </VekField>
+</VekStack>
+
+@code {
+    public static string __description__ = "Issue 7533, testing that the Start Adornment is not going two lines with the label";
+
+}

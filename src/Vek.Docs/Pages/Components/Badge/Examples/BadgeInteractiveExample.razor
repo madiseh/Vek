@@ -1,0 +1,123 @@
+﻿@namespace Vek.Docs.Examples
+
+
+
+<VekGrid>
+    <VekItem md="3">
+        <VekPaper Class="pa-4" Elevation="0">
+            <VekText Typo="Typo.h6" GutterBottom="true">Test Options</VekText>
+            <VekSelect T="string" Label="Component" Margin="Margin.Dense" Dense="true" Value="@SelectedTestComponent" ValueChanged="OnSelectedTestComponent">
+                <VekSelectItem T="string" Value="@("VekIcon")">VekIcon</VekSelectItem>
+                <VekSelectItem T="string" Value="@("VekButton")">VekButton</VekSelectItem>
+                <VekSelectItem T="string" Value="@("VekIconButton")">VekIconButton</VekSelectItem>
+                <VekSelectItem T="string" Value="@("VekText")">VekText</VekSelectItem>
+                <VekSelectItem T="string" Value="@("VekAvatar")">VekAvatar</VekSelectItem>
+                <VekSelectItem T="string" Value="@("VekChip")">VekChip</VekSelectItem>
+            </VekSelect>
+        </VekPaper>
+    </VekItem>
+    <VekItem md="6" Class="d-flex align-center justify-center my-auto">
+        <VekBadge Origin="@Origin" Content="@BadgeContent" Color="Color.Primary" Overlap="@Overlap" Dot="@Dot" Bordered="@Bordered" Icon="@BadgeIcon">
+            @if (SelectedTestComponent == "VekIcon")
+            {
+                <VekIcon Icon="@Icons.Custom.Brands.Vek" Color="Color.Default" Size="Size.Large" />
+            }
+            else if (SelectedTestComponent == "VekButton")
+            {
+                <VekButton Color="Color.Primary" Variant="Variant.Filled">VekButton</VekButton>
+            }
+            else if (SelectedTestComponent == "VekIconButton")
+            {
+                <VekIconButton Icon="@Icons.Material.Filled.Email" Color="Color.Default" />
+            }
+            else if (SelectedTestComponent == "VekText")
+            {
+                <VekText>VekText</VekText>
+            }
+            else if(SelectedTestComponent == "VekAvatar")
+            {
+                <VekAvatar Size="Size.Large" Class="ma-2">
+                    <VekImage Src="images/mony.jpg" />
+                </VekAvatar>
+            }
+            else if(SelectedTestComponent == "VekChip")
+            {
+                <VekChip T="string" Label="true" Color="Color.Warning" Style="color:black;">Radioactive Areas</VekChip>
+            }
+        </VekBadge>
+    </VekItem>
+    <VekItem md="3">
+        <VekPaper Class="pa-4" Elevation="0">
+            <VekText Typo="Typo.h6" GutterBottom="true">Badge Options</VekText>
+            <VekSelect Label="Badge Origin" Margin="Margin.Dense" Dense="true" @bind-Value="Origin">
+                <VekSelectItem Value="Origin.TopLeft">TopLeft</VekSelectItem>
+                <VekSelectItem Value="Origin.TopCenter">TopCenter</VekSelectItem>
+                <VekSelectItem Value="Origin.TopRight">TopRight</VekSelectItem>
+                <VekSelectItem Value="Origin.CenterLeft">CenterLeft</VekSelectItem>
+                <VekSelectItem Value="Origin.CenterCenter">CenterCenter</VekSelectItem>
+                <VekSelectItem Value="Origin.CenterRight">CenterRight</VekSelectItem>
+                <VekSelectItem Value="Origin.BottomLeft">BottomLeft</VekSelectItem>
+                <VekSelectItem Value="Origin.BottomCenter">BottomCenter</VekSelectItem>
+                <VekSelectItem Value="Origin.BottomRight">BottomRight</VekSelectItem>
+            </VekSelect>
+            <VekCheckBox @bind-Value="Dot" Label="Dot" Color="Color.Primary" Style="width:100%;" />
+            <VekCheckBox @bind-Value="Overlap" Label="Overlap" Color="Color.Primary" Style="width:100%;" />
+            <VekCheckBox @bind-Value="Bordered" Label="Bordered" Color="Color.Primary" Style="width:100%;" />
+            <VekCheckBox T="bool" ValueChanged="AddIcon" Label="Icon" Color="Color.Primary" Style="width:100%;" />
+            <VekText Typo="Typo.subtitle2" Class="my-2">Badge Content</VekText>
+            <div style="display: flex;">
+                <VekButton OnClick="AddValue" Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" FullWidth="true" Class="mr-1">Add @AddNumber</VekButton>
+                <VekButton OnClick="ClearContent" Variant="Variant.Filled" Size="Size.Small" Color="Color.Secondary" FullWidth="true" Class="ml-1">Clear</VekButton>
+            </div>
+        </VekPaper>
+    </VekItem>
+</VekGrid>
+
+@code {
+    public Origin Origin { get; set; } = Origin.TopRight;
+    public bool Dot { get; set; }
+    public bool Overlap { get; set; }
+    public bool Bordered { get; set; }
+    public string BadgeIcon { get; set; }
+
+    public string SelectedTestComponent { get; set; } = "VekChip";
+    public string AddNumber { get; set; } = "1";
+
+    public int? BadgeContent { get; set; }
+
+    public void OnSelectedTestComponent(string value)
+    {
+        SelectedTestComponent = value;
+    }
+
+    public void AddIcon()
+    {
+        if (String.IsNullOrEmpty(BadgeIcon))
+        {
+            BadgeIcon = Icons.Custom.Uncategorized.Radioactive;
+        }
+        else
+        {
+            BadgeIcon = null;
+        }
+    }
+
+    public void AddValue()
+    {
+        if(BadgeContent == null)
+        {
+            AddNumber = "25";
+            BadgeContent = 1;
+        }
+        else
+        {
+            BadgeContent += 25;
+        }
+    }
+
+    public void ClearContent()
+    {
+        AddNumber = "1";
+        BadgeContent = null;
+    }
+}

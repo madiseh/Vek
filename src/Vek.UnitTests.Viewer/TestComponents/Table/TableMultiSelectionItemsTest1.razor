@@ -1,0 +1,23 @@
+﻿<VekDateRangePicker DateRange="DateRange" />
+
+<VekTable T="ComplexObject" Items="_simulatedServerData" Filter="Filter" MultiSelection @bind-SelectedItems="_selectedItems" Comparer="_comparer" Dense>
+    <HeaderContent>
+        <VekTh>Id</VekTh>
+        <VekTh>Name</VekTh>
+        <VekTh>DateTime</VekTh>
+        <VekTh>X</VekTh>
+        <VekTh>Y</VekTh>
+    </HeaderContent>
+    <RowTemplate>
+        <VekTd>@context.Id</VekTd>
+        <VekTd>@context.Name</VekTd>
+        <VekTd>@context.DateTime</VekTd>
+        <VekTd>@context.NestedObject.X</VekTd>
+        <VekTd>@context.NestedObject.Y</VekTd>
+    </RowTemplate>
+    <PagerContent>
+        <VekTablePager HideRowsPerPage />
+    </PagerContent>
+</VekTable>
+
+<VekText>SelectedItems { @string.Join(", ", _selectedItems.Select(x => x.Id)) }</VekText>

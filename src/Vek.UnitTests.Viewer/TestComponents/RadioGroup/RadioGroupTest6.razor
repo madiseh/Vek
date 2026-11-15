@@ -1,0 +1,16 @@
+﻿<VekRadioGroup @bind-Value="@_option">
+    <VekRadio Value="@("1")" Dense="true" />
+    <VekRadio Value="@("2")" Size="Size.Small" />
+    <VekRadio Value="@("3")" />
+    <VekRadio Value="@("4")" Size="Size.Large" />
+</VekRadioGroup>
+
+<VekButton OnClick="OnClick" />
+
+@code {
+    public static string __description__ = "RadioGroup should be resettable";
+
+    private string? _option;
+
+    private void OnClick() => _option = null;
+}

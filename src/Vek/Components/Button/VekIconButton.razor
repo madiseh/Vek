@@ -1,0 +1,24 @@
+﻿@namespace Vek
+@inherits VekBaseButton
+
+@{
+    OpenRoot(__builder, Classname);
+    RenderLabel(__builder);
+    __builder.CloseElement();
+}
+
+@code {
+    private void RenderLabel(RenderTreeBuilder __builder)
+    {
+        @if (!string.IsNullOrEmpty(Icon))
+        {
+            <span class="vek-icon-button-label">
+                <VekIcon Disabled="@Disabled" Icon="@Icon" Size="@Size" />
+            </span>
+        }
+        else
+        {
+            <VekText Typo="Typo.body2" Color="Color.Inherit">@ChildContent</VekText>
+        }
+    }
+}

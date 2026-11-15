@@ -1,0 +1,28 @@
+@namespace Vek.Docs.Examples
+
+<VekGrid>
+    <VekItem xs="12" md="8">
+        <VekStack Row="@_row" Reverse="@_reverse" Breakpoint="@_breakpoint">
+            <VekPaper Class="pa-3">Item 1</VekPaper>
+            <VekPaper Class="pa-3">Item 2</VekPaper>
+            <VekPaper Class="pa-3">Item 3</VekPaper>
+        </VekStack>
+    </VekItem>
+    <VekItem xs="12" md="4">
+        <VekStack>
+            <VekSwitch Label="Row" @bind-Value="_row" />
+            <VekSwitch Label="Reverse" @bind-Value="_reverse" />
+            <VekSelect T="Breakpoint" @bind-Value="_breakpoint" Label="Breakpoint">
+                @foreach (var value in Enum.GetValues(typeof(Breakpoint)).Cast<Breakpoint>()){
+                    <VekSelectItem T="Breakpoint" Value="value">@value</VekSelectItem>
+                }
+            </VekSelect>
+        </VekStack>
+    </VekItem>
+</VekGrid>
+
+@code {
+    private Breakpoint _breakpoint = Breakpoint.None;
+    private bool _row = false;
+    private bool _reverse = false;
+}

@@ -1,0 +1,15 @@
+﻿<VekPaper Class="pa-4">
+    <VekStack Spacing="2">
+        <VekButton id="outside_btn" OnClick="OnExpandCollapseClick">@(_expanded ? "Collapse" : "Expand")</VekButton>
+        <VekDivider />
+        <VekCollapse @bind-Expanded="_expanded">
+            This content is collapsible
+        </VekCollapse>
+    </VekStack>
+</VekPaper>
+<VekSwitch T="bool" Label="Expanded" @bind-Value="_expanded" Color="Color.Primary" />
+@code {
+    private bool _expanded = true;
+
+    private void OnExpandCollapseClick() => _expanded = !_expanded;
+}

@@ -1,0 +1,13 @@
+﻿<VekPopoverProvider />
+
+<VekSelect @bind-Value="_value">
+    <VekSelectItem T="int" Value="1">One</VekSelectItem>
+    <VekSelectItem T="int" Value="2">Two</VekSelectItem>
+    <VekSelectItem T="int" Value="3">Three</VekSelectItem>
+</VekSelect>
+
+@code {
+    public static string __description__ = "Initially, since the value is not in the list of options, it should be shown as text instead of render fragment.";
+
+    private int _value = 17;
+}

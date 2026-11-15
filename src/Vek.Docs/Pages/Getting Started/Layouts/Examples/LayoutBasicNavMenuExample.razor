@@ -1,0 +1,11 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekNavMenu>
+    <VekNavLink Href="/" Match="NavLinkMatch.All">Dashboard</VekNavLink>
+    <VekNavLink Href="/servers" Match="NavLinkMatch.Prefix">Servers</VekNavLink>
+    <VekNavGroup Title="Settings" Expanded="true">
+        <VekNavLink Href="/users"  Match="NavLinkMatch.Prefix">Users</VekNavLink>
+        <VekNavLink Href="/security"  Match="NavLinkMatch.Prefix">Security</VekNavLink>
+    </VekNavGroup>
+    <VekNavLink Href="/about"  Match="NavLinkMatch.Prefix">About</VekNavLink>
+</VekNavMenu>

@@ -1,0 +1,52 @@
+﻿<VekDialog>
+    <DialogContent>
+        <VekText>Journey of life</VekText>
+    </DialogContent>
+    <DialogActions>
+        <VekButton OnClick="Cancel">Cancel</VekButton>
+        <VekButton Color="Color.Primary" OnClick="Submit">OK</VekButton>
+    </DialogActions>
+</VekDialog>
+
+@code {
+    public static int OnInitializedCount;
+    public static int OnParametersSetCount;
+
+    [CascadingParameter]
+    public IVekDialogInstance VekDialog { get; set; } = null!;
+
+    private void Submit() => VekDialog.Close(DialogResult.Ok(true));
+    private void Cancel() => VekDialog.Cancel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        await Task.Delay(10);
+
+        OnInitializedCount++;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        await Task.Delay(10);
+
+        OnParametersSetCount++;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            return;
+        }
+
+        await Task.Delay(10);
+
+        VekDialog.Close(DialogResult.Ok(true));
+    }
+}

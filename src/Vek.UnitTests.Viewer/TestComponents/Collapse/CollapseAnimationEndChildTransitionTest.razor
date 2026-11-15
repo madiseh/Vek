@@ -1,0 +1,14 @@
+﻿<VekCollapse Expanded="true" OnAnimationEnd="OnAnimationEnd">
+    <div id="inner">content</div>
+</VekCollapse>
+
+<div id="animation_end_count">@_animationEndCount</div>
+
+@code {
+    private int _animationEndCount;
+
+    private void OnAnimationEnd()
+    {
+        _animationEndCount++;
+    }
+}

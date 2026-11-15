@@ -1,0 +1,31 @@
+﻿<VekLayout>
+    <VekAppBar Elevation="1">
+        <VekIconButton id="toggle-drawer-button" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+    </VekAppBar>
+    <VekDrawer @ref="@Drawer" @bind-Open="@_open" Variant="@Variant" OpenMiniOnHover="@OpenMiniOnHover" Elevation="1" Breakpoint="@Breakpoint" ClipMode="@ClipMode">
+    </VekDrawer>
+    <VekMainContent Class="pt-16 px-16">
+        <VekContainer Class="mt-6">
+        </VekContainer>
+    </VekMainContent>
+</VekLayout>
+
+@code{ 
+    private bool _open;
+
+    public VekDrawer Drawer { get; private set; } = null!;
+
+    [Parameter]
+    public Breakpoint Breakpoint { get; set; } = Breakpoint.Md;
+
+    [Parameter]
+    public DrawerVariant Variant { get; set; } = DrawerVariant.Responsive;
+
+    [Parameter]
+    public bool OpenMiniOnHover { get; set; }
+
+    [Parameter]
+    public DrawerClipMode ClipMode { get; set; }
+
+    private void ToggleDrawer() => _open = !_open;
+}

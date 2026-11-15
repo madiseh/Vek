@@ -1,0 +1,20 @@
+﻿<VekTable ServerData="ServerReload">
+    <HeaderContent>
+        <VekTh><VekTableSortLabel SortLabel="No." T="int">Nr</VekTableSortLabel></VekTh>
+    </HeaderContent>
+    <RowTemplate>
+        <VekTd DataLabel="Nr">@context</VekTd>
+    </RowTemplate>
+</VekTable>
+
+@code {
+    public static string __description__ = "The table should not crash when the TableData Items are null.";
+
+    /// <summary>
+    /// Here we simulate getting the paged, filtered and ordered data from the server
+    /// </summary>
+    private static Task<TableData<int>> ServerReload(TableState state, CancellationToken token)
+    {
+        return Task.FromResult(new TableData<int>());
+    }
+}

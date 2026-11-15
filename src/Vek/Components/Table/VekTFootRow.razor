@@ -1,0 +1,28 @@
+﻿@namespace Vek
+@implements IDisposable
+@inherits VekComponentBase
+
+<tr class="@Classname" @onclick="@OnRowClick" style="@Style" @attributes="@UserAttributes">
+    @if (Context.DisplayApplyButtonAtStart(IgnoreEditable) || Context.DisplayEditButtonAtStart(IgnoreEditable))
+    {
+        <VekTh />
+    }
+    @if (Expandable || ((Context?.Table?.MultiSelection ?? false) && !IgnoreCheckbox))
+    {
+        <VekTd>
+            @if (Expandable)
+            {
+                <div class="ml-4 mr-5"></div>
+            }
+            @if (Checkable)
+            {
+                <VekCheckBox @bind-Value="Checked" ReadOnly="!SelectionChangeable" Disabled="!SelectionChangeable" Class="vek-table-cell-checkbox" />
+            }
+        </VekTd>
+    }
+    @ChildContent
+    @if (Context.DisplayApplyButtonAtEnd(IgnoreEditable) || Context.DisplayEditButtonAtEnd(IgnoreEditable))
+    {
+        <VekTh />
+    }
+</tr>

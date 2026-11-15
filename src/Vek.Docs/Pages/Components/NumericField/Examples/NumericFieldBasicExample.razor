@@ -1,0 +1,11 @@
+﻿@namespace Vek.Docs.Examples
+
+<VekNumericField @bind-Value="IntValue" Label="Standard" Variant="Variant.Text" Min="0" Max="10" />
+<VekNumericField @bind-Value="DoubleValue" Label="Filled" Variant="Variant.Filled" Min="0.0" />
+<VekNumericField @bind-Value="DecimalValue" Label="Outlined" Variant="Variant.Outlined" Step=".2M" />
+
+@code {
+    public int IntValue { get; set; }
+    public double DoubleValue { get; set; }
+    public decimal DecimalValue { get; set; }
+}
