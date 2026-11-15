@@ -1,5 +1,13 @@
 # AGENTS.md - AI Coding Agent Guide for Vek
 
+## Architecture and Governance
+
+Vek maintains centralized architecture and governance documentation under `docs/governance/`:
+- [Architecture](docs/governance/architecture.md): System architecture, multi-targeting (`net8.0`/`net9.0`/`net10.0`), project dependencies, `ParameterState<T>`, root rendering, CSS tokens, Bun asset pipeline, and Test Viewer.
+- [Development Rules](docs/governance/development-rules.md): C# coding standards, XML documentation rules (`<summary>`, constructor guidelines), parameter registration patterns, `UserAttributes` precedence, and Roslyn analyzer conventions.
+- [Testing Standards](docs/governance/testing-standards.md): bUnit standards, fake time provider (`Context.AddFakeTimeProvider()`), test parallelization (`ParallelScope.Fixtures`), Microsoft.Testing.Platform runner syntax, and APG accessibility verification.
+- [Governance Index](docs/governance/README.md): Documentation routing guidelines and anti-sprawl policy for AI agents.
+
 ## Change Type Matrix
 
 | Change type | Common locations | Verification | Notes |
@@ -331,11 +339,14 @@ Verify with bUnit assertions on roles and `aria-*` attributes before and after i
 
 ## Finishing a Task
 
+Execute the **`/review-finalize`** skill (`.agents/skills/review-finalize/SKILL.md`) upon completing tasks to run the standard 5-phase verification, test execution, in-place documentation sync to `docs/governance/`, and commit readiness check.
+
 A task is finished when:
-- Formatting was run for relevant changed files.
+- Formatting was run for relevant changed files (`dotnet format whitespace --folder --include <files>` from `src/`).
 - The relevant target project builds cleanly with no new warnings when code, docs app, analyzer, or asset inputs changed.
 - Tests were updated and run when behavior changed.
 - Docs were updated when component behavior or public API changed.
+- Newly learned rules, corrections, and architectural patterns from the session were synchronized in-place into `docs/governance/` without creating documentation sprawl.
 - No new dependencies were added without approval.
 
 In the final response, report what changed, the exact verification commands run, whether formatting was run, any skipped verification and the reason, and follow-up work intentionally left out of scope.
