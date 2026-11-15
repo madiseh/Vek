@@ -2,8 +2,8 @@
 // Vek licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO.Compression;
 using System.Text;
 using System.Xml;
@@ -94,7 +94,7 @@ namespace Vek.Components.DataGrid.Export
             while (columnIndex > 0)
             {
                 columnIndex--;
-                result.Insert(0, (char)('A' + columnIndex % 26));
+                result.Insert(0, (char)('A' + (columnIndex % 26)));
                 columnIndex /= 26;
             }
             return result.ToString();
