@@ -3,7 +3,7 @@
 ## Architecture and Governance
 
 Vek maintains centralized architecture and governance documentation under `docs/governance/`:
-- [Architecture](docs/governance/architecture.md): System architecture, multi-targeting (`net8.0`/`net9.0`/`net10.0`), project dependencies, `ParameterState<T>`, root rendering, CSS tokens, Bun asset pipeline, and Test Viewer.
+- [Architecture](docs/governance/architecture.md): System architecture, multi-targeting (`net8.0`/`net9.0`/`net10.0`/`net11.0`), project dependencies, `ParameterState<T>`, root rendering, CSS tokens, Bun asset pipeline, and Test Viewer.
 - [Development Rules](docs/governance/development-rules.md): C# coding standards, XML documentation rules (`<summary>`, constructor guidelines), parameter registration patterns, `UserAttributes` precedence, and Roslyn analyzer conventions.
 - [Testing Standards](docs/governance/testing-standards.md): bUnit standards, fake time provider (`Context.AddFakeTimeProvider()`), test parallelization (`ParallelScope.Fixtures`), Microsoft.Testing.Platform runner syntax, and APG accessibility verification.
 - [Governance Index](docs/governance/README.md): Documentation routing guidelines and anti-sprawl policy for AI agents.
@@ -55,7 +55,7 @@ Vek maintains centralized architecture and governance documentation under `docs/
 ## Environment Requirements
 
 - `global.json` pins the .NET SDK feature band; use an SDK from that band to restore, build, and test this repository. If commands fail with SDK resolution errors, compare `dotnet --version` against `global.json`.
-- The library targets `net8.0`, `net9.0`, and `net10.0`.
+- The library targets `net8.0`, `net9.0`, `net10.0`, and `net11.0`.
 
 ## Scoped Commands and Verification
 
@@ -68,7 +68,7 @@ Vek maintains centralized architecture and governance documentation under `docs/
 ### Choose the smallest valid verification loop
 - For repository metadata or prose-only changes outside the build inputs, such as `README.md`, `CHANGELOG.md`, or `.github/` text-only edits: do not run `dotnet`.
 - For component `.cs` or `.razor` changes with behavior coverage: use the default local loop below, a single filtered `dotnet test` against `src/Vek.UnitTests/Vek.UnitTests.csproj` with `-p:SkipBunCompile=true`.
-- For component `.cs` or `.razor` changes that only need compile validation: build one framework with `dotnet build src/Vek/Vek.csproj -f net10.0 -p:SkipBunCompile=true`. The library multi-targets net8.0/net9.0/net10.0; `-f` compiles just one for a faster check, and PR CI also compiles only net10.0.
+- For component `.cs` or `.razor` changes that only need compile validation: build one framework with `dotnet build src/Vek/Vek.csproj -f net10.0 -p:SkipBunCompile=true`. The library multi-targets net8.0/net9.0/net10.0/net11.0; `-f` compiles just one for a faster check, and PR CI also compiles only net10.0.
 - For `TScripts` or `Styles`: run a normal scoped project build.
 - For docs changes: build the relevant docs project. Avoid docs host run loops during agent verification.
 - To check whether current `dev` already contains a fix, use https://github.com/madiseh/vek, which is continuously deployed from `dev`, before building anything locally. vek.com tracks the latest release.

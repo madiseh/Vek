@@ -2,8 +2,10 @@
 
   <PropertyGroup>
     <TargetFrameworks>net8.0;net9.0;$(PrimaryTargetFramework)</TargetFrameworks>
+    <TargetFrameworks Condition=" '$([MSBuild]::VersionGreaterThanOrEquals($(NETCoreSdkVersion), 11.0))' == 'true' Or '$(IncludeNet11)' == 'true' ">$(TargetFrameworks);net11.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <EnumGenerator_ForceInternal>true</EnumGenerator_ForceInternal>
+    <NoWarn Condition="'$(TargetFramework)' == 'net11.0'">$(NoWarn);BL0011;BL0012;BL0016</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -12,8 +14,8 @@
     <Company>Vek</Company>
     <Authors>Amin Sabaghi</Authors>
     <Copyright>Copyright 2026 Amin Sabaghi (Vek)</Copyright>
-    <PackageTags>Blazor, Vek, Material, Material Design, Components, Blazor Components, Blazor Library, .NET 8, .NET 10, net8.0, net10.0</PackageTags>
-    <Description>Enterprise-ready Blazor Component Suite based on Material Design principles with an emphasis on ease of use and extensibility. Built for .NET 8.0 and .NET 10.0.</Description>
+    <PackageTags>Blazor, Vek, Material, Material Design, Components, Blazor Components, Blazor Library, .NET 8, .NET 10, .NET 11, net8.0, net10.0, net11.0</PackageTags>
+    <Description>Enterprise-ready Blazor Component Suite based on Material Design principles with an emphasis on ease of use and extensibility. Built for .NET 8.0, .NET 10.0, and .NET 11.0.</Description>
     <PackageProjectUrl>https://github.com/madiseh/vek</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/madiseh/vek</RepositoryUrl>
@@ -89,6 +91,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.1" />
     <PackageReference Include="Microsoft.Extensions.Localization" Version="10.0.1" />
   </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net11.0' ">
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="11.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="11.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="11.0.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.ResxSourceGenerator" Version="3.11.0-beta1.26226.5">
@@ -121,7 +128,7 @@
   <PropertyGroup>
     <!-- Check if we're the first TFM when building directly (no outer build) -->
     <_IsFirstTfm>false</_IsFirstTfm>
-    <_IsFirstTfm Condition="'$(TargetFramework)' == 'net10.0'">true</_IsFirstTfm>
+    <_IsFirstTfm Condition="'$(TargetFramework)' == 'net10.0' Or '$(TargetFramework)' == 'net11.0'">true</_IsFirstTfm>
   </PropertyGroup>
 
   <Target Name="BuildWebAssets"
