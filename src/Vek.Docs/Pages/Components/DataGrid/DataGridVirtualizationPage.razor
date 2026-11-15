@@ -1,0 +1,116 @@
+@page "/components/datagrid/virtualization"
+
+<DocsPage>
+    <DocsPageHeader Title="DataGrid - Virtualization & Server Data" Component="@nameof(VekDataGrid<T>)">
+        <Description>
+            Learn about server-side operations, UI virtualization, large dataset streaming, observability, culture formatting, and accessibility options in <CodeInline>&lt;VekDataGrid&gt;</CodeInline>.
+        </Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Server Side Filtering, Sorting and Pagination">
+                <Description>
+                    Set <CodeInline>ServerData</CodeInline> to load data from the backend that is filtered, sorted and paginated.
+                    DataGrid will call this async function whenever the user navigates the pager or changes sorting by clicking on the sort header icons.
+                    In this example, we also show how to force the datagrid to update when the search textfield blurs, so that the datagrid reloads server-filtered data.
+                    <VekAlert Severity="Severity.Warning" Dense="true" Class="mt-3">
+                        The parameter <CodeInline>ServerData</CodeInline> is incompatible with the parameters <CodeInline>Items</CodeInline> and <CodeInline>QuickFilter</CodeInline>. If <CodeInline>ServerData</CodeInline> is mixed with <CodeInline>Items</CodeInline> and <CodeInline>QuickFilter</CodeInline>, an <CodeInline>InvalidOperationException</CodeInline> is thrown at runtime.
+                    </VekAlert>
+                    <VekAlert Severity="Severity.Info" Dense="true" Class="mt-3">
+                        The example shows a solution to replace <CodeInline>QuickFilter</CodeInline> when <CodeInline>ServerData</CodeInline> is used.
+                    </VekAlert>
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridServerSideExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridServerSideExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Virtualization">
+                <Description>
+                    The items in the <CodeInline>&lt;VekDataGrid></CodeInline> can be virtualized to provide better rendering performance. Setting the <CodeInline>Virtualize</CodeInline> property
+                    to <CodeInline>true</CodeInline> will cause the items to be rendered virtually. You must restrict the height for virtualization to work.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridVirtualizationExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridVirtualizationExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Virtualize server data">
+                <Description>
+                    The <CodeInline>&lt;VekDataGrid></CodeInline> supports virtualization of data fetched from a server, enhancing the grid's performance for large datasets.
+                    For this feature to work, the <CodeInline>Virtualize</CodeInline> property must be set to <CodeInline>true</CodeInline>,
+                    the <CodeInline>VirtualizeServerData</CodeInline> parameter should be used to facilitate data retrieval and streaming from the server,
+                    and the <CodeInline>ItemSize</CodeInline> should be specified to optimize virtualization.
+
+                    Please make sure to constrain the grid's height, as virtualization relies on this dimension.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridVirtualizeServerDataExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridVirtualizeServerDataExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Observability">
+                <Description>
+                    When loading the <CodeInline>&lt;VekDataGrid></CodeInline> with a collection that implements <CodeInline>INotifyCollectionChanged</CodeInline>, changes to the
+                    underlying collection will automatically be reflected in the <CodeInline>&lt;VekDataGrid></CodeInline>.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridObservabilityExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridObservabilityExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="CultureInfo">
+                <Description>
+                    DataGrid <CodeInline>Culture</CodeInline> (CultureInfo) property is used to display and edit/filter column data.
+                    When it is not set, cell values use the current culture through .NET's default formatting behavior.
+                    Set it to <CodeInline>CultureInfo.InvariantCulture</CodeInline> when invariant numeric or date formatting is required.
+                    Each <CodeInline>&lt;Column></CodeInline> can define its own culture to specify its format individually.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridColumnCultureExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridColumnCultureExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Accessibility">
+                <Description>
+                    Set <CodeInline>aria-label</CodeInline> or <CodeInline>aria-labelledby</CodeInline> in the
+                    <CodeInline>TableAttributes</CodeInline> parameter to provide an accessible name for the HTML
+                    <CodeInline>&lt;table&gt;</CodeInline> element. This helps screen readers announce the purpose of the table.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridAriaLabelExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridAriaLabelExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Other Options">
+                <Description>
+                    There are many options available for the <CodeInline>&lt;VekDataGrid></CodeInline> that are not covered in the examples above.
+                    The <CodeInline>&lt;ColGroup></CodeInline> component allows you to apply a span or style property to multiple columns. However,
+                    the available styles are limited to a few CSS properties, including width, visibility, background, and border. Additionally, the
+                    `span` property enables a column to extend across multiple columns. The <CodeInline>Loading</CodeInline> property displays a loading
+                    indicator while the data grid is retrieving data. You can bind this attribute to a `bool` variable set to `true` when initializing
+                    the page and toggle it once the data has loaded. The <CodeInline>FixedHeader</CodeInline> property ensures that the header remains
+                    fixed at the top of the grid, even when scrolling. These are just a few of the many available options. For a complete list and
+                    additional details, refer to the <VekLink Href="components/datagrid#api">API</VekLink> documentation above.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridOtherOptionsExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridOtherOptionsExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

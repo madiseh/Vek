@@ -109,8 +109,7 @@ namespace Vek.Docs.Services
 
                     if (menuElement.GroupComponents is not null)
                     {
-                        links.AddRange(menuElement.GroupComponents.Select(i => new NavigationFooterLink(i.Name, i.Link))
-                            .OrderBy(i => i.Link));
+                        links.AddRange(menuElement.GroupComponents.Select(i => new NavigationFooterLink(i.Name, i.Link)));
                     }
                 }
 

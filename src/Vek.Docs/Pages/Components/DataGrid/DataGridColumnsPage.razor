@@ -1,0 +1,137 @@
+@page "/components/datagrid/columns"
+
+<DocsPage>
+    <DocsPageHeader Title="DataGrid - Columns & Layout" Component="@nameof(VekDataGrid<T>)">
+        <Description>
+            Learn how to control column widths, resizing, drag-and-drop reordering, column visibility panels, sticky columns, visual styling, and context menus in <CodeInline>&lt;VekDataGrid&gt;</CodeInline>.
+        </Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Column Sizing">
+                <Description>
+                    Use the <CodeInline>&lt;ColGroup></CodeInline> render fragment to set the initial widths of each column.
+                    Widths can be expressed as percentages (e.g. <CodeInline>width: 20%</CodeInline>) or fixed values (e.g. <CodeInline>width: 120px</CodeInline>).
+                    When columns are also resizable, these values serve as the initial widths before the user drags the resize handles.
+                    <br><br>
+                    To prevent long text from wrapping inside a cell, apply <CodeInline>white-space: nowrap</CodeInline> via the column's
+                    <CodeInline>CellStyle</CodeInline> parameter. Combine it with <CodeInline>overflow: hidden</CodeInline> and
+                    <CodeInline>text-overflow: ellipsis</CodeInline> (and <CodeInline>max-width: 0</CodeInline> to make the ellipsis
+                    work together with a percentage-based column width) for a cleaner truncated display.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridColumnSizingExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridColumnSizingExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Resizing">
+                <Description>
+                    The <CodeInline>&lt;VekDataGrid></CodeInline> allows you to resize columns interactively when
+                    <CodeInline>ColumnResizeMode</CodeInline> is not set to <CodeInline>None</CodeInline>, which is the default.
+                    There are two modes for resizing: <CodeInline>ResizeMode.Container</CodeInline> and <CodeInline>ResizeMode.Column</CodeInline>.
+                    <CodeInline>ResizeMode.Container</CodeInline> resizes the entire data grid while <CodeInline>ResizeMode.Column</CodeInline> only resizes
+                    columns using available space within the data grid.
+                    Initial column widths for resizable grids can be set using <CodeInline>&lt;ColGroup></CodeInline> as shown in the Column Sizing example above.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridResizeExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridResizeExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Column Reordering">
+                <Description>
+                    To enable Column Reordering via Drag and Drop, set the <CodeInline>DragDropColumnReordering</CodeInline> parameter to true. Columns can override this parameter with their <CodeInline>DragAndDropEnabled</CodeInline> parameter if necessary.
+                    Header drag-and-drop behavior is controlled by <CodeInline>ColumnReorderMode</CodeInline> using <CodeInline>DataGridDragAndDropColumnReorderMode</CodeInline>:
+                    <CodeInline>DataGridDragAndDropColumnReorderMode.Swap</CodeInline> (default) swaps the dragged column with the target column, while <CodeInline>DataGridDragAndDropColumnReorderMode.Insert</CodeInline> inserts the dragged column at the target position and shifts intermediate columns.
+                    In the example all but two fixed columns can be reordered by dragging their header onto another. On mouse-over the draggable columns show their <CodeInline>DragIndicatorIcon</CodeInline> and when dragging
+                    a header over another column header, it will signal its ability to swap places by changing its text color. The drag-over effect can be customized by setting parameters <CodeInline>DropAllowedClass</CodeInline> and <CodeInline>DropNotAllowedClass</CodeInline>
+                    to your own CSS classes.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridColumReorderingExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridColumReorderingExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Columns Panel">
+                <Description>
+                    The <CodeInline>&lt;VekDataGrid></CodeInline> can open a columns panel using <CodeInline>ShowColumnsPanel</CodeInline>.
+                    The panel allows the re-ordering, hiding, filtering and grouping of columns. The enabled functionality matches the grid and column options except column re-ordering.
+                    <br><br>
+                    Column re-ordering is enabled in the panel using the <CodeInline>ColumnsPanelReordering</CodeInline> property. Re-ordering is on an insert basis, so it does not respect the column level <CodeInline>DragAndDropEnabled</CodeInline> property which swaps columns.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridColumnsPanelExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridColumnsPanelExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Sticky Columns">
+                <Description>
+                    The <CodeInline>&lt;VekDataGrid></CodeInline> allows you to make a column stick to the left or right. Setting the <CodeInline>StickyLeft</CodeInline> or <CodeInline>StickyRight</CodeInline> properties
+                    to <CodeInline>true</CodeInline> will make those columns "sticky". You must turn on <CodeInline>HorizontalScrollbar</CodeInline> to see the columns stick to either side.
+                    <br><br>
+                    There are a couple of things to keep in mind with sticky columns. First, if there are not enough columns and data to force the data grid to scroll, you will not see
+                    the columns stick, and that is by design and simply how sticky works in CSS. Secondly, there is nothing stopping you from making multiple columns sticky, but it will
+                    not have the effect you presumably intend. Instead, each column will be sticky when it reached the left or right side of the data grid and will overlap the sticky column
+                    before it.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridStickyColumnsExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridStickyColumnsExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Visual Styling">
+                <Description>
+                    The <CodeInline>&lt;VekDataGrid></CodeInline> has many built in properties to change its style and also allows for custom styling as well.
+                    <br><br>
+                    Row level classes and styles can be applied using the <CodeInline>RowClass</CodeInline> and <CodeInline>RowStyle</CodeInline> properties
+                    respectively. To style rows according to the data of the row, you would use the <CodeInline>RowClassFunc</CodeInline> and <CodeInline>RowStyleFunc</CodeInline>
+                    properties. For even finer grain control, you can style at the header, cell and footer level as well by using the <CodeInline>HeaderClass</CodeInline>, <CodeInline>HeaderStyle</CodeInline>,
+                    <CodeInline>HeaderClassFunc</CodeInline>, <CodeInline>HeaderStyleFunc</CodeInline>, <CodeInline>CellClass</CodeInline>,
+                    <CodeInline>CellStyle</CodeInline>, <CodeInline>CellClassFunc</CodeInline>, <CodeInline>CellStyleFunc</CodeInline>,
+                    <CodeInline>FooterClass</CodeInline>, <CodeInline>FooterStyle</CodeInline>, <CodeInline>FooterClassFunc</CodeInline> and <CodeInline>FooterStyleFunc</CodeInline> properties.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridVisualStylingExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridVisualStylingExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Context Menu">
+                <Description>
+                    A context menu can be added to increase the flexibility and efficiency that the <CodeInline>&lt;VekDataGrid></CodeInline> offers.
+                    There are several scenarios where a context menu can be beneficial such as performing row level actions,
+                    accessing additional information, or just providing a more intuitive user experience.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridContextMenuExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridContextMenuExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Cell Context Menu">
+                <Description>
+                    A context menu for cells can be added to increase the flexibility and efficiency that the <CodeInline>&lt;VekDataGrid></CodeInline> offers.
+                    There are several scenarios where a context menu can be beneficial such as performing cell level actions,
+                    accessing additional information, or just providing a more intuitive user experience.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridCellContextMenuExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridCellContextMenuExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

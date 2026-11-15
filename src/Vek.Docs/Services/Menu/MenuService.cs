@@ -57,7 +57,18 @@ namespace Vek.Docs.Services
             .AddItem("Rating", typeof(VekRating), typeof(VekRatingItem))
             .AddItem("Skeleton", typeof(VekSkeleton))
             .AddItem("Table", typeof(VekTable<T>), typeof(VekTableBase), typeof(VekTablePager), typeof(VekTableGroupRow<T>), typeof(VekTableSortLabel<T>), typeof(VekTd), typeof(VekTh), typeof(VekTr), typeof(VekTFootRow), typeof(VekTHeadRow))
-            .AddItem("Data Grid", typeof(VekDataGrid<T>), typeof(Column<T>), typeof(FilterHeaderCell<T>), typeof(FooterCell<T>), typeof(HeaderCell<T>), typeof(HierarchyColumn<T>), typeof(VekDataGridPager<T>), typeof(TemplateColumn<T>))
+            // Data Grid Group
+            .AddNavGroup("Data Grid", false, new DocsComponents()
+                .AddItem("Overview", typeof(VekDataGrid<T>), "datagrid", typeof(Column<T>), typeof(FilterHeaderCell<T>), typeof(FooterCell<T>), typeof(HeaderCell<T>), typeof(HierarchyColumn<T>), typeof(VekDataGridPager<T>), typeof(TemplateColumn<T>))
+                .AddItem("Sorting", typeof(VekDataGrid<T>), "datagrid/sorting")
+                .AddItem("Filtering", typeof(VekDataGrid<T>), "datagrid/filtering")
+                .AddItem("Grouping", typeof(VekDataGrid<T>), "datagrid/grouping")
+                .AddItem("Editing", typeof(VekDataGrid<T>), "datagrid/editing")
+                .AddItem("Selection", typeof(VekDataGrid<T>), "datagrid/selection")
+                .AddItem("Detail Row", typeof(VekDataGrid<T>), "datagrid/detail-row")
+                .AddItem("Columns & Layout", typeof(VekDataGrid<T>), "datagrid/columns")
+                .AddItem("Virtualization & Server Data", typeof(VekDataGrid<T>), "datagrid/virtualization")
+            , sortByName: false)
             .AddItem("Simple Table", typeof(VekSimpleTable))
             .AddItem("Tooltip", typeof(VekTooltip))
             .AddItem("Typography", typeof(VekText))
@@ -217,20 +228,27 @@ namespace Vek.Docs.Services
                 {
                     foreach (var groupComponent in component.GroupComponents)
                     {
-                        _componentLookup.Add(groupComponent.Type, groupComponent);
-                        _parents.Add(groupComponent.Type, component);
+                        _componentLookup.TryAdd(groupComponent.Type, groupComponent);
+                        _parents.TryAdd(groupComponent.Type, component);
+                        if (groupComponent.ChildTypes is not null)
+                        {
+                            foreach (var childType in groupComponent.ChildTypes)
+                            {
+                                _parents.TryAdd(childType, component);
+                            }
+                        }
                     }
                 }
                 else
                 {
-                    _componentLookup.Add(component.Type, component);
+                    _componentLookup.TryAdd(component.Type, component);
                     // top-level types refer to themself as parent ;)
-                    _parents.Add(component.Type, component);
+                    _parents.TryAdd(component.Type, component);
                     if (component.ChildTypes is not null)
                     {
                         foreach (var childType in component.ChildTypes)
                         {
-                            _parents.Add(childType, component);
+                            _parents.TryAdd(childType, component);
                         }
                     }
                 }
@@ -296,18 +314,32 @@ namespace Vek.Docs.Services
                 }
 
                 _docsComponentsApi = new DocsComponents();
+                var addedTypes = new HashSet<Type>();
                 foreach (var item in Components)
                 {
                     if (item.IsNavGroup)
                     {
+                        if (item.Name == "Data Grid")
+                        {
+                            _docsComponentsApi.AddItem(item.Name, typeof(VekDataGrid<T>));
+                            addedTypes.Add(typeof(VekDataGrid<T>));
+                            continue;
+                        }
+
                         foreach (var groupComponent in item.GroupComponents)
                         {
-                            _docsComponentsApi.AddItem(groupComponent.Name, groupComponent.Type);
+                            if (addedTypes.Add(groupComponent.Type))
+                            {
+                                _docsComponentsApi.AddItem(groupComponent.Name, groupComponent.Type);
+                            }
                         }
                     }
                     else
                     {
-                        _docsComponentsApi.AddItem(item.Name, item.Type);
+                        if (addedTypes.Add(item.Type))
+                        {
+                            _docsComponentsApi.AddItem(item.Name, item.Type);
+                        }
                     }
                 }
 
