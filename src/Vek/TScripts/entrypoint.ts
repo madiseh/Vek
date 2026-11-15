@@ -31,12 +31,14 @@ import VekTableCell from "./vekTableCell";
 import VekThemeProvider from "./vekThemeProvider";
 import VekTimePicker from "./vekTimePicker";
 import VekWindow from "./VekWindow";
+import { downloadFileFromStream } from "./vekDataGridExport";
 
 declare global {
     interface Window {
         getTabbableElements: typeof getTabbableElements;
         hasDefinedParentHeight: typeof hasDefinedParentHeight;
         vekDragAndDrop: VekDragAndDrop;
+        vekDataGridExport: { downloadFileFromStream: typeof downloadFileFromStream };
         vekElementRef: VekElementReference;
         vekExitPrompt: VekExitPrompt;
         vekFileUpload: VekFileUpload;
@@ -75,6 +77,7 @@ declare global {
 window.getTabbableElements = getTabbableElements;
 window.hasDefinedParentHeight = hasDefinedParentHeight;
 window.vekDragAndDrop = new VekDragAndDrop();
+window.vekDataGridExport = { downloadFileFromStream };
 window.vekElementRef = new VekElementReference();
 // Guard against a second copy of the script replacing the instance that owns the registered prompts.
 if (!window.vekExitPrompt) {
