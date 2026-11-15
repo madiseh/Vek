@@ -93,3 +93,15 @@ Vek ships first-party Roslyn analyzers (`src/Vek.Analyzers`) and code fixes (`sr
     ```bash
     dotnet format whitespace --folder --include Vek/Components/Menu/VekMenu.razor.cs
     ```
+
+---
+
+## 6. Clean-Room Implementation & Brand Anonymity Policy
+
+- **Zero Third-Party Brand Traces**: Never mention, reference, or leave traces of third-party commercial UI vendors, product lines, or proprietary component suites (e.g. commercial grid/component packages) anywhere in commit messages, branch names, PR titles, PR descriptions, source code, comments, or documentation.
+- **Clean-Room Reverse Engineering**: When features are inspired by, reverse-engineered from, or benchmarked against external UI libraries:
+  1. Inspect behaviors, contracts, and interaction models locally (e.g. using decompiler inspection or evidence-gathering toolkits).
+  2. Implement all functionality 100% cleanly from the ground up using native VekBlazor architecture (`ParameterState<T>`, `CssBuilder`, `RenderTreeBuilder`, bUnit).
+  3. Never copy-paste decompiled third-party proprietary source code or naming artifacts.
+- **Functional Naming Discipline**: Always use vendor-neutral, functional terminology that describes the feature's role in the library (e.g., "DataGrid Search Panel with Live Match Highlighting", "word grouping parser", "multi-column search evaluator").
+- **Subfolder Discipline for Compound Components**: Complex compound components (particularly `DataGrid`) must strictly enforce subfolder separation. Never place new models, helpers, or sub-components directly into the component's root folder when dedicated functional subdirectories (`Filtering/`, `Models/`, `Cells/`, `Columns/`, `Grouping/`) exist.

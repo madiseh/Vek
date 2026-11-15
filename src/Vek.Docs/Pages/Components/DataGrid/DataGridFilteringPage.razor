@@ -66,6 +66,19 @@
                 </SectionContent>
             </DocsPageSection>
 
+            <DocsPageSection>
+                <SectionHeader Title="Search Panel & Highlighting">
+                    <Description>
+                        Enable a built-in search box with <CodeInline>ShowSearchBox="true"</CodeInline>. By default, search terms evaluate across all searchable columns using <CodeInline>DataGridSearchTextParseMode.GroupWordsByAnd</CodeInline> (all words must match). You can switch to <CodeInline>GroupWordsByOr</CodeInline> or <CodeInline>ExactMatch</CodeInline> via <CodeInline>SearchTextParseMode</CodeInline>.
+                        <br><br>
+                        Columns can be excluded from search with <CodeInline>AllowSearch="false"</CodeInline>. Matching substrings inside data cells are automatically highlighted with <CodeInline>&lt;mark&gt;</CodeInline> tags when <CodeInline>HighlightSearchResults="true"</CodeInline> (default).
+                    </Description>
+                </SectionHeader>
+                <SectionContent DarkenBackground="true" Code="@nameof(DataGridSearchPanelExample)" Block="true" FullWidth="true">
+                    <DataGridSearchPanelExample />
+                </SectionContent>
+            </DocsPageSection>
+
         </DocsPageSection>
 
     </DocsPageContent>

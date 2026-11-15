@@ -87,6 +87,20 @@ Vek components are engineered to avoid unnecessary allocations, redundant abstra
 - Component-computed `class` and `style` values are merged with caller-provided `class` and `style` via `CssBuilder` and `StyleBuilder`.
 - Fallback values are used for HTML/ARIA attributes so caller-specified attributes in `UserAttributes` can override them unless strict internal behavior forbids it.
 
+### DataGrid Subsystem & Subfolder Architecture
+`VekDataGrid<T>` is a compound enterprise component partitioned into strict functional subdirectories under `src/Vek/Components/DataGrid/`:
+- **`Cells/`**: Cell rendering components and cell-level lifecycle helpers (`Cell.cs`, `CellContext.cs`, `HeaderCell.razor`, `FilterHeaderCell.razor`, `FooterCell.razor`, etc.).
+- **`Columns/`**: Column definitions and structural bindings (`Column.razor`, `PropertyColumn.cs`, `TemplateColumn.cs`, `HierarchyColumn.razor`, `SelectColumn.razor`).
+- **`Filtering/`**: Filtering engines, token evaluation, and filter parameters (`DataGridSearchEngine.cs`, `DataGridSearchTextParseMode.cs`, `Filter.cs`, `FilterDefinition.cs`, `FilterExpressionGenerator.cs`, `DataGridFilterMode.cs`).
+- **`Grouping/`**: Row grouping structures, grouping definitions, and footer aggregates (`DataGridGroupRow.razor`, `GroupDefinition.cs`, `AggregateDefinition.cs`).
+- **`Models/`**: Event arguments, contexts, validation state, and grid state snapshots (`DataGridSearchBoxContext.cs`, `DataGridCellClickEventArgs.cs`, `GridState.cs`, `IndexBag.cs`).
+- **Root Directory**: Reserved exclusively for top-level component orchestrators (`VekDataGrid.razor`, `VekDataGridPager.razor`).
+
+#### Search & Highlighting Pipeline
+The search panel provides multi-column full-text evaluation and live highlighting:
+- **`DataGridSearchEngine`**: Tokenizes input respecting whitespace and quotes (`"exact phrase"`), evaluating rows against all columns where `column.AllowSearch` is true. Supports `GroupWordsByAnd` (all tokens match across columns), `GroupWordsByOr` (any token matches), and `ExactMatch`.
+- **Zero-Component Allocation Highlighting**: Cell text matches are rendered via `RenderCellHighlightedText` using `Splitter.GetFragments` and a cached `NonBacktracking` regex to emit `<mark class="vek-table-cell-highlight">` tags directly to the render tree without instantiating child components per cell.
+
 ---
 
 ## 3. Reactive State Management: ParameterState Framework

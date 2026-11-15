@@ -281,3 +281,14 @@
     padding: 2px;
   }
 }
+.vek-table-cell-highlight {
+  background-color: var(--vek-palette-warning-lighten);
+  color: var(--vek-palette-text-primary);
+  padding: 0 0.125rem;
+  border-radius: 2px;
+}
+
+.vek-data-grid-search-input {
+  min-width: 200px;
+  max-width: 320px;
+}

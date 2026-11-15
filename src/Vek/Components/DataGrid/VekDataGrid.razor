@@ -19,6 +19,28 @@
             {
                 <VekToolBar Class="vek-table-toolbar" Style="@HeaderFooterStyle" WrapContent="@ToolBarWrapContent">
                     @ToolBarContent
+                    @if (_showSearchBoxState.Value || SearchBoxTemplate != null)
+                    {
+                        @if (SearchBoxTemplate != null)
+                        {
+                            @SearchBoxTemplate(new DataGridSearchBoxContext<T>(this))
+                        }
+                        else
+                        {
+                            <VekTextField T="string"
+                                          Value="@_searchTextState.Value"
+                                          ValueChanged="@OnSearchInputChangedAsync"
+                                          Placeholder="@(_searchBoxPlaceholderState.Value ?? "Search...")"
+                                          DebounceInterval="@_searchBoxInputDelayState.Value"
+                                          Clearable="true"
+                                          Immediate="true"
+                                          Adornment="Adornment.Start"
+                                          AdornmentIcon="@Icons.Material.Filled.Search"
+                                          Margin="Margin.Dense"
+                                          Class="vek-data-grid-search-input"
+                                          aria-label="Search data grid" />
+                        }
+                    }
                     @if (ShowMenuIcon)
                     {
                         @ToolbarMenu(this)
@@ -27,12 +49,37 @@
             }
             else
             {
-                @if (ShowMenuIcon)
+                @if (_showSearchBoxState.Value || SearchBoxTemplate != null || ShowMenuIcon)
                 {
                     @*Add the default toolbar.*@
                     <VekToolBar Class="vek-table-toolbar" Style="@HeaderFooterStyle" WrapContent="@ToolBarWrapContent">
                         <VekSpacer />
-                        @ToolbarMenu(this)
+                        @if (_showSearchBoxState.Value || SearchBoxTemplate != null)
+                        {
+                            @if (SearchBoxTemplate != null)
+                            {
+                                @SearchBoxTemplate(new DataGridSearchBoxContext<T>(this))
+                            }
+                            else
+                            {
+                                <VekTextField T="string"
+                                              Value="@_searchTextState.Value"
+                                              ValueChanged="@OnSearchInputChangedAsync"
+                                              Placeholder="@(_searchBoxPlaceholderState.Value ?? "Search...")"
+                                              DebounceInterval="@_searchBoxInputDelayState.Value"
+                                              Clearable="true"
+                                              Immediate="true"
+                                              Adornment="Adornment.Start"
+                                              AdornmentIcon="@Icons.Material.Filled.Search"
+                                              Margin="Margin.Dense"
+                                              Class="vek-data-grid-search-input"
+                                              aria-label="Search data grid" />
+                            }
+                        }
+                        @if (ShowMenuIcon)
+                        {
+                            @ToolbarMenu(this)
+                        }
                     </VekToolBar>
                 }
             }
@@ -447,25 +494,17 @@
                      }
                      else if (column.Culture is not null && column.isNumber)
                      {
-                         if (column.ContentFormat is not null)
-                         {
-                             @(((IFormattable?)cell._valueNumber)?.ToString(column.ContentFormat, column.Culture))
-                         }
-                         else
-                         {
-                             @cell._valueNumber?.ToString(column.Culture)
-                         }
+                         var text = column.ContentFormat is not null
+                             ? ((IFormattable?)cell._valueNumber)?.ToString(column.ContentFormat, column.Culture)
+                             : cell._valueNumber?.ToString(column.Culture);
+                         @RenderCellHighlightedText(text, column)
                      }
                      else
                      {
-                         if (column.ContentFormat is not null)
-                         {
-                             @(((IFormattable?)cell.ComputedValue)?.ToString(column.ContentFormat, column.Culture))
-                         }
-                         else
-                         {
-                             @cell.ComputedValue
-                         }
+                         var text = column.ContentFormat is not null
+                             ? ((IFormattable?)cell.ComputedValue)?.ToString(column.ContentFormat, column.Culture)
+                             : cell.ComputedValue?.ToString();
+                         @RenderCellHighlightedText(text, column)
                      }
                  }
              </td>
