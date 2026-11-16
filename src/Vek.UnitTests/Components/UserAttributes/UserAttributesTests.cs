@@ -26,6 +26,8 @@ namespace Vek.UnitTests.UserAttributes
             Exclude(typeof(VekOverlay));        // Sectioned component, skip
             Exclude(typeof(DataGridGroupRow<>));  // Internal component, skip
             Exclude(typeof(DataGridVirtualizeRow<>)); // Internal component, skip
+            Exclude(typeof(DataGridFilterRow<>)); // Internal component, skip
+            Exclude(typeof(DataGridFilterCell<>)); // Internal component, skip
             Exclude(typeof(BaseRadialChart<,>)); // Internal component, skip
             Exclude(typeof(BaseAxisChart<,>)); // Internal component, skip
         }

@@ -4,7 +4,7 @@
 - **Feature ID**: 014
 - **Feature Slug**: datagrid-column-header-filter-button
 - **Module**: DataGrid
-- **Status**: Backlog
+- **Status**: Ready
 - **Priority**: 14
 - **Dependencies**: ["004"]
 

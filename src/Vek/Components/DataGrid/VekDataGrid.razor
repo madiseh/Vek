@@ -234,7 +234,11 @@
                                         </th>
                                     </tr>
                                 }
-                                @if (Filterable && FilterMode == DataGridFilterMode.ColumnFilterRow)
+                                @if (_showFilterRowState.Value)
+                                {
+                                    <DataGridFilterRow T="T" />
+                                }
+                                else if (Filterable && FilterMode == DataGridFilterMode.ColumnFilterRow)
                                 {
                                     <tr class="vek-table-row">
                                         @foreach (var column in RenderedColumns)

@@ -78,6 +78,57 @@
       padding: 6px 24px 6px 16px;
       padding-inline-start: 16px;
       padding-inline-end: 24px;
+
+      &.vek-datagrid-filter-cell {
+        padding: 4px 8px;
+        vertical-align: middle;
+
+        .vek-datagrid-filter-cell-content {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          width: 100%;
+
+          .vek-datagrid-filter-operator-menu {
+            flex: 0 0 auto;
+          }
+
+          .vek-datagrid-filter-input {
+            flex: 1 1 auto;
+            min-width: 0;
+
+            .vek-input-control {
+              margin-top: 0 !important;
+              margin-bottom: 0 !important;
+            }
+          }
+
+          .vek-datagrid-filter-range {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex: 1 1 auto;
+            min-width: 0;
+
+            .vek-datagrid-filter-input {
+              flex: 1 1 50%;
+              min-width: 0;
+            }
+          }
+
+          .vek-datagrid-filter-null-label {
+            font-size: 0.8125rem;
+            color: var(--vek-palette-text-secondary);
+            font-style: italic;
+            padding: 4px 8px;
+            flex: 1 1 auto;
+          }
+
+          .vek-datagrid-filter-clear-button {
+            flex: 0 0 auto;
+          }
+        }
+      }
     }
 
     &.sticky-left,
