@@ -52,8 +52,8 @@
       "specification": "specifications/004-datagrid-advanced-filter-row.md",
       "dependencies": [],
       "started_at": "2026-11-16T12:05:53Z",
-      "completed_at": "2026-11-16T12:34:56Z",
-      "pr_url": "Fully documented pull request with verification summary and example usage."
+      "completed_at": "2026-11-16T12:35:47Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/14"
     },
     {
       "id": "005",
