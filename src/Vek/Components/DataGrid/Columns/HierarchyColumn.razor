@@ -5,7 +5,7 @@
 @typeparam T
 
 <TemplateColumn T="T" Tag="@("hierarchy-column")" Sortable="false" Resizable="false" ShowColumnOptions="false" HeaderClassFunc="@HeaderClassFunc"
-    Hideable="Hideable" Hidden="Hidden" HiddenChanged="HiddenChanged" HeaderClass="@(EnableHeaderToggle ? $"vek-header-togglehierarchy {HeaderClass}" : HeaderClass)"
+    Hideable="Hideable" AllowHiding="AllowHiding" Hidden="Hidden" HiddenChanged="HiddenChanged" HeaderClass="@(EnableHeaderToggle ? $"vek-header-togglehierarchy {HeaderClass}" : HeaderClass)"
     Filterable="false" Editable="false" DragAndDropEnabled="@DragAndDropEnabled" HeaderTemplate="@HeaderTemplate" ButtonDisabledFunc="@ButtonDisabledFunc"
     HeaderStyle="@HeaderStyle" HeaderStyleFunc="@HeaderStyleFunc" Class="@Class"
     CellClass="@CellClass" CellClassFunc="@CellClassFunc" CellStyle="@CellStyle" CellStyleFunc="@CellStyleFunc" InitiallyExpandedFunc="@InitiallyExpandedFunc" HierarchyVisibilityToggled="@HierarchyVisibilityToggled">

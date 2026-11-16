@@ -398,6 +398,21 @@
     </CascadingValue>
 </CascadingValue>
 
+@if (_isColumnChooserVisible)
+{
+    <VekOverlay @bind-Visible="_isColumnChooserVisible" AutoClose="true" OnClick="HideColumnChooserAsync" />
+    <div class="vek-datagrid-column-chooser-dialog" role="dialog" aria-modal="true" aria-label="Column Chooser">
+        @if (ColumnChooserTemplate != null)
+        {
+            @ColumnChooserTemplate(new DataGridColumnChooserContext<T>(this, _columnChooserAnchorId))
+        }
+        else
+        {
+            <DataGridColumnChooser T="T" DataGrid="this" OnClose="HideColumnChooserAsync" />
+        }
+    </div>
+}
+
 @code {
 
     internal RenderFragment ToolbarMenu(VekDataGrid<T> dataGrid) =>

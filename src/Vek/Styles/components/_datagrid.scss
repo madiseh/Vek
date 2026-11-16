@@ -292,3 +292,93 @@
   min-width: 200px;
   max-width: 320px;
 }
+
+// Column Chooser
+.vek-column-chooser {
+  display: flex;
+  flex-direction: column;
+  min-width: 280px;
+  max-width: 400px;
+  max-height: 480px;
+  padding: 16px;
+  box-sizing: border-box;
+  background-color: var(--vek-palette-surface);
+  color: var(--vek-palette-text-primary);
+  border-radius: var(--vek-default-borderradius);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  &__search {
+    margin-bottom: 8px;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: 300px;
+    padding: 4px 0;
+    gap: 4px;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 4px;
+    border-radius: var(--vek-default-borderradius);
+    transition: background-color 150ms ease;
+
+    &:hover {
+      background-color: var(--vek-palette-action-hover);
+    }
+
+    &--disabled {
+      opacity: 0.7;
+    }
+  }
+
+  &__item-checkbox {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__item-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid var(--vek-palette-table-lines);
+  }
+}
+
+.vek-datagrid-column-chooser-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: var(--vek-zindex-dialog, 1400);
+  outline: none;
+  border-radius: var(--vek-default-borderradius);
+  box-shadow: var(--vek-elevation-8);
+  background-color: var(--vek-palette-surface);
+}

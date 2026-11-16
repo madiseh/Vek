@@ -1,0 +1,89 @@
+@namespace Vek
+@typeparam T
+@inherits VekComponentBase
+
+<div class="@Classname" style="@Style" @attributes="UserAttributes">
+    <div class="vek-column-chooser__header">
+        <span class="vek-column-chooser__title">@_titleState.Value</span>
+        <VekIconButton Icon="@Icons.Material.Filled.Close"
+                       Size="Size.Small"
+                       Class="vek-column-chooser__close-button"
+                       aria-label="Close column chooser"
+                       OnClick="@OnCloseAsync" />
+    </div>
+
+    @if (_allowFilteringState.Value)
+    {
+        <div class="vek-column-chooser__search">
+            <VekTextField T="string"
+                          Value="@_searchText"
+                          ValueChanged="@OnSearchChanged"
+                          Placeholder="@_searchPlaceholderState.Value"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          Margin="Margin.Dense"
+                          Immediate="true"
+                          Clearable="true"
+                          Class="vek-column-chooser__search-input" />
+        </div>
+    }
+
+    <div class="vek-column-chooser__list" role="list">
+        @foreach (var column in GetFilteredColumns())
+        {
+            var isFirst = ResolvedDataGrid?.RenderedColumns.IndexOf(column) == 0;
+            var isLast = ResolvedDataGrid != null && ResolvedDataGrid.RenderedColumns.IndexOf(column) == ResolvedDataGrid.RenderedColumns.Count - 1;
+            var isAllowHiding = IsColumnAllowHiding(column);
+            var isVisible = IsColumnVisible(column);
+
+            <div class="@GetItemClassname(column)" role="listitem">
+                <VekCheckBox T="bool"
+                             Value="@isVisible"
+                             ValueChanged="@(val => OnColumnVisibilityChangedAsync(column, val))"
+                             Disabled="@(!isAllowHiding)"
+                             Label="@GetColumnTitle(column)"
+                             Dense="true"
+                             Color="Color.Primary"
+                             Class="vek-column-chooser__item-checkbox" />
+
+                @if (_allowReorderState.Value)
+                {
+                    <div class="vek-column-chooser__item-actions">
+                        <VekIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp"
+                                       Size="Size.Small"
+                                       Disabled="@isFirst"
+                                       aria-label="Move column up"
+                                       Class="vek-column-chooser__reorder-button vek-column-chooser__reorder-up"
+                                       OnClick="@(() => OnMoveUp(column))" />
+                        <VekIconButton Icon="@Icons.Material.Filled.KeyboardArrowDown"
+                                       Size="Size.Small"
+                                       Disabled="@isLast"
+                                       aria-label="Move column down"
+                                       Class="vek-column-chooser__reorder-button vek-column-chooser__reorder-down"
+                                       OnClick="@(() => OnMoveDown(column))" />
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    @if (_showActionsState.Value)
+    {
+        <div class="vek-column-chooser__footer">
+            <VekButton Size="Size.Small"
+                       Variant="Variant.Text"
+                       Color="Color.Primary"
+                       Class="vek-column-chooser__action-button vek-column-chooser__hide-all"
+                       OnClick="@OnHideAllAsync">
+                Hide All
+            </VekButton>
+            <VekButton Size="Size.Small"
+                       Variant="Variant.Text"
+                       Color="Color.Primary"
+                       Class="vek-column-chooser__action-button vek-column-chooser__show-all"
+                       OnClick="@OnShowAllAsync">
+                Show All
+            </VekButton>
+        </div>
+    }
+</div>

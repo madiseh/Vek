@@ -586,6 +586,16 @@ namespace Vek
         public RenderFragment<DataGridSearchBoxContext<T>>? SearchBoxTemplate { get; set; }
 
         /// <summary>
+        /// Gets or sets the custom template used to render the column chooser dialog.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>. When set, this overrides the default <see cref="DataGridColumnChooser{T}"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Appearance)]
+        public RenderFragment<DataGridColumnChooserContext<T>>? ColumnChooserTemplate { get; set; }
+
+        /// <summary>
         /// Whether matching search terms are highlighted in searchable cells.
         /// </summary>
         /// <remarks>
@@ -3398,6 +3408,62 @@ namespace Vek
             {
                 HideColumnsPanel();
             }
+        }
+
+        private bool _isColumnChooserVisible;
+        private string? _columnChooserAnchorId;
+
+        /// <summary>
+        /// Gets a value indicating whether the column chooser dialog is currently open.
+        /// </summary>
+        public bool IsColumnChooserVisible => _isColumnChooserVisible;
+
+        /// <summary>
+        /// Gets the anchor element identifier passed to the open column chooser dialog, if any.
+        /// </summary>
+        public string? ColumnChooserAnchorId => _columnChooserAnchorId;
+
+        /// <summary>
+        /// Shows the column chooser dialog, optionally anchored to the specified element ID.
+        /// </summary>
+        /// <param name="anchorId">The optional HTML element ID to anchor the chooser dialog to.</param>
+        public Task ShowColumnChooserAsync(string? anchorId = null)
+        {
+            _columnChooserAnchorId = anchorId;
+            _isColumnChooserVisible = true;
+            StateHasChanged();
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Hides the column chooser dialog.
+        /// </summary>
+        public Task HideColumnChooserAsync()
+        {
+            _isColumnChooserVisible = false;
+            _columnChooserAnchorId = null;
+            StateHasChanged();
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Moves the specified column one position earlier in the rendered columns order.
+        /// </summary>
+        /// <param name="column">The column to move.</param>
+        public void MoveColumnUp(Column<T> column)
+        {
+            ColumnUp(column);
+            StateHasChanged();
+        }
+
+        /// <summary>
+        /// Moves the specified column one position later in the rendered columns order.
+        /// </summary>
+        /// <param name="column">The column to move.</param>
+        public void MoveColumnDown(Column<T> column)
+        {
+            ColumnDown(column);
+            StateHasChanged();
         }
 
         private Task ColumnOrderUpdated(VekItemDropInfo<Column<T>> dropItem)
