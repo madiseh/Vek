@@ -85,6 +85,21 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Column Chooser & Visibility Customization">
+                <Description>
+                    The <CodeInline>&lt;VekDataGrid></CodeInline> provides a built-in column chooser dialog via <CodeInline>ShowColumnChooserAsync()</CodeInline> and <CodeInline>HideColumnChooserAsync()</CodeInline>.
+                    Users can toggle column visibility, filter large column sets with the search box, and reorder display positions.
+                    <br><br>
+                    To protect mandatory or pinned columns from being concealed, set <CodeInline>AllowHiding="false"</CodeInline> on the column.
+                    Custom chooser dialog interfaces can also be provided using the <CodeInline>ColumnChooserTemplate</CodeInline> render fragment slot.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridColumnChooserExample)" Block="true" FullWidth="true">
+                <DataGridColumnChooserExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Sticky Columns">
                 <Description>
                     The <CodeInline>&lt;VekDataGrid></CodeInline> allows you to make a column stick to the left or right. Setting the <CodeInline>StickyLeft</CodeInline> or <CodeInline>StickyRight</CodeInline> properties

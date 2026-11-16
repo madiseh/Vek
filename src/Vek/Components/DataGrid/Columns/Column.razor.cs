@@ -30,8 +30,10 @@ namespace Vek
         internal ParameterState<bool> _groupExpandedState;
         internal ParameterState<int> _groupByOrderState;
         private readonly ParameterState<bool> _allowSearchState;
+        private readonly ParameterState<bool> _allowHidingState;
 
         internal ParameterState<bool> AllowSearchState => _allowSearchState;
+        internal ParameterState<bool> AllowHidingState => _allowHidingState;
 
         /// <summary>
         /// The data grid which owns this column.
@@ -264,6 +266,16 @@ namespace Vek
         /// </remarks>
         [Parameter]
         public bool? Hideable { get; set; }
+
+        /// <summary>
+        /// Specifies whether this column can be hidden via the column chooser or visibility customization.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>. When set to <c>false</c>, this column cannot be concealed.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public bool AllowHiding { get; set; } = true;
 
         /// <summary>
         /// Hides this column.
@@ -569,6 +581,10 @@ namespace Vek
         {
             get
             {
+                if (!_allowHidingState.Value)
+                {
+                    return false;
+                }
                 return Hideable ?? DataGrid?.Hideable ?? false;
             }
         }
@@ -658,6 +674,8 @@ namespace Vek
             using var registerScope = CreateRegisterScope();
             _allowSearchState = registerScope.RegisterParameter<bool>(nameof(AllowSearch))
                 .WithParameter(() => AllowSearch);
+            _allowHidingState = registerScope.RegisterParameter<bool>(nameof(AllowHiding))
+                .WithParameter(() => AllowHiding);
             HiddenState = registerScope.RegisterParameter<bool>(nameof(Hidden))
                 .WithParameter(() => Hidden)
                 .WithEventCallback(() => HiddenChanged);
@@ -775,6 +793,10 @@ namespace Vek
         /// </summary>
         public Task HideAsync()
         {
+            if (!_allowHidingState.Value)
+            {
+                return Task.CompletedTask;
+            }
             return HiddenState.SetValueAsync(true);
         }
 
@@ -792,6 +814,10 @@ namespace Vek
         public async Task ToggleAsync()
         {
             Debug.Assert(DataGrid is not null);
+            if (!HiddenState.Value && !_allowHidingState.Value)
+            {
+                return;
+            }
             await HiddenState.SetValueAsync(!HiddenState.Value);
             ((IVekStateHasChanged)DataGrid).StateHasChanged();
         }

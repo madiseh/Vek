@@ -1,0 +1,37 @@
+@using System.Net.Http.Json
+@using Vek.Examples.Data.Models
+@namespace Vek.Docs.Examples
+@inject HttpClient httpClient
+
+<div class="d-flex align-center gap-4 mb-4">
+    <VekButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.ViewColumn"
+               OnClick="@(() => _grid.ShowColumnChooserAsync())">
+        Customize Columns
+    </VekButton>
+</div>
+
+<VekDataGrid T="Element" @ref="_grid" Items="@Elements" Filterable="false" SortMode="SortMode.Multiple">
+    <Columns>
+        <PropertyColumn Property="x => x.Number" Title="Nr" AllowHiding="false" />
+        <PropertyColumn Property="x => x.Sign" />
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Position" />
+        <PropertyColumn Property="x => x.Molar" Title="Molar mass" />
+        <PropertyColumn Property="x => x.Group" Title="Category" />
+    </Columns>
+    <PagerContent>
+        <VekDataGridPager T="Element" />
+    </PagerContent>
+</VekDataGrid>
+
+@code {
+    private VekDataGrid<Element> _grid = null!;
+    private IEnumerable<Element> Elements = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = await httpClient.GetFromJsonAsync<List<Element>>("webapi/periodictable") ?? [];
+    }
+}

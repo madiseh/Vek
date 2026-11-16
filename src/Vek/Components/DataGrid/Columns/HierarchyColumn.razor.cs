@@ -74,6 +74,16 @@ public partial class HierarchyColumn<[DynamicallyAccessedMembers(DynamicallyAcce
     public bool? Hideable { get; set; }
 
     /// <summary>
+    /// Specifies whether this column can be hidden via the column chooser or visibility customization.
+    /// </summary>
+    /// <remarks>
+    /// Defaults to <c>true</c>. When set to <c>false</c>, this column cannot be concealed.
+    /// </remarks>
+    [Parameter]
+    [Category(CategoryTypes.DataGrid.Behavior)]
+    public bool AllowHiding { get; set; } = true;
+
+    /// <summary>
     /// Hides this column.
     /// </summary>
     /// <remarks>
