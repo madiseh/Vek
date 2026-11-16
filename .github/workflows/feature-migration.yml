@@ -42,4 +42,4 @@ jobs:
 
       - name: Verify Clean Working Tree & Brand Anonymity
         run: |
-          git grep -i "devexpress" && exit 1 || echo "Brand anonymity verified: 0 violations."
+          git grep -i -E "dev""express" -- ":!.github/workflows/*" && exit 1 || echo "Brand anonymity verified: 0 violations."

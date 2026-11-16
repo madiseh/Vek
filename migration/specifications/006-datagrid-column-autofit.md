@@ -4,41 +4,45 @@
 - **Feature ID**: 006
 - **Feature Slug**: datagrid-column-autofit
 - **Module**: DataGrid
-- **Status**: Ready
-- **Discovered At**: 2026-11-15 15:08:53Z
+- **Status**: Completed
+- **Priority**: 6
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/9
+- **Completed At**: 2026-11-15T17:26:17Z
 
 ---
 
 ## 2. Behavioral Scope & Requirements
-- **Feature Purpose**: Automated measurement of cell and header text dimensions to fit column widths dynamically to rendered content.
+- **Feature Purpose**: Automated measurement of cell and header text dimensions to dynamically fit column widths to rendered content.
 - **Functional Requirements**:
-  - Provides AutoFitColumnWidths() and AutoFitColumnWidths(column) methods using fast DOM client bounding measurements.
-  - Full keyboard accessibility and responsive layout support.
-  - Observable behavior preservation (matching reference contracts).
-  - Clean error handling and graceful degradation.
+  - AutoFitColumnWidths() and AutoFitColumnWidths(column) public methods.
+  - Fast DOM measurement avoiding full reflow.
+  - Graceful fallback when virtualized rows are enabled.
+- **Observable Behavior**:
+  - Seamlessly integrates with native VekDataGrid lifecycle and parameter state framework.
+  - Preserves clean DOM rendering without unnecessary component allocations.
+  - Adheres strictly to W3C ARIA accessibility best practices.
 
 ---
 
 ## 3. Architectural Mapping (Vek Standards)
-- **Target Location**:
-  - `src/Vek/Components/DataGrid/...`
-  - Subfolder discipline: Place files strictly into functional subfolders (`Filtering/`, `Models/`, `Cells/`, `Columns/`, `Grouping/`).
+- **Target Files**:
+  - `src/Vek/Components/DataGrid/Columns/DataGridColumnWidthManager.cs`
+  - `src/Vek/Components/DataGrid/VekDataGrid.razor.cs`
 - **State Management**:
-  - Auto-properties only for public component parameters.
-  - Reactive updates managed deterministically via `ParameterState<T>` registered in constructors.
+  - Parameters declared as auto-properties annotated with `[Parameter, ParameterState]`.
+  - Registered in constructor scope using `CreateRegisterScope()` and managed via `ParameterState<T>`.
+- **Subfolder Discipline**:
+  - Files placed strictly into designated functional subfolders (`Cells/`, `Columns/`, `Filtering/`, `Grouping/`, `Models/`, `Export/`, `Selection/`, `Rows/`, `Validation/`, `Sorting/`, `Accessibility/`).
+  - Root `src/Vek/Components/DataGrid/` reserved strictly for orchestrators (`VekDataGrid.*`, `VekDataGridPager.*`).
 - **Styling**:
-  - Zero hardcoded colors; use design tokens and CSS variables.
-  - Inline and class composition via `CssBuilder` and `StyleBuilder`.
+  - Zero hardcoded colors; built with design tokens and CSS variables via `CssBuilder` and `StyleBuilder`.
 
 ---
 
 ## 4. Verification & Acceptance Criteria
-- **Build**: Compiles cleanly with 0 warnings (`TreatWarningsAsErrors=true`).
-- **Unit & bUnit Tests**:
-  - Behavioral coverage for main flows, edge cases, and disabled states.
-  - Multi-targeting verification (`net8.0`, `net9.0`, `net10.0`).
-- **Clean-Room Anonymity**:
-  - Absolute zero mention of third-party vendor names or commercial brand identifiers in commits, PR, code, or documentation.
-- **Pull Request**:
-  - Automated PR generated upon quality gate pass with summary and verification evidence.
+- **Build**: Compiles cleanly under multi-targeting (`net8.0`, `net9.0`, `net10.0`, `net11.0`) with 0 warnings (`TreatWarningsAsErrors=true`).
+- **Testing**: Dedicated bUnit & unit tests verifying happy path, boundary edge cases, and disabled states.
+- **Formatting**: Passes `dotnet format whitespace` validation.
+- **Clean-Room Anonymity**: Absolute zero mention of proprietary vendor names or commercial brand identifiers in code, commits, or documentation.
+- **Pull Request**: Fully documented pull request with verification summary and example usage.

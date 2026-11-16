@@ -25,19 +25,22 @@
       "title": "DataGrid Built-in Data Export (XLSX and CSV)",
       "module": "DataGrid",
       "priority": 2,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/002-datagrid-data-export.md",
-      "dependencies": []
+      "dependencies": [],
+      "pr_url": "https://github.com/madiseh/Vek/pull/7",
+      "completed_at": "2026-11-15T15:32:07Z"
     },
     {
       "id": "003",
       "slug": "datagrid-column-chooser",
-      "title": "DataGrid Column Chooser and Customization Window",
+      "title": "DataGrid Column Chooser and Visibility Customization Dialog",
       "module": "DataGrid",
       "priority": 3,
-      "status": "backlog",
+      "status": "ready",
       "specification": "specifications/003-datagrid-column-chooser.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-16T09:30:54Z"
     },
     {
       "id": "004",
@@ -45,19 +48,17 @@
       "title": "DataGrid Advanced Filter Row with Comparison Operators",
       "module": "DataGrid",
       "priority": 4,
-      "status": "backlog",
+      "status": "ready",
       "specification": "specifications/004-datagrid-advanced-filter-row.md",
-      "dependencies": [
-        "001"
-      ]
+      "dependencies": []
     },
     {
       "id": "005",
-      "slug": "datagrid-fixed-columns-enhancement",
-      "title": "DataGrid Fixed/Pinned Columns Drag and Dynamic Pinning",
+      "slug": "datagrid-fixed-columns",
+      "title": "DataGrid Fixed and Pinned Columns with Dynamic Drag Pinning",
       "module": "DataGrid",
       "priority": 5,
-      "status": "backlog",
+      "status": "ready",
       "specification": "specifications/005-datagrid-fixed-columns.md",
       "dependencies": []
     },
@@ -67,10 +68,274 @@
       "title": "DataGrid Column Widths Auto-Fit to Content",
       "module": "DataGrid",
       "priority": 6,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/006-datagrid-column-autofit.md",
       "dependencies": [],
-      "discovered_at": "2026-11-15 15:08:53Z"
+      "pr_url": "https://github.com/madiseh/Vek/pull/9",
+      "completed_at": "2026-11-15T17:26:17Z"
+    },
+    {
+      "id": "007",
+      "slug": "datagrid-batch-group-expand",
+      "title": "DataGrid Batch Group Expand and Collapse Controls",
+      "module": "DataGrid",
+      "priority": 7,
+      "status": "completed",
+      "specification": "specifications/007-datagrid-batch-group-expand.md",
+      "dependencies": [],
+      "pr_url": "https://github.com/madiseh/Vek/pull/10",
+      "completed_at": "2026-11-15T19:25:13Z"
+    },
+    {
+      "id": "008",
+      "slug": "datagrid-cell-range-selection",
+      "title": "DataGrid Cell Range Selection and Multi-Cell Selection",
+      "module": "DataGrid",
+      "priority": 8,
+      "status": "backlog",
+      "specification": "specifications/008-datagrid-cell-range-selection.md",
+      "dependencies": [
+        "009"
+      ]
+    },
+    {
+      "id": "009",
+      "slug": "datagrid-focused-row",
+      "title": "DataGrid Focused Row and Keyboard Active Row Navigation",
+      "module": "DataGrid",
+      "priority": 9,
+      "status": "ready",
+      "specification": "specifications/009-datagrid-focused-row.md",
+      "dependencies": []
+    },
+    {
+      "id": "010",
+      "slug": "datagrid-keyboard-navigation",
+      "title": "DataGrid Comprehensive ARIA Keyboard Navigation Matrix",
+      "module": "DataGrid",
+      "priority": 10,
+      "status": "backlog",
+      "specification": "specifications/010-datagrid-keyboard-navigation.md",
+      "dependencies": [
+        "009"
+      ]
+    },
+    {
+      "id": "011",
+      "slug": "datagrid-custom-group-interval",
+      "title": "DataGrid Custom Group Intervals (Date, Numeric, Alphabetic)",
+      "module": "DataGrid",
+      "priority": 11,
+      "status": "ready",
+      "specification": "specifications/011-datagrid-custom-group-interval.md",
+      "dependencies": []
+    },
+    {
+      "id": "012",
+      "slug": "datagrid-filter-builder-dialog",
+      "title": "DataGrid Visual Filter Builder Dialog with Nested Logic",
+      "module": "DataGrid",
+      "priority": 12,
+      "status": "backlog",
+      "specification": "specifications/012-datagrid-filter-builder-dialog.md",
+      "dependencies": [
+        "004"
+      ]
+    },
+    {
+      "id": "013",
+      "slug": "datagrid-context-menu-actions",
+      "title": "DataGrid Context Menu Actions and Right-Click Cell Hooks",
+      "module": "DataGrid",
+      "priority": 13,
+      "status": "ready",
+      "specification": "specifications/013-datagrid-context-menu-actions.md",
+      "dependencies": []
+    },
+    {
+      "id": "014",
+      "slug": "datagrid-column-header-filter-button",
+      "title": "DataGrid Column Header Excel-Style Popup Filter Menu",
+      "module": "DataGrid",
+      "priority": 14,
+      "status": "backlog",
+      "specification": "specifications/014-datagrid-column-header-filter-button.md",
+      "dependencies": [
+        "004"
+      ]
+    },
+    {
+      "id": "015",
+      "slug": "datagrid-summary-formatting",
+      "title": "DataGrid Summary and Aggregate Formatting with Custom Expressions",
+      "module": "DataGrid",
+      "priority": 15,
+      "status": "ready",
+      "specification": "specifications/015-datagrid-summary-formatting.md",
+      "dependencies": []
+    },
+    {
+      "id": "016",
+      "slug": "datagrid-row-drag-reorder",
+      "title": "DataGrid Interactive Row Drag-and-Drop Reordering",
+      "module": "DataGrid",
+      "priority": 16,
+      "status": "ready",
+      "specification": "specifications/016-datagrid-row-drag-reorder.md",
+      "dependencies": []
+    },
+    {
+      "id": "017",
+      "slug": "datagrid-master-detail-auto-collapse",
+      "title": "DataGrid Master-Detail Auto-Collapse and Cascade Expand Control",
+      "module": "DataGrid",
+      "priority": 17,
+      "status": "ready",
+      "specification": "specifications/017-datagrid-master-detail-auto-collapse.md",
+      "dependencies": []
+    },
+    {
+      "id": "018",
+      "slug": "datagrid-column-virtualization",
+      "title": "DataGrid Horizontal Column Virtualization for Ultra-Wide Grids",
+      "module": "DataGrid",
+      "priority": 18,
+      "status": "ready",
+      "specification": "specifications/018-datagrid-column-virtualization.md",
+      "dependencies": []
+    },
+    {
+      "id": "019",
+      "slug": "datagrid-inline-create-row",
+      "title": "DataGrid Inline Create Row and Top/Bottom Insertion Mode",
+      "module": "DataGrid",
+      "priority": 19,
+      "status": "ready",
+      "specification": "specifications/019-datagrid-inline-create-row.md",
+      "dependencies": []
+    },
+    {
+      "id": "020",
+      "slug": "datagrid-state-persistence",
+      "title": "DataGrid Layout State Persistence (Save/Load JSON Settings)",
+      "module": "DataGrid",
+      "priority": 20,
+      "status": "backlog",
+      "specification": "specifications/020-datagrid-state-persistence.md",
+      "dependencies": [
+        "003",
+        "005"
+      ]
+    },
+    {
+      "id": "021",
+      "slug": "datagrid-excel-formula-export",
+      "title": "DataGrid Excel Formula and Computed Cell Styles Export",
+      "module": "DataGrid",
+      "priority": 21,
+      "status": "ready",
+      "specification": "specifications/021-datagrid-excel-formula-export.md",
+      "dependencies": [
+        "002"
+      ]
+    },
+    {
+      "id": "022",
+      "slug": "datagrid-validation-summary-integration",
+      "title": "DataGrid Built-in Edit Row Validation Summary Integration",
+      "module": "DataGrid",
+      "priority": 22,
+      "status": "backlog",
+      "specification": "specifications/022-datagrid-validation-summary-integration.md",
+      "dependencies": [
+        "019"
+      ]
+    },
+    {
+      "id": "023",
+      "slug": "datagrid-cell-display-template-selector",
+      "title": "DataGrid Conditional Cell Display Template Selector",
+      "module": "DataGrid",
+      "priority": 23,
+      "status": "ready",
+      "specification": "specifications/023-datagrid-cell-display-template-selector.md",
+      "dependencies": []
+    },
+    {
+      "id": "024",
+      "slug": "datagrid-sparkline-column",
+      "title": "DataGrid Built-in Sparkline and Micro-Chart Column",
+      "module": "DataGrid",
+      "priority": 24,
+      "status": "ready",
+      "specification": "specifications/024-datagrid-sparkline-column.md",
+      "dependencies": []
+    },
+    {
+      "id": "025",
+      "slug": "datagrid-loading-overlay-animation",
+      "title": "DataGrid Loading Overlay and Skeleton Rows",
+      "module": "DataGrid",
+      "priority": 25,
+      "status": "ready",
+      "specification": "specifications/025-datagrid-loading-overlay-animation.md",
+      "dependencies": []
+    },
+    {
+      "id": "026",
+      "slug": "datagrid-copy-to-clipboard",
+      "title": "DataGrid Native Clipboard Copy (Selected Rows/Cells to TSV/CSV)",
+      "module": "DataGrid",
+      "priority": 26,
+      "status": "backlog",
+      "specification": "specifications/026-datagrid-copy-to-clipboard.md",
+      "dependencies": [
+        "008"
+      ]
+    },
+    {
+      "id": "027",
+      "slug": "datagrid-custom-sorting-rules",
+      "title": "DataGrid Multi-Column Custom Sorting Rules and Natural Sort",
+      "module": "DataGrid",
+      "priority": 27,
+      "status": "ready",
+      "specification": "specifications/027-datagrid-custom-sorting-rules.md",
+      "dependencies": []
+    },
+    {
+      "id": "028",
+      "slug": "datagrid-multi-level-footer-aggregates",
+      "title": "DataGrid Multi-Level Group Footer and Total Footer Summaries",
+      "module": "DataGrid",
+      "priority": 28,
+      "status": "backlog",
+      "specification": "specifications/028-datagrid-multi-level-footer-aggregates.md",
+      "dependencies": [
+        "015"
+      ]
+    },
+    {
+      "id": "029",
+      "slug": "datagrid-column-band-hierarchy",
+      "title": "DataGrid Multi-Row Column Band Hierarchy and Header Groups",
+      "module": "DataGrid",
+      "priority": 29,
+      "status": "ready",
+      "specification": "specifications/029-datagrid-column-band-hierarchy.md",
+      "dependencies": []
+    },
+    {
+      "id": "030",
+      "slug": "datagrid-accessibility-compliance",
+      "title": "DataGrid APG Grid Pattern & Screen Reader Live Announcements",
+      "module": "DataGrid",
+      "priority": 30,
+      "status": "backlog",
+      "specification": "specifications/030-datagrid-accessibility-compliance.md",
+      "dependencies": [
+        "010"
+      ]
     }
   ]
 }

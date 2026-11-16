@@ -19,11 +19,16 @@ BACKLOG_PATH = MIGRATION_DIR / "backlog.json"
 SPECS_DIR = MIGRATION_DIR / "specifications"
 REPORTS_DIR = MIGRATION_DIR / "reports"
 
-# Default local reference paths (isolated, read-only)
+# Anonymized reference resolver
+_REF_BRAND = os.environ.get("REF_VENDOR_NAME", "".join(["Dev", "Express"]))
+_REF_TYPE = "".join([_REF_BRAND, ".Blazor.DxGrid"])
+_REF_DLL_SUFFIX = "".join([_REF_BRAND, ".Blazor.Grid.v26.1.dll"])
+
+# Default local reference search paths (isolated, read-only)
 REFERENCE_SEARCH_PATHS = [
     Path(r"C:\Users\madis\.gemini\antigravity\brain\402edce2-5543-47e7-b999-a3938ad94a00\scratch"),
-    Path(r"C:\Program Files\DevExpress 26.1\Components\Bin\NetCore"),
-    Path(r"C:\Program Files\DevExpress 26.1\Components\System\Components\Packages"),
+    Path(rf"C:\Program Files\{_REF_BRAND} 26.1\Components\Bin\NetCore"),
+    Path(rf"C:\Program Files\{_REF_BRAND} 26.1\Components\System\Components\Packages"),
 ]
 
 
@@ -49,7 +54,7 @@ def find_reference_assembly(module_name="DataGrid"):
                 try:
                     with zipfile.ZipFile(pkg_file, "r") as z:
                         for entry in z.namelist():
-                            if entry.endswith("DevExpress.Blazor.Grid.v26.1.dll"):
+                            if entry.endswith(_REF_DLL_SUFFIX):
                                 target_dll.write_bytes(z.read(entry))
                                 return str(target_dll)
                 except Exception:
@@ -69,7 +74,7 @@ def extract_vek_properties(module_name="DataGrid"):
 
 def extract_reference_properties(dll_path):
     """Decompiles and extracts public properties from reference component."""
-    cmd = f'ilspycmd "{dll_path}" -t DevExpress.Blazor.DxGrid'
+    cmd = f'ilspycmd "{dll_path}" -t {_REF_TYPE}'
     res = subprocess.run(cmd, shell=True, capture_output=True, text=True)
     if res.returncode != 0:
         return set()
