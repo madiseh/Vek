@@ -6,9 +6,9 @@ using System.Collections.Concurrent;
 using AwesomeAssertions;
 using Bunit;
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using Vek.Charts;
 using Vek.Services;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.UserAttributes
 {
