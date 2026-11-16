@@ -46,3 +46,40 @@ The agents must never simply copy code from Project B to Project A. Instead, the
 - **Comprehensive Test Coverage**: Every migrated feature must include unit tests and bUnit component tests exercising the reconstructed behaviors and edge cases.
 - **Bounded Repair Attempts**: The automated repair loop between Reviewer/Test Gate and Implementer is capped at **2 iterations**. If the build or tests still fail after 2 retries, the attempt is marked as `Failed` / `Needs Human Intervention` and halts.
 - **Human Merge Only**: The automated pipeline never merges directly into `master`. It opens a detailed Pull Request for human review and sign-off.
+
+---
+
+## 3. Orchestration & State Lifecycle
+
+The migration pipeline is driven by `migration/scripts/orchestrator.py`, which synchronizes state bidirectionally between `migration/backlog.json` and the individual contract specifications in `migration/specifications/XXX-*.md`:
+
+### Common Commands
+- **List All Features**:
+  ```bash
+  python migration/scripts/orchestrator.py --list
+  ```
+  Displays the full status matrix of all 30 features with dependencies, statuses (`[COMPLETED]`, `[IN PROGRESS]`, `[READY]`, `[BACKLOG]`), and PR URLs.
+
+- **Pick / Start a Specific Feature**:
+  ```bash
+  python migration/scripts/orchestrator.py --pick 003
+  ```
+  Validates prerequisites, sets feature state to `in_progress` across both `backlog.json` and the `.md` specification, and outputs the target branch and instructions.
+
+- **Complete a Feature**:
+  ```bash
+  python migration/scripts/orchestrator.py --complete 003 --pr https://github.com/madiseh/Vek/pull/12
+  ```
+  Transitions feature state to `completed` in both `backlog.json` and the `.md` contract, records completion timestamp and PR URL, and automatically promotes any dependent backlog items whose prerequisites are now satisfied to `ready`.
+
+- **Synchronize Specifications and Backlog**:
+  ```bash
+  python migration/scripts/orchestrator.py --sync
+  ```
+  Scans all specification files, reads their metadata headers, resolves dependencies, and ensures `backlog.json` and Markdown contracts stay in 100% synchronization.
+
+- **Run Quality Gates**:
+  ```bash
+  python migration/scripts/orchestrator.py --verify
+  ```
+  Runs build, unit tests, whitespace formatting, and brand cleanliness verification.
