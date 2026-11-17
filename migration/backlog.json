@@ -37,10 +37,12 @@
       "title": "DataGrid Column Chooser and Visibility Customization Dialog",
       "module": "DataGrid",
       "priority": 3,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/003-datagrid-column-chooser.md",
       "dependencies": [],
-      "started_at": "2026-11-16T09:30:54Z"
+      "started_at": "2026-11-16T09:30:54Z",
+      "completed_at": "2026-11-17T07:44:14Z",
+      "pr_url": "https://github.com/madiseh/vek/pull/13"
     },
     {
       "id": "004",

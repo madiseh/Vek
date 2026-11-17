@@ -4,10 +4,12 @@
 - **Feature ID**: 003
 - **Feature Slug**: datagrid-column-chooser
 - **Module**: DataGrid
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 3
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/vek/pull/13
 - **Started At**: 2026-11-16T09:30:54Z
+- **Completed At**: 2026-11-17T07:44:14Z
 
 ---
 
