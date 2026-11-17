@@ -3,6 +3,37 @@
 All notable changes to Vek will be documented in this file.
 For GitHub Releases and downloadable packages, see the [Releases page](https://github.com/madiseh/Vek/releases).
 
+## [v1.0.4] - 2026-11-17
+
+> Vek v1.0.4 introduces sticky fixed and pinned columns with dynamic drag pinning, an advanced filter row with type-safe comparison operators, a column chooser visibility dialog, and full orchestration for the autonomous feature migration pipeline.
+
+### 📌 DataGrid Fixed & Pinned Columns
+- Added left and right sticky column pinning with `DataGridFixedStyle` (`None`, `Left`, `Right`) on `Column<T>`.
+- Dynamic sticky offset calculation for multi-column left and right pinning without overlapping.
+- Visual elevation drop shadows separating fixed boundary zones from scrollable content.
+- Column options header context menu actions for dynamic pinning and unpinning.
+- Dynamic drag pinning support when reordering columns across fixed boundary regions.
+- Added interactive documentation example (`DataGridFixedColumnsExample`) and complete bUnit test suite.
+
+### 🔍 DataGrid Advanced Filter Row
+- Added dedicated filter row below column headers enabled via `FilterRow="true"` on `VekDataGrid<T>`.
+- Rich set of comparison operators (`DataGridFilterOperator`) including Equals, NotEquals, Contains, StartsWith, EndsWith, GreaterThan, LessThan, Between, Empty, and NotEmpty.
+- Dynamic LINQ filter expression generator with null-safe expression tree compilation.
+- Type-aware filter cell inputs supporting text, numbers, dates, booleans, and enums.
+- Added interactive documentation example (`DataGridAdvancedFilterRowExample`) and comprehensive test coverage.
+
+### 🎛️ DataGrid Column Chooser Dialog
+- Interactive column visibility management dialog with search filtering and toggle switches.
+- Programmatic control via `ShowColumnChooserAsync()` on `VekDataGrid<T>`.
+- Added `Hidable` property on columns to protect critical columns from being hidden.
+- Added interactive documentation example (`DataGridColumnChooserExample`) and unit test suite.
+
+### 🔄 Autonomous Feature Migration Pipeline
+- Established specifications and contract verification for 30 upstream feature migrations.
+- Implemented bidirectional backlog tracking and orchestration tooling.
+
+---
+
 ## [v1.0.3] - 2026-11-15
 
 > Vek v1.0.3 introduces content-based column width auto-calculation and double-click column auto-fitting for DataGrid, adds full target framework and CI packaging pipeline support for **.NET 11**, and enhances package asset verification.
