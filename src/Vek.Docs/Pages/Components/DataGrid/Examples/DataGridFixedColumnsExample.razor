@@ -1,0 +1,66 @@
+@namespace Vek.Docs.Examples
+
+<div class="d-flex flex-wrap align-center gap-4 mb-4">
+    <VekText Typo="Typo.body2">
+        Pinned Left: <b>@(_idColumn?.EffectiveFixedStyle == DataGridFixedStyle.Left ? "ID" : "") @(_nameColumn?.EffectiveFixedStyle == DataGridFixedStyle.Left ? "Name" : "")</b> |
+        Pinned Right: <b>@(_salaryColumn?.EffectiveFixedStyle == DataGridFixedStyle.Right ? "Salary" : "") @(_actionsColumn?.EffectiveFixedStyle == DataGridFixedStyle.Right ? "Actions" : "")</b>
+    </VekText>
+    <VekButton Variant="Variant.Outlined" Size="Size.Small" OnClick="TogglePinNameAsync">
+        @(_nameColumn?.EffectiveFixedStyle == DataGridFixedStyle.Left ? "Unpin Name" : "Pin Name Left")
+    </VekButton>
+    <VekButton Variant="Variant.Outlined" Size="Size.Small" OnClick="TogglePinSalaryAsync">
+        @(_salaryColumn?.EffectiveFixedStyle == DataGridFixedStyle.Right ? "Unpin Salary" : "Pin Salary Right")
+    </VekButton>
+</div>
+
+<VekDataGrid @ref="_grid" Items="@_employees" HorizontalScrollbar="true" Bordered="true" Dense="true" DragDropColumnReordering="true" DragPinningEnabled="true">
+    <Columns>
+        <PropertyColumn @ref="_idColumn" Property="x => x.Id" Title="ID" Width="80px" FixedStyle="DataGridFixedStyle.Left" />
+        <PropertyColumn @ref="_nameColumn" Property="x => x.FullName" Title="Full Name" Width="160px" FixedStyle="DataGridFixedStyle.Left" />
+        <PropertyColumn Property="x => x.Department" Title="Department" Width="180px" />
+        <PropertyColumn Property="x => x.Role" Title="Role" Width="200px" />
+        <PropertyColumn Property="x => x.Email" Title="Email Address" Width="240px" />
+        <PropertyColumn Property="x => x.Phone" Title="Phone" Width="160px" />
+        <PropertyColumn Property="x => x.Location" Title="Office Location" Width="180px" />
+        <PropertyColumn @ref="_salaryColumn" Property="x => x.Salary" Title="Salary" Format="C0" Width="140px" FixedStyle="DataGridFixedStyle.Right" />
+        <TemplateColumn @ref="_actionsColumn" Title="Actions" Width="100px" FixedStyle="DataGridFixedStyle.Right">
+            <CellTemplate>
+                <VekIconButton Icon="@Icons.Material.Outlined.Edit" Size="@Size.Small" aria-label="Edit employee" />
+                <VekIconButton Icon="@Icons.Material.Outlined.Delete" Size="@Size.Small" aria-label="Delete employee" />
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</VekDataGrid>
+
+@code {
+    private VekDataGrid<Employee> _grid = null!;
+    private PropertyColumn<Employee, int> _idColumn = null!;
+    private PropertyColumn<Employee, string> _nameColumn = null!;
+    private PropertyColumn<Employee, decimal> _salaryColumn = null!;
+    private TemplateColumn<Employee> _actionsColumn = null!;
+
+    private async Task TogglePinNameAsync()
+    {
+        var targetStyle = _nameColumn.EffectiveFixedStyle == DataGridFixedStyle.Left ? DataGridFixedStyle.None : DataGridFixedStyle.Left;
+        await _grid.PinColumnAsync(_nameColumn, targetStyle);
+    }
+
+    private async Task TogglePinSalaryAsync()
+    {
+        var targetStyle = _salaryColumn.EffectiveFixedStyle == DataGridFixedStyle.Right ? DataGridFixedStyle.None : DataGridFixedStyle.Right;
+        await _grid.PinColumnAsync(_salaryColumn, targetStyle);
+    }
+
+    private readonly List<Employee> _employees = new()
+    {
+        new(101, "Alice Montgomery", "Engineering", "Principal Architect", "alice.montgomery@example.com", "+1-555-0101", "San Francisco, CA", 185_000m),
+        new(102, "Bob Harrington", "Marketing", "Brand Strategist", "bob.harrington@example.com", "+1-555-0102", "New York, NY", 125_000m),
+        new(103, "Carla Vance", "Product", "Group Product Manager", "carla.vance@example.com", "+1-555-0103", "Seattle, WA", 165_000m),
+        new(104, "David Sterling", "Engineering", "Senior Software Engineer", "david.sterling@example.com", "+1-555-0104", "Austin, TX", 145_000m),
+        new(105, "Elena Rostova", "Design", "Lead Product Designer", "elena.rostova@example.com", "+1-555-0105", "Chicago, IL", 135_000m),
+        new(106, "Frank Chen", "Finance", "Director of Financial Planning", "frank.chen@example.com", "+1-555-0106", "Boston, MA", 175_000m),
+        new(107, "Grace Hopper", "Research", "Distinguished Scientist", "grace.hopper@example.com", "+1-555-0107", "San Jose, CA", 210_000m),
+    };
+
+    public record Employee(int Id, string FullName, string Department, string Role, string Email, string Phone, string Location, decimal Salary);
+}

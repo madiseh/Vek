@@ -236,6 +236,7 @@ namespace Vek
         protected override void OnParametersSet()
         {
             base.OnParametersSet();
+            UpdateStickyColumnOffsets();
             if (Items != null)
             {
                 if (ServerData != null)
@@ -365,6 +366,12 @@ namespace Vek
                 Debug.Assert(dragAndDropSource.HeaderCell is not null);
                 Debug.Assert(dragAndDropDestination.HeaderCell is not null);
 
+                if (DragPinningEnabled)
+                {
+                    UpdateColumnPinningAfterDrop(dragAndDropSource);
+                }
+
+                UpdateStickyColumnOffsets();
                 StateHasChanged();
             }
             return Task.CompletedTask;
@@ -751,6 +758,33 @@ namespace Vek
         /// </remarks>
         [Parameter]
         public bool ShowColumnOptions { get; set; } = true;
+
+        /// <summary>
+        /// Allows columns to be pinned or fixed to the left or right edges of the grid viewport.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. Can be overridden for individual columns via <see cref="Column{T}.AllowPinning"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public bool AllowColumnPinning { get; set; } = false;
+
+        /// <summary>
+        /// Enables dynamic pinning and unpinning of columns during drag-and-drop column reordering.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>. When <c>true</c>, dragging a column into a pinned region pins it, and dragging out unpins it.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public bool DragPinningEnabled { get; set; } = true;
+
+        /// <summary>
+        /// Occurs when a column's fixed pinning state is changed via user interaction or programmatic pinning.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public EventCallback<DataGridColumnPinChangedEventArgs<T>> ColumnPinChanged { get; set; }
 
         /// <summary>
         /// The breakpoint at which the grid switches to mobile layout.
@@ -1904,7 +1938,7 @@ namespace Vek
         {
             get
             {
-                return RenderedColumns.Any(x => x.StickyLeft || x.StickyRight);
+                return RenderedColumns.Any(x => x.IsPinnedLeft || x.IsPinnedRight);
             }
         }
 
@@ -2212,6 +2246,8 @@ namespace Vek
             {
                 RenderedColumns.Add(column);
             }
+
+            UpdateStickyColumnOffsets();
         }
 
         internal CancellationToken CancelServerDataToken()
@@ -2241,6 +2277,7 @@ namespace Vek
         internal void RemoveColumn(Column<T> column)
         {
             RenderedColumns.Remove(column);
+            UpdateStickyColumnOffsets();
 
             if (column.Tag?.ToString() == "hierarchy-column")
             {
@@ -3855,6 +3892,182 @@ namespace Vek
             var gridRect = await _gridElement.VekGetBoundingClientRectAsync();
             var gridHeight = gridRect.Height;
             return gridHeight;
+        }
+
+        #endregion
+
+        #region Column Pinning & Sticky Offsets
+
+        /// <summary>
+        /// Pins or unpins a column to the left or right edge of the grid viewport.
+        /// </summary>
+        /// <param name="column">The column to pin or unpin.</param>
+        /// <param name="fixedStyle">The desired fixed pinning style.</param>
+        public async Task PinColumnAsync(Column<T> column, DataGridFixedStyle fixedStyle)
+        {
+            if (column is null || !RenderedColumns.Contains(column))
+            {
+                return;
+            }
+
+            await column.SetFixedStyleAsync(fixedStyle);
+            ReorderPinnedColumns(column, fixedStyle);
+            UpdateStickyColumnOffsets();
+            StateHasChanged();
+
+            if (ColumnPinChanged.HasDelegate)
+            {
+                await ColumnPinChanged.InvokeAsync(new DataGridColumnPinChangedEventArgs<T>(column, fixedStyle));
+            }
+        }
+
+        internal void OnColumnFixedStyleChanged(Column<T> column)
+        {
+            ReorderPinnedColumns(column, column.EffectiveFixedStyle);
+            UpdateStickyColumnOffsets();
+            StateHasChanged();
+
+            if (ColumnPinChanged.HasDelegate)
+            {
+                _ = ColumnPinChanged.InvokeAsync(new DataGridColumnPinChangedEventArgs<T>(column, column.EffectiveFixedStyle));
+            }
+        }
+
+        internal void UpdateStickyColumnOffsets()
+        {
+            var visibleColumns = RenderedColumns.Where(c => !c.HiddenState.Value).ToList();
+
+            // 1. Calculate Left-pinned offsets
+            double currentLeftOffset = 0;
+            var leftColumns = visibleColumns.Where(c => c.IsPinnedLeft).ToList();
+            var lastLeftPinned = leftColumns.LastOrDefault();
+
+            foreach (var col in visibleColumns)
+            {
+                if (col.IsPinnedLeft)
+                {
+                    col.StickyLeftOffset = currentLeftOffset;
+                    col.IsLastStickyLeft = (col == lastLeftPinned);
+                    currentLeftOffset += col.GetEstimatedWidthPx();
+                }
+                else
+                {
+                    col.StickyLeftOffset = null;
+                    col.IsLastStickyLeft = false;
+                }
+            }
+
+            // 2. Calculate Right-pinned offsets (from right to left)
+            double currentRightOffset = 0;
+            var rightColumns = visibleColumns.Where(c => c.IsPinnedRight).ToList();
+            var firstRightPinned = rightColumns.FirstOrDefault();
+
+            for (var i = visibleColumns.Count - 1; i >= 0; i--)
+            {
+                var col = visibleColumns[i];
+                if (col.IsPinnedRight)
+                {
+                    col.StickyRightOffset = currentRightOffset;
+                    col.IsFirstStickyRight = (col == firstRightPinned);
+                    currentRightOffset += col.GetEstimatedWidthPx();
+                }
+                else
+                {
+                    col.StickyRightOffset = null;
+                    col.IsFirstStickyRight = false;
+                }
+            }
+        }
+
+        private void ReorderPinnedColumns(Column<T> column, DataGridFixedStyle targetFixedStyle)
+        {
+            if (!RenderedColumns.Contains(column))
+            {
+                return;
+            }
+
+            RenderedColumns.Remove(column);
+
+            if (targetFixedStyle == DataGridFixedStyle.Left)
+            {
+                var lastLeftIndex = -1;
+                for (var i = 0; i < RenderedColumns.Count; i++)
+                {
+                    if (RenderedColumns[i].IsPinnedLeft)
+                    {
+                        lastLeftIndex = i;
+                    }
+                }
+
+                if (lastLeftIndex >= 0)
+                {
+                    RenderedColumns.Insert(lastLeftIndex + 1, column);
+                }
+                else
+                {
+                    var insertIndex = RenderedColumns.Any(x => x.Tag?.ToString() == "hierarchy-column") ? 1 : 0;
+                    RenderedColumns.Insert(Math.Min(insertIndex, RenderedColumns.Count), column);
+                }
+            }
+            else if (targetFixedStyle == DataGridFixedStyle.Right)
+            {
+                RenderedColumns.Add(column);
+            }
+            else
+            {
+                var firstRightIndex = -1;
+                for (var i = 0; i < RenderedColumns.Count; i++)
+                {
+                    if (RenderedColumns[i].IsPinnedRight)
+                    {
+                        firstRightIndex = i;
+                        break;
+                    }
+                }
+
+                if (firstRightIndex >= 0)
+                {
+                    RenderedColumns.Insert(firstRightIndex, column);
+                }
+                else
+                {
+                    RenderedColumns.Add(column);
+                }
+            }
+        }
+
+        private void UpdateColumnPinningAfterDrop(Column<T> draggedColumn)
+        {
+            var index = RenderedColumns.IndexOf(draggedColumn);
+            if (index < 0) return;
+
+            var prevColumn = index > 0 ? RenderedColumns[index - 1] : null;
+            var nextColumn = index < RenderedColumns.Count - 1 ? RenderedColumns[index + 1] : null;
+
+            if ((prevColumn is null || prevColumn.IsPinnedLeft || prevColumn.Tag?.ToString() == "hierarchy-column") &&
+                nextColumn is not null && nextColumn.IsPinnedLeft)
+            {
+                if (draggedColumn.EffectiveFixedStyle != DataGridFixedStyle.Left)
+                {
+                    _ = draggedColumn.SetFixedStyleAsync(DataGridFixedStyle.Left);
+                }
+            }
+            else if ((nextColumn is null || nextColumn.IsPinnedRight) &&
+                     prevColumn is not null && prevColumn.IsPinnedRight)
+            {
+                if (draggedColumn.EffectiveFixedStyle != DataGridFixedStyle.Right)
+                {
+                    _ = draggedColumn.SetFixedStyleAsync(DataGridFixedStyle.Right);
+                }
+            }
+            else if ((prevColumn is null || !prevColumn.IsPinnedLeft) &&
+                     (nextColumn is null || !nextColumn.IsPinnedRight))
+            {
+                if (draggedColumn.EffectiveFixedStyle != DataGridFixedStyle.None)
+                {
+                    _ = draggedColumn.SetFixedStyleAsync(DataGridFixedStyle.None);
+                }
+            }
         }
 
         #endregion

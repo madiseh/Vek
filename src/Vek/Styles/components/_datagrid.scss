@@ -140,10 +140,18 @@
 
     &.sticky-left {
       left: 0px;
+
+      &.sticky-left-last {
+        box-shadow: 4px 0 8px -2px var(--vek-palette-shadow, rgba(0, 0, 0, 0.12));
+      }
     }
 
     &.sticky-right {
       right: 0px;
+
+      &.sticky-right-first {
+        box-shadow: -4px 0 8px -2px var(--vek-palette-shadow, rgba(0, 0, 0, 0.12));
+      }
     }
 
     &:not(.vek-table-child-content) {
