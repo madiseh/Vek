@@ -4,7 +4,7 @@
 - **Feature ID**: 020
 - **Feature Slug**: datagrid-state-persistence
 - **Module**: DataGrid
-- **Status**: Backlog
+- **Status**: Ready
 - **Priority**: 20
 - **Dependencies**: ["003", "005"]
 

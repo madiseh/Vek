@@ -63,9 +63,12 @@
       "title": "DataGrid Fixed and Pinned Columns with Dynamic Drag Pinning",
       "module": "DataGrid",
       "priority": 5,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/005-datagrid-fixed-columns.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-17T07:45:10Z",
+      "completed_at": "2026-11-17T08:18:29Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/15"
     },
     {
       "id": "006",
@@ -225,7 +228,7 @@
       "title": "DataGrid Layout State Persistence (Save/Load JSON Settings)",
       "module": "DataGrid",
       "priority": 20,
-      "status": "backlog",
+      "status": "ready",
       "specification": "specifications/020-datagrid-state-persistence.md",
       "dependencies": [
         "003",

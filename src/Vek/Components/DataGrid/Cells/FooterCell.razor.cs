@@ -4,6 +4,7 @@
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using Microsoft.AspNetCore.Components;
 using Vek.Utilities;
 
@@ -68,6 +69,8 @@ namespace Vek
             new StyleBuilder()
                 .AddStyle(Column?.FooterStyleFunc?.Invoke(items ?? Enumerable.Empty<T>()))
                 .AddStyle(Column?.FooterStyle)
+                .AddStyle("left", Column?.StickyLeftOffsetPx, when: Column?.StickyLeftOffsetPx is not null)
+                .AddStyle("right", Column?.StickyRightOffsetPx, when: Column?.StickyRightOffsetPx is not null)
                 .AddStyle(Style)
                 .AddStyle("font-weight", "600")
                 .Build();

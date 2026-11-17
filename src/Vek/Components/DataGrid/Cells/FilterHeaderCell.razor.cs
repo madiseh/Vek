@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
@@ -50,6 +51,8 @@ namespace Vek
         private string Stylename =>
             new StyleBuilder()
                 .AddStyle(Column?.HeaderStyle)
+                .AddStyle("left", Column?.StickyLeftOffsetPx, when: Column?.StickyLeftOffsetPx is not null)
+                .AddStyle("right", Column?.StickyRightOffsetPx, when: Column?.StickyRightOffsetPx is not null)
                 .AddStyle(Style)
                 .Build();
 

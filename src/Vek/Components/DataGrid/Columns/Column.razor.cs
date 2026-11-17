@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Components;
 using Vek.Extensions;
 using Vek.Interfaces;
@@ -34,6 +35,8 @@ namespace Vek
         private readonly ParameterState<bool> _allowHidingState;
         private readonly ParameterState<bool?> _allowFilteringState;
         private readonly ParameterState<DataGridFilterOperator> _filterOperatorState;
+        private readonly ParameterState<DataGridFixedStyle> _fixedStyleState;
+        private readonly ParameterState<string?> _widthState;
 
         internal ParameterState<bool> AllowSearchState => _allowSearchState;
         internal ParameterState<bool> AllowHidingState => _allowHidingState;
@@ -416,6 +419,139 @@ namespace Vek
         public bool StickyRight { get; set; }
 
         /// <summary>
+        /// Fixes or pins this column to the left or right edge of the viewport.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="DataGridFixedStyle.None"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public DataGridFixedStyle FixedStyle { get; set; }
+
+        /// <summary>
+        /// Occurs when the <see cref="FixedStyle"/> property has changed.
+        /// </summary>
+        [Parameter]
+        public EventCallback<DataGridFixedStyle> FixedStyleChanged { get; set; }
+
+        /// <summary>
+        /// Allows this column to be pinned to the left or right edge of the viewport.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>, inheriting from <see cref="VekDataGrid{T}.AllowColumnPinning"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public bool? AllowPinning { get; set; }
+
+        /// <summary>
+        /// The width of this column (e.g. "120px", "15%").
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Appearance)]
+        public string? Width { get; set; }
+
+        /// <summary>
+        /// Sets the fixed pinning style of this column.
+        /// </summary>
+        /// <param name="fixedStyle">The target fixed style.</param>
+        public Task SetFixedStyleAsync(DataGridFixedStyle fixedStyle)
+        {
+            return _fixedStyleState.SetValueAsync(fixedStyle);
+        }
+
+        /// <summary>
+        /// Resolves the effective fixed pinning style, taking into account <see cref="FixedStyle"/>, <see cref="StickyLeft"/>, and <see cref="StickyRight"/>.
+        /// </summary>
+        public DataGridFixedStyle EffectiveFixedStyle
+        {
+            get
+            {
+                var fixedStyle = _fixedStyleState.Value;
+                if (fixedStyle != DataGridFixedStyle.None)
+                {
+                    return fixedStyle;
+                }
+
+                if (StickyLeft)
+                {
+                    return DataGridFixedStyle.Left;
+                }
+
+                if (StickyRight)
+                {
+                    return DataGridFixedStyle.Right;
+                }
+
+                return DataGridFixedStyle.None;
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether this column is pinned to the left edge of the grid.
+        /// </summary>
+        public bool IsPinnedLeft => EffectiveFixedStyle == DataGridFixedStyle.Left;
+
+        /// <summary>
+        /// Indicates whether this column is pinned to the right edge of the grid.
+        /// </summary>
+        public bool IsPinnedRight => EffectiveFixedStyle == DataGridFixedStyle.Right;
+
+        internal double? StickyLeftOffset { get; set; }
+
+        internal double? StickyRightOffset { get; set; }
+
+        internal string? StickyLeftOffsetPx => StickyLeftOffset.HasValue ? $"{StickyLeftOffset.Value.ToString("0.##", CultureInfo.InvariantCulture)}px" : null;
+
+        internal string? StickyRightOffsetPx => StickyRightOffset.HasValue ? $"{StickyRightOffset.Value.ToString("0.##", CultureInfo.InvariantCulture)}px" : null;
+
+        internal bool IsLastStickyLeft { get; set; }
+
+        internal bool IsFirstStickyRight { get; set; }
+
+        internal double GetEstimatedWidthPx()
+        {
+            if (HeaderCell?.Width.HasValue == true && HeaderCell.Width.Value > 0)
+            {
+                return HeaderCell.Width.Value;
+            }
+
+            var widthStr = _widthState.Value;
+            if (!string.IsNullOrWhiteSpace(widthStr))
+            {
+                if (widthStr.EndsWith("px", StringComparison.OrdinalIgnoreCase) &&
+                    double.TryParse(widthStr.Substring(0, widthStr.Length - 2).Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedPx))
+                {
+                    return parsedPx;
+                }
+
+                if (double.TryParse(widthStr.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedRaw))
+                {
+                    return parsedRaw;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(HeaderStyle))
+            {
+                var match = Regex.Match(HeaderStyle, @"width\s*:\s*([0-9.]+)(px)?", RegexOptions.IgnoreCase);
+                if (match.Success && double.TryParse(match.Groups[1].Value, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedStylePx))
+                {
+                    return parsedStylePx;
+                }
+            }
+
+            if (Tag?.ToString() == "hierarchy-column" || Tag?.ToString() == "select-column")
+            {
+                return 48.0;
+            }
+
+            return 120.0;
+        }
+
+        /// <summary>
         /// The template used to display this column's filter.
         /// </summary>
         [Parameter]
@@ -569,8 +705,10 @@ namespace Vek
         internal string HeaderClassname =>
             new CssBuilder("vek-table-cell")
                 .AddClass("vek-table-cell-hide", HideSmall)
-                .AddClass("sticky-left", StickyLeft)
-                .AddClass("sticky-right", StickyRight)
+                .AddClass("sticky-left", IsPinnedLeft)
+                .AddClass("sticky-right", IsPinnedRight)
+                .AddClass("sticky-left-last", IsLastStickyLeft)
+                .AddClass("sticky-right-first", IsFirstStickyRight)
                 .AddClass(Class)
                 .Build();
 
@@ -578,8 +716,10 @@ namespace Vek
             new CssBuilder("vek-table-cell")
                 .AddClass("footer-cell")
                 .AddClass("vek-table-cell-hide", HideSmall)
-                .AddClass("sticky-left", StickyLeft)
-                .AddClass("sticky-right", StickyRight)
+                .AddClass("sticky-left", IsPinnedLeft)
+                .AddClass("sticky-right", IsPinnedRight)
+                .AddClass("sticky-left-last", IsLastStickyLeft)
+                .AddClass("sticky-right-first", IsFirstStickyRight)
                 .AddClass(Class)
                 .Build();
 
@@ -730,7 +870,18 @@ namespace Vek
                 .WithParameter(() => GroupByOrder)
                 .WithEventCallback(() => GroupByOrderChanged)
                 .WithChangeHandler(OnGroupByOrderChangedAsync);
+            _fixedStyleState = registerScope.RegisterParameter<DataGridFixedStyle>(nameof(FixedStyle))
+                .WithParameter(() => FixedStyle)
+                .WithEventCallback(() => FixedStyleChanged)
+                .WithChangeHandler(OnFixedStyleParameterChangedAsync);
+            _widthState = registerScope.RegisterParameter<string?>(nameof(Width))
+                .WithParameter(() => Width)
+                .WithChangeHandler(OnWidthParameterChangedAsync);
         }
+
+        private void OnFixedStyleParameterChangedAsync() => DataGrid?.OnColumnFixedStyleChanged(this);
+
+        private void OnWidthParameterChangedAsync() => DataGrid?.UpdateStickyColumnOffsets();
 
         private void OnGroupingParameterChangedAsync() => DataGrid?.GroupItems();
 

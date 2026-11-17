@@ -4,9 +4,12 @@
 - **Feature ID**: 005
 - **Feature Slug**: datagrid-fixed-columns
 - **Module**: DataGrid
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 5
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/15
+- **Started At**: 2026-11-17T07:45:10Z
+- **Completed At**: 2026-11-17T08:18:29Z
 
 ---
 

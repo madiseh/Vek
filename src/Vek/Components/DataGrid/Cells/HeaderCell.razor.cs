@@ -4,8 +4,10 @@
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Vek.Extensions;
 using Vek.Interfaces;
 using Vek.Utilities;
 
@@ -87,6 +89,9 @@ namespace Vek
                 .AddStyle(Column?.HeaderStyleFunc?.Invoke(DataGrid?.CurrentPageItems ?? Enumerable.Empty<T>()))
                 .AddStyle(Column?.HeaderStyle)
                 .AddStyle("width", Width?.ToPx(), when: Width.HasValue)
+                .AddStyle("width", Column?.GetState(x => x.Width), when: !string.IsNullOrWhiteSpace(Column?.GetState(x => x.Width)) && !Width.HasValue)
+                .AddStyle("left", Column?.StickyLeftOffsetPx, when: Column?.StickyLeftOffsetPx is not null)
+                .AddStyle("right", Column?.StickyRightOffsetPx, when: Column?.StickyRightOffsetPx is not null)
                 .AddStyle(Style)
                 .Build();
 
@@ -220,16 +225,65 @@ namespace Vek
             }
         }
 
+        private bool pinnable
+        {
+            get
+            {
+                if (Column?.AllowPinning.HasValue == true)
+                {
+                    return Column.AllowPinning.Value;
+                }
+
+                return DataGrid?.AllowColumnPinning ?? false;
+            }
+        }
+
         private bool showColumnOptions
         {
             get
             {
-                if (!sortable && !filterable && !groupable && !hideable)
+                if (!sortable && !filterable && !groupable && !hideable && !pinnable)
                     return false;
-                if (!sortable && DataGrid?.FilterMode == DataGridFilterMode.ColumnFilterRow)
+                if (!sortable && !pinnable && DataGrid?.FilterMode == DataGridFilterMode.ColumnFilterRow)
                     return false;
 
                 return Column?.ShowColumnOptions ?? DataGrid?.ShowColumnOptions ?? true;
+            }
+        }
+
+        internal async Task PinLeftAsync()
+        {
+            if (Column is not null)
+            {
+                await Column.SetFixedStyleAsync(DataGridFixedStyle.Left);
+                if (DataGrid is not null)
+                {
+                    await DataGrid.PinColumnAsync(Column, DataGridFixedStyle.Left);
+                }
+            }
+        }
+
+        internal async Task PinRightAsync()
+        {
+            if (Column is not null)
+            {
+                await Column.SetFixedStyleAsync(DataGridFixedStyle.Right);
+                if (DataGrid is not null)
+                {
+                    await DataGrid.PinColumnAsync(Column, DataGridFixedStyle.Right);
+                }
+            }
+        }
+
+        internal async Task UnpinAsync()
+        {
+            if (Column is not null)
+            {
+                await Column.SetFixedStyleAsync(DataGridFixedStyle.None);
+                if (DataGrid is not null)
+                {
+                    await DataGrid.PinColumnAsync(Column, DataGridFixedStyle.None);
+                }
             }
         }
 

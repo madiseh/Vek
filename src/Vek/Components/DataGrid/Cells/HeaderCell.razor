@@ -117,6 +117,21 @@ else if (Column != null && !Column.HiddenState.Value)
                 @if (showColumnOptions)
                 {
                     <VekMenu Icon="@DataGrid.ColumnOptionsIcon" Size="Size.Small" Dense="true" AriaLabel="@Localizer[LanguageResource.VekDataGrid_ShowColumnOptions]">
+                        @if (pinnable)
+                        {
+                            if (Column?.EffectiveFixedStyle != DataGridFixedStyle.Left)
+                            {
+                                <VekMenuItem OnClick="@PinLeftAsync">@Localizer[LanguageResource.VekDataGrid_PinLeft]</VekMenuItem>
+                            }
+                            if (Column?.EffectiveFixedStyle != DataGridFixedStyle.Right)
+                            {
+                                <VekMenuItem OnClick="@PinRightAsync">@Localizer[LanguageResource.VekDataGrid_PinRight]</VekMenuItem>
+                            }
+                            if (Column?.EffectiveFixedStyle != DataGridFixedStyle.None)
+                            {
+                                <VekMenuItem OnClick="@UnpinAsync">@Localizer[LanguageResource.VekDataGrid_Unpin]</VekMenuItem>
+                            }
+                        }
                         <VekMenuItem Disabled="@(SortDirection == SortDirection.None)" OnClick="@RemoveSortAsync">@Localizer[LanguageResource.VekDataGrid_Unsort]</VekMenuItem>
                         @if (filterable && DataGrid.FilterMode != DataGridFilterMode.ColumnFilterRow)
                         {

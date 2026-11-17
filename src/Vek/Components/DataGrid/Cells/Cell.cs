@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text.Json;
 using Vek.Utilities;
 
@@ -54,8 +55,10 @@ namespace Vek
         internal string ComputedClass =>
             new CssBuilder("vek-table-cell")
                 .AddClass("vek-table-cell-hide", _column.HideSmall)
-                .AddClass("sticky-left", _column.StickyLeft)
-                .AddClass("sticky-right", _column.StickyRight)
+                .AddClass("sticky-left", _column.IsPinnedLeft)
+                .AddClass("sticky-right", _column.IsPinnedRight)
+                .AddClass("sticky-left-last", _column.IsLastStickyLeft)
+                .AddClass("sticky-right-first", _column.IsFirstStickyRight)
                 .AddClass($"edit-mode-cell", (_dataGrid.EditMode == DataGridEditMode.Cell || (_dataGrid.EditMode == DataGridEditMode.Inline && _dataGrid.IsEditingItem(_item))) && _column.Editable)
                 .AddClass(_column.CellClassFunc?.Invoke(_item))
                 .AddClass(_column.CellClass)
@@ -68,15 +71,27 @@ namespace Vek
                 var cellStyle = _column.CellStyleFunc?.Invoke(_item);
 
                 // Most cells style nothing, and StyleBuilder would return an empty string anyway.
-                if (cellStyle is null && _column.CellStyle is null)
+                if (cellStyle is null && _column.CellStyle is null &&
+                    !_column.StickyLeftOffset.HasValue && !_column.StickyRightOffset.HasValue)
                 {
                     return string.Empty;
                 }
 
-                return new StyleBuilder()
+                var builder = new StyleBuilder()
                     .AddStyle(cellStyle)
-                    .AddStyle(_column.CellStyle)
-                    .Build();
+                    .AddStyle(_column.CellStyle);
+
+                if (_column.StickyLeftOffset.HasValue)
+                {
+                    builder.AddStyle("left", $"{_column.StickyLeftOffset.Value.ToString("0.##", CultureInfo.InvariantCulture)}px");
+                }
+
+                if (_column.StickyRightOffset.HasValue)
+                {
+                    builder.AddStyle("right", $"{_column.StickyRightOffset.Value.ToString("0.##", CultureInfo.InvariantCulture)}px");
+                }
+
+                return builder.Build();
             }
         }
 
