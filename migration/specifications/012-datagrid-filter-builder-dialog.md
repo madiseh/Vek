@@ -4,7 +4,7 @@
 - **Feature ID**: 012
 - **Feature Slug**: datagrid-filter-builder-dialog
 - **Module**: DataGrid
-- **Status**: Backlog
+- **Status**: Ready
 - **Priority**: 12
 - **Dependencies**: ["004"]
 

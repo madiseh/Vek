@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Components;
+using Vek.Extensions;
 using Vek.Interfaces;
 using Vek.State;
 using Vek.Utilities;
@@ -31,9 +32,13 @@ namespace Vek
         internal ParameterState<int> _groupByOrderState;
         private readonly ParameterState<bool> _allowSearchState;
         private readonly ParameterState<bool> _allowHidingState;
+        private readonly ParameterState<bool?> _allowFilteringState;
+        private readonly ParameterState<DataGridFilterOperator> _filterOperatorState;
 
         internal ParameterState<bool> AllowSearchState => _allowSearchState;
         internal ParameterState<bool> AllowHidingState => _allowHidingState;
+        internal ParameterState<bool?> AllowFilteringState => _allowFilteringState;
+        internal ParameterState<DataGridFilterOperator> FilterOperatorState => _filterOperatorState;
 
         /// <summary>
         /// The data grid which owns this column.
@@ -248,6 +253,26 @@ namespace Vek
         /// </remarks>
         [Parameter]
         public virtual bool? Filterable { get; set; }
+
+        /// <summary>
+        /// Specifies whether filtering is permitted for this column.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>. When set, this overrides <see cref="VekDataGrid{T}.Filterable"/> and <see cref="VekDataGrid{T}.ShowFilterRow"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Filtering)]
+        public bool? AllowFiltering { get; set; }
+
+        /// <summary>
+        /// The default comparison operator used when filtering this column in the filter row.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="DataGridFilterOperator.Default"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Filtering)]
+        public DataGridFilterOperator FilterOperator { get; set; } = DataGridFilterOperator.Default;
 
         /// <summary>
         /// Shows the filter icon.
@@ -609,7 +634,17 @@ namespace Vek
         {
             get
             {
-                return Filterable ?? DataGrid?.Filterable ?? false;
+                if (_allowFilteringState.Value.HasValue)
+                {
+                    return _allowFilteringState.Value.Value;
+                }
+
+                if (Filterable.HasValue)
+                {
+                    return Filterable.Value;
+                }
+
+                return (DataGrid?.GetState(x => x.ShowFilterRow) == true) || (DataGrid?.Filterable == true);
             }
         }
 
@@ -676,6 +711,10 @@ namespace Vek
                 .WithParameter(() => AllowSearch);
             _allowHidingState = registerScope.RegisterParameter<bool>(nameof(AllowHiding))
                 .WithParameter(() => AllowHiding);
+            _allowFilteringState = registerScope.RegisterParameter<bool?>(nameof(AllowFiltering))
+                .WithParameter(() => AllowFiltering);
+            _filterOperatorState = registerScope.RegisterParameter<DataGridFilterOperator>(nameof(FilterOperator))
+                .WithParameter(() => FilterOperator);
             HiddenState = registerScope.RegisterParameter<bool>(nameof(Hidden))
                 .WithParameter(() => Hidden)
                 .WithEventCallback(() => HiddenChanged);
@@ -705,7 +744,7 @@ namespace Vek
 
             if (FilterOperators.Count > 0)
             {
-                var defaultOperators = FilterOperator.GetOperatorByDataType(PropertyType);
+                var defaultOperators = Vek.FilterOperator.GetOperatorByDataType(PropertyType);
                 var invalidOperators = FilterOperators.Where(@operator => !defaultOperators.Contains(@operator)).ToArray();
 
                 if (invalidOperators.Length > 0)
@@ -731,7 +770,7 @@ namespace Vek
         {
             if (FilterOperators.Count == 0)
             {
-                return FilterOperator.GetOperatorByDataType(fieldType);
+                return Vek.FilterOperator.GetOperatorByDataType(fieldType);
             }
             else
             {

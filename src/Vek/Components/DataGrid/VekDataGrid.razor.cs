@@ -66,6 +66,8 @@ namespace Vek
         private readonly ParameterState<T?> _selectedItemState;
         private readonly ParameterState<HashSet<T>?> _selectedItemsState;
         private readonly ParameterState<bool> _expandSingleRowState;
+        internal readonly ParameterState<bool> _showFilterRowState;
+        internal readonly ParameterState<int> _filterRowInputDelayState;
         internal readonly ParameterState<bool> _showSearchBoxState;
         internal readonly ParameterState<string?> _searchTextState;
         internal readonly ParameterState<DataGridSearchTextParseMode> _searchTextParseModeState;
@@ -128,6 +130,12 @@ namespace Vek
             registerScope.RegisterParameter<IEqualityComparer<T>?>(nameof(Comparer))
                 .WithParameter(() => Comparer)
                 .WithChangeHandler(OnComparerChanged);
+
+            _showFilterRowState = registerScope.RegisterParameter<bool>(nameof(ShowFilterRow))
+                .WithParameter(() => ShowFilterRow);
+
+            _filterRowInputDelayState = registerScope.RegisterParameter<int>(nameof(FilterRowInputDelay))
+                .WithParameter(() => FilterRowInputDelay);
 
             _showSearchBoxState = registerScope.RegisterParameter<bool>(nameof(ShowSearchBox))
                 .WithParameter(() => ShowSearchBox);
@@ -705,6 +713,26 @@ namespace Vek
         /// </remarks>
         [Parameter]
         public bool Filterable { get; set; } = false;
+
+        /// <summary>
+        /// Displays a dedicated filter row beneath the column headers.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Filtering)]
+        public bool ShowFilterRow { get; set; }
+
+        /// <summary>
+        /// The debounce delay in milliseconds for filter row input changes before applying the filter.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>300</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Filtering)]
+        public int FilterRowInputDelay { get; set; } = 300;
 
         /// <summary>
         /// Allows columns to be hidden.

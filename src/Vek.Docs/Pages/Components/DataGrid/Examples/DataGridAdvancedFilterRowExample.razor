@@ -1,0 +1,43 @@
+@namespace Vek.Docs.Examples
+
+<VekStack Spacing="3">
+    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="4">
+        <VekSwitch @bind-Value="_showFilterRow" Label="Show Filter Row" Color="Color.Primary" />
+        <VekNumericField @bind-Value="_inputDelay" Label="Input Delay (ms)" Min="0" Max="2000" Step="100" Margin="Margin.Dense" Style="max-width: 180px;" />
+    </VekStack>
+
+    <VekDataGrid Items="@_employees"
+                 ShowFilterRow="@_showFilterRow"
+                 FilterRowInputDelay="@_inputDelay"
+                 Hover="true"
+                 Dense="true"
+                 Elevation="1">
+        <Columns>
+            <PropertyColumn Property="x => x.Id" Title="ID" AllowFiltering="false" />
+            <PropertyColumn Property="x => x.Name" Title="Name" FilterOperator="DataGridFilterOperator.StartsWith" />
+            <PropertyColumn Property="x => x.Department" Title="Department" />
+            <PropertyColumn Property="x => x.Salary" Title="Salary" Format="C0" />
+            <PropertyColumn Property="x => x.HireDate" Title="Hire Date" Format="yyyy-MM-dd" />
+            <PropertyColumn Property="x => x.Active" Title="Active" />
+        </Columns>
+    </VekDataGrid>
+</VekStack>
+
+@code {
+    private bool _showFilterRow = true;
+    private int _inputDelay = 300;
+
+    public record Employee(int Id, string Name, string Department, double Salary, DateOnly HireDate, bool Active);
+
+    private static readonly List<Employee> _employees =
+    [
+        new(101, "Alice Johnson", "Engineering", 125000, new DateOnly(2020, 3, 15), true),
+        new(102, "Bob Smith", "Marketing", 85000, new DateOnly(2021, 6, 1), true),
+        new(103, "Charlie Davis", "Engineering", 140000, new DateOnly(2018, 11, 20), true),
+        new(104, "Diana Prince", "Product", 110000, new DateOnly(2022, 1, 10), false),
+        new(105, "Evan Wright", "Operations", 72000, new DateOnly(2023, 4, 5), true),
+        new(106, "Fiona Gallagher", "Finance", 98000, new DateOnly(2019, 8, 12), true),
+        new(107, "George Clark", "Engineering", 115000, new DateOnly(2021, 9, 23), false),
+        new(108, "Hannah Abbott", "Marketing", 91000, new DateOnly(2020, 12, 1), true),
+    ];
+}

@@ -79,6 +79,20 @@
                 </SectionContent>
             </DocsPageSection>
 
+            <DocsPageSection>
+                <SectionHeader Title="Advanced Filter Row">
+                    <Description>
+                        Enable a dedicated inline filter row beneath column headers by setting <CodeInline>ShowFilterRow="true"</CodeInline>.
+                        Each column provides comparison operator selectors (such as <CodeInline>Equals</CodeInline>, <CodeInline>Contains</CodeInline>, <CodeInline>StartsWith</CodeInline>, <CodeInline>Between</CodeInline>, <CodeInline>GreaterThan</CodeInline>, <CodeInline>LessThan</CodeInline>, <CodeInline>IsNull</CodeInline>, and <CodeInline>IsNotNull</CodeInline>) with debounced input configured via <CodeInline>FilterRowInputDelay</CodeInline> (default 300ms).
+                        <br /><br />
+                        Individual columns can configure their default operator using <CodeInline>FilterOperator</CodeInline> and enable or disable filtering using <CodeInline>AllowFiltering</CodeInline>.
+                    </Description>
+                </SectionHeader>
+                <SectionContent DarkenBackground="true" Code="@nameof(DataGridAdvancedFilterRowExample)" Block="true" FullWidth="true">
+                    <DataGridAdvancedFilterRowExample />
+                </SectionContent>
+            </DocsPageSection>
+
         </DocsPageSection>
 
     </DocsPageContent>
