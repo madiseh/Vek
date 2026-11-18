@@ -116,8 +116,8 @@
       "specification": "specifications/009-datagrid-focused-row.md",
       "dependencies": [],
       "started_at": "2026-11-18T07:58:47Z",
-      "completed_at": "2026-11-18T09:15:18Z",
-      "pr_url": "Fully documented pull request with verification summary and example usage."
+      "completed_at": "2026-11-18T09:44:13Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/16"
     },
     {
       "id": "010",
