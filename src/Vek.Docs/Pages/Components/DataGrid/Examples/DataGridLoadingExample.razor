@@ -1,0 +1,91 @@
+@namespace Vek.Docs.Examples
+
+<div class="d-flex flex-wrap align-center gap-4 mb-4">
+    <VekButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" Disabled="@_loading" OnClick="ReloadAsync">
+        @(_loading ? "Fetching..." : "Reload Telemetry")
+    </VekButton>
+    <VekButton Variant="Variant.Outlined" Color="Color.Secondary" Disabled="@_loading" OnClick="SimulateFreshLoadAsync">
+        Simulate Initial Fetch
+    </VekButton>
+    <VekSelect @bind-Value="_progressColor" Label="Progress Color" Dense="true" Margin="Margin.Dense" Style="min-width: 160px;">
+        <VekSelectItem Value="Color.Info">Info</VekSelectItem>
+        <VekSelectItem Value="Color.Primary">Primary</VekSelectItem>
+        <VekSelectItem Value="Color.Success">Success</VekSelectItem>
+        <VekSelectItem Value="Color.Warning">Warning</VekSelectItem>
+        <VekSelectItem Value="Color.Secondary">Secondary</VekSelectItem>
+    </VekSelect>
+</div>
+
+<VekDataGrid Items="@_nodes" T="ServerNode" Loading="@_loading" LoadingProgressColor="@_progressColor" Bordered="true" Dense="true" Hover="true">
+    <LoadingContent>
+        <div class="d-flex flex-column align-center justify-center pa-8 gap-3">
+            <VekProgressCircular Indeterminate="true" Color="@_progressColor" Size="Size.Medium" />
+            <VekText Typo="Typo.subtitle1">Querying server cluster status...</VekText>
+            <VekText Typo="Typo.caption" Color="Color.Secondary">Establishing secure telemetry stream</VekText>
+        </div>
+    </LoadingContent>
+    <Columns>
+        <PropertyColumn Property="x => x.NodeId" Title="Node ID" />
+        <PropertyColumn Property="x => x.Host" Title="Hostname" />
+        <PropertyColumn Property="x => x.Region" Title="Region" />
+        <TemplateColumn Title="Status">
+            <CellTemplate>
+                <VekChip Color="@(context.Item.Status == "Online" ? Color.Success : Color.Warning)" Size="Size.Small" Variant="Variant.Outlined">
+                    @context.Item.Status
+                </VekChip>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x => x.CpuUsage" Title="CPU Usage" Format="P0" />
+        <PropertyColumn Property="x => x.MemoryUsage" Title="Memory Usage" Format="P0" />
+        <PropertyColumn Property="x => x.ActiveConnections" Title="Connections" Format="N0" />
+    </Columns>
+</VekDataGrid>
+
+@code {
+    private bool _loading = false;
+    private Color _progressColor = Color.Info;
+
+    public record ServerNode(
+        string NodeId,
+        string Host,
+        string Region,
+        string Status,
+        double CpuUsage,
+        double MemoryUsage,
+        int ActiveConnections);
+
+    private List<ServerNode> _nodes = new();
+
+    protected override void OnInitialized()
+    {
+        _nodes = GenerateNodes();
+    }
+
+    private async Task ReloadAsync()
+    {
+        _loading = true;
+        await Task.Delay(1200);
+        _nodes = GenerateNodes();
+        _loading = false;
+    }
+
+    private async Task SimulateFreshLoadAsync()
+    {
+        _loading = true;
+        _nodes = new();
+        StateHasChanged();
+        await Task.Delay(1500);
+        _nodes = GenerateNodes();
+        _loading = false;
+    }
+
+    private static List<ServerNode> GenerateNodes() => new()
+    {
+        new("NODE-01", "us-east-prod-01.vek.internal", "us-east-1", "Online", 0.42, 0.68, 1_420),
+        new("NODE-02", "us-east-prod-02.vek.internal", "us-east-1", "Online", 0.78, 0.84, 2_890),
+        new("NODE-03", "eu-west-prod-01.vek.internal", "eu-west-1", "Online", 0.35, 0.52, 980),
+        new("NODE-04", "eu-west-prod-02.vek.internal", "eu-west-1", "Degraded", 0.91, 0.93, 3_150),
+        new("NODE-05", "ap-southeast-01.vek.internal", "ap-southeast-1", "Online", 0.28, 0.45, 750),
+        new("NODE-06", "ap-northeast-01.vek.internal", "ap-northeast-1", "Online", 0.54, 0.61, 1_820)
+    };
+}
