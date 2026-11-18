@@ -344,6 +344,230 @@
       "dependencies": [
         "010"
       ]
+    },
+    {
+      "id": "031",
+      "slug": "button-loading-state-and-auto-disable",
+      "title": "Button Loading / Busy Spinner State with Auto-Disable",
+      "module": "Button",
+      "priority": 31,
+      "status": "ready",
+      "specification": "specifications/031-button-loading-state-and-auto-disable.md",
+      "dependencies": []
+    },
+    {
+      "id": "032",
+      "slug": "button-group-selection-modes",
+      "title": "ButtonGroup Single and Multiple Selection Toggle Modes",
+      "module": "ButtonGroup",
+      "priority": 32,
+      "status": "ready",
+      "specification": "specifications/032-button-group-selection-modes.md",
+      "dependencies": []
+    },
+    {
+      "id": "033",
+      "slug": "split-button-and-dropdown-actions",
+      "title": "SplitButton with Dual Actions and DropDown Menu",
+      "module": "Button",
+      "priority": 33,
+      "status": "ready",
+      "specification": "specifications/033-split-button-and-dropdown-actions.md",
+      "dependencies": []
+    },
+    {
+      "id": "034",
+      "slug": "button-double-click-and-debounce-guard",
+      "title": "Button Click Debounce and Double-Click Protection",
+      "module": "Button",
+      "priority": 34,
+      "status": "ready",
+      "specification": "specifications/034-button-double-click-and-debounce-guard.md",
+      "dependencies": []
+    },
+    {
+      "id": "035",
+      "slug": "button-badge-and-counter-adornment",
+      "title": "Button Floating Badge, Status Dot, and Counter Adornment",
+      "module": "Button",
+      "priority": 35,
+      "status": "ready",
+      "specification": "specifications/035-button-badge-and-counter-adornment.md",
+      "dependencies": []
+    },
+    {
+      "id": "036",
+      "slug": "textbox-clear-button-modes",
+      "title": "TextBox Clear Button Display Modes and Action Hooks",
+      "module": "TextField",
+      "priority": 36,
+      "status": "ready",
+      "specification": "specifications/036-textbox-clear-button-modes.md",
+      "dependencies": []
+    },
+    {
+      "id": "037",
+      "slug": "textbox-password-visibility-toggle",
+      "title": "TextBox Password Masking with Interactive Visibility Toggle",
+      "module": "TextField",
+      "priority": 37,
+      "status": "ready",
+      "specification": "specifications/037-textbox-password-visibility-toggle.md",
+      "dependencies": []
+    },
+    {
+      "id": "038",
+      "slug": "textbox-debounced-bind-value-modes",
+      "title": "TextBox Configurable Value Binding Modes and Debounce Delay",
+      "module": "TextField",
+      "priority": 38,
+      "status": "ready",
+      "specification": "specifications/038-textbox-debounced-bind-value-modes.md",
+      "dependencies": []
+    },
+    {
+      "id": "039",
+      "slug": "textbox-custom-buttons-and-adornments",
+      "title": "TextBox Embedded Custom Action Buttons and Adornment Slots",
+      "module": "TextField",
+      "priority": 39,
+      "status": "ready",
+      "specification": "specifications/039-textbox-custom-buttons-and-adornments.md",
+      "dependencies": []
+    },
+    {
+      "id": "040",
+      "slug": "masked-input-regex-and-literals",
+      "title": "MaskedInput Pattern Rules, Prompt Characters, and Literals Preservation",
+      "module": "Mask",
+      "priority": 40,
+      "status": "ready",
+      "specification": "specifications/040-masked-input-regex-and-literals.md",
+      "dependencies": []
+    },
+    {
+      "id": "041",
+      "slug": "spin-edit-mousewheel-and-acceleration",
+      "title": "SpinEdit Stepper Controls, Mouse Wheel Scrolling, and Acceleration",
+      "module": "NumericField",
+      "priority": 41,
+      "status": "ready",
+      "specification": "specifications/041-spin-edit-mousewheel-and-acceleration.md",
+      "dependencies": []
+    },
+    {
+      "id": "042",
+      "slug": "combobox-incremental-filtering-and-virtual-scroll",
+      "title": "ComboBox Incremental Live Filtering and Virtualized Dropdown",
+      "module": "Autocomplete",
+      "priority": 42,
+      "status": "ready",
+      "specification": "specifications/042-combobox-incremental-filtering-and-virtual-scroll.md",
+      "dependencies": []
+    },
+    {
+      "id": "043",
+      "slug": "combobox-multi-selection-and-chip-tags",
+      "title": "ComboBox Multi-Selection with Removable Chip Tags",
+      "module": "Select",
+      "priority": 43,
+      "status": "backlog",
+      "specification": "specifications/043-combobox-multi-selection-and-chip-tags.md",
+      "dependencies": [
+        "042"
+      ]
+    },
+    {
+      "id": "044",
+      "slug": "tabs-scroll-and-navigation-buttons",
+      "title": "Tabs Overflow Scrolling with Interactive Navigation Buttons",
+      "module": "Tabs",
+      "priority": 44,
+      "status": "ready",
+      "specification": "specifications/044-tabs-scroll-and-navigation-buttons.md",
+      "dependencies": []
+    },
+    {
+      "id": "045",
+      "slug": "tabs-closable-tabs-and-lifecycle-events",
+      "title": "Tabs Dynamic Close Button and Tab Removal Lifecycle",
+      "module": "Tabs",
+      "priority": 45,
+      "status": "ready",
+      "specification": "specifications/045-tabs-closable-tabs-and-lifecycle-events.md",
+      "dependencies": []
+    },
+    {
+      "id": "046",
+      "slug": "tabs-lazy-render-and-caching-modes",
+      "title": "Tabs Render Modes: Active Tab Lazily with DOM Caching",
+      "module": "Tabs",
+      "priority": 46,
+      "status": "ready",
+      "specification": "specifications/046-tabs-lazy-render-and-caching-modes.md",
+      "dependencies": []
+    },
+    {
+      "id": "047",
+      "slug": "tabs-multi-orientation-and-positions",
+      "title": "Tabs Vertical Orientation and Position (Top, Bottom, Left, Right)",
+      "module": "Tabs",
+      "priority": 47,
+      "status": "ready",
+      "specification": "specifications/047-tabs-multi-orientation-and-positions.md",
+      "dependencies": []
+    },
+    {
+      "id": "048",
+      "slug": "tabs-drag-and-drop-reorder",
+      "title": "Tabs Interactive Drag-and-Drop Tab Reordering",
+      "module": "Tabs",
+      "priority": 48,
+      "status": "backlog",
+      "specification": "specifications/048-tabs-drag-and-drop-reorder.md",
+      "dependencies": [
+        "044"
+      ]
+    },
+    {
+      "id": "049",
+      "slug": "tabs-badge-and-custom-header-template",
+      "title": "Tabs Custom Header Template, Status Badges, and Icon Slots",
+      "module": "Tabs",
+      "priority": 49,
+      "status": "ready",
+      "specification": "specifications/049-tabs-badge-and-custom-header-template.md",
+      "dependencies": []
+    },
+    {
+      "id": "050",
+      "slug": "accordion-expand-modes-and-animation",
+      "title": "Accordion Expand Modes (Single, Multiple, SingleOrNone) and Animation",
+      "module": "ExpansionPanel",
+      "priority": 50,
+      "status": "ready",
+      "specification": "specifications/050-accordion-expand-modes-and-animation.md",
+      "dependencies": []
+    },
+    {
+      "id": "051",
+      "slug": "context-menu-target-selector-and-triggers",
+      "title": "ContextMenu Target Selector Binding, Long-Press Touch, and Submenus",
+      "module": "Menu",
+      "priority": 51,
+      "status": "ready",
+      "specification": "specifications/051-context-menu-target-selector-and-triggers.md",
+      "dependencies": []
+    },
+    {
+      "id": "052",
+      "slug": "toolbar-adaptive-collapse-and-overflow-menu",
+      "title": "Toolbar Adaptive Layout with Overflow Dropdown Menu",
+      "module": "ToolBar",
+      "priority": 52,
+      "status": "ready",
+      "specification": "specifications/052-toolbar-adaptive-collapse-and-overflow-menu.md",
+      "dependencies": []
     }
   ]
 }
