@@ -35,6 +35,9 @@ namespace Vek
         private readonly ParameterState<bool> _allowHidingState;
         private readonly ParameterState<bool?> _allowFilteringState;
         private readonly ParameterState<DataGridFilterOperator> _filterOperatorState;
+        private readonly ParameterState<DataGridGroupInterval> _groupIntervalState;
+        private readonly ParameterState<decimal> _groupIntervalSizeState;
+        private readonly ParameterState<GroupIntervalCalculator?> _groupIntervalCalculatorState;
         private readonly ParameterState<DataGridFixedStyle> _fixedStyleState;
         private readonly ParameterState<string?> _widthState;
 
@@ -136,6 +139,36 @@ namespace Vek
         /// </summary>
         [Parameter]
         public Func<T, object>? GroupBy { get; set; }
+
+        /// <summary>
+        /// Groups column values into built-in date, alphabetic, or numeric intervals.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="DataGridGroupInterval.None"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public DataGridGroupInterval GroupInterval { get; set; }
+
+        /// <summary>
+        /// Sets the width of numeric ranges when <see cref="GroupInterval"/> is <see cref="DataGridGroupInterval.NumericRange"/>.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>10</c> and must be greater than zero.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public decimal GroupIntervalSize { get; set; } = 10;
+
+        /// <summary>
+        /// Calculates a custom grouping key from each column value.
+        /// </summary>
+        /// <remarks>
+        /// When supplied, this calculator takes precedence over <see cref="GroupInterval"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public GroupIntervalCalculator? GroupIntervalCalculator { get; set; }
 
         /// <summary>
         /// The order in which values are grouped when there are more than one group
@@ -855,6 +888,15 @@ namespace Vek
                 .WithParameter(() => AllowFiltering);
             _filterOperatorState = registerScope.RegisterParameter<DataGridFilterOperator>(nameof(FilterOperator))
                 .WithParameter(() => FilterOperator);
+            _groupIntervalState = registerScope.RegisterParameter<DataGridGroupInterval>(nameof(GroupInterval))
+                .WithParameter(() => GroupInterval)
+                .WithChangeHandler(OnGroupIntervalParameterChanged);
+            _groupIntervalSizeState = registerScope.RegisterParameter<decimal>(nameof(GroupIntervalSize))
+                .WithParameter(() => GroupIntervalSize)
+                .WithChangeHandler(OnGroupIntervalParameterChanged);
+            _groupIntervalCalculatorState = registerScope.RegisterParameter<GroupIntervalCalculator?>(nameof(GroupIntervalCalculator))
+                .WithParameter(() => GroupIntervalCalculator)
+                .WithChangeHandler(OnGroupIntervalParameterChanged);
             HiddenState = registerScope.RegisterParameter<bool>(nameof(Hidden))
                 .WithParameter(() => Hidden)
                 .WithEventCallback(() => HiddenChanged);
@@ -884,6 +926,8 @@ namespace Vek
         private void OnWidthParameterChangedAsync() => DataGrid?.UpdateStickyColumnOffsets();
 
         private void OnGroupingParameterChangedAsync() => DataGrid?.GroupItems();
+
+        private void OnGroupIntervalParameterChanged() => DataGrid?.GroupItems();
 
         private void OnGroupByOrderChangedAsync() => DataGrid?.GroupItems();
 
@@ -946,7 +990,33 @@ namespace Vek
 
         internal void CompileGroupBy()
         {
-            if (groupBy == null && !string.IsNullOrWhiteSpace(PropertyName))
+            if (GroupBy is not null)
+            {
+                groupBy = GroupBy;
+            }
+            else if (_groupIntervalCalculatorState.Value is not null || _groupIntervalState.Value != DataGridGroupInterval.None)
+            {
+                groupBy = item =>
+                {
+                    object? value;
+                    if (typeof(T) == typeof(IDictionary<string, object>))
+                    {
+                        value = PropertyName is not null && item is IDictionary<string, object> values && values.TryGetValue(PropertyName, out var fieldValue)
+                            ? fieldValue
+                            : null;
+                    }
+                    else
+                    {
+                        value = PropertyFunc(item);
+                    }
+
+                    var calculator = _groupIntervalCalculatorState.Value;
+                    return calculator is not null
+                        ? calculator(value)!
+                        : DataGridGroupIntervalEvaluator.Evaluate(value, _groupIntervalState.Value, _groupIntervalSizeState.Value)!;
+                };
+            }
+            else if (groupBy == null && !string.IsNullOrWhiteSpace(PropertyName))
             {
                 var type = typeof(T);
                 // set the default GroupBy

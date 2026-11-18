@@ -1,0 +1,25 @@
+@namespace TestComponents.DataGrid
+@attribute [ViewerHidden]
+
+<VekDataGrid T="GroupIntervalItem" Items="Items" Groupable>
+    <Columns>
+        <PropertyColumn Property="x => x.JoinedAt" Title="Joined" Grouping="true"
+                        GroupInterval="Interval" GroupIntervalCalculator="Calculator" />
+    </Columns>
+</VekDataGrid>
+
+@code {
+    [Parameter]
+    public GroupIntervalCalculator? Calculator { get; set; }
+
+    [Parameter]
+    public DataGridGroupInterval Interval { get; set; } = DataGridGroupInterval.DateMonth;
+
+    public sealed record GroupIntervalItem(DateTime JoinedAt);
+
+    private static readonly List<GroupIntervalItem> Items =
+    [
+        new(new DateTime(2025, 3, 4)),
+        new(new DateTime(2025, 3, 26))
+    ];
+}

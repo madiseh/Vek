@@ -46,6 +46,19 @@
         </DocsPageSection>
 
         <DocsPageSection>
+              <SectionHeader Title="Group Intervals">
+                  <Description>
+                      Use <CodeInline>GroupInterval</CodeInline> to group dates by year, month, or quarter, text by its first letter, and numbers into ranges.
+                      Set <CodeInline>GroupIntervalSize</CodeInline> to choose the numeric range width, or provide a <CodeInline>GroupIntervalCalculator</CodeInline>
+                      when the group key depends on your data.
+                  </Description>
+              </SectionHeader>
+              <SectionContent DarkenBackground="true" Code="@nameof(DataGridGroupIntervalExample)" ShowCode="false" Block="true" FullWidth="true">
+                  <DataGridGroupIntervalExample />
+              </SectionContent>
+          </DocsPageSection>
+
+          <DocsPageSection>
             <SectionHeader Title="Custom Group Template">
                 <Description>
                     Custom group templates let you modify how group headers look, display item counts, percentages, and control group expansion programmatically.
