@@ -1,0 +1,28 @@
+@namespace Vek.Docs.Examples
+
+<VekDataGrid T="HireRecord" Items="Records" Groupable GroupExpanded Hover>
+    <Columns>
+        <PropertyColumn Property="x => x.Team" Title="Team" Grouping="true"
+                        GroupInterval="DataGridGroupInterval.Alphabetical" GroupByOrder="0" />
+        <PropertyColumn Property="x => x.StartedOn" Title="Started" Grouping="true"
+                        GroupInterval="DataGridGroupInterval.DateQuarter" GroupByOrder="1" />
+        <PropertyColumn Property="x => x.AnnualCompensation" Title="Annual compensation" Grouping="true"
+                        GroupInterval="DataGridGroupInterval.NumericRange" GroupIntervalSize="25000" GroupByOrder="2" />
+    </Columns>
+</VekDataGrid>
+
+@code {
+    public static string __description__ = "Group DataGrid rows by date, alphabetic, and numeric intervals.";
+
+    private static readonly HireRecord[] Records =
+    [
+        new("Analytics", new DateTime(2024, 1, 15), 72000),
+        new("Analytics", new DateTime(2024, 3, 21), 89000),
+        new("Analytics", new DateTime(2024, 5, 8), 105000),
+        new("Customer Success", new DateTime(2024, 2, 2), 68000),
+        new("Customer Success", new DateTime(2024, 7, 12), 82000),
+        new("Design", new DateTime(2024, 4, 18), 96000)
+    ];
+
+    private sealed record HireRecord(string Team, DateTime StartedOn, decimal AnnualCompensation);
+}
