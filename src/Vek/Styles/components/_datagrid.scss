@@ -267,6 +267,23 @@
       background-color: var(--vek-palette-table-hover);
     }
   }
+
+  .vek-table-cell:focus:not(.vek-table-cell-focused) {
+    outline: none;
+  }
+
+  .vek-table-cell.vek-table-cell-focused {
+    outline: 2px solid var(--vek-palette-primary);
+    outline-offset: -2px;
+    background-color: color-mix(in srgb, var(--vek-palette-primary) 12%, transparent);
+    position: relative;
+    z-index: 2;
+
+    &:focus-visible {
+      outline: 2px solid var(--vek-palette-primary);
+      outline-offset: -2px;
+    }
+  }
 }
 
 .vek-data-grid-cell-selected {

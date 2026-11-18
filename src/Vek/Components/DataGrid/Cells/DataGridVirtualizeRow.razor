@@ -1,4 +1,4 @@
-﻿@namespace Vek
+@namespace Vek
 @inherits VekComponentBase
 @typeparam T
 @using Vek.Utilities
@@ -42,7 +42,7 @@
                 .AddClass("vek-table-row-focused", isFocused)
                 .Build();
             var rowStyle = new StyleBuilder().AddStyle(DataGrid.RowStyle).AddStyle(DataGrid.RowStyleFunc?.Invoke(itemBag.Item, itemBag.Index)).Build();
-            int? rowTabIndex = DataGrid.HasFocusedRow ? (isFocused ? 0 : -1) : null;
+            int? rowTabIndex = !DataGrid.IsKeyboardNavigationEnabled && DataGrid.HasFocusedRow ? (isFocused ? 0 : -1) : null;
         }
         <tr class="vek-table-row @rowClass" Style="@rowStyle" @key="itemBag.Item"
             id="@DataGrid.GetRowId(itemBag.Index)"

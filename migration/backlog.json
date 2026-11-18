@@ -128,11 +128,14 @@
       "title": "DataGrid Comprehensive ARIA Keyboard Navigation Matrix",
       "module": "DataGrid",
       "priority": 10,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/010-datagrid-keyboard-navigation.md",
       "dependencies": [
         "009"
-      ]
+      ],
+      "started_at": "2026-11-18T16:23:32Z",
+      "completed_at": "2026-11-18T17:13:35Z",
+      "pr_url": "Fully documented pull request with verification summary and example usage."
     },
     {
       "id": "011",
@@ -345,7 +348,7 @@
       "title": "DataGrid APG Grid Pattern & Screen Reader Live Announcements",
       "module": "DataGrid",
       "priority": 30,
-      "status": "backlog",
+      "status": "ready",
       "specification": "specifications/030-datagrid-accessibility-compliance.md",
       "dependencies": [
         "010"

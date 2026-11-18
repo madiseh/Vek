@@ -1,4 +1,4 @@
-﻿// Copyright (c) Vek 2021
+// Copyright (c) Vek 2021
 // Vek licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -81,6 +81,8 @@ namespace Vek
         private readonly ParameterState<int> _focusedRowIndexState;
         private readonly ParameterState<T?> _focusedItemState;
         private readonly ParameterState<bool> _autoScrollToFocusedRowState;
+        private readonly ParameterState<bool> _keyboardNavigationEnabledState;
+        private readonly ParameterState<int> _focusedColumnIndexState;
         private readonly ParameterState<DataGridSelectionMode> _selectionModeState;
         private readonly ParameterState<DataGridCellRange?> _selectedCellRangeState;
         private readonly DataGridCellSelectionModel _cellSelectionModel = new();
@@ -93,11 +95,20 @@ namespace Vek
         /// </summary>
         public DataGridFocusManager<T> FocusManager { get; }
 
+        /// <summary>
+        /// Gets the handler responsible for WAI-ARIA Grid keyboard navigation, roving tabindex, and keyboard edit/selection lifecycles.
+        /// </summary>
+        public DataGridAriaKeyboardHandler<T> KeyboardHandler { get; }
+
         internal IReadOnlyList<string> CurrentSearchTokens { get; private set; } = Array.Empty<string>();
         internal ParameterState<bool> HighlightSearchResultsState => _highlightSearchResultsState;
         internal bool HasFocusedRow => _focusedRowEnabledState.Value;
+        internal bool IsKeyboardNavigationEnabled => _keyboardNavigationEnabledState.Value;
+        internal bool IsAriaGrid => _keyboardNavigationEnabledState.Value || _selectionModeState.Value == DataGridSelectionMode.CellRange;
         internal int CurrentFocusedIndex => _focusedRowIndexState.Value;
+        internal int CurrentFocusedColumnIndex => _focusedColumnIndexState.Value;
         internal T? CurrentFocusedItem => _focusedItemState.Value;
+        internal bool HasActiveEdit => !EqualityComparer<T?>.Default.Equals(_editingSourceItem, default) || _isEditFormOpen;
 
         private const string PrePrefix = "__vek_dg_pre__:";
         private const string PostPrefix = "__vek_dg_post__:";
@@ -130,6 +141,7 @@ namespace Vek
             _openHierarchies = new HashSet<T>(Comparer);
             _initialExpansions = new HashSet<T>(Comparer);
             FocusManager = new DataGridFocusManager<T>(this);
+            KeyboardHandler = new DataGridAriaKeyboardHandler<T>(this);
             using var registerScope = CreateRegisterScope();
             registerScope.RegisterParameter<IEnumerable<T>?>(nameof(Items))
                 .WithParameter(() => Items)
@@ -195,6 +207,14 @@ namespace Vek
 
             _autoScrollToFocusedRowState = registerScope.RegisterParameter<bool>(nameof(AutoScrollToFocusedRow))
                 .WithParameter(() => AutoScrollToFocusedRow);
+
+            _keyboardNavigationEnabledState = registerScope.RegisterParameter<bool>(nameof(KeyboardNavigationEnabled))
+                .WithParameter(() => KeyboardNavigationEnabled);
+
+            _focusedColumnIndexState = registerScope.RegisterParameter<int>(nameof(FocusedColumnIndex))
+                .WithParameter(() => FocusedColumnIndex)
+                .WithEventCallback(() => FocusedColumnIndexChanged)
+                .WithChangeHandler(OnFocusedColumnIndexChangedAsync);
 
             _selectionModeState = registerScope.RegisterParameter<DataGridSelectionMode>(nameof(SelectionMode))
                 .WithParameter(() => SelectionMode);
@@ -1707,6 +1727,35 @@ namespace Vek
         public bool AutoScrollToFocusedRow { get; set; } = true;
 
         /// <summary>
+        /// Enables full WAI-ARIA Grid keyboard navigation with roving tabindex across cells.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. When enabled, arrow keys, Home/End, PageUp/PageDown navigate cells,
+        /// Enter and F2 activate editing, Escape cancels active edits, Space toggles row selection,
+        /// and Tab exits the grid to adjacent interactive elements.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public bool KeyboardNavigationEnabled { get; set; }
+
+        /// <summary>
+        /// The zero-based visible column index of the currently focused cell.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>-1</c>. Supports two-way binding (<c>@bind-FocusedColumnIndex</c>) when <see cref="KeyboardNavigationEnabled"/> is <c>true</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public int FocusedColumnIndex { get; set; } = -1;
+
+        /// <summary>
+        /// Occurs when <see cref="FocusedColumnIndex"/> has changed.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public EventCallback<int> FocusedColumnIndexChanged { get; set; }
+
+        /// <summary>
         /// Allows grouping of columns in this grid.
         /// </summary>
         /// <remarks>
@@ -2205,7 +2254,7 @@ namespace Vek
 
         private async Task OnFocusedRowIndexChangedAsync(ParameterChangedEventArgs<int> args)
         {
-            if (!_focusedRowEnabledState.Value)
+            if (!_focusedRowEnabledState.Value && !_keyboardNavigationEnabledState.Value)
             {
                 return;
             }
@@ -2232,9 +2281,14 @@ namespace Vek
             }
         }
 
+        private Task OnFocusedColumnIndexChangedAsync(ParameterChangedEventArgs<int> args)
+        {
+            return Task.CompletedTask;
+        }
+
         private async Task OnFocusedItemChangedAsync(ParameterChangedEventArgs<T?> args)
         {
-            if (!_focusedRowEnabledState.Value)
+            if (!_focusedRowEnabledState.Value && !_keyboardNavigationEnabledState.Value)
             {
                 return;
             }
@@ -2279,7 +2333,7 @@ namespace Vek
         /// <param name="autoScroll">Whether to scroll the newly focused row into view.</param>
         public async Task SetFocusedRowIndexAsync(int index, bool autoScroll = true)
         {
-            if (!_focusedRowEnabledState.Value)
+            if (!_focusedRowEnabledState.Value && !_keyboardNavigationEnabledState.Value)
             {
                 return;
             }
@@ -2329,7 +2383,7 @@ namespace Vek
         /// <param name="autoScroll">Whether to scroll the newly focused row into view.</param>
         public async Task SetFocusedItemAsync(T? item, bool autoScroll = true)
         {
-            if (!_focusedRowEnabledState.Value)
+            if (!_focusedRowEnabledState.Value && !_keyboardNavigationEnabledState.Value)
             {
                 return;
             }
@@ -2363,7 +2417,7 @@ namespace Vek
         /// <param name="autoScroll">Whether to scroll the newly focused row into view.</param>
         public async Task SetFocusedRowAsync(int index, T? item, bool autoScroll = true)
         {
-            if (!_focusedRowEnabledState.Value)
+            if (!_focusedRowEnabledState.Value && !_keyboardNavigationEnabledState.Value)
             {
                 return;
             }
@@ -2387,6 +2441,128 @@ namespace Vek
 
             await InvokeAsync(StateHasChanged);
         }
+
+        /// <summary>
+        /// Sets the active focused cell by row and visible column indices.
+        /// </summary>
+        /// <param name="rowIndex">The zero-based visible row index.</param>
+        /// <param name="columnIndex">The zero-based visible column index.</param>
+        /// <param name="autoScroll">Whether to scroll the focused row into view.</param>
+        public async Task SetFocusedCellAsync(int rowIndex, int columnIndex, bool autoScroll = true)
+        {
+            if (!_keyboardNavigationEnabledState.Value && !_focusedRowEnabledState.Value)
+            {
+                return;
+            }
+
+            var visibleItems = GetVisibleRowItems();
+            var visibleColumnCount = GetVisibleColumnCount();
+            if (visibleItems.Count == 0 || visibleColumnCount == 0)
+            {
+                return;
+            }
+
+            var targetRow = Math.Clamp(rowIndex, 0, visibleItems.Count - 1);
+            var targetColumn = Math.Clamp(columnIndex, 0, visibleColumnCount - 1);
+            var previousRowIndex = _focusedRowIndexState.Value;
+            var previousItem = _focusedItemState.Value;
+            var targetItem = visibleItems[targetRow];
+            var comparer = Comparer ?? EqualityComparer<T>.Default;
+
+            await _focusedRowIndexState.SetValueAsync(targetRow);
+            await _focusedColumnIndexState.SetValueAsync(targetColumn);
+            await _focusedItemState.SetValueAsync(targetItem);
+
+            if (previousRowIndex != targetRow || !comparer.Equals(previousItem, targetItem))
+            {
+                await FocusedRowChanged.InvokeAsync(new DataGridFocusedRowChangedEventArgs<T>(targetItem, targetRow, previousItem, previousRowIndex));
+            }
+
+            if (autoScroll && _autoScrollToFocusedRowState.Value)
+            {
+                await ScrollToFocusedRowAsync(targetRow);
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
+
+        /// <summary>
+        /// Checks whether the cell at the specified visible row and column coordinates currently holds keyboard focus.
+        /// </summary>
+        /// <param name="rowIndex">The zero-based visible row index.</param>
+        /// <param name="columnIndex">The zero-based visible column index.</param>
+        /// <returns><c>true</c> if the cell is focused; otherwise, <c>false</c>.</returns>
+        public bool IsCellFocused(int rowIndex, int columnIndex)
+        {
+            if (!_keyboardNavigationEnabledState.Value)
+            {
+                return false;
+            }
+
+            var activeRow = GetEffectiveFocusedRowIndex();
+            var activeColumn = GetEffectiveFocusedColumnIndex();
+            return activeRow >= 0 && activeColumn >= 0 && rowIndex == activeRow && columnIndex == activeColumn;
+        }
+
+        internal int GetVisibleColumnCount()
+        {
+            var count = 0;
+            foreach (var column in RenderedColumns)
+            {
+                if (!column.HiddenState.Value)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        internal int GetEffectiveFocusedRowIndex()
+        {
+            var count = GetVisibleRowItems().Count;
+            if (count == 0)
+            {
+                return -1;
+            }
+
+            var index = _focusedRowIndexState.Value;
+            return index < 0 ? 0 : Math.Clamp(index, 0, count - 1);
+        }
+
+        internal int GetEffectiveFocusedColumnIndex()
+        {
+            var count = GetVisibleColumnCount();
+            if (count == 0)
+            {
+                return -1;
+            }
+
+            var index = _focusedColumnIndexState.Value;
+            return index < 0 ? 0 : Math.Clamp(index, 0, count - 1);
+        }
+
+        internal string GetCellId(int rowIndex, int columnIndex) => $"{_gridId}_cell_{rowIndex}_{columnIndex}";
+
+        internal string? GetCellAriaSelected(T item, bool cellSelected)
+        {
+            if (_selectionModeState.Value == DataGridSelectionMode.CellRange)
+            {
+                return cellSelected ? "true" : "false";
+            }
+
+            if (_keyboardNavigationEnabledState.Value &&
+                GetSelectColumn() is null &&
+                !IsRowSelectionDisabled(item) &&
+                (Selection.Contains(item) || (SelectionChangeable && (SelectOnRowClick || MultiSelection))))
+            {
+                return Selection.Contains(item) ? "true" : "false";
+            }
+
+            return null;
+        }
+
+        internal Task NotifyStateChangedAsync() => InvokeAsync(StateHasChanged);
 
         /// <summary>
         /// Checks whether the row representing the given item and index is currently focused.
@@ -2455,7 +2631,7 @@ namespace Vek
 
         internal async Task ScrollToFocusedRowAsync(int index)
         {
-            if (index < 0 || !_autoScrollToFocusedRowState.Value || !_focusedRowEnabledState.Value)
+            if (index < 0 || !_autoScrollToFocusedRowState.Value || (!_focusedRowEnabledState.Value && !_keyboardNavigationEnabledState.Value))
             {
                 return;
             }
@@ -2507,10 +2683,16 @@ namespace Vek
                     if (_cellSelectionModel.MoveActiveCell(rowDelta, columnDelta, visibleRows.Count, visibleColumns) is { } range)
                     {
                         await _selectedCellRangeState.SetValueAsync(range);
+                        await InvokeAsync(StateHasChanged);
                     }
 
                     return;
                 }
+            }
+
+            if (_keyboardNavigationEnabledState.Value && await KeyboardHandler.HandleKeyDownAsync(args))
+            {
+                return;
             }
 
             if (_focusedRowEnabledState.Value)
@@ -2581,9 +2763,28 @@ namespace Vek
             return _selectionModeState.Value == DataGridSelectionMode.CellRange && _cellSelectionModel.IsActive(rowIndex, columnIndex);
         }
 
-        internal string? ActiveCellId => _cellSelectionModel.Range is { } range
-            ? $"{_gridId}_cell_{range.EndRow}_{range.EndColumn}"
-            : null;
+        internal string? ActiveCellId
+        {
+            get
+            {
+                if (_selectionModeState.Value == DataGridSelectionMode.CellRange && _cellSelectionModel.Range is { } range)
+                {
+                    return GetCellId(range.EndRow, range.EndColumn);
+                }
+
+                if (_keyboardNavigationEnabledState.Value)
+                {
+                    var activeRow = GetEffectiveFocusedRowIndex();
+                    var activeColumn = GetEffectiveFocusedColumnIndex();
+                    if (activeRow >= 0 && activeColumn >= 0)
+                    {
+                        return GetCellId(activeRow, activeColumn);
+                    }
+                }
+
+                return null;
+            }
+        }
 
         internal (double Sum, double Average, int NumericCount, int CellCount) GetCellRangeSummary()
         {
@@ -3624,7 +3825,7 @@ namespace Vek
         internal async Task OnRowClickedAsync(MouseEventArgs args, T item, int rowIndex)
         {
             await RowClick.InvokeAsync(new DataGridRowClickEventArgs<T>(args, item, rowIndex));
-            if (_focusedRowEnabledState.Value)
+            if (_focusedRowEnabledState.Value || _keyboardNavigationEnabledState.Value)
             {
                 await SetFocusedRowAsync(rowIndex, item);
             }
@@ -3653,6 +3854,11 @@ namespace Vek
                 _cellRangePointerGesture = false;
             }
 
+            if (_keyboardNavigationEnabledState.Value)
+            {
+                await SetFocusedCellAsync(rowIndex, columnIndex);
+            }
+
             await CellClick.InvokeAsync(new DataGridCellClickEventArgs<T>(args, item, rowIndex, columnIndex, column));
             await ActivateRowBehaviorsAsync(item, selectRow: _selectionModeState.Value != DataGridSelectionMode.CellRange);
         }
@@ -3665,7 +3871,8 @@ namespace Vek
         /// </summary>
         private async Task ActivateRowBehaviorsAsync(T item, bool selectRow = true)
         {
-            if (_focusedRowEnabledState.Value && (_focusedItemState.Value is null || !EqualityComparer<T?>.Default.Equals(_focusedItemState.Value, item)))
+            if ((_focusedRowEnabledState.Value || _keyboardNavigationEnabledState.Value) &&
+                (_focusedItemState.Value is null || !EqualityComparer<T?>.Default.Equals(_focusedItemState.Value, item)))
             {
                 await SetFocusedItemAsync(item);
             }
@@ -3692,7 +3899,7 @@ namespace Vek
         // The lambdas live in their own methods because the compiler allocates a closure on entry to whichever method
         // declares one, even when the branch that needs it is never taken.
         private EventCallback<MouseEventArgs> GetCellClickCallback(T item, int rowIndex, int colIndex, Column<T> column)
-            => CellClick.HasDelegate || _selectionModeState.Value == DataGridSelectionMode.CellRange
+            => CellClick.HasDelegate || _selectionModeState.Value == DataGridSelectionMode.CellRange || _keyboardNavigationEnabledState.Value
                 ? CreateCellClickCallback(item, rowIndex, colIndex, column)
                 : default;
 
@@ -3954,7 +4161,10 @@ namespace Vek
         public async Task CancelEditingItemAsync()
         {
             EditingCanceledEvent?.Invoke();
-            await CanceledEditingItem.InvokeAsync(_editingItem);
+            var canceledItem = !EqualityComparer<T?>.Default.Equals(_editingItem, default)
+                ? _editingItem
+                : _editingSourceItem;
+            await CanceledEditingItem.InvokeAsync(canceledItem);
             ClearEditingItem();
             _isEditFormOpen = false;
         }
