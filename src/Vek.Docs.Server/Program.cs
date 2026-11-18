@@ -4,6 +4,7 @@ using Vek.Docs.Services;
 using Vek.Docs.Services.Notifications;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseStaticWebAssets();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

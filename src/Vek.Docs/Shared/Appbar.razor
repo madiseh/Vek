@@ -19,55 +19,52 @@
     <NavLink ActiveClass="d-flex align-center me-4" href="/">
         <VekLogo Class="docs-vek-logo" />
         <VekText Color="Color.Primary" Typo="Typo.h5" Class="docs-brand-text">Vek</VekText>
+        <span class="vek-chip vek-chip-outlined vek-chip-size-small ms-2 py-0 px-2" style="font-size: 0.72rem; font-weight: 600; border-radius: 9999px; border-color: var(--vek-palette-primary); color: var(--vek-palette-primary);">v1.0</span>
     </NavLink>
     <VekButton Href="/getting-started/installation" Color="Color.Inherit" Variant="Variant.Text" Class="@GetActiveClass(DocsBasePage.GettingStarted)">Get Started</VekButton>
-    <VekButton Href="/docs/overview" Color="Color.Inherit" Variant="Variant.Text" Class="@GetActiveClass(DocsBasePage.Docs)">Docs</VekButton>
-    <VekButton Href="/vek/project/team" Color="Color.Inherit" Variant="Variant.Text" Class="@GetActiveClass(DocsBasePage.DiscoverMore)">Learn More</VekButton>
-    <VekMenu Color="Color.Inherit" Variant="Variant.Text" Class="mx-1 px-3" PopoverClass="docs-layout-menu-shadow" ListClass="d-flex px-4 pb-2 docs-appbar-special-menu" LockScroll="true" Label="Projects" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+    <VekButton Href="/docs/overview" Color="Color.Inherit" Variant="Variant.Text" Class="@GetActiveClass(DocsBasePage.Docs)">Components</VekButton>
+    <VekButton Href="/api" Color="Color.Inherit" Variant="Variant.Text" Class="mx-1 px-3">API</VekButton>
+    <VekButton Href="/features/break-points" Color="Color.Inherit" Variant="Variant.Text" Class="mx-1 px-3">Features</VekButton>
+    <VekButton Href="/vek/project/releases" Color="Color.Inherit" Variant="Variant.Text" Class="mx-1 px-3">Releases</VekButton>
+    <VekMenu Color="Color.Inherit" Variant="Variant.Text" Class="mx-1 px-3" PopoverClass="docs-layout-menu-shadow" ListClass="d-flex px-4 pb-2 docs-appbar-special-menu" LockScroll="true" Label="Resources" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
         <VekList T="string">
             <VekListItem Href="/vek/introduction">
                 <div class="d-flex">
-                    <VekText Color="Color.Primary">Vek</VekText>
+                    <VekText Color="Color.Primary">About Vek</VekText>
                 </div>
-                <VekText Typo="Typo.body2">What is Vek?</VekText>
+                <VekText Typo="Typo.body2">Vision & Architecture</VekText>
             </VekListItem>
-            <VekListItem Href="https://github.com/madiseh/vek/">
+            <VekListItem Href="/vek/project/roadmap">
                 <div class="d-flex">
-                    <VekText Color="Color.Primary">Try</VekText><VekText>Vek</VekText>
+                    <VekText>Roadmap</VekText>
                 </div>
-                <VekText Typo="Typo.body2">Online code editor with Blazor</VekText>
+                <VekText Typo="Typo.body2">Upcoming releases & features</VekText>
             </VekListItem>
-            <VekListItem Href="https://github.com/Vek/ThemeManager">
+            <VekListItem Href="/vek/community/getting-help">
                 <div class="d-flex">
-                    <VekText>Theme</VekText><VekText Color="Color.Secondary">Manager</VekText>
+                    <VekText>Community</VekText>
                 </div>
-                <VekText Typo="Typo.body2">Manage your theme live in your app</VekText>
-            </VekListItem>
-            <VekListItem Href="https://github.com/Vek/Templates">
-                <div class="d-flex">
-                    <VekText>Templates</VekText>
-                </div>
-                <VekText Typo="Typo.body2">Blazor templates with Vek</VekText>
+                <VekText Typo="Typo.body2">Discussions and getting help</VekText>
             </VekListItem>
         </VekList>
         <VekList T="string" Class="relative">
-            <VekListItem Href="https://github.com/madiseh/vek.Icons">
+            <VekListItem Href="https://github.com/madiseh/vek" Target="_blank">
                 <div class="d-flex">
-                    <VekText>Icon Pack</VekText>
+                    <VekText>GitHub Repository</VekText>
                 </div>
-                <VekText Typo="Typo.body2">Extra Material icons and symbols</VekText>
+                <VekText Typo="Typo.body2">Source code, issues & PRs</VekText>
             </VekListItem>
-            <VekListItem Href="https://github.com/Vek/Translations">
+            <VekListItem Href="https://www.nuget.org/packages/Vek" Target="_blank">
                 <div class="d-flex">
-                    <VekText>Translations</VekText>
+                    <VekText Color="Color.Secondary">NuGet Package</VekText>
                 </div>
-                <VekText Typo="Typo.body2">Support for additional locales</VekText>
+                <VekText Typo="Typo.body2">Latest release downloads</VekText>
             </VekListItem>
-            <VekListItem Href="/vek/community/extensions">
+            <VekListItem Href="/vek/community/contribution">
                 <div class="d-flex">
-                    <VekText Color="Color.Warning">Extensions</VekText>
+                    <VekText Color="Color.Success">Contribute</VekText>
                 </div>                
-                <VekText Typo="Typo.body2">Community Extensions</VekText>
+                <VekText Typo="Typo.body2">How to contribute to Vek</VekText>
             </VekListItem>
         </VekList>
     </VekMenu>
