@@ -3,6 +3,21 @@
 All notable changes to Vek will be documented in this file.
 For GitHub Releases and downloadable packages, see the [Releases page](https://github.com/madiseh/Vek/releases).
 
+## [v1.1.0] - 2026-11-19
+
+> Vek v1.1.0 adds comprehensive keyboard navigation and accessibility support for DataGrid, plus configurable custom grouping intervals.
+
+### ⌨️ DataGrid Keyboard Navigation & Accessibility
+- Added WAI-ARIA grid keyboard navigation with roving focus, grid boundary navigation, paging, editing and selection shortcuts, and natural Tab exit.
+- Added focused-cell state and accessible grid roles, active-descendant tracking, and selected-state reporting.
+- Added an interactive documentation example. ([PR #22](https://github.com/madiseh/Vek/pull/22))
+
+### 🗓️ Custom DataGrid Group Intervals
+- Added date-based year, month, quarter, and alphabetic intervals, configurable numeric intervals, and custom group-key calculators.
+- Rebuilds group definitions when interval parameters change and documents the feature with an interactive example. ([PR #23](https://github.com/madiseh/Vek/pull/23))
+
+---
+
 ## [v1.0.5] - 2026-11-18
 
 > Vek v1.0.5 introduces DataGrid cell range and multi-cell selection, focused row and active keyboard navigation, a major documentation overhaul with a modern bento hero and glassmorphism styling, component architecture reorganization into functional subfolders, and completion of the 100-feature migration catalog.
