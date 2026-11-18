@@ -81,6 +81,11 @@ namespace Vek
         private readonly ParameterState<int> _focusedRowIndexState;
         private readonly ParameterState<T?> _focusedItemState;
         private readonly ParameterState<bool> _autoScrollToFocusedRowState;
+        private readonly ParameterState<DataGridSelectionMode> _selectionModeState;
+        private readonly ParameterState<DataGridCellRange?> _selectedCellRangeState;
+        private readonly DataGridCellSelectionModel _cellSelectionModel = new();
+        private bool _isDraggingCellRange;
+        private bool _cellRangePointerGesture;
         private readonly string _gridId = Identifier.Create("vek_datagrid_");
 
         /// <summary>
@@ -190,6 +195,14 @@ namespace Vek
 
             _autoScrollToFocusedRowState = registerScope.RegisterParameter<bool>(nameof(AutoScrollToFocusedRow))
                 .WithParameter(() => AutoScrollToFocusedRow);
+
+            _selectionModeState = registerScope.RegisterParameter<DataGridSelectionMode>(nameof(SelectionMode))
+                .WithParameter(() => SelectionMode);
+
+            _selectedCellRangeState = registerScope.RegisterParameter<DataGridCellRange?>(nameof(SelectedCellRange))
+                .WithParameter(() => SelectedCellRange)
+                .WithEventCallback(() => SelectedCellRangeChanged)
+                .WithChangeHandler(OnSelectedCellRangeChangedAsync);
         }
 
         protected string Classname =>
@@ -1605,6 +1618,33 @@ namespace Vek
         public T? SelectedItem { get; set; }
 
         /// <summary>
+        /// Determines whether the grid selects rows or rectangular cell ranges.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="DataGridSelectionMode.Row"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Selecting)]
+        public DataGridSelectionMode SelectionMode { get; set; }
+
+        /// <summary>
+        /// The rectangular cell range currently selected by the user.
+        /// </summary>
+        /// <remarks>
+        /// Coordinates are zero-based within the visible data rows and rendered columns. This parameter is used when <see cref="SelectionMode"/> is <see cref="DataGridSelectionMode.CellRange"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Selecting)]
+        public DataGridCellRange? SelectedCellRange { get; set; }
+
+        /// <summary>
+        /// Occurs when <see cref="SelectedCellRange"/> changes.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Selecting)]
+        public EventCallback<DataGridCellRange?> SelectedCellRangeChanged { get; set; }
+
+        /// <summary>
         /// Enables dedicated row focus tracking and keyboard navigation.
         /// </summary>
         /// <remarks>
@@ -2072,10 +2112,11 @@ namespace Vek
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var sortModeBefore = SortMode;
+            var hasSortModeParameter = parameters.TryGetValue(nameof(SortMode), out SortMode sortMode);
             await base.SetParametersAsync(parameters);
 
             VirtualItemsProviderInitialize();
-            if (_isFirstRendered && parameters.TryGetValue(nameof(SortMode), out SortMode sortMode) && sortMode != sortModeBefore)
+            if (_isFirstRendered && hasSortModeParameter && sortMode != sortModeBefore)
                 await ClearCurrentSortings();
         }
 
@@ -2439,12 +2480,155 @@ namespace Vek
 
         internal async Task OnKeyDownAsync(KeyboardEventArgs args)
         {
-            if (!_focusedRowEnabledState.Value)
+            if (_selectionModeState.Value == DataGridSelectionMode.CellRange && args.ShiftKey)
+            {
+                var rowDelta = args.Key switch
+                {
+                    "ArrowDown" => 1,
+                    "ArrowUp" => -1,
+                    _ => 0
+                };
+                var columnDelta = args.Key switch
+                {
+                    "ArrowRight" => 1,
+                    "ArrowLeft" => -1,
+                    _ => 0
+                };
+
+                if (rowDelta != 0 || columnDelta != 0)
+                {
+                    var visibleRows = GetVisibleRowItems();
+                    var visibleColumns = RenderedColumns.Count;
+                    if (_cellSelectionModel.Range is null && visibleRows.Count > 0 && visibleColumns > 0)
+                    {
+                        _cellSelectionModel.BeginAt(Math.Clamp(_focusedRowIndexState.Value, 0, visibleRows.Count - 1), 0);
+                    }
+
+                    if (_cellSelectionModel.MoveActiveCell(rowDelta, columnDelta, visibleRows.Count, visibleColumns) is { } range)
+                    {
+                        await _selectedCellRangeState.SetValueAsync(range);
+                    }
+
+                    return;
+                }
+            }
+
+            if (_focusedRowEnabledState.Value)
+            {
+                await FocusManager.HandleKeyDownAsync(args);
+            }
+        }
+
+        internal async Task OnCellMouseDownAsync(MouseEventArgs args, int rowIndex, int columnIndex)
+        {
+            if (_selectionModeState.Value != DataGridSelectionMode.CellRange)
             {
                 return;
             }
 
-            await FocusManager.HandleKeyDownAsync(args);
+            _isDraggingCellRange = true;
+            _cellRangePointerGesture = true;
+            var range = _cellSelectionModel.SetCell(rowIndex, columnIndex, args.ShiftKey);
+            await _selectedCellRangeState.SetValueAsync(range);
+        }
+
+        internal async Task OnCellMouseEnterAsync(int rowIndex, int columnIndex)
+        {
+            if (!_isDraggingCellRange || _selectionModeState.Value != DataGridSelectionMode.CellRange)
+            {
+                return;
+            }
+
+            var range = _cellSelectionModel.SetCell(rowIndex, columnIndex, extend: true);
+            await _selectedCellRangeState.SetValueAsync(range);
+        }
+
+        internal void OnCellMouseUp()
+        {
+            _isDraggingCellRange = false;
+        }
+
+        private EventCallback<MouseEventArgs> GetCellMouseDownCallback(int rowIndex, int columnIndex)
+            => _selectionModeState.Value == DataGridSelectionMode.CellRange
+                ? EventCallback.Factory.Create<MouseEventArgs>(this, args => OnCellMouseDownAsync(args, rowIndex, columnIndex))
+                : default;
+
+        private EventCallback<MouseEventArgs> GetCellMouseEnterCallback(int rowIndex, int columnIndex)
+            => _selectionModeState.Value == DataGridSelectionMode.CellRange
+                ? EventCallback.Factory.Create<MouseEventArgs>(this, () => OnCellMouseEnterAsync(rowIndex, columnIndex))
+                : default;
+
+        private EventCallback<MouseEventArgs> GetCellMouseUpCallback()
+            => _selectionModeState.Value == DataGridSelectionMode.CellRange
+                ? EventCallback.Factory.Create<MouseEventArgs>(this, OnCellMouseUp)
+                : default;
+
+        private Task OnSelectedCellRangeChangedAsync(ParameterChangedEventArgs<DataGridCellRange?> args)
+        {
+            _cellSelectionModel.SetRange(args.Value);
+            _isDraggingCellRange = false;
+            return Task.CompletedTask;
+        }
+
+        internal bool IsCellSelected(int rowIndex, int columnIndex)
+        {
+            return _selectionModeState.Value == DataGridSelectionMode.CellRange &&
+                   _selectedCellRangeState.Value?.Contains(rowIndex, columnIndex) == true;
+        }
+
+        internal bool IsActiveCell(int rowIndex, int columnIndex)
+        {
+            return _selectionModeState.Value == DataGridSelectionMode.CellRange && _cellSelectionModel.IsActive(rowIndex, columnIndex);
+        }
+
+        internal string? ActiveCellId => _cellSelectionModel.Range is { } range
+            ? $"{_gridId}_cell_{range.EndRow}_{range.EndColumn}"
+            : null;
+
+        internal (double Sum, double Average, int NumericCount, int CellCount) GetCellRangeSummary()
+        {
+            if (_selectionModeState.Value != DataGridSelectionMode.CellRange || _selectedCellRangeState.Value is not { } range)
+            {
+                return (0, 0, 0, 0);
+            }
+
+            var rows = GetVisibleRowItems();
+            var columns = RenderedColumns;
+            var sum = 0d;
+            var numericCount = 0;
+            for (var rowIndex = range.MinRow; rowIndex <= range.MaxRow && rowIndex < rows.Count; rowIndex++)
+            {
+                if (rowIndex < 0)
+                {
+                    continue;
+                }
+
+                for (var columnIndex = range.MinColumn; columnIndex <= range.MaxColumn && columnIndex < columns.Count; columnIndex++)
+                {
+                    if (columnIndex < 0 || !TypeIdentifier.IsNumber(columns[columnIndex].PropertyType))
+                    {
+                        continue;
+                    }
+
+                    var value = columns[columnIndex].PropertyFunc(rows[rowIndex]);
+                    if (value is null)
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        sum += Convert.ToDouble(value, CultureInfo.InvariantCulture);
+                        numericCount++;
+                    }
+                    catch (Exception exception) when (exception is FormatException or InvalidCastException or OverflowException)
+                    {
+                        // Non-convertible numeric values do not contribute to the aggregate.
+                    }
+                }
+            }
+
+            return (sum, numericCount == 0 ? 0 : sum / numericCount, numericCount, range.CellCount);
         }
 
         /// <summary>
@@ -3444,7 +3628,7 @@ namespace Vek
             {
                 await SetFocusedRowAsync(rowIndex, item);
             }
-            await ActivateRowBehaviorsAsync(item);
+            await ActivateRowBehaviorsAsync(item, selectRow: _selectionModeState.Value != DataGridSelectionMode.CellRange);
         }
 
         internal Task OnContextMenuClickedAsync(MouseEventArgs args, T item, int rowIndex)
@@ -3458,8 +3642,19 @@ namespace Vek
             // (OnRowClickedAsync), so we share the same row behaviors via ActivateRowBehaviorsAsync.
             // RowClick is intentionally not raised here; whether it should fire on a cell click
             // is an explicit API decision.
+            if (_selectionModeState.Value == DataGridSelectionMode.CellRange)
+            {
+                if (!_cellRangePointerGesture)
+                {
+                    var range = _cellSelectionModel.SetCell(rowIndex, columnIndex, args.ShiftKey);
+                    await _selectedCellRangeState.SetValueAsync(range);
+                }
+
+                _cellRangePointerGesture = false;
+            }
+
             await CellClick.InvokeAsync(new DataGridCellClickEventArgs<T>(args, item, rowIndex, columnIndex, column));
-            await ActivateRowBehaviorsAsync(item);
+            await ActivateRowBehaviorsAsync(item, selectRow: _selectionModeState.Value != DataGridSelectionMode.CellRange);
         }
 
         /// <summary>
@@ -3468,7 +3663,7 @@ namespace Vek
         /// Both <see cref="OnRowClickedAsync"/> and <see cref="OnCellClickedAsync"/> delegate here
         /// so that new row-click behaviors only need to be added in one place.
         /// </summary>
-        private async Task ActivateRowBehaviorsAsync(T item)
+        private async Task ActivateRowBehaviorsAsync(T item, bool selectRow = true)
         {
             if (_focusedRowEnabledState.Value && (_focusedItemState.Value is null || !EqualityComparer<T?>.Default.Equals(_focusedItemState.Value, item)))
             {
@@ -3483,7 +3678,10 @@ namespace Vek
                     await SetEditingItemAsync(item);
             }
 
-            await SetSelectedItemAsync(item);
+            if (selectRow)
+            {
+                await SetSelectedItemAsync(item);
+            }
         }
 
         internal Task OnCellContextMenuClickedAsync(MouseEventArgs args, T item, int rowIndex, int columnIndex, Column<T> column)
@@ -3494,7 +3692,7 @@ namespace Vek
         // The lambdas live in their own methods because the compiler allocates a closure on entry to whichever method
         // declares one, even when the branch that needs it is never taken.
         private EventCallback<MouseEventArgs> GetCellClickCallback(T item, int rowIndex, int colIndex, Column<T> column)
-            => CellClick.HasDelegate
+            => CellClick.HasDelegate || _selectionModeState.Value == DataGridSelectionMode.CellRange
                 ? CreateCellClickCallback(item, rowIndex, colIndex, column)
                 : default;
 

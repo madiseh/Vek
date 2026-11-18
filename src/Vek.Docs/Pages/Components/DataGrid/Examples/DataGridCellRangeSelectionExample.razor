@@ -1,0 +1,28 @@
+@namespace Vek.Docs.Examples
+
+<VekDataGrid T="QuarterlySales" Items="Sales" SelectionMode="DataGridSelectionMode.CellRange" @bind-SelectedCellRange="_selectedCellRange">
+    <Columns>
+        <PropertyColumn Property="item => item.Team" Title="Team" />
+        <PropertyColumn Property="item => item.January" Title="January" />
+        <PropertyColumn Property="item => item.February" Title="February" />
+        <PropertyColumn Property="item => item.March" Title="March" />
+    </Columns>
+</VekDataGrid>
+
+<VekText Typo="Typo.body2" Class="mt-2">
+    Select a cell, then hold Shift and use the arrow keys to extend the range. You can also drag across cells.
+</VekText>
+
+@code {
+    private readonly List<QuarterlySales> Sales =
+    [
+        new("North", 1250, 1480, 1375),
+        new("Central", 980, 1120, 1260),
+        new("South", 1540, 1390, 1610),
+        new("West", 1180, 1325, 1450)
+    ];
+
+    private DataGridCellRange? _selectedCellRange;
+
+    private sealed record QuarterlySales(string Team, int January, int February, int March);
+}
