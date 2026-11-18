@@ -146,6 +146,7 @@ Vek's visual language is powered by a modern, CSS-variable-driven design system.
 ### Core Principles
 - **No Hard-Coded Colors**: All colors, backgrounds, borders, shadows, and radii are sourced from CSS custom properties (`var(--vek-palette-...)`).
 - **Dynamic Theming**: Light and Dark mode switching is accomplished purely via CSS custom properties and theme attributes without requiring full component re-rendering.
+- **Docs Design System & Typography**: The documentation website (`Vek.Docs`) adheres to a high-contrast modern developer aesthetic pairing **Plus Jakarta Sans** (headings, UI) with **JetBrains Mono** (code snippets, CLI prompts, tabular metrics), and an Electric Cobalt (`#2563EB`) / Sky Cyan (`#0EA5E9`) accent palette over Deep Obsidian (`#0B0F17`) dark canvases.
 - **Fluent Builders**:
   - `CssBuilder`: Used to fluently assemble CSS classes, conditionally toggle modifier classes, and merge caller-supplied classes.
   - `StyleBuilder`: Used to construct clean inline style strings, CSS custom property overrides, and dimensions.

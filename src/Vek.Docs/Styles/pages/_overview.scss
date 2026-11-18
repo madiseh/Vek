@@ -5,24 +5,26 @@
 }
 
 .explore-card {
-  transition: all .2s ease-in;
+  height: 157px;
+  width: 157px;
+  border-radius: var(--vek-default-borderradius);
+  border: 1px solid var(--vek-palette-divider);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   @media(hover: hover) and (pointer: fine) {
     &:hover {
-      background-color: var(--vek-palette-primary-hover);
+      border-color: var(--vek-palette-primary);
+      background-color: var(--vek-palette-surface);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px -4px rgba(37, 99, 235, 0.15);
       cursor: pointer;
     }
   }
 
   &:active {
-    background-color: var(--vek-palette-primary-hover);
+    transform: translateY(0);
     cursor: pointer;
   }
-}
-
-.explore-card {
-  height: 157px;
-  width: 157px;
 }
 
 @media (max-width:600px) {
