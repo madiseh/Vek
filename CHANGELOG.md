@@ -3,6 +3,59 @@
 All notable changes to Vek will be documented in this file.
 For GitHub Releases and downloadable packages, see the [Releases page](https://github.com/madiseh/Vek/releases).
 
+## [v1.0.5] - 2026-11-18
+
+> Vek v1.0.5 introduces DataGrid cell range and multi-cell selection, focused row and active keyboard navigation, a major documentation overhaul with a modern bento hero and glassmorphism styling, component architecture reorganization into functional subfolders, and completion of the 100-feature migration catalog.
+
+### 🔲 DataGrid Cell Range Selection & Multi-Cell Selection
+- Added rectangular cell range selection (`DataGridCellRange`) with row/column boundary tracking (`StartRowIndex`, `EndRowIndex`, `StartColumnIndex`, `EndColumnIndex`).
+- Added `DataGridSelectionMode.Cell` and `DataGridSelectionMode.CellRange` supporting single-cell, multi-cell, and continuous rectangular cell selection.
+- Introduced `DataGridCellSelectionModel<T>` managing selected ranges and individual cell coordinates with shift-click range expansion.
+- Added interactive documentation example (`DataGridCellRangeSelectionExample`) and comprehensive bUnit test coverage (`DataGridCellRangeTests`).
+- Styled cell selection regions with subtle token-based selection fills and active range boundaries.
+
+### 🎯 DataGrid Focused Row & Keyboard Navigation
+- Added focused row selection with `FocusedRowEnabled="true"` and `FocusedRowIndex` two-way binding on `VekDataGrid<T>`.
+- Added `FocusedRowChanged` event callback with `DataGridFocusedRowChangedEventArgs<T>`.
+- Added programmatic focus management via `DataGridFocusManager<T>` (`FocusRowAsync`, `FocusNextRowAsync`, `FocusPreviousRowAsync`, `FocusFirstRowAsync`, `FocusLastRowAsync`).
+- Built-in ARIA keyboard navigation for row focus (Arrow Up, Arrow Down, Home, End).
+- Full NativeAOT / trimming compatibility with `[DynamicallyAccessedMembers]` annotations on focus types.
+- Visual styling with elevation, token-based outline, and active background tint.
+- Added interactive documentation example (`DataGridFocusedRowExample`) and comprehensive bUnit test suite (`DataGridFocusedRowTests`).
+
+### 🎨 Documentation Site Modernization & Bento Hero
+- Complete visual redesign of the Vek documentation portal featuring modern typography, refined palette, and glassmorphism appbar.
+- Rebuilt landing page with an interactive bento grid hero highlighting core framework capabilities and live component showcases.
+- Modernized section headers, cards, and theme presets.
+
+### 🏗️ Component Architecture & Functional Subfolders
+- Reorganized components into domain-driven subfolders across 12 component families for maintainability and scalability:
+  - **Table**: `Cells`, `Columns`, `Models`
+  - **Button**: `ButtonGroup`, `IconButton`, `MenuButton`, `ToggleIconButton`
+  - **Input**: `Adornments`, `Base`, `Debounced`, `Field`, `Masked`, `Numeric`, `Range`, `Selection`, `Text`
+  - **Tabs**: `Models`, `Parts`
+  - **Snackbar**: `Configuration`, `Models`, `Parts`
+  - **TreeView**: `Models`, `Parts`
+  - **Card**: `Parts`
+  - **Breadcrumbs**: `Models`, `Parts`
+  - **Stepper**: `Models`
+  - **NavMenu**: `Models`
+  - **Dialog**: `Models`
+  - **DropZone**: `Models`
+
+### 📚 DataGrid Documentation & Examples
+- Split legacy catch-all options into dedicated, focused interactive examples:
+  - `DataGridColGroupExample`: Demonstrating column group widths, styling, and multi-column span.
+  - `DataGridLoadingExample`: Demonstrating async reloads, `LoadingProgressColor`, and custom loading content templates.
+  - `DataGridFixedHeaderFooterExample`: Demonstrating viewport scrolling with sticky fixed headers and aggregate fixed footers.
+- Synchronized governance rules in `docs/governance/development-rules.md`.
+
+### 🔄 Autonomous Feature Migration Pipeline
+- Expanded upstream feature catalog to 100 comprehensive specifications across all core UI components.
+- Upgraded automated quality gate verification to full `dotnet format` checks in CI.
+
+---
+
 ## [v1.0.4] - 2026-11-17
 
 > Vek v1.0.4 introduces sticky fixed and pinned columns with dynamic drag pinning, an advanced filter row with type-safe comparison operators, a column chooser visibility dialog, and full orchestration for the autonomous feature migration pipeline.
