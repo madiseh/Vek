@@ -322,8 +322,8 @@ def verify_quality_gates(worktree_dir=ROOT_DIR):
     if not test_ok:
         return False, f"Tests failed:\n{err or out}"
 
-    # 3. Format
-    fmt_ok, out, err = run_cmd("cd src && dotnet format whitespace --folder --verify-no-changes", cwd=worktree_dir)
+    # 3. Format (full dotnet format covering whitespace, style, and analyzers)
+    fmt_ok, out, err = run_cmd("cd src && dotnet format --verify-no-changes --no-restore", cwd=worktree_dir)
     if not fmt_ok:
         return False, f"Formatting verification failed:\n{err or out}"
 
