@@ -255,6 +255,18 @@
       }
     }
   }
+
+  .vek-table-row.vek-table-row-focused {
+    background-color: var(--vek-palette-table-hover);
+    outline: 2px solid var(--vek-palette-primary);
+    outline-offset: -2px;
+    position: relative;
+    z-index: 1;
+
+    &:hover {
+      background-color: var(--vek-palette-table-hover);
+    }
+  }
 }
 
 @mixin datagrid-loading-display-smalldevices($breakpoint) {

@@ -100,7 +100,7 @@
       "title": "DataGrid Cell Range Selection and Multi-Cell Selection",
       "module": "DataGrid",
       "priority": 8,
-      "status": "backlog",
+      "status": "ready",
       "specification": "specifications/008-datagrid-cell-range-selection.md",
       "dependencies": [
         "009"
@@ -112,9 +112,12 @@
       "title": "DataGrid Focused Row and Keyboard Active Row Navigation",
       "module": "DataGrid",
       "priority": 9,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/009-datagrid-focused-row.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-18T07:58:47Z",
+      "completed_at": "2026-11-18T09:15:18Z",
+      "pr_url": "Fully documented pull request with verification summary and example usage."
     },
     {
       "id": "010",
@@ -122,7 +125,7 @@
       "title": "DataGrid Comprehensive ARIA Keyboard Navigation Matrix",
       "module": "DataGrid",
       "priority": 10,
-      "status": "backlog",
+      "status": "ready",
       "specification": "specifications/010-datagrid-keyboard-navigation.md",
       "dependencies": [
         "009"

@@ -4,7 +4,7 @@
 - **Feature ID**: 008
 - **Feature Slug**: datagrid-cell-range-selection
 - **Module**: DataGrid
-- **Status**: Backlog
+- **Status**: Ready
 - **Priority**: 8
 - **Dependencies**: ["009"]
 
