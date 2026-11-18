@@ -4,7 +4,7 @@
 - **Feature ID**: 010
 - **Feature Slug**: datagrid-keyboard-navigation
 - **Module**: DataGrid
-- **Status**: Backlog
+- **Status**: Ready
 - **Priority**: 10
 - **Dependencies**: ["009"]
 

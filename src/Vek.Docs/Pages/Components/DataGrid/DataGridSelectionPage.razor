@@ -36,5 +36,24 @@
             </SectionContent>
         </DocsPageSection>
 
+        <DocsPageSection>
+            <SectionHeader Title="Focused Row and Keyboard Navigation">
+                <Description>
+                    Enable <CodeInline>FocusedRowEnabled="true"</CodeInline> to track a dedicated active row focus independently of selection.<br><br>
+                    The focused row supports two-way binding via <CodeInline>@@bind-FocusedRowIndex</CodeInline> and <CodeInline>@@bind-FocusedItem</CodeInline>, as well as change notifications through <CodeInline>FocusedRowChanged</CodeInline>.<br><br>
+                    When focused row navigation is enabled, users can traverse rows using standard keyboard commands:
+                    <ul>
+                        <li><CodeInline>ArrowDown</CodeInline> / <CodeInline>ArrowUp</CodeInline>: Move focus to the adjacent next or previous row.</li>
+                        <li><CodeInline>PageDown</CodeInline> / <CodeInline>PageUp</CodeInline>: Jump down or up by the configured page size.</li>
+                        <li><CodeInline>Home</CodeInline> / <CodeInline>End</CodeInline>: Jump directly to the first or last row.</li>
+                    </ul>
+                    The grid automatically ensures the active row remains visible by scrolling it into view unless <CodeInline>AutoScrollToFocusedRow="false"</CodeInline> is configured.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridFocusedRowExample)" ShowCode="true" Block="true" FullWidth="true">
+                <DataGridFocusedRowExample />
+            </SectionContent>
+        </DocsPageSection>
+
     </DocsPageContent>
 </DocsPage>

@@ -36,6 +36,9 @@ namespace Vek
         [Inject]
         private IJSRuntime JSRuntime { get; set; } = null!;
 
+        [Inject]
+        private IScrollManager ScrollManager { get; set; } = null!;
+
         private VekForm? _editForm;
         internal int? _rowsPerPage;
         private int _currentPage = 0;
@@ -74,9 +77,22 @@ namespace Vek
         internal readonly ParameterState<int> _searchBoxInputDelayState;
         internal readonly ParameterState<string?> _searchBoxPlaceholderState;
         internal readonly ParameterState<bool> _highlightSearchResultsState;
+        private readonly ParameterState<bool> _focusedRowEnabledState;
+        private readonly ParameterState<int> _focusedRowIndexState;
+        private readonly ParameterState<T?> _focusedItemState;
+        private readonly ParameterState<bool> _autoScrollToFocusedRowState;
+        private readonly string _gridId = Identifier.Create("vek_datagrid_");
+
+        /// <summary>
+        /// Gets the manager responsible for focused row tracking and keyboard navigation.
+        /// </summary>
+        public DataGridFocusManager<T> FocusManager { get; }
 
         internal IReadOnlyList<string> CurrentSearchTokens { get; private set; } = Array.Empty<string>();
         internal ParameterState<bool> HighlightSearchResultsState => _highlightSearchResultsState;
+        internal bool HasFocusedRow => _focusedRowEnabledState.Value;
+        internal int CurrentFocusedIndex => _focusedRowIndexState.Value;
+        internal T? CurrentFocusedItem => _focusedItemState.Value;
 
         private const string PrePrefix = "__vek_dg_pre__:";
         private const string PostPrefix = "__vek_dg_post__:";
@@ -108,6 +124,7 @@ namespace Vek
             SelectedItems = new HashSet<T>(Comparer);
             _openHierarchies = new HashSet<T>(Comparer);
             _initialExpansions = new HashSet<T>(Comparer);
+            FocusManager = new DataGridFocusManager<T>(this);
             using var registerScope = CreateRegisterScope();
             registerScope.RegisterParameter<IEnumerable<T>?>(nameof(Items))
                 .WithParameter(() => Items)
@@ -157,6 +174,22 @@ namespace Vek
 
             _highlightSearchResultsState = registerScope.RegisterParameter<bool>(nameof(HighlightSearchResults))
                 .WithParameter(() => HighlightSearchResults);
+
+            _focusedRowEnabledState = registerScope.RegisterParameter<bool>(nameof(FocusedRowEnabled))
+                .WithParameter(() => FocusedRowEnabled);
+
+            _focusedRowIndexState = registerScope.RegisterParameter<int>(nameof(FocusedRowIndex))
+                .WithParameter(() => FocusedRowIndex)
+                .WithEventCallback(() => FocusedRowIndexChanged)
+                .WithChangeHandler(OnFocusedRowIndexChangedAsync);
+
+            _focusedItemState = registerScope.RegisterParameter<T?>(nameof(FocusedItem))
+                .WithParameter(() => FocusedItem)
+                .WithEventCallback(() => FocusedItemChanged)
+                .WithChangeHandler(OnFocusedItemChangedAsync);
+
+            _autoScrollToFocusedRowState = registerScope.RegisterParameter<bool>(nameof(AutoScrollToFocusedRow))
+                .WithParameter(() => AutoScrollToFocusedRow);
         }
 
         protected string Classname =>
@@ -1572,6 +1605,68 @@ namespace Vek
         public T? SelectedItem { get; set; }
 
         /// <summary>
+        /// Enables dedicated row focus tracking and keyboard navigation.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. When enabled, a single row can have active focus independent of selection,
+        /// navigable via keyboard arrow keys, Page Up/Down, Home, and End.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public bool FocusedRowEnabled { get; set; }
+
+        /// <summary>
+        /// The zero-based index of the currently focused row within the visible page or dataset.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>-1</c> (no row focused). Supports two-way binding (<c>@bind-FocusedRowIndex</c>).
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public int FocusedRowIndex { get; set; } = -1;
+
+        /// <summary>
+        /// Occurs when the <see cref="FocusedRowIndex"/> has changed.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public EventCallback<int> FocusedRowIndexChanged { get; set; }
+
+        /// <summary>
+        /// The data item corresponding to the currently focused row.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>default</c>. Supports two-way binding (<c>@bind-FocusedItem</c>).
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public T? FocusedItem { get; set; }
+
+        /// <summary>
+        /// Occurs when the <see cref="FocusedItem"/> has changed.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public EventCallback<T?> FocusedItemChanged { get; set; }
+
+        /// <summary>
+        /// Occurs when the focused row changes due to user interaction or programmatic update.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public EventCallback<DataGridFocusedRowChangedEventArgs<T>> FocusedRowChanged { get; set; }
+
+        /// <summary>
+        /// Automatically scrolls the focused row into view when focus changes.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>. Requires <see cref="FocusedRowEnabled"/> to be <c>true</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public bool AutoScrollToFocusedRow { get; set; } = true;
+
+        /// <summary>
         /// Allows grouping of columns in this grid.
         /// </summary>
         /// <remarks>
@@ -2065,6 +2160,291 @@ namespace Vek
                 _openHierarchies.Add(first);
                 await InvokeAsync(StateHasChanged);
             }
+        }
+
+        private async Task OnFocusedRowIndexChangedAsync(ParameterChangedEventArgs<int> args)
+        {
+            if (!_focusedRowEnabledState.Value)
+            {
+                return;
+            }
+
+            var newIndex = args.Value;
+            var visibleItems = GetVisibleRowItems();
+            if (newIndex >= 0 && newIndex < visibleItems.Count)
+            {
+                var targetItem = visibleItems[newIndex];
+                var comparer = Comparer ?? EqualityComparer<T>.Default;
+                if (!comparer.Equals(_focusedItemState.Value, targetItem))
+                {
+                    await _focusedItemState.SetValueAsync(targetItem);
+                }
+
+                if (_autoScrollToFocusedRowState.Value)
+                {
+                    await ScrollToFocusedRowAsync(newIndex);
+                }
+            }
+            else if (newIndex < 0 && _focusedItemState.Value is not null)
+            {
+                await _focusedItemState.SetValueAsync(default);
+            }
+        }
+
+        private async Task OnFocusedItemChangedAsync(ParameterChangedEventArgs<T?> args)
+        {
+            if (!_focusedRowEnabledState.Value)
+            {
+                return;
+            }
+
+            var newItem = args.Value;
+            if (newItem is null)
+            {
+                if (_focusedRowIndexState.Value != -1)
+                {
+                    await _focusedRowIndexState.SetValueAsync(-1);
+                }
+                return;
+            }
+
+            var visibleItems = GetVisibleRowItems();
+            var comparer = Comparer ?? EqualityComparer<T>.Default;
+            var newIndex = -1;
+            for (var i = 0; i < visibleItems.Count; i++)
+            {
+                if (comparer.Equals(visibleItems[i], newItem))
+                {
+                    newIndex = i;
+                    break;
+                }
+            }
+
+            if (_focusedRowIndexState.Value != newIndex)
+            {
+                await _focusedRowIndexState.SetValueAsync(newIndex);
+            }
+
+            if (newIndex >= 0 && _autoScrollToFocusedRowState.Value)
+            {
+                await ScrollToFocusedRowAsync(newIndex);
+            }
+        }
+
+        /// <summary>
+        /// Sets the focused row by index and optionally scrolls it into view.
+        /// </summary>
+        /// <param name="index">The zero-based row index to focus, or <c>-1</c> to clear focus.</param>
+        /// <param name="autoScroll">Whether to scroll the newly focused row into view.</param>
+        public async Task SetFocusedRowIndexAsync(int index, bool autoScroll = true)
+        {
+            if (!_focusedRowEnabledState.Value)
+            {
+                return;
+            }
+
+            var visibleItems = GetVisibleRowItems();
+            var count = visibleItems.Count;
+            var previousIndex = _focusedRowIndexState.Value;
+            var previousItem = _focusedItemState.Value;
+
+            if (index < 0 || index >= count)
+            {
+                await _focusedRowIndexState.SetValueAsync(-1);
+                await _focusedItemState.SetValueAsync(default);
+
+                if (previousIndex != -1 || previousItem is not null)
+                {
+                    await FocusedRowChanged.InvokeAsync(new DataGridFocusedRowChangedEventArgs<T>(default, -1, previousItem, previousIndex));
+                }
+
+                await InvokeAsync(StateHasChanged);
+                return;
+            }
+
+            var targetItem = visibleItems[index];
+            var comparer = Comparer ?? EqualityComparer<T>.Default;
+
+            await _focusedRowIndexState.SetValueAsync(index);
+            await _focusedItemState.SetValueAsync(targetItem);
+
+            if (previousIndex != index || !comparer.Equals(previousItem, targetItem))
+            {
+                await FocusedRowChanged.InvokeAsync(new DataGridFocusedRowChangedEventArgs<T>(targetItem, index, previousItem, previousIndex));
+            }
+
+            if (autoScroll && _autoScrollToFocusedRowState.Value)
+            {
+                await ScrollToFocusedRowAsync(index);
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
+
+        /// <summary>
+        /// Sets the focused row by item reference and optionally scrolls it into view.
+        /// </summary>
+        /// <param name="item">The item to focus, or <c>null</c> to clear focus.</param>
+        /// <param name="autoScroll">Whether to scroll the newly focused row into view.</param>
+        public async Task SetFocusedItemAsync(T? item, bool autoScroll = true)
+        {
+            if (!_focusedRowEnabledState.Value)
+            {
+                return;
+            }
+
+            if (item is null)
+            {
+                await SetFocusedRowIndexAsync(-1, false);
+                return;
+            }
+
+            var visibleItems = GetVisibleRowItems();
+            var comparer = Comparer ?? EqualityComparer<T>.Default;
+            var index = -1;
+            for (var i = 0; i < visibleItems.Count; i++)
+            {
+                if (comparer.Equals(visibleItems[i], item))
+                {
+                    index = i;
+                    break;
+                }
+            }
+
+            await SetFocusedRowAsync(index, item, autoScroll);
+        }
+
+        /// <summary>
+        /// Sets the focused row by both index and item reference.
+        /// </summary>
+        /// <param name="index">The zero-based row index.</param>
+        /// <param name="item">The data item.</param>
+        /// <param name="autoScroll">Whether to scroll the newly focused row into view.</param>
+        public async Task SetFocusedRowAsync(int index, T? item, bool autoScroll = true)
+        {
+            if (!_focusedRowEnabledState.Value)
+            {
+                return;
+            }
+
+            var previousIndex = _focusedRowIndexState.Value;
+            var previousItem = _focusedItemState.Value;
+            var comparer = Comparer ?? EqualityComparer<T>.Default;
+
+            await _focusedRowIndexState.SetValueAsync(index);
+            await _focusedItemState.SetValueAsync(item);
+
+            if (previousIndex != index || !comparer.Equals(previousItem, item))
+            {
+                await FocusedRowChanged.InvokeAsync(new DataGridFocusedRowChangedEventArgs<T>(item, index, previousItem, previousIndex));
+            }
+
+            if (autoScroll && index >= 0 && _autoScrollToFocusedRowState.Value)
+            {
+                await ScrollToFocusedRowAsync(index);
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
+
+        /// <summary>
+        /// Checks whether the row representing the given item and index is currently focused.
+        /// </summary>
+        /// <param name="item">The item to test.</param>
+        /// <param name="index">The row index to test.</param>
+        /// <returns><c>true</c> if the row is focused; otherwise, <c>false</c>.</returns>
+        public bool IsRowFocused(T? item, int index)
+        {
+            if (!_focusedRowEnabledState.Value)
+            {
+                return false;
+            }
+
+            if (_focusedRowIndexState.Value >= 0 && _focusedRowIndexState.Value == index && !IsGrouped)
+            {
+                return true;
+            }
+
+            if (_focusedItemState.Value is not null && item is not null)
+            {
+                var comparer = Comparer ?? EqualityComparer<T>.Default;
+                return comparer.Equals(_focusedItemState.Value, item);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks whether the specified item is currently focused.
+        /// </summary>
+        /// <param name="item">The item to test.</param>
+        /// <returns><c>true</c> if the item is focused; otherwise, <c>false</c>.</returns>
+        public bool IsRowFocused(T? item)
+        {
+            if (!_focusedRowEnabledState.Value || item is null || _focusedItemState.Value is null)
+            {
+                return false;
+            }
+
+            var comparer = Comparer ?? EqualityComparer<T>.Default;
+            return comparer.Equals(_focusedItemState.Value, item);
+        }
+
+        /// <summary>
+        /// Checks whether the specified visible row index is currently focused.
+        /// </summary>
+        /// <param name="index">The row index to test.</param>
+        /// <returns><c>true</c> if the index is focused; otherwise, <c>false</c>.</returns>
+        public bool IsIndexFocused(int index)
+        {
+            return _focusedRowEnabledState.Value && index >= 0 && _focusedRowIndexState.Value == index;
+        }
+
+        internal string GetRowId(int index) => $"{_gridId}_row_{index}";
+
+        internal IReadOnlyList<T> GetVisibleRowItems()
+        {
+            if (CurrentPageItems is IReadOnlyList<T> list)
+            {
+                return list;
+            }
+
+            return CurrentPageItems.ToList();
+        }
+
+        internal async Task ScrollToFocusedRowAsync(int index)
+        {
+            if (index < 0 || !_autoScrollToFocusedRowState.Value || !_focusedRowEnabledState.Value)
+            {
+                return;
+            }
+
+            try
+            {
+                var rowId = GetRowId(index);
+                if (Virtualize)
+                {
+                    await ScrollManager.ScrollToVirtualizedItemAsync(_gridId, index, ItemSize, rowId, ScrollBehavior.Auto);
+                }
+                else
+                {
+                    await ScrollManager.ScrollIntoViewAsync($"#{rowId}", ScrollBehavior.Auto);
+                }
+            }
+            catch
+            {
+                // ScrollManager operations may not be supported during prerendering or headless testing.
+            }
+        }
+
+        internal async Task OnKeyDownAsync(KeyboardEventArgs args)
+        {
+            if (!_focusedRowEnabledState.Value)
+            {
+                return;
+            }
+
+            await FocusManager.HandleKeyDownAsync(args);
         }
 
         /// <summary>
@@ -3060,6 +3440,10 @@ namespace Vek
         internal async Task OnRowClickedAsync(MouseEventArgs args, T item, int rowIndex)
         {
             await RowClick.InvokeAsync(new DataGridRowClickEventArgs<T>(args, item, rowIndex));
+            if (_focusedRowEnabledState.Value)
+            {
+                await SetFocusedRowAsync(rowIndex, item);
+            }
             await ActivateRowBehaviorsAsync(item);
         }
 
@@ -3086,6 +3470,11 @@ namespace Vek
         /// </summary>
         private async Task ActivateRowBehaviorsAsync(T item)
         {
+            if (_focusedRowEnabledState.Value && (_focusedItemState.Value is null || !EqualityComparer<T?>.Default.Equals(_focusedItemState.Value, item)))
+            {
+                await SetFocusedItemAsync(item);
+            }
+
             if (EditTrigger == DataGridEditTrigger.OnRowClick)
             {
                 if (EditMode == DataGridEditMode.Cell)

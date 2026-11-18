@@ -1,0 +1,87 @@
+@namespace Vek.Docs.Examples
+
+<div class="d-flex flex-wrap align-center gap-2 mb-4">
+    <VekButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => _grid.FocusManager.MoveFirstAsync())">First</VekButton>
+    <VekButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => _grid.FocusManager.MovePreviousAsync())">Previous</VekButton>
+    <VekButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => _grid.FocusManager.MoveNextAsync())">Next</VekButton>
+    <VekButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => _grid.FocusManager.MoveLastAsync())">Last</VekButton>
+    <VekButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Error" OnClick="@(() => _grid.FocusManager.ClearFocusAsync())">Clear Focus</VekButton>
+</div>
+
+<VekDataGrid @ref="_grid"
+             T="ServerNode"
+             Items="@_servers"
+             FocusedRowEnabled="true"
+             @bind-FocusedRowIndex="_focusedRowIndex"
+             @bind-FocusedItem="_focusedServer"
+             FocusedRowChanged="@OnFocusedRowChanged"
+             Hover="true"
+             Bordered="true"
+             Dense="true">
+    <Columns>
+        <PropertyColumn Property="x => x.Id" Title="ID" Width="80px" />
+        <PropertyColumn Property="x => x.HostName" Title="Host Name" />
+        <PropertyColumn Property="x => x.Region" Title="Region" />
+        <PropertyColumn Property="x => x.CpuUsage" Title="CPU Usage" Format="P0" />
+        <PropertyColumn Property="x => x.MemoryUsage" Title="Memory Usage" Format="P0" />
+        <PropertyColumn Property="x => x.Status" Title="Status" />
+    </Columns>
+</VekDataGrid>
+
+<div class="mt-4 pa-4 vek-paper-outlined rounded">
+    <VekText Typo="Typo.subtitle2">Focused Row Details:</VekText>
+    <VekText Typo="Typo.body2">
+        <b>Focused Index:</b> @(_focusedRowIndex >= 0 ? _focusedRowIndex.ToString() : "None")
+    </VekText>
+    @if (_focusedServer is not null)
+    {
+        <VekText Typo="Typo.body2">
+            <b>Server:</b> @_focusedServer.HostName (@_focusedServer.Region) &mdash; Status: @_focusedServer.Status
+        </VekText>
+    }
+    else
+    {
+        <VekText Typo="Typo.body2" Class="vek-text-secondary">
+            No row is currently focused. Click any row or use keyboard arrows (ArrowUp/ArrowDown, PageUp/PageDown, Home/End) to navigate.
+        </VekText>
+    }
+    @if (!string.IsNullOrEmpty(_lastEventMessage))
+    {
+        <VekText Typo="Typo.caption" Class="mt-2 text-secondary">
+            Last Event: @_lastEventMessage
+        </VekText>
+    }
+</div>
+
+@code {
+#nullable enable
+    private VekDataGrid<ServerNode> _grid = null!;
+    private int _focusedRowIndex = 0;
+    private ServerNode? _focusedServer;
+    private string? _lastEventMessage;
+
+    protected override void OnInitialized()
+    {
+        _focusedServer = _servers.FirstOrDefault();
+    }
+
+    private void OnFocusedRowChanged(DataGridFocusedRowChangedEventArgs<ServerNode> args)
+    {
+        _lastEventMessage = $"Row {args.RowIndex} ({args.Item?.HostName ?? "none"}) focused (previous: row {args.PreviousRowIndex})";
+    }
+
+    private readonly List<ServerNode> _servers = new()
+    {
+        new(1, "prod-app-01.us-east", "US East (N. Virginia)", 0.42, 0.68, "Online"),
+        new(2, "prod-app-02.us-east", "US East (N. Virginia)", 0.58, 0.74, "Online"),
+        new(3, "prod-db-01.us-east", "US East (N. Virginia)", 0.81, 0.92, "High Load"),
+        new(4, "prod-app-01.eu-central", "EU Central (Frankfurt)", 0.35, 0.51, "Online"),
+        new(5, "prod-app-02.eu-central", "EU Central (Frankfurt)", 0.29, 0.47, "Online"),
+        new(6, "prod-db-01.eu-central", "EU Central (Frankfurt)", 0.64, 0.83, "Online"),
+        new(7, "prod-app-01.ap-southeast", "AP Southeast (Singapore)", 0.49, 0.62, "Online"),
+        new(8, "prod-backup-01.us-west", "US West (Oregon)", 0.12, 0.25, "Idle"),
+    };
+
+    public record ServerNode(int Id, string HostName, string Region, double CpuUsage, double MemoryUsage, string Status);
+#nullable restore
+}

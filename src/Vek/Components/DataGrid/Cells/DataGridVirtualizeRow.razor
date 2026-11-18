@@ -35,13 +35,19 @@
 
     <ChildContent>
         @{
+            var isFocused = DataGrid.IsRowFocused(itemBag.Item, itemBag.Index);
             var rowClass = new CssBuilder(DataGrid.RowClass)
                 .AddClass(DataGrid.RowClassFunc?.Invoke(itemBag.Item, itemBag.Index))
                 .AddClass("vek-table-row-stripe", DataGrid.Striped && itemBag.Index % 2 == 0)
+                .AddClass("vek-table-row-focused", isFocused)
                 .Build();
             var rowStyle = new StyleBuilder().AddStyle(DataGrid.RowStyle).AddStyle(DataGrid.RowStyleFunc?.Invoke(itemBag.Item, itemBag.Index)).Build();
+            int? rowTabIndex = DataGrid.HasFocusedRow ? (isFocused ? 0 : -1) : null;
         }
         <tr class="vek-table-row @rowClass" Style="@rowStyle" @key="itemBag.Item"
+            id="@DataGrid.GetRowId(itemBag.Index)"
+            tabindex="@rowTabIndex"
+            aria-current="@(isFocused ? "true" : null)"
             @attributes="GetRowAttributes(itemBag.Item)"
             @onclick="this.AsNonRenderingEventHandler<MouseEventArgs>(args => RowClick.InvokeAsync((args, itemBag.Item, itemBag.Index)))"
             @oncontextmenu="@GetContextMenuCallback(itemBag)"
