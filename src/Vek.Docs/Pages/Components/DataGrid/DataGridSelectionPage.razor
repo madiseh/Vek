@@ -68,5 +68,19 @@
             </SectionContent>
         </DocsPageSection>
 
+        <DocsPageSection>
+            <SectionHeader Title="ARIA Grid Keyboard Navigation">
+                <Description>
+                    Set <CodeInline>KeyboardNavigationEnabled="true"</CodeInline> to enable full W3C WAI-ARIA Grid keyboard navigation with roving <CodeInline>tabindex</CodeInline> across table cells.
+                    Only the active cell holds <CodeInline>tabindex="0"</CodeInline> while inactive cells use <CodeInline>tabindex="-1"</CodeInline>, allowing <CodeInline>Tab</CodeInline> to enter and exit the grid cleanly.
+                    Use arrow keys, <CodeInline>Home</CodeInline>/<CodeInline>End</CodeInline> (or <CodeInline>Ctrl+Home</CodeInline>/<CodeInline>Ctrl+End</CodeInline>), and <CodeInline>PageUp</CodeInline>/<CodeInline>PageDown</CodeInline> to move between cells,
+                    <CodeInline>F2</CodeInline> or <CodeInline>Enter</CodeInline> to start or commit editing, <CodeInline>Escape</CodeInline> to cancel edits, and <CodeInline>Space</CodeInline> to toggle row selection.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridKeyboardNavigationExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridKeyboardNavigationExample />
+            </SectionContent>
+        </DocsPageSection>
+
     </DocsPageContent>
 </DocsPage>

@@ -1,4 +1,4 @@
-﻿@namespace Vek
+@namespace Vek
 @inherits VekComponentBase
 @typeparam T
 @using Vek.Extensions
@@ -88,11 +88,11 @@
                 <VekDropContainer @ref="_dropContainer" T="Column<T>" Items="@RenderedColumns" ItemsSelector="(item, dropzone) => RenderedColumnsItemsSelector(item, dropzone)" ItemDropped="ItemUpdatedAsync" CanDropClass="@DropAllowedClass" NoDropClass="@DropNotAllowedClass" ApplyDropClassesOnDragStarted="@ApplyDropClassesOnDragStarted">
                     <ChildContent>
                         <table @attributes="TableAttributes" class="vek-table-root" style="@TableRootStyle"
-                               role="@(_selectionModeState.Value == DataGridSelectionMode.CellRange ? "grid" : null)"
-                               aria-multiselectable="@(_selectionModeState.Value == DataGridSelectionMode.CellRange ? "true" : null)"
+                               role="@(IsAriaGrid ? "grid" : null)"
+                               aria-multiselectable="@(_selectionModeState.Value == DataGridSelectionMode.CellRange || (_keyboardNavigationEnabledState.Value && MultiSelection) ? "true" : null)"
                                aria-activedescendant="@ActiveCellId"
-                               tabindex="@(_focusedRowEnabledState.Value || _selectionModeState.Value == DataGridSelectionMode.CellRange ? 0 : null)"
-                               @onkeydown="OnKeyDownAsync">
+                               tabindex="@(!_keyboardNavigationEnabledState.Value && (_focusedRowEnabledState.Value || _selectionModeState.Value == DataGridSelectionMode.CellRange) ? 0 : null)"
+                               @onkeydown="this.AsNonRenderingEventHandler<KeyboardEventArgs>(OnKeyDownAsync)">
                             @if (ColGroup != null)
                             {
                                 <colgroup>
@@ -498,16 +498,20 @@
                  var cellClickCallback = GetCellClickCallback(item, rowIndex, colIndex, column);
                  var cellContextMenuClickCallback = GetCellContextMenuClickCallback(item, rowIndex, colIndex, column);
                  var cellSelected = IsCellSelected(rowIndex, colIndex);
+                 var cellFocused = IsCellFocused(rowIndex, colIndex);
+                 var cellTabIndex = KeyboardHandler.GetCellTabIndex(rowIndex, colIndex);
                  var cellClass = new CssBuilder(cell.ComputedClass)
                      .AddClass("vek-data-grid-cell-selected", cellSelected)
+                     .AddClass("vek-table-cell-focused", cellFocused)
                      .Build();
              }
-             <td id="@(_selectionModeState.Value == DataGridSelectionMode.CellRange ? $"{_gridId}_cell_{rowIndex}_{colIndex}" : null)"
-                 role="@(_selectionModeState.Value == DataGridSelectionMode.CellRange ? "gridcell" : null)"
+             <td id="@(IsAriaGrid ? GetCellId(rowIndex, colIndex) : null)"
+                 role="@(IsAriaGrid ? "gridcell" : null)"
+                 tabindex="@cellTabIndex"
                  data-label="@column.Title" class="@cellClass" style="@cell.ComputedStyle"
-                 aria-selected="@(_selectionModeState.Value == DataGridSelectionMode.CellRange ? cellSelected.ToString().ToLowerInvariant() : null)"
+                 aria-selected="@GetCellAriaSelected(item, cellSelected)"
                  @onclick="cellClickCallback"
-                 @onclick:stopPropagation="@(CellClick.HasDelegate || _selectionModeState.Value == DataGridSelectionMode.CellRange)"
+                 @onclick:stopPropagation="@(CellClick.HasDelegate || _selectionModeState.Value == DataGridSelectionMode.CellRange || _keyboardNavigationEnabledState.Value)"
                  @onmousedown="GetCellMouseDownCallback(rowIndex, colIndex)"
                  @onmouseover="GetCellMouseEnterCallback(rowIndex, colIndex)"
                  @onmouseup="GetCellMouseUpCallback()"

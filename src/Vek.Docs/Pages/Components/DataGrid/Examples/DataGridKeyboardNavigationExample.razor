@@ -1,0 +1,95 @@
+@namespace Vek.Docs.Examples
+
+<div class="d-flex flex-wrap align-center gap-2 mb-3">
+    <VekButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => _grid.KeyboardHandler.MoveLeftAsync())">Left</VekButton>
+    <VekButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => _grid.KeyboardHandler.MoveRightAsync())">Right</VekButton>
+    <VekButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => _grid.KeyboardHandler.MoveUpAsync())">Up</VekButton>
+    <VekButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => _grid.KeyboardHandler.MoveDownAsync())">Down</VekButton>
+    <VekButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary" OnClick="@(() => _grid.KeyboardHandler.ActivateEditAsync())">Edit (F2)</VekButton>
+    <VekButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Success" OnClick="@(() => _grid.KeyboardHandler.ActivateOrCommitEditAsync())">Commit (Enter)</VekButton>
+    <VekButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Warning" OnClick="@(() => _grid.KeyboardHandler.CancelEditAsync())">Cancel (Esc)</VekButton>
+    <VekButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Secondary" OnClick="@(() => _grid.KeyboardHandler.ToggleRowSelectionAsync())">Toggle Select (Space)</VekButton>
+</div>
+
+<VekDataGrid @ref="_grid"
+             T="TaskItem"
+             Items="@_tasks"
+             KeyboardNavigationEnabled="true"
+             @bind-FocusedRowIndex="_focusedRowIndex"
+             @bind-FocusedColumnIndex="_focusedColumnIndex"
+             MultiSelection="true"
+             @bind-SelectedItems="_selectedItems"
+             RowStyleFunc="@((item, _) => _selectedItems.Contains(item) ? "background-color: var(--vek-palette-table-hover);" : string.Empty)"
+             ReadOnly="false"
+             EditMode="DataGridEditMode.Inline"
+             StartedEditingItem="@OnStartedEditing"
+             CanceledEditingItem="@OnCanceledEditing"
+             CommittedItemChanged="@OnCommittedItem"
+             Hover="true"
+             Bordered="true"
+             Dense="true">
+    <Columns>
+        <PropertyColumn Property="x => x.Id" Title="ID" Editable="false" Width="70px" />
+        <PropertyColumn Property="x => x.Title" Title="Task" />
+        <PropertyColumn Property="x => x.Owner" Title="Owner" />
+        <PropertyColumn Property="x => x.Status" Title="Status" />
+        <PropertyColumn Property="x => x.EstimateHours" Title="Hours" />
+    </Columns>
+</VekDataGrid>
+
+<div class="d-flex flex-wrap align-center justify-space-between gap-2 mt-3 pa-3 vek-paper-outlined rounded">
+    <div>
+        <VekText Typo="Typo.subtitle2">Keyboard Matrix State</VekText>
+        <VekText Typo="Typo.body2">
+            <b>Active Cell:</b> Row @(_grid?.KeyboardHandler.ActiveRowIndex ?? _focusedRowIndex), Column @(_grid?.KeyboardHandler.ActiveColumnIndex ?? _focusedColumnIndex)
+            &nbsp;|&nbsp; <b>Edit State:</b> @_editState
+            &nbsp;|&nbsp; <b>Selected Rows:</b> @(_selectedItems.Count == 0 ? "None" : string.Join(", ", _selectedItems.Select(x => x.Title)))
+        </VekText>
+        <VekText Typo="Typo.caption" Class="vek-text-secondary">
+            Click any cell or Tab into the grid, then use Arrows, Home/End, Ctrl+Home/Ctrl+End, PageUp/PageDown, F2/Enter, Escape, Space, and Tab.
+        </VekText>
+    </div>
+    <VekButton Variant="Variant.Text" Size="Size.Small">Next Interactive Control (Tab Target)</VekButton>
+</div>
+
+@code {
+#nullable enable
+    private VekDataGrid<TaskItem> _grid = null!;
+    private int _focusedRowIndex = 0;
+    private int _focusedColumnIndex = 1;
+    private HashSet<TaskItem> _selectedItems = new();
+    private string _editState = "Viewing";
+
+    private void OnStartedEditing(TaskItem item)
+    {
+        _editState = $"Editing '{item.Title}'";
+    }
+
+    private void OnCanceledEditing(TaskItem item)
+    {
+        _editState = $"Canceled '{item?.Title ?? "row"}'";
+    }
+
+    private void OnCommittedItem(TaskItem item)
+    {
+        _editState = $"Committed '{item.Title}'";
+    }
+
+    private readonly List<TaskItem> _tasks = new()
+    {
+        new() { Id = 101, Title = "Audit grid focus order", Owner = "Maya Lin", Status = "In Progress", EstimateHours = 4 },
+        new() { Id = 102, Title = "Add roving tabindex matrix", Owner = "Liam Patel", Status = "Review", EstimateHours = 6 },
+        new() { Id = 103, Title = "Verify inline edit shortcuts", Owner = "Elena Rossi", Status = "Planned", EstimateHours = 3 },
+        new() { Id = 104, Title = "Document APG interactions", Owner = "Noah Kim", Status = "Done", EstimateHours = 2 }
+    };
+
+    public class TaskItem
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Owner { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+        public int EstimateHours { get; set; }
+    }
+#nullable restore
+}

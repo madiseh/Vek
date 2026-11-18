@@ -4,7 +4,7 @@
 - **Feature ID**: 030
 - **Feature Slug**: datagrid-accessibility-compliance
 - **Module**: DataGrid
-- **Status**: Backlog
+- **Status**: Ready
 - **Priority**: 30
 - **Dependencies**: ["010"]
 
