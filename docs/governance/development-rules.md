@@ -41,6 +41,10 @@ Every public API surface in Vek must be thoroughly, concisely, and consistently 
 ### Private & Internal Implementation State
 - **Ordinary Line Comments Only**: Never use XML documentation tags (`///`) for private or internal fields, properties, or helper methods. Use ordinary single-line `//` comments describing invariants or non-obvious design decisions.
 
+### Documentation Pages & Example Standards
+- **No Catch-All 'Other Options' Sections**: Feature-rich, complex components (such as `VekDataGrid`) must provide dedicated sections and standalone, realistic examples for each distinct functionality or scenario (e.g., column group layouts, asynchronous loading feedback, sticky headers/footers) rather than grouping unrelated properties together into generic summary blocks.
+- **Guided Progression & Concrete Scenarios**: Order examples from canonical to advanced. Each scenario must use realistic domain data and models, clear visual styling, and practical explanations showing when and why the feature is applied.
+
 ---
 
 ## 3. Component Authoring Standards
