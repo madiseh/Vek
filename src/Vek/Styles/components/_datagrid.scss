@@ -269,6 +269,23 @@
   }
 }
 
+.vek-data-grid-cell-selected {
+  background-color: color-mix(in srgb, var(--vek-palette-primary) 16%, transparent);
+  box-shadow: inset 0 0 0 1px var(--vek-palette-primary);
+  user-select: none;
+}
+
+.vek-data-grid-cell-range-summary {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1.25rem;
+  padding: 0.5rem 1rem;
+  border-top: 1px solid var(--vek-palette-divider);
+  color: var(--vek-palette-text-secondary);
+  font-size: 0.875rem;
+}
+
 @mixin datagrid-loading-display-smalldevices($breakpoint) {
   .vek-data-grid.vek-#{$breakpoint}table.vek-table-sticky-header {
     .vek-table-root .vek-table-head .vek-table-loading {

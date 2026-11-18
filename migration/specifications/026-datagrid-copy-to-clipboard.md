@@ -4,7 +4,7 @@
 - **Feature ID**: 026
 - **Feature Slug**: datagrid-copy-to-clipboard
 - **Module**: DataGrid
-- **Status**: Backlog
+- **Status**: Ready
 - **Priority**: 26
 - **Dependencies**: ["008"]
 

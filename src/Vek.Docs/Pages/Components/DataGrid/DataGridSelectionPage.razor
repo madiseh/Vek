@@ -55,5 +55,18 @@
             </SectionContent>
         </DocsPageSection>
 
+        <DocsPageSection>
+            <SectionHeader Title="Cell Range Selection">
+                <Description>
+                    Set <CodeInline>SelectionMode="DataGridSelectionMode.CellRange"</CodeInline> to select a rectangular range of cells.
+                    Click and drag to select with a pointer, or focus a cell and use <CodeInline>Shift</CodeInline> with an arrow key to extend the range.
+                    The status bar updates the sum, average, and cell count as the range changes.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridCellRangeSelectionExample)" ShowCode="true" Block="true" FullWidth="true">
+                <DataGridCellRangeSelectionExample />
+            </SectionContent>
+        </DocsPageSection>
+
     </DocsPageContent>
 </DocsPage>

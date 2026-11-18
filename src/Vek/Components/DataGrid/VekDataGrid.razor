@@ -3,6 +3,7 @@
 @typeparam T
 @using Vek.Extensions
 @using Vek.Resources
+@using Vek.Utilities
 @inject InternalVekLocalizer Localizer
 
 @{
@@ -86,7 +87,12 @@
             <div @ref=_gridElement id="@_gridId" class="@TableClass" style="@TableStyle">
                 <VekDropContainer @ref="_dropContainer" T="Column<T>" Items="@RenderedColumns" ItemsSelector="(item, dropzone) => RenderedColumnsItemsSelector(item, dropzone)" ItemDropped="ItemUpdatedAsync" CanDropClass="@DropAllowedClass" NoDropClass="@DropNotAllowedClass" ApplyDropClassesOnDragStarted="@ApplyDropClassesOnDragStarted">
                     <ChildContent>
-                        <table @attributes="TableAttributes" class="vek-table-root" style="@TableRootStyle" tabindex="@(_focusedRowEnabledState.Value ? 0 : null)" @onkeydown="OnKeyDownAsync">
+                        <table @attributes="TableAttributes" class="vek-table-root" style="@TableRootStyle"
+                               role="@(_selectionModeState.Value == DataGridSelectionMode.CellRange ? "grid" : null)"
+                               aria-multiselectable="@(_selectionModeState.Value == DataGridSelectionMode.CellRange ? "true" : null)"
+                               aria-activedescendant="@ActiveCellId"
+                               tabindex="@(_focusedRowEnabledState.Value || _selectionModeState.Value == DataGridSelectionMode.CellRange ? 0 : null)"
+                               @onkeydown="OnKeyDownAsync">
                             @if (ColGroup != null)
                             {
                                 <colgroup>
@@ -356,6 +362,15 @@
                     </ItemRenderer>
                 </VekDropContainer>
             </div>
+            @if (_selectionModeState.Value == DataGridSelectionMode.CellRange && _selectedCellRangeState.Value is not null)
+            {
+                var summary = GetCellRangeSummary();
+                <div class="vek-data-grid-cell-range-summary" role="status" aria-live="polite">
+                    <span>Sum: @summary.Sum.ToString("G", System.Globalization.CultureInfo.CurrentCulture)</span>
+                    <span>Average: @summary.Average.ToString("G", System.Globalization.CultureInfo.CurrentCulture)</span>
+                    <span>Count: @summary.CellCount</span>
+                </div>
+            }
             @if (PagerContent != null)
             {
                 <div class="vek-table-pagination" style="@HeaderFooterStyle">
@@ -482,10 +497,20 @@
                                     hasEditableContent;
                  var cellClickCallback = GetCellClickCallback(item, rowIndex, colIndex, column);
                  var cellContextMenuClickCallback = GetCellContextMenuClickCallback(item, rowIndex, colIndex, column);
+                 var cellSelected = IsCellSelected(rowIndex, colIndex);
+                 var cellClass = new CssBuilder(cell.ComputedClass)
+                     .AddClass("vek-data-grid-cell-selected", cellSelected)
+                     .Build();
              }
-             <td data-label="@column.Title" class="@cell.ComputedClass" style="@cell.ComputedStyle"
+             <td id="@(_selectionModeState.Value == DataGridSelectionMode.CellRange ? $"{_gridId}_cell_{rowIndex}_{colIndex}" : null)"
+                 role="@(_selectionModeState.Value == DataGridSelectionMode.CellRange ? "gridcell" : null)"
+                 data-label="@column.Title" class="@cellClass" style="@cell.ComputedStyle"
+                 aria-selected="@(_selectionModeState.Value == DataGridSelectionMode.CellRange ? cellSelected.ToString().ToLowerInvariant() : null)"
                  @onclick="cellClickCallback"
-                 @onclick:stopPropagation="@CellClick.HasDelegate"
+                 @onclick:stopPropagation="@(CellClick.HasDelegate || _selectionModeState.Value == DataGridSelectionMode.CellRange)"
+                 @onmousedown="GetCellMouseDownCallback(rowIndex, colIndex)"
+                 @onmouseover="GetCellMouseEnterCallback(rowIndex, colIndex)"
+                 @onmouseup="GetCellMouseUpCallback()"
                  @oncontextmenu="cellContextMenuClickCallback"
                  @oncontextmenu:stopPropagation="@CellContextMenuClick.HasDelegate"
                  @oncontextmenu:preventDefault="@CellContextMenuClick.HasDelegate">
