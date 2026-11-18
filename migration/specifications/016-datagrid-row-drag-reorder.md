@@ -41,6 +41,6 @@
 ## 4. Verification & Acceptance Criteria
 - **Build**: Compiles cleanly under multi-targeting (`net8.0`, `net9.0`, `net10.0`, `net11.0`) with 0 warnings (`TreatWarningsAsErrors=true`).
 - **Testing**: Dedicated bUnit & unit tests verifying happy path, boundary edge cases, and disabled states.
-- **Formatting**: Passes `dotnet format whitespace` validation.
+- **Formatting**: Passes `dotnet format` validation.
 - **Clean-Room Anonymity**: Absolute zero mention of proprietary vendor names or commercial brand identifiers in code, commits, or documentation.
 - **Pull Request**: Fully documented pull request with verification summary and example usage.

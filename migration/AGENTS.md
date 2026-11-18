@@ -42,7 +42,7 @@ The agents must never simply copy code from Project B to Project A. Instead, the
 - **Mandatory CI Build & Test**:
   - `dotnet build` with 0 errors and 0 warnings (`TreatWarningsAsErrors=true`).
   - Scoped `dotnet test` with 100% passing tests.
-  - Final pre-PR formatting pass (`dotnet format whitespace`).
+  - Final pre-PR formatting pass (`dotnet format --verify-no-changes`).
 - **Comprehensive Test Coverage**: Every migrated feature must include unit tests and bUnit component tests exercising the reconstructed behaviors and edge cases.
 - **Bounded Repair Attempts**: The automated repair loop between Reviewer/Test Gate and Implementer is capped at **2 iterations**. If the build or tests still fail after 2 retries, the attempt is marked as `Failed` / `Needs Human Intervention` and halts.
 - **Human Merge Only**: The automated pipeline never merges directly into `master`. It opens a detailed Pull Request for human review and sign-off.
@@ -82,4 +82,4 @@ The migration pipeline is driven by `migration/scripts/orchestrator.py`, which s
   ```bash
   python migration/scripts/orchestrator.py --verify
   ```
-  Runs build, unit tests, whitespace formatting, and brand cleanliness verification.
+  Runs build, unit tests, full dotnet format verification, and brand cleanliness verification.

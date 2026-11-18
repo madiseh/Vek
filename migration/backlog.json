@@ -347,6 +347,718 @@
       "dependencies": [
         "010"
       ]
+    },
+    {
+      "id": "031",
+      "slug": "button-loading-state-and-auto-disable",
+      "title": "Button Loading / Busy Spinner State with Auto-Disable",
+      "module": "Button",
+      "priority": 31,
+      "status": "ready",
+      "specification": "specifications/031-button-loading-state-and-auto-disable.md",
+      "dependencies": []
+    },
+    {
+      "id": "032",
+      "slug": "button-group-selection-modes",
+      "title": "ButtonGroup Single and Multiple Selection Toggle Modes",
+      "module": "ButtonGroup",
+      "priority": 32,
+      "status": "ready",
+      "specification": "specifications/032-button-group-selection-modes.md",
+      "dependencies": []
+    },
+    {
+      "id": "033",
+      "slug": "split-button-and-dropdown-actions",
+      "title": "SplitButton with Dual Actions and DropDown Menu",
+      "module": "Button",
+      "priority": 33,
+      "status": "ready",
+      "specification": "specifications/033-split-button-and-dropdown-actions.md",
+      "dependencies": []
+    },
+    {
+      "id": "034",
+      "slug": "button-double-click-and-debounce-guard",
+      "title": "Button Click Debounce and Double-Click Protection",
+      "module": "Button",
+      "priority": 34,
+      "status": "ready",
+      "specification": "specifications/034-button-double-click-and-debounce-guard.md",
+      "dependencies": []
+    },
+    {
+      "id": "035",
+      "slug": "button-badge-and-counter-adornment",
+      "title": "Button Floating Badge, Status Dot, and Counter Adornment",
+      "module": "Button",
+      "priority": 35,
+      "status": "ready",
+      "specification": "specifications/035-button-badge-and-counter-adornment.md",
+      "dependencies": []
+    },
+    {
+      "id": "036",
+      "slug": "textbox-clear-button-modes",
+      "title": "TextBox Clear Button Display Modes and Action Hooks",
+      "module": "TextField",
+      "priority": 36,
+      "status": "ready",
+      "specification": "specifications/036-textbox-clear-button-modes.md",
+      "dependencies": []
+    },
+    {
+      "id": "037",
+      "slug": "textbox-password-visibility-toggle",
+      "title": "TextBox Password Masking with Interactive Visibility Toggle",
+      "module": "TextField",
+      "priority": 37,
+      "status": "ready",
+      "specification": "specifications/037-textbox-password-visibility-toggle.md",
+      "dependencies": []
+    },
+    {
+      "id": "038",
+      "slug": "textbox-debounced-bind-value-modes",
+      "title": "TextBox Configurable Value Binding Modes and Debounce Delay",
+      "module": "TextField",
+      "priority": 38,
+      "status": "ready",
+      "specification": "specifications/038-textbox-debounced-bind-value-modes.md",
+      "dependencies": []
+    },
+    {
+      "id": "039",
+      "slug": "textbox-custom-buttons-and-adornments",
+      "title": "TextBox Embedded Custom Action Buttons and Adornment Slots",
+      "module": "TextField",
+      "priority": 39,
+      "status": "ready",
+      "specification": "specifications/039-textbox-custom-buttons-and-adornments.md",
+      "dependencies": []
+    },
+    {
+      "id": "040",
+      "slug": "masked-input-regex-and-literals",
+      "title": "MaskedInput Pattern Rules, Prompt Characters, and Literals Preservation",
+      "module": "Mask",
+      "priority": 40,
+      "status": "ready",
+      "specification": "specifications/040-masked-input-regex-and-literals.md",
+      "dependencies": []
+    },
+    {
+      "id": "041",
+      "slug": "spin-edit-mousewheel-and-acceleration",
+      "title": "SpinEdit Stepper Controls, Mouse Wheel Scrolling, and Acceleration",
+      "module": "NumericField",
+      "priority": 41,
+      "status": "ready",
+      "specification": "specifications/041-spin-edit-mousewheel-and-acceleration.md",
+      "dependencies": []
+    },
+    {
+      "id": "042",
+      "slug": "combobox-incremental-filtering-and-virtual-scroll",
+      "title": "ComboBox Incremental Live Filtering and Virtualized Dropdown",
+      "module": "Autocomplete",
+      "priority": 42,
+      "status": "ready",
+      "specification": "specifications/042-combobox-incremental-filtering-and-virtual-scroll.md",
+      "dependencies": []
+    },
+    {
+      "id": "043",
+      "slug": "combobox-multi-selection-and-chip-tags",
+      "title": "ComboBox Multi-Selection with Removable Chip Tags",
+      "module": "Select",
+      "priority": 43,
+      "status": "backlog",
+      "specification": "specifications/043-combobox-multi-selection-and-chip-tags.md",
+      "dependencies": [
+        "042"
+      ]
+    },
+    {
+      "id": "044",
+      "slug": "tabs-scroll-and-navigation-buttons",
+      "title": "Tabs Overflow Scrolling with Interactive Navigation Buttons",
+      "module": "Tabs",
+      "priority": 44,
+      "status": "ready",
+      "specification": "specifications/044-tabs-scroll-and-navigation-buttons.md",
+      "dependencies": []
+    },
+    {
+      "id": "045",
+      "slug": "tabs-closable-tabs-and-lifecycle-events",
+      "title": "Tabs Dynamic Close Button and Tab Removal Lifecycle",
+      "module": "Tabs",
+      "priority": 45,
+      "status": "ready",
+      "specification": "specifications/045-tabs-closable-tabs-and-lifecycle-events.md",
+      "dependencies": []
+    },
+    {
+      "id": "046",
+      "slug": "tabs-lazy-render-and-caching-modes",
+      "title": "Tabs Render Modes: Active Tab Lazily with DOM Caching",
+      "module": "Tabs",
+      "priority": 46,
+      "status": "ready",
+      "specification": "specifications/046-tabs-lazy-render-and-caching-modes.md",
+      "dependencies": []
+    },
+    {
+      "id": "047",
+      "slug": "tabs-multi-orientation-and-positions",
+      "title": "Tabs Vertical Orientation and Position (Top, Bottom, Left, Right)",
+      "module": "Tabs",
+      "priority": 47,
+      "status": "ready",
+      "specification": "specifications/047-tabs-multi-orientation-and-positions.md",
+      "dependencies": []
+    },
+    {
+      "id": "048",
+      "slug": "tabs-drag-and-drop-reorder",
+      "title": "Tabs Interactive Drag-and-Drop Tab Reordering",
+      "module": "Tabs",
+      "priority": 48,
+      "status": "backlog",
+      "specification": "specifications/048-tabs-drag-and-drop-reorder.md",
+      "dependencies": [
+        "044"
+      ]
+    },
+    {
+      "id": "049",
+      "slug": "tabs-badge-and-custom-header-template",
+      "title": "Tabs Custom Header Template, Status Badges, and Icon Slots",
+      "module": "Tabs",
+      "priority": 49,
+      "status": "ready",
+      "specification": "specifications/049-tabs-badge-and-custom-header-template.md",
+      "dependencies": []
+    },
+    {
+      "id": "050",
+      "slug": "accordion-expand-modes-and-animation",
+      "title": "Accordion Expand Modes (Single, Multiple, SingleOrNone) and Animation",
+      "module": "ExpansionPanel",
+      "priority": 50,
+      "status": "ready",
+      "specification": "specifications/050-accordion-expand-modes-and-animation.md",
+      "dependencies": []
+    },
+    {
+      "id": "051",
+      "slug": "context-menu-target-selector-and-triggers",
+      "title": "ContextMenu Target Selector Binding, Long-Press Touch, and Submenus",
+      "module": "Menu",
+      "priority": 51,
+      "status": "ready",
+      "specification": "specifications/051-context-menu-target-selector-and-triggers.md",
+      "dependencies": []
+    },
+    {
+      "id": "052",
+      "slug": "toolbar-adaptive-collapse-and-overflow-menu",
+      "title": "Toolbar Adaptive Layout with Overflow Dropdown Menu",
+      "module": "ToolBar",
+      "priority": 52,
+      "status": "ready",
+      "specification": "specifications/052-toolbar-adaptive-collapse-and-overflow-menu.md",
+      "dependencies": []
+    },
+    {
+      "id": "053",
+      "slug": "datepicker-disabled-dates-and-custom-rendering",
+      "title": "DatePicker Disabled Date Predicates and Custom Day Cell Templates",
+      "module": "DatePicker",
+      "priority": 53,
+      "status": "ready",
+      "specification": "specifications/053-datepicker-disabled-dates-and-custom-rendering.md",
+      "dependencies": []
+    },
+    {
+      "id": "054",
+      "slug": "datepicker-range-picker-mode",
+      "title": "DatePicker Dual Calendar Range Selection with Preset Ranges",
+      "module": "DatePicker",
+      "priority": 54,
+      "status": "ready",
+      "specification": "specifications/054-datepicker-range-picker-mode.md",
+      "dependencies": []
+    },
+    {
+      "id": "055",
+      "slug": "datepicker-inline-calendar-mode",
+      "title": "DatePicker Embedded Inline Calendar Display (Non-Popup Mode)",
+      "module": "DatePicker",
+      "priority": 55,
+      "status": "ready",
+      "specification": "specifications/055-datepicker-inline-calendar-mode.md",
+      "dependencies": []
+    },
+    {
+      "id": "056",
+      "slug": "timepicker-time-intervals-and-12-24-format",
+      "title": "TimePicker Configurable Minute Intervals, Seconds, and 12/24-Hour Formats",
+      "module": "TimePicker",
+      "priority": 56,
+      "status": "ready",
+      "specification": "specifications/056-timepicker-time-intervals-and-12-24-format.md",
+      "dependencies": []
+    },
+    {
+      "id": "057",
+      "slug": "timepicker-analog-clock-face-selector",
+      "title": "TimePicker Interactive Radial Clock Face and Touch Hand Selector",
+      "module": "TimePicker",
+      "priority": 57,
+      "status": "ready",
+      "specification": "specifications/057-timepicker-analog-clock-face-selector.md",
+      "dependencies": []
+    },
+    {
+      "id": "058",
+      "slug": "datepicker-multi-view-decade-century-navigation",
+      "title": "DatePicker Multi-Level Decade, Century, and Year Fast-Jump Navigation",
+      "module": "DatePicker",
+      "priority": 58,
+      "status": "ready",
+      "specification": "specifications/058-datepicker-multi-view-decade-century-navigation.md",
+      "dependencies": []
+    },
+    {
+      "id": "059",
+      "slug": "treeview-checkbox-tri-state-selection",
+      "title": "TreeView Recursive Tri-State Hierarchical Checkbox Selection",
+      "module": "TreeView",
+      "priority": 59,
+      "status": "ready",
+      "specification": "specifications/059-treeview-checkbox-tri-state-selection.md",
+      "dependencies": []
+    },
+    {
+      "id": "060",
+      "slug": "treeview-node-drag-and-drop-reorder",
+      "title": "TreeView Interactive Node Drag-and-Drop Reordering and Reparenting",
+      "module": "TreeView",
+      "priority": 60,
+      "status": "ready",
+      "specification": "specifications/060-treeview-node-drag-and-drop-reorder.md",
+      "dependencies": []
+    },
+    {
+      "id": "061",
+      "slug": "treeview-lazy-load-child-nodes-async",
+      "title": "TreeView On-Demand Asynchronous Child Node Fetching on Expand",
+      "module": "TreeView",
+      "priority": 61,
+      "status": "ready",
+      "specification": "specifications/061-treeview-lazy-load-child-nodes-async.md",
+      "dependencies": []
+    },
+    {
+      "id": "062",
+      "slug": "treeview-search-filter-and-auto-expand",
+      "title": "TreeView Live Search Filtering with Auto-Expansion of Matching Ancestors",
+      "module": "TreeView",
+      "priority": 62,
+      "status": "ready",
+      "specification": "specifications/062-treeview-search-filter-and-auto-expand.md",
+      "dependencies": []
+    },
+    {
+      "id": "063",
+      "slug": "treeview-node-inline-editing-and-renaming",
+      "title": "TreeView In-Place Node Text Editing and Keyboard Renaming (F2/Enter)",
+      "module": "TreeView",
+      "priority": 63,
+      "status": "ready",
+      "specification": "specifications/063-treeview-node-inline-editing-and-renaming.md",
+      "dependencies": []
+    },
+    {
+      "id": "064",
+      "slug": "treeview-custom-node-templates-and-badges",
+      "title": "TreeView Custom Node Templates, Action Buttons, and Status Badges",
+      "module": "TreeView",
+      "priority": 64,
+      "status": "ready",
+      "specification": "specifications/064-treeview-custom-node-templates-and-badges.md",
+      "dependencies": []
+    },
+    {
+      "id": "065",
+      "slug": "treeview-multi-column-tree-list-layout",
+      "title": "TreeView Multi-Column TreeList Layout with Resizable Columns",
+      "module": "TreeView",
+      "priority": 65,
+      "status": "ready",
+      "specification": "specifications/065-treeview-multi-column-tree-list-layout.md",
+      "dependencies": []
+    },
+    {
+      "id": "066",
+      "slug": "dialog-draggable-and-resizable-modals",
+      "title": "Dialog Draggable Header, Viewport Clamping, and Resizable Edges",
+      "module": "Dialog",
+      "priority": 66,
+      "status": "ready",
+      "specification": "specifications/066-dialog-draggable-and-resizable-modals.md",
+      "dependencies": []
+    },
+    {
+      "id": "067",
+      "slug": "dialog-modal-stacking-and-z-index-manager",
+      "title": "Dialog Multi-Modal Cascading Stacking and Focus Isolation",
+      "module": "Dialog",
+      "priority": 67,
+      "status": "ready",
+      "specification": "specifications/067-dialog-modal-stacking-and-z-index-manager.md",
+      "dependencies": []
+    },
+    {
+      "id": "068",
+      "slug": "dialog-fullscreen-toggle-and-maximize",
+      "title": "Dialog Header Maximize / Restore Toggle and Fullscreen Mode",
+      "module": "Dialog",
+      "priority": 68,
+      "status": "ready",
+      "specification": "specifications/068-dialog-fullscreen-toggle-and-maximize.md",
+      "dependencies": []
+    },
+    {
+      "id": "069",
+      "slug": "messagebox-fluent-confirm-prompt-api",
+      "title": "MessageBox Fluent Async ShowConfirmAsync, ShowPromptAsync, and Custom Buttons",
+      "module": "MessageBox",
+      "priority": 69,
+      "status": "ready",
+      "specification": "specifications/069-messagebox-fluent-confirm-prompt-api.md",
+      "dependencies": []
+    },
+    {
+      "id": "070",
+      "slug": "dialog-animation-transitions-and-drawer-sheet",
+      "title": "Dialog Configurable Entrance Animations and Slide-In Sheet Position",
+      "module": "Dialog",
+      "priority": 70,
+      "status": "ready",
+      "specification": "specifications/070-dialog-animation-transitions-and-drawer-sheet.md",
+      "dependencies": []
+    },
+    {
+      "id": "071",
+      "slug": "dialog-focus-trap-and-escape-key-handling",
+      "title": "Dialog W3C Modal Focus Trap and Escape Key Interception",
+      "module": "Dialog",
+      "priority": 71,
+      "status": "ready",
+      "specification": "specifications/071-dialog-focus-trap-and-escape-key-handling.md",
+      "dependencies": []
+    },
+    {
+      "id": "072",
+      "slug": "fileupload-drag-and-drop-zone",
+      "title": "FileUpload Full-Surface Drag-and-Drop Area with Hover Visual Cue",
+      "module": "FileUpload",
+      "priority": 72,
+      "status": "ready",
+      "specification": "specifications/072-fileupload-drag-and-drop-zone.md",
+      "dependencies": []
+    },
+    {
+      "id": "073",
+      "slug": "fileupload-chunked-and-resumable-upload",
+      "title": "FileUpload Client-Side Chunking for Large Files and Progress Tracking",
+      "module": "FileUpload",
+      "priority": 73,
+      "status": "ready",
+      "specification": "specifications/073-fileupload-chunked-and-resumable-upload.md",
+      "dependencies": []
+    },
+    {
+      "id": "074",
+      "slug": "fileupload-image-preview-and-client-validation",
+      "title": "FileUpload Instant Image Thumbnail Preview and File Type/Size Client Validation",
+      "module": "FileUpload",
+      "priority": 74,
+      "status": "ready",
+      "specification": "specifications/074-fileupload-image-preview-and-client-validation.md",
+      "dependencies": []
+    },
+    {
+      "id": "075",
+      "slug": "fileupload-multi-file-queue-and-cancel",
+      "title": "FileUpload Multi-File Queue Management with Individual Retry and Cancel",
+      "module": "FileUpload",
+      "priority": 75,
+      "status": "ready",
+      "specification": "specifications/075-fileupload-multi-file-queue-and-cancel.md",
+      "dependencies": []
+    },
+    {
+      "id": "076",
+      "slug": "dropzone-custom-slot-templates",
+      "title": "DropZone Customizable Empty State, Active Dragging, and Uploading Templates",
+      "module": "DropZone",
+      "priority": 76,
+      "status": "ready",
+      "specification": "specifications/076-dropzone-custom-slot-templates.md",
+      "dependencies": []
+    },
+    {
+      "id": "077",
+      "slug": "slider-dual-thumb-range-selection",
+      "title": "Slider Dual-Thumb Range Selection with Lower and Upper Value Binding",
+      "module": "Slider",
+      "priority": 77,
+      "status": "ready",
+      "specification": "specifications/077-slider-dual-thumb-range-selection.md",
+      "dependencies": []
+    },
+    {
+      "id": "078",
+      "slug": "slider-tick-marks-and-labeled-steps",
+      "title": "Slider Discrete Step Snapping, Custom Ticks, and Scale Value Labels",
+      "module": "Slider",
+      "priority": 78,
+      "status": "ready",
+      "specification": "specifications/078-slider-tick-marks-and-labeled-steps.md",
+      "dependencies": []
+    },
+    {
+      "id": "079",
+      "slug": "slider-vertical-orientation-and-touch-track",
+      "title": "Slider Vertical Layout Orientation with Touch-Accurate Scrubbing",
+      "module": "Slider",
+      "priority": 79,
+      "status": "ready",
+      "specification": "specifications/079-slider-vertical-orientation-and-touch-track.md",
+      "dependencies": []
+    },
+    {
+      "id": "080",
+      "slug": "slider-tooltip-value-formatting",
+      "title": "Slider Floating Value Tooltip with Custom String and Currency Formatter",
+      "module": "Slider",
+      "priority": 80,
+      "status": "ready",
+      "specification": "specifications/080-slider-tooltip-value-formatting.md",
+      "dependencies": []
+    },
+    {
+      "id": "081",
+      "slug": "rating-half-star-precision-and-hover-preview",
+      "title": "Rating Fractional/Half-Star Precision and Live Hover Score Preview",
+      "module": "Rating",
+      "priority": 81,
+      "status": "ready",
+      "specification": "specifications/081-rating-half-star-precision-and-hover-preview.md",
+      "dependencies": []
+    },
+    {
+      "id": "082",
+      "slug": "rating-custom-icons-and-sentiment-emojis",
+      "title": "Rating Custom SVG Icon Sets, Hearts, and Multi-Sentiment Emojis",
+      "module": "Rating",
+      "priority": 82,
+      "status": "ready",
+      "specification": "specifications/082-rating-custom-icons-and-sentiment-emojis.md",
+      "dependencies": []
+    },
+    {
+      "id": "083",
+      "slug": "splitpanel-resizable-panes-and-collapse",
+      "title": "SplitPanel Resizable Splitter Bar with Double-Click Pane Collapse",
+      "module": "SplitPanel",
+      "priority": 83,
+      "status": "ready",
+      "specification": "specifications/083-splitpanel-resizable-panes-and-collapse.md",
+      "dependencies": []
+    },
+    {
+      "id": "084",
+      "slug": "splitpanel-nested-horizontal-vertical-splits",
+      "title": "SplitPanel Nested Multi-Directional Layout Panes (Horizontal in Vertical)",
+      "module": "SplitPanel",
+      "priority": 84,
+      "status": "ready",
+      "specification": "specifications/084-splitpanel-nested-horizontal-vertical-splits.md",
+      "dependencies": [
+        "083"
+      ]
+    },
+    {
+      "id": "085",
+      "slug": "card-expandable-collapsible-content",
+      "title": "Card Collapsible Body with Animated Toggle Action in Header",
+      "module": "Card",
+      "priority": 85,
+      "status": "ready",
+      "specification": "specifications/085-card-expandable-collapsible-content.md",
+      "dependencies": []
+    },
+    {
+      "id": "086",
+      "slug": "card-header-actions-and-media-ratio",
+      "title": "Card Aspect-Ratio Media Box, Header Context Menu, and Action Button Toolbar",
+      "module": "Card",
+      "priority": 86,
+      "status": "ready",
+      "specification": "specifications/086-card-header-actions-and-media-ratio.md",
+      "dependencies": []
+    },
+    {
+      "id": "087",
+      "slug": "drawer-docked-persistent-and-mini-variants",
+      "title": "Drawer Mini / Rail Variant with Icon-Only Mode and Smooth Width Expansion",
+      "module": "Drawer",
+      "priority": 87,
+      "status": "ready",
+      "specification": "specifications/087-drawer-docked-persistent-and-mini-variants.md",
+      "dependencies": []
+    },
+    {
+      "id": "088",
+      "slug": "drawer-swipe-gesture-and-backdrop-dismiss",
+      "title": "Drawer Mobile Edge-Swipe Touch Gestures and Backdrop Tap Dismiss",
+      "module": "Drawer",
+      "priority": 88,
+      "status": "ready",
+      "specification": "specifications/088-drawer-swipe-gesture-and-backdrop-dismiss.md",
+      "dependencies": []
+    },
+    {
+      "id": "089",
+      "slug": "snackbar-action-button-and-undo-callback",
+      "title": "Snackbar Interactive Action Buttons with Async Undo Callback",
+      "module": "Snackbar",
+      "priority": 89,
+      "status": "ready",
+      "specification": "specifications/089-snackbar-action-button-and-undo-callback.md",
+      "dependencies": []
+    },
+    {
+      "id": "090",
+      "slug": "snackbar-queue-stacking-and-auto-dismiss-timer",
+      "title": "Snackbar Multi-Toast Queue Stacking, Visual Progress Countdown, and Pause on Hover",
+      "module": "Snackbar",
+      "priority": 90,
+      "status": "ready",
+      "specification": "specifications/090-snackbar-queue-stacking-and-auto-dismiss-timer.md",
+      "dependencies": [
+        "089"
+      ]
+    },
+    {
+      "id": "091",
+      "slug": "skeleton-bone-shapes-and-shimmer-animation",
+      "title": "Skeleton Pre-Configured Shape Cards, Avatars, and Synchronized Shimmer",
+      "module": "Skeleton",
+      "priority": 91,
+      "status": "ready",
+      "specification": "specifications/091-skeleton-bone-shapes-and-shimmer-animation.md",
+      "dependencies": []
+    },
+    {
+      "id": "092",
+      "slug": "progress-circular-and-linear-indeterminate-modes",
+      "title": "Progress Circular and Linear Percentage Indicators with Animated Buffer Bar",
+      "module": "Progress",
+      "priority": 92,
+      "status": "ready",
+      "specification": "specifications/092-progress-circular-and-linear-indeterminate-modes.md",
+      "dependencies": []
+    },
+    {
+      "id": "093",
+      "slug": "badge-status-dots-and-overlap-positions",
+      "title": "Badge Status Indicator Dots, Max Value Truncation (99+), and Placement Anchors",
+      "module": "Badge",
+      "priority": 93,
+      "status": "ready",
+      "specification": "specifications/093-badge-status-dots-and-overlap-positions.md",
+      "dependencies": []
+    },
+    {
+      "id": "094",
+      "slug": "avatar-group-stack-and-overflow-counter",
+      "title": "AvatarGroup Overlapping Facepile Stack with +N Excess Member Counter",
+      "module": "Avatar",
+      "priority": 94,
+      "status": "ready",
+      "specification": "specifications/094-avatar-group-stack-and-overflow-counter.md",
+      "dependencies": []
+    },
+    {
+      "id": "095",
+      "slug": "stepper-vertical-and-horizontal-orientations",
+      "title": "Stepper Horizontal and Vertical Orientation with Responsive Step Collapse",
+      "module": "Stepper",
+      "priority": 95,
+      "status": "ready",
+      "specification": "specifications/095-stepper-vertical-and-horizontal-orientations.md",
+      "dependencies": []
+    },
+    {
+      "id": "096",
+      "slug": "stepper-step-validation-and-cancellable-navigation",
+      "title": "Stepper Per-Step Form Validation and Async Cancellable Navigation Guards",
+      "module": "Stepper",
+      "priority": 96,
+      "status": "ready",
+      "specification": "specifications/096-stepper-step-validation-and-cancellable-navigation.md",
+      "dependencies": [
+        "095"
+      ]
+    },
+    {
+      "id": "097",
+      "slug": "stepper-linear-vs-non-linear-step-modes",
+      "title": "Stepper Non-Linear Step Completion, Editable Steps, and Error State Badges",
+      "module": "Stepper",
+      "priority": 97,
+      "status": "ready",
+      "specification": "specifications/097-stepper-linear-vs-non-linear-step-modes.md",
+      "dependencies": [
+        "095"
+      ]
+    },
+    {
+      "id": "098",
+      "slug": "pagination-page-size-selector-and-quick-jump",
+      "title": "Pagination Integrated Page Size Selector Dropdown and Direct Page Jump Input",
+      "module": "Pagination",
+      "priority": 98,
+      "status": "ready",
+      "specification": "specifications/098-pagination-page-size-selector-and-quick-jump.md",
+      "dependencies": []
+    },
+    {
+      "id": "099",
+      "slug": "colorpicker-rgba-hex-hsv-and-palette-presets",
+      "title": "ColorPicker Visual Spectrum Canvas, Alpha Slider, and Swatch Palette Presets",
+      "module": "ColorPicker",
+      "priority": 99,
+      "status": "ready",
+      "specification": "specifications/099-colorpicker-rgba-hex-hsv-and-palette-presets.md",
+      "dependencies": []
+    },
+    {
+      "id": "100",
+      "slug": "hotkey-global-and-scoped-keyboard-shortcuts",
+      "title": "Hotkey Global and Scoped Shortcut Binding Manager with Chord Key Sequences",
+      "module": "Hotkey",
+      "priority": 100,
+      "status": "ready",
+      "specification": "specifications/100-hotkey-global-and-scoped-keyboard-shortcuts.md",
+      "dependencies": []
     }
   ]
 }
