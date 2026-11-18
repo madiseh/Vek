@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Web;
 
@@ -13,7 +14,7 @@ namespace Vek;
 /// Manages focused row state, keyboard navigation traversal, and focus transitions for <see cref="VekDataGrid{T}"/>.
 /// </summary>
 /// <typeparam name="T">The data grid item type.</typeparam>
-public class DataGridFocusManager<T>
+public class DataGridFocusManager<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>
 {
     private readonly VekDataGrid<T> _dataGrid;
 

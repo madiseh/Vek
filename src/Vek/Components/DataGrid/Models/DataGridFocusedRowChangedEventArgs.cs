@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Vek;
 
@@ -10,7 +11,7 @@ namespace Vek;
 /// Provides data for the <see cref="VekDataGrid{T}.FocusedRowChanged"/> event.
 /// </summary>
 /// <typeparam name="T">The type of item represented in the data grid.</typeparam>
-public class DataGridFocusedRowChangedEventArgs<T> : EventArgs
+public class DataGridFocusedRowChangedEventArgs<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T> : EventArgs
 {
     /// <summary>
     /// Gets the data item associated with the newly focused row, or <c>default</c> if no row is focused.
