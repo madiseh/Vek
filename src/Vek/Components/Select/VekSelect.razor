@@ -22,7 +22,7 @@
                          @onmousedown="@HandleMouseDown">
             <InputContent>
                 <VekInput @ref="_elementReference"
-                          InputType="@(CanRenderValue || (Strict && !IsValueInList) ? InputType.Hidden : InputType.Text)"
+                          InputType="@(CanRenderValue || CanRenderChips || (Strict && !IsValueInList) ? InputType.Hidden : InputType.Text)"
                           Class="@InputClassname"
                           Margin="@Margin"
                           Placeholder="@Placeholder"
@@ -48,12 +48,16 @@
                           ClearIcon="@ClearIcon"
                           OnClearButtonClick="@(async (e) => await SelectClearButtonClickHandlerAsync(e))"
                           @attributes="GetInputUserAttributes()"
-                          ShrinkLabel="@(ShrinkLabel || CanRenderValue)"
+                          ShrinkLabel="@(ShrinkLabel || CanRenderValue || CanRenderChips)"
                           InputId="@InputElementId"
                           Required="@Required">
                     @if (CanRenderValue)
                     {
                         @GetSelectedValuePresenter()
+                    }
+                    else if (CanRenderChips)
+                    {
+                        @GetChipsPresenter()
                     }
                 </VekInput>
                 @if (FitContent)

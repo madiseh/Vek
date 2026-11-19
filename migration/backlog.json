@@ -498,11 +498,14 @@
       "title": "ComboBox Multi-Selection with Removable Chip Tags",
       "module": "Select",
       "priority": 43,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/043-combobox-multi-selection-and-chip-tags.md",
       "dependencies": [
         "042"
-      ]
+      ],
+      "started_at": "2026-11-19T19:31:10Z",
+      "completed_at": "2026-11-19T20:15:20Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/46"
     },
     {
       "id": "044",

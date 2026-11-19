@@ -36,6 +36,9 @@ namespace Vek
         private readonly string _listboxId = Identifier.Create("select-listbox");
         private readonly ParameterState<bool> _openState;
         private readonly ParameterState<IReadOnlyCollection<T?>?> _selectedValuesState;
+        private readonly ParameterState<bool> _chipsState;
+        private readonly ParameterState<int?> _maxDisplayedTagsState;
+        private readonly ParameterState<int?> _maxSelectedLabelsState;
         private readonly VekSelectContext<T> _context;
 
         internal string ElementId { get; } = Identifier.Create("select");
@@ -58,6 +61,12 @@ namespace Vek
             registerScope.RegisterParameter<bool>(nameof(MultiSelection))
                 .WithParameter(() => MultiSelection)
                 .WithChangeHandler(() => SuppressInteractionEffectsWhileAsync(() => UpdateTextPropertyAsync(false)));
+            _chipsState = registerScope.RegisterParameter<bool>(nameof(Chips))
+                .WithParameter(() => Chips);
+            _maxDisplayedTagsState = registerScope.RegisterParameter<int?>(nameof(MaxDisplayedTags))
+                .WithParameter(() => MaxDisplayedTags);
+            _maxSelectedLabelsState = registerScope.RegisterParameter<int?>(nameof(MaxSelectedLabels))
+                .WithParameter(() => MaxSelectedLabels);
             registerScope.RegisterParameter<IEqualityComparer<T?>?>(nameof(Comparer))
                 .WithParameter(() => Comparer)
                 .WithChangeHandler(OnComparerChangedAsync);
@@ -78,6 +87,7 @@ namespace Vek
             new CssBuilder("vek-select")
                 .AddClass("vek-width-full", FullWidth)
                 .AddClass("vek-width-content", FitContent && !FullWidth)
+                .AddClass("vek-select--chips", CanRenderChips)
                 .AddClass(OuterClass)
                 .Build();
 
@@ -89,6 +99,7 @@ namespace Vek
         protected string InputClassname =>
             new CssBuilder("vek-select-input")
                 .AddClass("vek-readonly", GetReadOnlyState())
+                .AddClass("vek-select-input--chips", CanRenderChips)
                 .AddClass(InputClass)
                 .Build();
 
@@ -457,6 +468,118 @@ namespace Vek
         public EventCallback<MouseEventArgs> OnClearButtonClick { get; set; }
 
         /// <summary>
+        /// Renders selected items as removable chip tags in multi-selection mode.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. Only applies when <see cref="MultiSelection"/> is <c>true</c>.
+        /// </remarks>
+        [Parameter, ParameterState(ParameterUsage = ParameterUsageOptions.None)]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public bool Chips { get; set; }
+
+        /// <summary>
+        /// The maximum number of chip tags displayed before overflowing into a summary badge.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c> (unlimited). Only applies when <see cref="MultiSelection"/> and <see cref="Chips"/> are <c>true</c>.
+        /// </remarks>
+        [Parameter, ParameterState(ParameterUsage = ParameterUsageOptions.None)]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public int? MaxDisplayedTags { get; set; }
+
+        /// <summary>
+        /// The maximum number of chip tags or labels to display before truncating with an overflow badge.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>. When set without <see cref="MaxDisplayedTags"/>, this limit is used.
+        /// </remarks>
+        [Parameter, ParameterState(ParameterUsage = ParameterUsageOptions.None)]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public int? MaxSelectedLabels { get; set; }
+
+        /// <summary>
+        /// The color of the chips rendered in multi-selection chip mode.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c> (uses default chip color).
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public Color? ChipColor { get; set; }
+
+        /// <summary>
+        /// The variant of the chips rendered in multi-selection chip mode.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Variant.Filled"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public Variant? ChipVariant { get; set; }
+
+        /// <summary>
+        /// The size of the chips rendered in multi-selection chip mode.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Size.Small"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public Size? ChipSize { get; set; }
+
+        /// <summary>
+        /// Whether chips can be closed / removed by clicking their close button.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool ChipCloseable { get; set; } = true;
+
+        /// <summary>
+        /// Optional CSS classes applied to each chip.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string? ChipClass { get; set; }
+
+        /// <summary>
+        /// Optional inline style applied to each chip.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string? ChipStyle { get; set; }
+
+        /// <summary>
+        /// Custom template used to render each chip's content.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public RenderFragment<T?>? ChipTemplate { get; set; }
+
+        /// <summary>
+        /// Custom template used to render the overflow badge displaying the count of hidden chips.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public RenderFragment<int>? OverflowChipTemplate { get; set; }
+
+        /// <summary>
+        /// Occurs when a chip close button is clicked and the value is removed from selection.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public EventCallback<T?> OnChipClose { get; set; }
+
+        /// <summary>
+        /// Occurs when a chip is removed from the selection.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public EventCallback<T?> OnChipRemoved { get; set; }
+
+        /// <summary>
         /// The list of choices the user can select.
         /// </summary>
         /// <remarks>
@@ -502,6 +625,16 @@ namespace Vek
         }
 
         protected bool IsValueInList => _context.TryGetShadowItemByValue(ReadValue, out _);
+
+        /// <summary>
+        /// Whether selected values should be rendered as chips in the input.
+        /// </summary>
+        protected bool CanRenderChips =>
+            MultiSelection &&
+            (_chipsState.Value || _maxDisplayedTagsState.Value.HasValue || _maxSelectedLabelsState.Value.HasValue) &&
+            _selectedValues.Count > 0;
+
+        private int? GetEffectiveMaxDisplayedTags() => _maxDisplayedTagsState.Value ?? _maxSelectedLabelsState.Value;
 
         /// <summary>
         /// Whether the clear button has something to clear.
@@ -1488,6 +1621,7 @@ namespace Vek
                         .OnKeyDown("End", SelectLastItem)
                         .OnKeyDownAny(["Enter", "NumpadEnter"], HandleEnterAsync)
                         .OnKeyDownAny(["a", "A"], HandleKeyAAsync)
+                        .OnKeyDown("Backspace", HandleBackspaceAsync)
                         .OnKeyDown("/^[^ ]$/", HandleCharacterSearchAsync)));
             }
 
@@ -1500,7 +1634,7 @@ namespace Vek
             {
                 UpdateFitContent();
             }
-            else if (firstRender && (CanRenderValue || IsValueInList))
+            else if (firstRender && (CanRenderValue || CanRenderChips || IsValueInList))
             {
                 // The first render runs before the shadow items register, so the value presenter could not resolve then.
                 // Only render again when the value now resolves to an item; otherwise the second pass rebuilds every item to produce the same output.
@@ -1550,6 +1684,162 @@ namespace Vek
             }
 
             return item.ChildContent;
+        }
+
+        protected RenderFragment GetChipsPresenter() => __builder =>
+        {
+            var max = GetEffectiveMaxDisplayedTags();
+            var selectedList = _selectedValues.ToList();
+            var itemsToDisplay = max.HasValue && max.Value >= 0 && max.Value < selectedList.Count
+                ? selectedList.Take(max.Value).ToList()
+                : selectedList;
+            var overflowCount = selectedList.Count - itemsToDisplay.Count;
+
+            __builder.OpenElement(0, "div");
+            __builder.AddAttribute(1, "class", "vek-select-chips");
+
+            var seq = 2;
+            foreach (var val in itemsToDisplay)
+            {
+                var localVal = val;
+                var text = GetItemText(localVal);
+
+                __builder.OpenElement(seq++, "div");
+                __builder.AddAttribute(seq++, "class", "vek-select-chip-wrapper");
+                __builder.AddEventStopPropagationAttribute(seq++, "onmousedown", true);
+                __builder.AddEventStopPropagationAttribute(seq++, "onclick", true);
+
+                __builder.OpenComponent<VekChip<T>>(seq++);
+                __builder.AddAttribute(seq++, "Size", ChipSize ?? Size.Small);
+                __builder.AddAttribute(seq++, "Variant", ChipVariant ?? Variant.Filled);
+                __builder.AddAttribute(seq++, "Color", ChipColor ?? Color.Default);
+                __builder.AddAttribute(seq++, "Disabled", GetDisabledState());
+                __builder.AddAttribute(seq++, "Class", new CssBuilder("vek-select-chip").AddClass(ChipClass).Build());
+                __builder.AddAttribute(seq++, "Style", ChipStyle);
+                if (ChipCloseable && !GetDisabledState() && !GetReadOnlyState())
+                {
+                    __builder.AddAttribute(seq++, "OnClose", EventCallback.Factory.Create<VekChip<T>>(this, () => RemoveChipAsync(localVal)));
+                }
+
+                if (ChipTemplate is not null)
+                {
+                    __builder.AddAttribute(seq++, "ChildContent", (RenderFragment)(builder => builder.AddContent(0, ChipTemplate(localVal))));
+                }
+                else
+                {
+                    __builder.AddAttribute(seq++, "Text", text);
+                }
+
+                __builder.CloseComponent();
+                __builder.CloseElement();
+            }
+
+            if (overflowCount > 0)
+            {
+                var overflowItems = selectedList.Skip(itemsToDisplay.Count).Select(GetItemText).ToList();
+                var overflowTitle = string.Join(", ", overflowItems);
+
+                __builder.OpenElement(seq++, "div");
+                __builder.AddAttribute(seq++, "class", "vek-select-chip-wrapper vek-select-chip-overflow");
+                __builder.AddAttribute(seq++, "title", overflowTitle);
+                __builder.AddEventStopPropagationAttribute(seq++, "onmousedown", true);
+                __builder.AddEventStopPropagationAttribute(seq++, "onclick", true);
+
+                if (OverflowChipTemplate is not null)
+                {
+                    __builder.AddContent(seq++, OverflowChipTemplate(overflowCount));
+                }
+                else
+                {
+                    __builder.OpenComponent<VekChip<string>>(seq++);
+                    __builder.AddAttribute(seq++, "Size", ChipSize ?? Size.Small);
+                    __builder.AddAttribute(seq++, "Variant", ChipVariant ?? Variant.Filled);
+                    __builder.AddAttribute(seq++, "Color", Color.Default);
+                    __builder.AddAttribute(seq++, "Disabled", GetDisabledState());
+                    __builder.AddAttribute(seq++, "Class", "vek-select-chip vek-select-overflow-badge");
+                    __builder.AddAttribute(seq++, "Text", $"+{overflowCount} more");
+                    __builder.CloseComponent();
+                }
+
+                __builder.CloseElement();
+            }
+
+            __builder.CloseElement();
+        };
+
+        protected string? GetItemText(T? value) => ConvertSet(value);
+
+        /// <summary>
+        /// Removes the specified value from the selection.
+        /// </summary>
+        /// <param name="value">The value to remove.</param>
+        public async Task RemoveValueAsync(T? value)
+        {
+            await RemoveChipAsync(value);
+        }
+
+        protected async Task RemoveChipAsync(T? value)
+        {
+            if (GetDisabledState() || GetReadOnlyState())
+            {
+                return;
+            }
+
+            await DeselectOptionAsync(value);
+            if (OnChipClose.HasDelegate)
+            {
+                await OnChipClose.InvokeAsync(value);
+            }
+            if (OnChipRemoved.HasDelegate)
+            {
+                await OnChipRemoved.InvokeAsync(value);
+            }
+        }
+
+        protected async Task DeselectOptionAsync(T? value)
+        {
+            var comparer = Comparer ?? EqualityComparer<T?>.Default;
+            if (!_selectedValues.Remove(value))
+            {
+                return;
+            }
+
+            var converted = _selectedValues.Select(ConvertSet).ToList();
+            var text = string.Join(Delimiter, converted);
+
+            if (MultiSelectionTextFunc is not null)
+            {
+                await SetCustomizedTextAsync(
+                    text,
+                    selectedConvertedValues: converted,
+                    multiSelectionTextFunc: MultiSelectionTextFunc
+                );
+            }
+            else
+            {
+                await SetTextAndUpdateValueAsync(text, updateValue: false);
+            }
+
+            UpdateSelectAllChecked();
+            await UpdateSelectedValuesStateAsync(comparer);
+            FieldChanged(_selectedValues);
+            await BeginValidateAsync();
+
+            if (typeof(T) == typeof(string))
+            {
+                await SetValueAndUpdateTextAsync((T?)(object?)ReadText, updateText: false);
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
+
+        private async Task HandleBackspaceAsync()
+        {
+            if (CanRenderChips && !_openState.Value && _selectedValues.Count > 0)
+            {
+                var last = _selectedValues.LastOrDefault();
+                await RemoveChipAsync(last);
+            }
         }
 
         /// <summary>
