@@ -165,7 +165,7 @@ Vek integrates targeted TypeScript helpers for interactions that require direct 
   - `src/Vek/TScripts/`: Contains TypeScript sources (`vekHelpers.ts`, `vekRipple.ts`, observers, popover positioning).
   - `entrypoint.ts`: Central export file bundled into `vek.js`.
 - **Shipped Bundle Hygiene**: Unit test files (`*.test.ts`) are executed by `bun test` and must **never** be imported into `entrypoint.ts` to prevent test harnesses from leaking into shipped production bundles.
-- **CSS Source and Release Output**: Edit styles in `src/Vek/Styles/**/*.scss` (the repository does not track a standalone `Vek.css` source file). Treat `src/Vek/wwwroot/Vek.min.css` as generated release output: do not edit or include it in feature PRs. Keep feature style changes in SCSS and include the minified bundle only when preparing release artifacts.
+- **Frontend Sources and Generated Minified Assets**: Keep style changes in `src/Vek/Styles/**/*.scss` and script changes in `src/Vek/TScripts/**/*.ts`. Do not edit or include generated `*.min.*` bundles or their source maps from `src/Vek/wwwroot/` in feature PRs. If a local build regenerates these outputs, restore them before committing. Include or update minified bundles and maps only when preparing release artifacts.
 
 ---
 
