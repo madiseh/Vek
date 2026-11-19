@@ -570,7 +570,7 @@ namespace Vek
                 var parentValue = parentItem.GetValue();
                 if (parentValue is not null)
                 {
-                    var parentSelected = parentItem.ChildItems.Select(x => x.GetValue()).Where(x => x is not null).All(x => _selection.Contains(x!));
+                    var parentSelected = AreAllChildrenSelected(parentItem, out var hasSelectableChildren) && hasSelectableChildren;
                     if (parentSelected)
                     {
                         _selection.Add(parentValue);
@@ -582,6 +582,33 @@ namespace Vek
                 }
                 parentItem = parentItem.Parent;
             }
+        }
+
+        private bool AreAllChildrenSelected(VekTreeViewItem<T> parentItem, out bool hasSelectableChildren)
+        {
+            hasSelectableChildren = false;
+            foreach (var child in parentItem.ChildItems)
+            {
+                var childValue = child.GetValue();
+                if (childValue is not null)
+                {
+                    hasSelectableChildren = true;
+                    if (!_selection.Contains(childValue))
+                    {
+                        return false;
+                    }
+                }
+
+                if (!AreAllChildrenSelected(child, out var hasSelectableDescendants))
+                {
+                    hasSelectableChildren |= hasSelectableDescendants;
+                    return false;
+                }
+
+                hasSelectableChildren |= hasSelectableDescendants;
+            }
+
+            return true;
         }
 
         internal async Task AddChildAsync(VekTreeViewItem<T> item)
