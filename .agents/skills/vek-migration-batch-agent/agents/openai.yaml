@@ -1,0 +1,7 @@
+interface:
+  display_name: "Vek Migration Batch Agent"
+  short_description: "Run an approved batch of parallel feature migrations"
+  default_prompt: "Use $vek-migration-batch-agent to propose a low-conflict batch of up to ten Vek migrations for my approval."
+
+policy:
+  allow_implicit_invocation: true
