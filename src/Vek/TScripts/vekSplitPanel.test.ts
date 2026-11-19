@@ -236,6 +236,17 @@ test("percentage sizes, bounds, and collapse/restore update the accessible divid
     panel.destroy();
 });
 
+test("collapsing a horizontal pane restores its previous height", () => {
+    const elements = renderSplitPanel();
+    VekSplitPanel.build("split", true, false, 50, null, 10, 30, 0, 20, 70, true);
+
+    expect(elements.first.style.height).toBe("180px");
+    elements.divider.dispatchEvent(new MouseEvent("dblclick"));
+    expect(elements.first.style.height).toBe("0px");
+    elements.divider.dispatchEvent(new MouseEvent("dblclick"));
+    expect(elements.first.style.height).toBe("180px");
+});
+
 test("pixel size bounds constrain keyboard and drag resizing", () => {
     const elements = renderSplitPanel();
     VekSplitPanel.build("split", false, false, 50, null, 10, 250, 1, 200, 400, false);

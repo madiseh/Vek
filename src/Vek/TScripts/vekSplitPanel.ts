@@ -272,7 +272,7 @@ export default class VekSplitPanel {
                 this.collapsed = false;
                 this._setPanelSizes(this.expandedSize || this._getContainerSize() / 2, this._getContainerSize());
             } else {
-                this.expandedSize = this.firstPanel.offsetWidth || this.firstPanel.offsetHeight || this._getContainerSize() / 2;
+                this.expandedSize = (this.horizontal ? this.firstPanel.offsetHeight : this.firstPanel.offsetWidth) || this._getContainerSize() / 2;
                 this.collapsed = true;
                 this._setPanelSizes(0, this._getContainerSize());
             }
