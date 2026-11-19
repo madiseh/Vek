@@ -4,10 +4,12 @@
 - **Feature ID**: 038
 - **Feature Slug**: textbox-debounced-bind-value-modes
 - **Module**: TextField
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 38
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/49
 - **Started At**: 2026-11-19T19:54:51Z
+- **Completed At**: 2026-11-19T20:31:59Z
 
 ---
 

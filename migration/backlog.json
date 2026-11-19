@@ -439,10 +439,12 @@
       "title": "TextBox Configurable Value Binding Modes and Debounce Delay",
       "module": "TextField",
       "priority": 38,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/038-textbox-debounced-bind-value-modes.md",
       "dependencies": [],
-      "started_at": "2026-11-19T19:54:51Z"
+      "started_at": "2026-11-19T19:54:51Z",
+      "completed_at": "2026-11-19T20:31:59Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/49"
     },
     {
       "id": "039",
