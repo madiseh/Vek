@@ -11,10 +11,10 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.Web.HtmlRendering;
 using Microsoft.Extensions.Logging.Abstractions;
+using NUnit.Framework;
 using Vek.Extensions;
 using Vek.UnitTests.Dummy;
 using Vek.UnitTests.TestComponents.NumericField;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {
