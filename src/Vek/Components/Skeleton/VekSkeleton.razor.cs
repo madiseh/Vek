@@ -44,15 +44,15 @@ namespace Vek
         [Category(CategoryTypes.Skeleton.Appearance)]
         public string? Height { set; get; }
 
-          /// <summary>
-          /// Sets the corner radius for the skeleton shape.
-          /// </summary>
-          /// <remarks>
-          /// Defaults to the shape's built-in radius.
-          /// </remarks>
-          [Parameter]
-          [Category(CategoryTypes.Skeleton.Appearance)]
-          public string? BorderRadius { get; set; }
+        /// <summary>
+        /// Sets the corner radius for the skeleton shape.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to the shape's built-in radius.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Skeleton.Appearance)]
+        public string? BorderRadius { get; set; }
 
         /// <summary>
         /// The shape of this skeleton.
