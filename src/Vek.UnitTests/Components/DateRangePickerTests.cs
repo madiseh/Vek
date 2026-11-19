@@ -7,10 +7,10 @@ using AwesomeAssertions;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using NUnit.Framework;
 using Vek.Extensions;
 using Vek.UnitTests.TestComponents.DatePicker;
 using Vek.Utilities;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {
@@ -2157,6 +2157,261 @@ namespace Vek.UnitTests.Components
             inputs.Should().OnlyContain(input => input.GetAttribute("aria-describedby") == "range-error");
             comp.Find("#range-error").TextContent.Trim().Should().Be("Invalid range");
         }
+
+        [Test]
+        public void DateRangePresets_BuiltInPresets_CalculateExpectedRanges()
+        {
+            var reference = new DateTime(2026, 11, 19); // Thursday
+
+            var today = DateRangePresets.Today().GetRange(reference);
+            today.Start.Should().Be(new DateTime(2026, 11, 19));
+            today.End.Should().Be(new DateTime(2026, 11, 19));
+
+            var yesterday = DateRangePresets.Yesterday().GetRange(reference);
+            yesterday.Start.Should().Be(new DateTime(2026, 11, 18));
+            yesterday.End.Should().Be(new DateTime(2026, 11, 18));
+
+            var thisWeek = DateRangePresets.ThisWeek().GetRange(reference);
+            thisWeek.Start.Should().Be(new DateTime(2026, 11, 16)); // Monday
+            thisWeek.End.Should().Be(new DateTime(2026, 11, 22));   // Sunday
+
+            var lastWeek = DateRangePresets.LastWeek().GetRange(reference);
+            lastWeek.Start.Should().Be(new DateTime(2026, 11, 9));
+            lastWeek.End.Should().Be(new DateTime(2026, 11, 15));
+
+            var last7Days = DateRangePresets.Last7Days().GetRange(reference);
+            last7Days.Start.Should().Be(new DateTime(2026, 11, 13));
+            last7Days.End.Should().Be(new DateTime(2026, 11, 19));
+
+            var last30Days = DateRangePresets.Last30Days().GetRange(reference);
+            last30Days.Start.Should().Be(new DateTime(2026, 10, 21));
+            last30Days.End.Should().Be(new DateTime(2026, 11, 19));
+
+            var thisMonth = DateRangePresets.ThisMonth().GetRange(reference);
+            thisMonth.Start.Should().Be(new DateTime(2026, 11, 1));
+            thisMonth.End.Should().Be(new DateTime(2026, 11, 30));
+
+            var lastMonth = DateRangePresets.LastMonth().GetRange(reference);
+            lastMonth.Start.Should().Be(new DateTime(2026, 10, 1));
+            lastMonth.End.Should().Be(new DateTime(2026, 10, 31));
+
+            var thisYear = DateRangePresets.ThisYear().GetRange(reference);
+            thisYear.Start.Should().Be(new DateTime(2026, 1, 1));
+            thisYear.End.Should().Be(new DateTime(2026, 12, 31));
+
+            var yearToDate = DateRangePresets.YearToDate().GetRange(reference);
+            yearToDate.Start.Should().Be(new DateTime(2026, 1, 1));
+            yearToDate.End.Should().Be(new DateTime(2026, 11, 19));
+
+            DateRangePresets.Default.Count.Should().Be(6);
+        }
+
+        [Test]
+        public void DateRangePreset_Constructors_And_Equality()
+        {
+            var p1 = new DateRangePreset("Custom 1", new DateRange(new DateTime(2025, 1, 1), new DateTime(2025, 1, 10)));
+            p1.Label.Should().Be("Custom 1");
+            p1.ToString().Should().Be("Custom 1");
+            p1.GetRange(DateTime.Today).Should().Be(new DateRange(new DateTime(2025, 1, 1), new DateTime(2025, 1, 10)));
+
+            var p2 = new DateRangePreset("Custom 2", new DateTime(2025, 2, 1), new DateTime(2025, 2, 15));
+            p2.GetRange(DateTime.Today).Start.Should().Be(new DateTime(2025, 2, 1));
+            p2.GetRange(DateTime.Today).End.Should().Be(new DateTime(2025, 2, 15));
+
+            var p3 = new DateRangePreset("Dynamic", refDate => new DateRange(refDate.AddDays(-2), refDate));
+            var range3 = p3.GetRange(new DateTime(2025, 5, 10));
+            range3.Start.Should().Be(new DateTime(2025, 5, 8));
+            range3.End.Should().Be(new DateTime(2025, 5, 10));
+
+            var p4 = new DateRangePreset("Parameterless", () => new DateRange(new DateTime(2025, 3, 1), new DateTime(2025, 3, 5)));
+            p4.GetRange(DateTime.Today).Start.Should().Be(new DateTime(2025, 3, 1));
+
+            var pEqual = new DateRangePreset("Custom 1", new DateRange());
+            p1.Equals(pEqual).Should().BeTrue();
+            p1.Equals(p2).Should().BeFalse();
+            p1.GetHashCode().Should().Be(pEqual.GetHashCode());
+        }
+
+        [Test]
+        public void DateRangePicker_ShowPresets_RendersDefaultPresets()
+        {
+            var comp = Context.Render<VekDateRangePicker>(parameters => parameters
+                .Add(p => p.PickerVariant, PickerVariant.Static)
+                .Add(p => p.ShowPresets, true));
+
+            var presetsContainer = comp.Find(".vek-picker-presets");
+            presetsContainer.Should().NotBeNull();
+            presetsContainer.GetAttribute("role").Should().Be("group");
+
+            var buttons = presetsContainer.QuerySelectorAll("button.vek-picker-preset-button");
+            buttons.Length.Should().Be(6);
+
+            var labels = buttons.Select(b => b.TextContent.Trim()).ToList();
+            labels.Should().Contain(["Today", "This Week", "Last 7 Days", "Last 30 Days", "This Month", "Year to Date"]);
+        }
+
+        [Test]
+        public void DateRangePicker_NoPresets_WhenNotEnabled()
+        {
+            var comp = Context.Render<VekDateRangePicker>(parameters => parameters
+                .Add(p => p.PickerVariant, PickerVariant.Static)
+                .Add(p => p.ShowPresets, false));
+
+            comp.FindAll(".vek-picker-presets").Should().BeEmpty();
+            comp.FindAll(".vek-picker-calendar-layout.has-presets").Should().BeEmpty();
+        }
+
+        [Test]
+        public void DateRangePicker_CustomPresetRanges_RendersCustomPresets()
+        {
+            var customPresets = new List<DateRangePreset>
+            {
+                new("Q1", new DateTime(2026, 1, 1), new DateTime(2026, 3, 31)),
+                new("Q2", new DateTime(2026, 4, 1), new DateTime(2026, 6, 30))
+            };
+
+            var comp = Context.Render<VekDateRangePicker>(parameters => parameters
+                .Add(p => p.PickerVariant, PickerVariant.Static)
+                .Add(p => p.PresetRanges, customPresets));
+
+            var buttons = comp.FindAll(".vek-picker-preset-button");
+            buttons.Count.Should().Be(2);
+            buttons[0].TextContent.Trim().Should().Be("Q1");
+            buttons[1].TextContent.Trim().Should().Be("Q2");
+        }
+
+        [Test]
+        public async Task DateRangePicker_ClickPreset_AppliesRangeAndHighlightsActivePreset()
+        {
+            var fakeTime = new DateTime(2026, 11, 19, 12, 0, 0, DateTimeKind.Local);
+            var customPresets = new List<DateRangePreset>
+            {
+                new("3 Days", refDate => new DateRange(refDate.AddDays(-2), refDate)),
+                new("Fixed Range", new DateTime(2026, 5, 1), new DateTime(2026, 5, 10))
+            };
+
+            var comp = Context.Render<VekDateRangePicker>(parameters => parameters
+                .Add(p => p.PickerVariant, PickerVariant.Static)
+                .Add(p => p.PresetRanges, customPresets));
+
+            var buttons = comp.FindAll(".vek-picker-preset-button");
+            buttons.Count.Should().Be(2);
+
+            // Initially neither is active
+            buttons[0].ClassList.Should().NotContain("vek-picker-preset-active");
+            buttons[0].GetAttribute("aria-pressed").Should().Be("false");
+
+            // Click the fixed range preset
+            await buttons[1].ClickAsync(new MouseEventArgs());
+
+            comp.Instance.DateRange.Should().NotBeNull();
+            comp.Instance.DateRange.Start.Should().Be(new DateTime(2026, 5, 1));
+            comp.Instance.DateRange.End.Should().Be(new DateTime(2026, 5, 10));
+
+            // Re-query buttons to check active state
+            var updatedButtons = comp.FindAll(".vek-picker-preset-button");
+            updatedButtons[1].ClassList.Should().Contain("vek-picker-preset-active");
+            updatedButtons[1].GetAttribute("aria-pressed").Should().Be("true");
+            updatedButtons[0].ClassList.Should().NotContain("vek-picker-preset-active");
+        }
+
+        [Test]
+        public async Task DateRangePicker_SelectPresetAsync_ReadOnlyOrDisabled_DoesNotModifyRange()
+        {
+            var preset = new DateRangePreset("Fixed", new DateTime(2026, 6, 1), new DateTime(2026, 6, 5));
+
+            var comp = Context.Render<VekDateRangePicker>(parameters => parameters
+                .Add(p => p.PickerVariant, PickerVariant.Static)
+                .Add(p => p.ReadOnly, true)
+                .Add(p => p.ShowPresets, true));
+
+            await comp.Instance.SelectPresetAsync(preset);
+            comp.Instance.DateRange.Should().BeNull();
+
+            var compDisabled = Context.Render<VekDateRangePicker>(parameters => parameters
+                .Add(p => p.PickerVariant, PickerVariant.Static)
+                .Add(p => p.Disabled, true)
+                .Add(p => p.ShowPresets, true));
+
+            await compDisabled.Instance.SelectPresetAsync(preset);
+            compDisabled.Instance.DateRange.Should().BeNull();
+        }
+
+        [Test]
+        public async Task DateRangePicker_AutoSwapDates_SwapsReversedClicks()
+        {
+            var comp = Context.Render<VekDateRangePicker>(parameters => parameters
+                .Add(p => p.PickerVariant, PickerVariant.Static)
+                .Add(p => p.StartMonth, new DateTime(2025, 1, 1))
+                .Add(p => p.AutoSwapDates, true));
+
+            IElement Day(int day) => comp.FindAll("button.vek-picker-calendar-day").First(x => x.TrimmedText().Equals(day.ToString()));
+
+            // Click day 20 first, then day 10
+            await Day(20).ClickAsync(new MouseEventArgs());
+            await Day(10).ClickAsync(new MouseEventArgs());
+
+            comp.Instance.DateRange.Should().Be(new DateRange(new DateTime(2025, 1, 10), new DateTime(2025, 1, 20)));
+            Day(10).ClassList.Should().Contain("vek-range-start-selected");
+            Day(20).ClassList.Should().Contain("vek-range-end-selected");
+            Day(15).ClassList.Should().Contain("vek-range-between");
+        }
+
+        [Test]
+        public async Task DateRangePicker_AutoSwapDates_False_ResetsSelectionOnEarlierClick()
+        {
+            var comp = Context.Render<VekDateRangePicker>(parameters => parameters
+                .Add(p => p.PickerVariant, PickerVariant.Static)
+                .Add(p => p.StartMonth, new DateTime(2025, 1, 1))
+                .Add(p => p.AutoSwapDates, false));
+
+            IElement Day(int day) => comp.FindAll("button.vek-picker-calendar-day").First(x => x.TrimmedText().Equals(day.ToString()));
+
+            // Click day 20, then click earlier day 10 with AutoSwapDates = false
+            await Day(20).ClickAsync(new MouseEventArgs());
+            await Day(10).ClickAsync(new MouseEventArgs());
+
+            // Should have restarted selection at day 10 without finalizing range
+            comp.Instance.DateRange.Should().BeNull();
+            Day(10).ClassList.Should().Contain("vek-range-start-selected");
+        }
+
+        [Test]
+        public void DateRangePicker_ProgrammaticReversedRange_AutoSwapsWhenEnabled()
+        {
+            var comp = Context.Render<VekDateRangePicker>(parameters => parameters
+                .Add(p => p.AutoSwapDates, true)
+                .Add(p => p.DateRange, new DateRange(new DateTime(2025, 8, 25), new DateTime(2025, 8, 5))));
+
+            comp.Instance.DateRange.Should().NotBeNull();
+            comp.Instance.DateRange.Start.Should().Be(new DateTime(2025, 8, 5));
+            comp.Instance.DateRange.End.Should().Be(new DateTime(2025, 8, 25));
+        }
+
+        [Test]
+        public void DateRangePicker_ContinuousHighlightClasses_AppliedCorrectly()
+        {
+            var start = new DateTime(2025, 3, 5);
+            var end = new DateTime(2025, 3, 10);
+
+            var comp = Context.Render<VekDateRangePicker>(parameters => parameters
+                .Add(p => p.PickerVariant, PickerVariant.Static)
+                .Add(p => p.StartMonth, new DateTime(2025, 3, 1))
+                .Add(p => p.DateRange, new DateRange(start, end)));
+
+            IElement Day(int day) => comp.FindAll("button.vek-picker-calendar-day").First(x => x.TrimmedText().Equals(day.ToString()));
+
+            Day(5).ClassList.Should().Contain("vek-range-start-selected");
+            Day(10).ClassList.Should().Contain("vek-range-end-selected");
+            Day(6).ClassList.Should().Contain("vek-range-between");
+            Day(7).ClassList.Should().Contain("vek-range-between");
+            Day(8).ClassList.Should().Contain("vek-range-between");
+            Day(9).ClassList.Should().Contain("vek-range-between");
+            Day(4).ClassList.Should().NotContain("vek-range-between");
+            Day(11).ClassList.Should().NotContain("vek-range-between");
+        }
+
+
     }
     public static class DatePickerRenderedFragmentExtensions
     {

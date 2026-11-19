@@ -624,9 +624,10 @@
       "title": "DatePicker Dual Calendar Range Selection with Preset Ranges",
       "module": "DatePicker",
       "priority": 54,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/054-datepicker-range-picker-mode.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:31:16Z"
     },
     {
       "id": "055",

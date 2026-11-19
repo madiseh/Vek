@@ -16,6 +16,9 @@ namespace Vek
         private readonly ParameterState<int?> _minDaysState;
         private readonly ParameterState<int?> _maxDaysState;
         private readonly ParameterState<bool> _allowDisabledDatesInCountState;
+        private readonly ParameterState<IReadOnlyList<DateRangePreset>?> _presetRangesState;
+        private readonly ParameterState<bool> _showPresetsState;
+        private readonly ParameterState<bool> _autoSwapDatesState;
         private DateTime? _firstDate, _secondDate;
         private (DateTime Start, DateTime End)? _earlierValidDates, _laterValidDates;
         private DateRange? _dateRange;
@@ -38,6 +41,12 @@ namespace Vek
             _allowDisabledDatesInCountState = registerScope.RegisterParameter<bool>(nameof(AllowDisabledDatesInCount))
                 .WithParameter(() => AllowDisabledDatesInCount)
                 .WithChangeHandler(RecalculateValidDays);
+            _presetRangesState = registerScope.RegisterParameter<IReadOnlyList<DateRangePreset>?>(nameof(PresetRanges))
+                .WithParameter(() => PresetRanges);
+            _showPresetsState = registerScope.RegisterParameter<bool>(nameof(ShowPresets))
+                .WithParameter(() => ShowPresets);
+            _autoSwapDatesState = registerScope.RegisterParameter<bool>(nameof(AutoSwapDates))
+                .WithParameter(() => AutoSwapDates);
 
             DisplayMonths = 2;
         }
@@ -72,6 +81,100 @@ namespace Vek
         [Parameter, ParameterState]
         [Category(CategoryTypes.FormComponent.Validation)]
         public bool AllowDisabledDatesInCount { get; set; } = true;
+
+        /// <summary>
+        /// A collection of predefined date range presets displayed for rapid selection.
+        /// </summary>
+        /// <remarks>
+        /// When configured or when <see cref="ShowPresets"/> is <c>true</c>, a preset selection panel is rendered.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public IReadOnlyList<DateRangePreset>? PresetRanges { get; set; }
+
+        /// <summary>
+        /// Displays the default quick preset date ranges when <see cref="PresetRanges"/> is not explicitly provided.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. Default presets include Today, This Week, Last 7 Days, Last 30 Days, This Month, and Year to Date.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool ShowPresets { get; set; }
+
+        /// <summary>
+        /// Automatically swaps start and end dates if the selected end date is earlier than the start date.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool AutoSwapDates { get; set; } = true;
+
+        /// <summary>
+        /// Gets the active presets collection, resolving between <see cref="PresetRanges"/> and default presets when <see cref="ShowPresets"/> is enabled.
+        /// </summary>
+        public IReadOnlyList<DateRangePreset>? EffectivePresets =>
+            _presetRangesState.Value is { Count: > 0 } ? _presetRangesState.Value :
+            _showPresetsState.Value ? DateRangePresets.Default : null;
+
+        /// <summary>
+        /// Selects a date range preset and updates the picker value.
+        /// </summary>
+        /// <param name="preset">The date range preset to select.</param>
+        public async Task SelectPresetAsync(DateRangePreset preset)
+        {
+            ArgumentNullException.ThrowIfNull(preset);
+
+            if (GetReadOnlyState() || GetDisabledState())
+            {
+                return;
+            }
+
+            var now = TimeProvider.GetLocalNow().Date;
+            var range = preset.GetRange(now);
+
+            _firstDate = null;
+            _secondDate = null;
+
+            if (range.Start.HasValue && StartMonth is null)
+            {
+                PickerMonth = new DateTime(GetCulture().Calendar.GetYear(range.Start.Value), GetCulture().Calendar.GetMonth(range.Start.Value), 1, GetCulture().Calendar);
+            }
+
+            await SetDateRangeAsync(range, updateValue: true);
+
+            if (PickerActions == null && AutoClose)
+            {
+                if (PickerVariant != PickerVariant.Static)
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(ClosingDelay), TimeProvider);
+                    await CloseAsync(false);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the specified preset matches the currently selected date range.
+        /// </summary>
+        /// <param name="preset">The date range preset to check.</param>
+        /// <returns><c>true</c> if the preset matches the current range; otherwise, <c>false</c>.</returns>
+        public bool IsPresetActive(DateRangePreset preset)
+        {
+            ArgumentNullException.ThrowIfNull(preset);
+
+            if (_dateRange?.Start is null || _dateRange?.End is null)
+            {
+                return false;
+            }
+
+            var now = TimeProvider.GetLocalNow().Date;
+            var presetRange = preset.GetRange(now);
+
+            return presetRange.Start?.Date == _dateRange.Start.Value.Date &&
+                   presetRange.End?.Date == _dateRange.End.Value.Date;
+        }
 
         /// <summary>
         /// The text displayed in the start input if no date is specified.
@@ -513,8 +616,18 @@ namespace Vek
             }
             if (_firstDate > dateTime)
             {
-                _secondDate = _firstDate;
-                _firstDate = dateTime;
+                if (_autoSwapDatesState.Value)
+                {
+                    _secondDate = _firstDate;
+                    _firstDate = dateTime;
+                }
+                else
+                {
+                    _firstDate = dateTime;
+                    _secondDate = null;
+                    RecalculateValidDays();
+                    return;
+                }
             }
             else
             {
@@ -626,13 +739,18 @@ namespace Vek
         /// <see cref="NormalizeDate"/>
         /// <param name="range">The date range to normalize</param>
         /// <returns>Normalized date range or null</returns>
-        private static DateRange? NormalizeDateRange(DateRange? range)
+        private DateRange? NormalizeDateRange(DateRange? range)
         {
             if (range is null)
                 return null;
 
             var start = NormalizeDate(range.Start);
             var end = NormalizeDate(range.End);
+
+            if (_autoSwapDatesState.Value && start.HasValue && end.HasValue && start.Value > end.Value)
+            {
+                (start, end) = (end, start);
+            }
 
             return new DateRange(start, end);
         }
