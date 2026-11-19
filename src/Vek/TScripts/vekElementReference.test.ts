@@ -73,6 +73,82 @@ test("saveFocus and restoreFocus return focus to the element that had it", () =>
     expect(document.activeElement).toBe(byId("outside"));
 });
 
+test("context menu listeners invoke .NET on the selector target and restore ARIA attributes", () => {
+    document.body.innerHTML = `<button id="actions">Actions</button>`;
+    const target = document.getElementById("actions")!;
+    const dotNetReference = { invokeMethodAsync: mock(() => Promise.resolve()) } as unknown as DotNet.DotNetObject;
+
+    const listenerId = elementRef.addContextMenuListenerForSelector("#actions", dotNetReference, 500);
+    expect(listenerId).toBeGreaterThan(0);
+    expect(target.getAttribute("aria-haspopup")).toBe("menu");
+    expect(target.getAttribute("aria-expanded")).toBe("false");
+
+    target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, clientX: 12, clientY: 18 }));
+    expect(dotNetReference.invokeMethodAsync).toHaveBeenCalledWith("OpenAtAsync", 0, 0, 12, 18);
+
+    elementRef.updateContextMenuExpanded(listenerId, true);
+    expect(target.getAttribute("aria-expanded")).toBe("true");
+    elementRef.removeContextMenuListener(listenerId);
+    expect(target.hasAttribute("aria-haspopup")).toBe(false);
+    expect(target.hasAttribute("aria-expanded")).toBe(false);
+
+    target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true }));
+    expect(dotNetReference.invokeMethodAsync).toHaveBeenCalledTimes(1);
+});
+
+test("context menu listeners preserve caller-provided ARIA attributes", () => {
+    document.body.innerHTML = `<button id="actions" aria-haspopup="dialog" aria-expanded="true">Actions</button>`;
+    const target = document.getElementById("actions")!;
+    const dotNetReference = { invokeMethodAsync: mock(() => Promise.resolve()) } as unknown as DotNet.DotNetObject;
+
+    const listenerId = elementRef.addContextMenuListenerForElement(target, dotNetReference, 500);
+    elementRef.updateContextMenuExpanded(listenerId, false);
+    expect(target.getAttribute("aria-haspopup")).toBe("dialog");
+    expect(target.getAttribute("aria-expanded")).toBe("true");
+
+    elementRef.removeContextMenuListener(listenerId);
+    expect(target.getAttribute("aria-haspopup")).toBe("dialog");
+    expect(target.getAttribute("aria-expanded")).toBe("true");
+});
+
+test("context menu listeners open after a touch long-press", () => {
+    document.body.innerHTML = `<button id="actions">Actions</button>`;
+    const target = document.getElementById("actions")!;
+    const dotNetReference = { invokeMethodAsync: mock(() => Promise.resolve()) } as unknown as DotNet.DotNetObject;
+    elementRef.addContextMenuListenerForElement(target, dotNetReference, 500);
+    jest.useFakeTimers();
+
+    const pointerDown = new Event("pointerdown", { bubbles: true }) as PointerEvent;
+    Object.defineProperties(pointerDown, {
+        pointerId: { value: 7 },
+        pointerType: { value: "touch" },
+        isPrimary: { value: true },
+        button: { value: 0 },
+        clientX: { value: 24 },
+        clientY: { value: 36 },
+        pageX: { value: 24 },
+        pageY: { value: 36 },
+    });
+    target.dispatchEvent(pointerDown);
+    jest.advanceTimersByTime(500);
+
+    expect(dotNetReference.invokeMethodAsync).toHaveBeenCalledWith("OpenAtAsync", 24, 36, 24, 36);
+});
+
+test("context menu listeners open from the Context Menu key and Shift+F10", () => {
+    document.body.innerHTML = `<button id="actions">Actions</button>`;
+    const target = document.getElementById("actions")!;
+    const dotNetReference = { invokeMethodAsync: mock(() => Promise.resolve()) } as unknown as DotNet.DotNetObject;
+    elementRef.addContextMenuListenerForElement(target, dotNetReference, 500);
+
+    target.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, cancelable: true, key: "ContextMenu" }));
+    target.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, cancelable: true, key: "F10", shiftKey: true }));
+
+    expect(dotNetReference.invokeMethodAsync).toHaveBeenCalledTimes(2);
+    expect(dotNetReference.invokeMethodAsync).toHaveBeenNthCalledWith(1, "OpenAtAsync", 0, 0, 0, 0);
+    expect(dotNetReference.invokeMethodAsync).toHaveBeenNthCalledWith(2, "OpenAtAsync", 0, 0, 0, 0);
+});
+
 test("selectRange selects text in text inputs and textareas", () => {
     const byId = renderForm();
     byId("name").value = "Ada Lovelace";

@@ -4,9 +4,12 @@
 - **Feature ID**: 051
 - **Feature Slug**: context-menu-target-selector-and-triggers
 - **Module**: Menu
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 51
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/37
+- **Started At**: 2026-11-19T11:27:51Z
+- **Completed At**: 2026-11-19T12:16:15Z
 
 ---
 
