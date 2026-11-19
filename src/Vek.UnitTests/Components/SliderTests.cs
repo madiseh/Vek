@@ -4,8 +4,8 @@ using AngleSharp.Html.Dom;
 using AwesomeAssertions;
 using Bunit;
 using Microsoft.AspNetCore.Components;
-using Vek.UnitTests.TestComponents.Slider;
 using NUnit.Framework;
+using Vek.UnitTests.TestComponents.Slider;
 
 #nullable enable
 namespace Vek.UnitTests.Components
@@ -284,6 +284,71 @@ namespace Vek.UnitTests.Components
             }
 
             container.Children.ElementAt(1).ClassList.Should().Contain("vek-slider-input");
+        }
+
+        /// <summary>
+        /// Includes the maximum value and positions marks according to their numeric values when the interval does not divide the range evenly.
+        /// </summary>
+        [Test]
+        public void TickInterval_IncludesAndPositionsMaximumMark()
+        {
+            var comp = Context.Render<VekSlider<double>>(x =>
+            {
+                x.Add(p => p.Min, 0);
+                x.Add(p => p.Max, 100);
+                x.Add(p => p.TickInterval, 30);
+                x.Add(p => p.ShowTicks, true);
+            });
+
+            var marks = comp.FindAll(".vek-slider-tickmark");
+            marks.Should().HaveCount(5);
+            marks.Select(mark => mark.GetAttribute("style")).Should().Equal(
+                "left:0%;",
+                "left:30%;",
+                "left:60%;",
+                "left:90%;",
+                "left:100%;");
+        }
+
+        /// <summary>
+        /// Formats each generated numeric tick value with the supplied label formatter.
+        /// </summary>
+        [Test]
+        public void TickMarkLabelFormatter_FormatsNumericScaleValues()
+        {
+            var comp = Context.Render<VekSlider<double>>(x =>
+            {
+                x.Add(p => p.Min, 0);
+                x.Add(p => p.Max, 100);
+                x.Add(p => p.TickInterval, 25);
+                x.Add(p => p.ShowTicks, true);
+                x.Add(p => p.TickMarkLabelFormatter, value => $"{value:0}%");
+            });
+
+            comp.FindAll(".vek-slider-track-tick-label")
+                .Select(label => label.TextContent)
+                .Should().Equal("0%", "25%", "50%", "75%", "100%");
+        }
+
+        /// <summary>
+        /// Rounds user input to the nearest configured step before reporting the value change.
+        /// </summary>
+        [Test]
+        public async Task InputValue_SnapsToNearestStep()
+        {
+            var changedValue = 0.0;
+            var comp = Context.Render<VekSlider<double>>(x =>
+            {
+                x.Add(p => p.Min, 100);
+                x.Add(p => p.Max, 200);
+                x.Add(p => p.Step, 25);
+                x.Add(p => p.ValueChanged, value => changedValue = value);
+            });
+
+            await comp.Find(".vek-slider-input").InputAsync("164");
+
+            changedValue.Should().Be(175);
+            ((IHtmlInputElement)comp.Find(".vek-slider-input")).Value.Should().Be("175");
         }
 
         [Test]

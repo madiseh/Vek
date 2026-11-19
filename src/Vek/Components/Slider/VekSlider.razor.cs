@@ -163,6 +163,26 @@ namespace Vek
         public bool TickMarks { get; set; } = false;
 
         /// <summary>
+        /// Displays tick marks along the track.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. This is an alias for <see cref="TickMarks"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Slider.Appearance)]
+        public bool ShowTicks { get; set; }
+
+        /// <summary>
+        /// Sets the spacing between displayed tick marks.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Step"/>. The maximum value is included when the interval does not divide the range evenly.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Slider.Appearance)]
+        public T? TickInterval { get; set; }
+
+        /// <summary>
         /// The tick mark labels for each step.
         /// </summary>
         /// <remarks>
@@ -171,6 +191,16 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.Slider.Appearance)]
         public string[]? TickMarkLabels { get; set; }
+
+        /// <summary>
+        /// Formats numeric tick values when explicit <see cref="TickMarkLabels"/> are not provided.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>. Only applies when <see cref="TickMarks"/> or <see cref="ShowTicks"/> is <c>true</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Slider.Appearance)]
+        public Func<double, string>? TickMarkLabelFormatter { get; set; }
 
         /// <summary>
         /// The size of this slider.
@@ -238,15 +268,70 @@ namespace Vek
         /// <inheritdoc />
         protected override void OnParametersSet()
         {
-            if (TickMarks)
-            {
-                var min = Convert.ToDecimal(Min);
-                var max = Convert.ToDecimal(Max);
-                var step = Convert.ToDecimal(Step);
-
-                _tickMarkCount = 1 + (int)((max - min) / step);
-            }
+            UpdateTickMarkCount();
             base.OnParametersSet();
+        }
+
+        private bool ShouldShowTicks => TickMarks || ShowTicks;
+
+        private void UpdateTickMarkCount()
+        {
+            if (!ShouldShowTicks)
+            {
+                _tickMarkCount = 0;
+                return;
+            }
+
+            var min = Convert.ToDecimal(Min);
+            var max = Convert.ToDecimal(Max);
+            var interval = Convert.ToDecimal(TickInterval ?? Step);
+            if (max < min || interval <= 0)
+            {
+                _tickMarkCount = 0;
+                return;
+            }
+
+            var range = max - min;
+            var fullIntervals = (int)decimal.Floor(range / interval);
+            var hasMaximumTick = range % interval != 0;
+            _tickMarkCount = fullIntervals + 1 + (hasMaximumTick ? 1 : 0);
+        }
+
+        private T GetTickMarkValue(int index)
+        {
+            var min = Convert.ToDecimal(Min);
+            var max = Convert.ToDecimal(Max);
+            if (index == _tickMarkCount - 1)
+            {
+                return Max;
+            }
+
+            var interval = Convert.ToDecimal(TickInterval ?? Step);
+            return T.CreateChecked(min + (interval * index));
+        }
+
+        private string GetTickMarkPositionStyle(int index)
+        {
+            var min = Convert.ToDecimal(Min);
+            var max = Convert.ToDecimal(Max);
+            if (max <= min)
+            {
+                return "left:0%;";
+            }
+
+            var value = Convert.ToDecimal(GetTickMarkValue(index));
+            var position = (double)((value - min) / (max - min) * 100);
+            return $"left:{position.ToString("0.##", CultureInfo.InvariantCulture)}%;";
+        }
+
+        private string? GetTickMarkLabel(int index)
+        {
+            if (TickMarkLabels is not null && index < TickMarkLabels.Length)
+            {
+                return TickMarkLabels[index];
+            }
+
+            return TickMarkLabelFormatter?.Invoke(Convert.ToDouble(GetTickMarkValue(index)));
         }
 
         private double CalculatePosition()
@@ -267,9 +352,26 @@ namespace Vek
         {
             if (T.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
             {
-                await _valueState.SetValueAsync(result);
-                await _nullableValueState.SetValueAsync(result);
+                var value = SnapToStep(result);
+                await _valueState.SetValueAsync(value);
+                await _nullableValueState.SetValueAsync(value);
             }
+        }
+
+        private T SnapToStep(T value)
+        {
+            var min = Convert.ToDecimal(Min);
+            var max = Convert.ToDecimal(Max);
+            var step = Convert.ToDecimal(Step);
+            if (max < min || step <= 0)
+            {
+                return value;
+            }
+
+            var clampedValue = Math.Clamp(Convert.ToDecimal(value), min, max);
+            var stepCount = decimal.Round((clampedValue - min) / step, MidpointRounding.AwayFromZero);
+            var snappedValue = Math.Clamp(min + (stepCount * step), min, max);
+            return T.CreateChecked(snappedValue);
         }
 
         private Task OnValueParameterChangedAsync(ParameterChangedEventArgs<T> arg)
