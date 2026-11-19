@@ -16,6 +16,14 @@ For GitHub Releases and downloadable packages, see the [Releases page](https://g
 - Added date-based year, month, quarter, and alphabetic intervals, configurable numeric intervals, and custom group-key calculators.
 - Rebuilds group definitions when interval parameters change and documents the feature with an interactive example. ([PR #23](https://github.com/madiseh/Vek/pull/23))
 
+### ✅ Test Results
+- Unit tests: 6,433 passed, 2 skipped, 0 failed (6,435 total).
+- Documentation tests: 1,456 passed, 0 skipped, 0 failed.
+- Analyzer tests: 391 passed, 0 skipped, 0 failed.
+- Format check: passed.
+- Build-only projects: 2 passed.
+- [Download the JUnit test reports](https://github.com/madiseh/Vek/releases/download/v1.1.0/test-results-v1.1.0.zip) from [candidate CI run 44408158952](https://github.com/madiseh/Vek/actions/runs/44408158952), for commit `f13fd7e55fa8a7e270a339b0aa4cb2ba0c29e379`.
+
 ---
 
 ## [v1.0.5] - 2026-11-18

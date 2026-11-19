@@ -28,7 +28,7 @@ Use this workflow when the user asks to prepare or publish a Vek release. Treat 
 
 ## 2. Verify the candidate before tagging
 
-1. Check GitHub Actions and commit statuses for the exact candidate SHA. Review all required jobs, including format checking, unit tests, docs tests, analyzer tests, and build-only projects from `build-test-vek.yml`.
+1. Check GitHub Actions and commit statuses for the exact candidate SHA. Review all required jobs, including format checking, unit tests, docs tests, analyzer tests, and build-only projects from `build-test-vek.yml`. Record the exact total, passed, skipped, and failed counts for every test project from the workflow summaries and JUnit XML reports, and confirm the sources agree.
 2. The current CI workflow runs on pull requests and pushes to `dev`, not on pushes to `master`. If the exact candidate SHA has no completed green CI run, manually dispatch `build-test-vek.yml` against `master` and wait for every job to finish.
 3. Also review checks on the PRs included in the release. A red or cancelled required check blocks release until it is understood and resolved.
 4. If any check fails, stop before creating or pushing the version tag. Report the failing run and job, and do not try to bypass it with a direct package push.
@@ -37,20 +37,21 @@ Use this workflow when the user asks to prepare or publish a Vek release. Treat 
 
 1. Generate the release text from the verified range, not from memory. Use merged PR titles and descriptions as evidence, and link each user-visible change to its PR when possible.
 2. Follow `.github/release.yml` categories and exclude `skip changelog` items. Review GitHub-generated release notes and keep the final text factual and concise. Do not rely on Nuntia preview or post-publish generation until its repository-owner condition is corrected: the current remote is `madiseh/Vek`, while the workflow only runs when `github.repository_owner == 'Vek'`.
-3. Update `CHANGELOG.md` with the new version, release date, a short summary, and grouped user-visible changes. Keep its format consistent with the existing entries.
+3. Update `CHANGELOG.md` with the new version, release date, a short summary, grouped user-visible changes, and a test-results section sourced from the exact candidate CI run. List each test project with passed, skipped, and failed counts before the full-changelog link.
 4. For each merged PR with relevant screenshots or product images, collect the image URLs from the PR description or comments, preserve their association with the feature, and add a short caption naming the feature and PR. Skip duplicates, unrelated images, and images that cannot be fetched or verified.
 5. Build one animated GIF slideshow from the selected screenshots in release order. Use a readable frame duration and fit images without distorting them. Save it as `release-slideshow.gif` and add a numbered list of image captions and PR links in the release notes so the changes remain understandable if the GIF does not animate in a viewer.
-6. If GIF creation is unavailable, add the verified images as a clearly captioned static gallery and report that an animated slideshow could not be produced. Do not describe a static gallery as a slideshow.
-7. Use GitHub's generated notes to cross-check the PR range, then verify that no merged user-visible PR is missing and no unmerged PR is included.
+6. Download the JUnit XML reports from the exact candidate CI run and package them as `test-results-vX.Y.Z.zip`. Inspect the reports for sensitive content, then attach the ZIP to the Release and link it from the test-results section. If JUnit artifacts are unavailable, report the blocker and do not claim that test results were uploaded.
+7. If GIF creation is unavailable, add the verified images as a clearly captioned static gallery and report that an animated slideshow could not be produced. Do not describe a static gallery as a slideshow.
+8. Use GitHub's generated notes to cross-check the PR range, then verify that no merged user-visible PR is missing and no unmerged PR is included.
 
 ## 4. Create the tag and draft Release
 
 1. Present the selected version, candidate SHA, release summary, and any blocking uncertainty before publication if the user has not clearly asked to publish. When the user has asked to publish, proceed with the explicitly requested release.
 2. Create the annotated tag `vX.Y.Z` on the recorded candidate SHA. Verify locally that `git rev-parse vX.Y.Z^{}` equals the candidate SHA.
 3. Push only that tag to `origin`. Do not push unrelated commits or branches.
-4. Create a GitHub draft Release for that tag and target SHA using the verified release notes. Upload `release-slideshow.gif` as a Release asset and embed it using its GitHub Release download URL. Include the static captions and PR links below the animation.
-5. Review the draft page: version, target commit, changelog text, links, image display, and attached asset must all be correct before publishing the Release.
-6. Publish the GitHub Release. This triggers `.github/workflows/nuntia-release-notes.yml`, but in the current `madiseh/Vek` repository the job is expected to skip because its owner condition is hard-coded to `Vek`. Confirm the workflow result. Keep the manually verified release notes as the source of truth; if Nuntia ran, failed, or changed the notes unexpectedly, repair the Release body and verify the slideshow and captions remain present.
+4. Create a GitHub draft Release for that tag and target SHA using the verified release notes. Set the GitHub Release title to exactly `vX.Y.Z`, with no product-name prefix (for example, `v1.1.0`, not `Vek 1.1.0` or `Vek v1.1.0`). Upload `release-slideshow.gif` and `test-results-vX.Y.Z.zip` as Release assets. Embed the slideshow and link the test-results asset from the notes.
+5. Review the draft page: confirm the title is exactly `vX.Y.Z`, and verify the tag, target commit, changelog text, per-project test counts, JUnit download link, image display, slideshow asset, and test-results asset before publishing the Release.
+6. Publish the GitHub Release. This triggers `.github/workflows/nuntia-release-notes.yml`, but in the current `madiseh/Vek` repository the job is expected to skip because its owner condition is hard-coded to `Vek`. Confirm the workflow result. Keep the manually verified release notes as the source of truth; if Nuntia ran, failed, or changed the notes unexpectedly, repair the Release body and verify the test counts, JUnit link, slideshow, and captions remain present.
 
 ## 5. Monitor NuGet publication and verify the result
 
@@ -70,4 +71,4 @@ Use this workflow when the user asks to prepare or publish a Vek release. Treat 
 
 ## Final report
 
-Report the version, tag, source SHA, release URL, PRs included, slideshow asset, CI run, NuGet.org and GitHub Packages status, and any caveats. Clearly distinguish verified completion from a queued run or delayed package indexing.
+Report the version, tag, source SHA, release URL, PRs included, slideshow and JUnit test-results assets, per-project test counts, CI run, NuGet.org and GitHub Packages status, and any caveats. Clearly distinguish verified completion from a queued run or delayed package indexing.
