@@ -4,9 +4,10 @@
 - **Feature ID**: 085
 - **Feature Slug**: card-expandable-collapsible-content
 - **Module**: Card
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 85
 - **Dependencies**: []
+- **Started At**: 2026-11-19T19:56:49Z
 
 ---
 

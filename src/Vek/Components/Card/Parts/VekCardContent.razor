@@ -1,6 +1,17 @@
 ﻿@namespace Vek
 @inherits VekComponentBase
 
-<div @attributes="UserAttributes" class="@Classname" style="@Style">
-    @ChildContent
-</div>
+@if (ParentCard?.Collapsible == true)
+{
+    <VekCollapse Class="vek-card-content-collapse" Expanded="@ParentCard.IsExpanded">
+        <div @attributes="UserAttributes" class="@Classname" style="@Style">
+            @ChildContent
+        </div>
+    </VekCollapse>
+}
+else
+{
+    <div @attributes="UserAttributes" class="@Classname" style="@Style">
+        @ChildContent
+    </div>
+}

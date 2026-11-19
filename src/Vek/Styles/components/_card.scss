@@ -38,6 +38,22 @@
   }
 }
 
+.vek-card-collapse-toggle {
+  flex: 0 0 auto;
+
+  &[aria-expanded="true"] .vek-icon {
+    transform: rotate(180deg);
+  }
+
+  .vek-icon {
+    transition: transform 300ms ease-in-out;
+  }
+}
+
+.vek-card-content-collapse {
+  width: 100%;
+}
+
 .vek-card-media {
   display: block;
   background-size: cover;
