@@ -17,7 +17,7 @@
      aria-live="polite"
      class="@SnackbarClass"
      style="@AnimationStyle"
-     @onclick="this.AsNonRenderingEventHandler(SnackbarClicked)"
+     @onclick="SnackbarClickedAsync"
      @onpointerenter="InteractionStartHandler"
      @onpointerleave="InteractionEndHandler"
      @ontouchstart="InteractionStartHandler"
@@ -44,14 +44,14 @@
         <div class="vek-snackbar-content-action">
             @if (ShowActionButton)
             {
-                <VekButton Class="vek-snackbar-action-button" Variant="@ActionVariant" Color="@ActionColor" OnClick="ActionClicked" DropShadow="false">
+                <VekButton Class="vek-snackbar-action-button" Variant="@ActionVariant" Color="@ActionColor" OnClick="ActionClickedAsync" DropShadow="false">
                     @Action
                 </VekButton>
             }
 
             @if (ShowCloseIcon)
             {
-                <VekIconButton Class="vek-snackbar-close-button ms-2" Icon="@CloseIcon" Size="Size.Small" OnClick="CloseIconClicked"
+                <VekIconButton Class="vek-snackbar-close-button ms-2" Icon="@CloseIcon" Size="Size.Small" OnClick="CloseIconClickedAsync"
                                aria-label="@Localizer[LanguageResource.VekSnackbar_Close]" />
             }
         </div>

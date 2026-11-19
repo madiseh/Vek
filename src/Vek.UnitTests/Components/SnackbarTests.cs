@@ -706,6 +706,46 @@ namespace Vek.UnitTests.Components
             await _provider.WaitForAssertionAsync(() => _provider.FindAll(".vek-snackbar").Count.Should().Be(0));
         }
 
+        /// <summary>
+        /// Keeps the snackbar visible until its asynchronous action completes.
+        /// </summary>
+        [Test]
+        [CancelAfter(5_000)]
+        public async Task ActionWaitsForAsyncCallbackBeforeDismissing()
+        {
+            var callbackStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var callbackCompletion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            Snackbar snackbar = null;
+
+            await _provider.InvokeAsync(() =>
+                snackbar = _service.Add("Item archived", Severity.Success, options =>
+                {
+                    options.ShowTransitionDuration = 0;
+                    options.VisibleStateDuration = 10;
+                    options.HideTransitionDuration = 0;
+                    options.RequireInteraction = false;
+                    options.Action = "Undo";
+                    options.OnClick = async _ =>
+                    {
+                        callbackStarted.SetResult();
+                        await callbackCompletion.Task.WaitAsync(NUnit.Framework.TestContext.CurrentContext.CancellationToken);
+                    };
+                })
+            );
+
+            var clickTask = _provider.Find(".vek-snackbar-action-button").ClickAsync();
+            await callbackStarted.Task.WaitAsync(NUnit.Framework.TestContext.CurrentContext.CancellationToken);
+
+            await AdvanceTimeAsync(100);
+            snackbar.State.SnackbarState.Should().Be(SnackbarState.Visible);
+            _provider.FindAll(".vek-snackbar").Count.Should().Be(1);
+
+            callbackCompletion.SetResult();
+            await clickTask;
+
+            _provider.FindAll(".vek-snackbar").Count.Should().Be(0);
+        }
+
         [Test]
         public async Task ActionAllowsAutoDismissWhenDisabled()
         {

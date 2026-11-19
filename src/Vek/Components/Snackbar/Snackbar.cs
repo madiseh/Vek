@@ -49,7 +49,7 @@ namespace Vek
 
         internal void Init() => TransitionTo(SnackbarState.Showing);
 
-        internal void Clicked(bool fromCloseIcon)
+        internal async Task ClickedAsync(bool fromCloseIcon)
         {
             // You should only be able to interact with the snackbar once.
             if (State.UserHasInteracted)
@@ -63,22 +63,27 @@ namespace Vek
                 // The returned Task is deliberately ignored. This approach allows the method
                 // to proceed without awaiting the completion of the task, maintaining UI responsiveness.
                 _ = State.Options.CloseButtonClickFunc?.Invoke(this);
+                State.UserHasInteracted = true;
+                TransitionTo(SnackbarState.Hiding, cancellable: false);
+                return;
             }
-            else
-            {
-                // Do not start the hiding transition if no click action
-                if (State.Options.OnClick is null)
-                {
-                    return;
-                }
 
-                // Click action is executed only if it's not from the close icon.
-                // Same as above, we are deliberately not awaiting.
-                _ = State.Options.OnClick?.Invoke(this);
+            // Do not start the hiding transition if no click action.
+            if (State.Options.OnClick is null)
+            {
+                return;
             }
 
             State.UserHasInteracted = true;
-            TransitionTo(SnackbarState.Hiding, cancellable: false);
+            PauseTransitions(true);
+            try
+            {
+                await State.Options.OnClick(this);
+            }
+            finally
+            {
+                TransitionTo(SnackbarState.Hiding, cancellable: false);
+            }
         }
 
         /// <summary>

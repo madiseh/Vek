@@ -155,6 +155,17 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Async action and undo">
+                <Description>
+                    An action callback can perform asynchronous work. The snackbar stays visible while <CodeInline>@nameof(SnackbarOptions.OnClick)</CodeInline> runs, then dismisses when the callback completes. Use <CodeInline>@nameof(SnackbarOptions.Action)</CodeInline> for its button label and <CodeInline>@nameof(CommonSnackbarOptions.ShowCloseIcon)</CodeInline> to control manual dismissal.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(SnackbarAsyncActionExample)">
+                <SnackbarAsyncActionExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Require Interaction">
                 <Description>Snackbars that define an action button stay visible until the user interacts with them. Use the <CodeInline>@nameof(CommonSnackbarOptions.RequireInteraction)</CodeInline> property to enforce this behavior for all snackbars or to opt out when actions should still dismiss automatically.</Description>
             </SectionHeader>

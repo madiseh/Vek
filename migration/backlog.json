@@ -979,9 +979,10 @@
       "title": "Snackbar Interactive Action Buttons with Async Undo Callback",
       "module": "Snackbar",
       "priority": 89,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/089-snackbar-action-button-and-undo-callback.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:56:58Z"
     },
     {
       "id": "090",

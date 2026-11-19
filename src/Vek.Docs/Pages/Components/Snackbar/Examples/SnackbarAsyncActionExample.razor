@@ -1,0 +1,25 @@
+﻿@namespace Vek.Docs.Examples
+
+@inject ISnackbar Snackbar
+
+<VekButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ArchiveItem">
+    Archive item
+</VekButton>
+
+@code {
+    private void ArchiveItem()
+    {
+        Snackbar.Add("Quarterly report archived", Severity.Success, options =>
+        {
+            options.Action = "Undo";
+            options.ActionColor = Color.Primary;
+            options.OnClick = UndoArchiveAsync;
+        });
+    }
+
+    private async Task UndoArchiveAsync(Vek.Snackbar snackbar)
+    {
+        await Task.Yield();
+        Snackbar.Add("Archive undone", Severity.Info);
+    }
+}
