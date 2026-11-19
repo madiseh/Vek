@@ -587,9 +587,10 @@
       "title": "DatePicker Disabled Date Predicates and Custom Day Cell Templates",
       "module": "DatePicker",
       "priority": 53,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/053-datepicker-disabled-dates-and-custom-rendering.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T10:14:14Z"
     },
     {
       "id": "054",

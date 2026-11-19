@@ -813,8 +813,34 @@ namespace Vek.UnitTests.Components
                 .Add(x => x.IsDateDisabledFunc, isDisabledFunc));
 
             comp.Instance.IsDateDisabledFunc.Should().Be(isDisabledFunc);
-            comp.FindAll("button.vek-picker-calendar-day").Select(button => ((IHtmlButtonElement)button).IsDisabled)
-                .Should().OnlyContain(disabled => disabled);
+            comp.FindAll("button.vek-picker-calendar-day").Should().OnlyContain(button =>
+                ((IHtmlButtonElement)button).IsDisabled && button.GetAttribute("aria-disabled") == "true");
+        }
+
+        /// <summary>
+        /// Provides disabled-date state and calendar values to a custom day cell template.
+        /// </summary>
+        [Test]
+        public async Task DayCellTemplateReceivesDateAndDisabledState()
+        {
+            var comp = Context.Render<VekDatePicker>(parameters => parameters
+                .Add(x => x.PickerVariant, PickerVariant.Static)
+                .Add(x => x.StartMonth, new DateTime(2026, 11, 1))
+                .Add(x => x.IsDateDisabledFunc, _ => true)
+                .Add(x => x.DayCellTemplate, day => builder =>
+                {
+                    builder.OpenElement(0, "span");
+                    builder.AddAttribute(1, "data-day", day.Day.ToString(CultureInfo.InvariantCulture));
+                    builder.AddAttribute(2, "data-disabled", day.IsDisabled ? "true" : "false");
+                    builder.CloseElement();
+                }));
+
+            var disabledButton = comp.Find("button.vek-picker-calendar-day[aria-disabled='true']");
+            disabledButton.GetAttribute("aria-label").Should().NotBeNullOrEmpty();
+            var dayContent = comp.Find("button.vek-picker-calendar-day[aria-disabled='true'] span");
+            dayContent.GetAttribute("data-disabled").Should().Be("true");
+            int.TryParse(dayContent.GetAttribute("data-day"), out var dayNumber).Should().BeTrue();
+            dayNumber.Should().BeInRange(1, 31);
         }
 
         [Test]
@@ -1709,6 +1735,29 @@ namespace Vek.UnitTests.Components
             await comp.InvokeAsync(() => keyInterceptorService.OnKeyDown(datePicker.ElementId, new KeyboardEventArgs() { Key = "Enter", Type = "keydown", }));
             await comp.WaitForAssertionAsync(() => comp.FindAll("div.vek-picker-open").Count.Should().Be(0));
             datePicker.Date.Should().Be(expectedDate2);
+        }
+
+        /// <summary>
+        /// Skips disabled dates while moving the highlighted day with the keyboard.
+        /// </summary>
+        [Test]
+        public async Task DatePicker_KeyboardNavigation_SkipsDisabledDates()
+        {
+            var keyInterceptorService = Context.AddKeyInterceptorService();
+            var startDate = new DateTime(2026, 11, 1);
+            var comp = Context.Render<SimpleVekDatePickerTest>(parameters => parameters
+                .Add(picker => picker.Date, startDate)
+                .Add(picker => picker.IsDateDisabledFunc, date => date is { Year: 2026, Month: 11, Day: 2 or 3 }));
+            var datePickerComponent = comp.FindComponent<VekDatePicker>();
+            var datePicker = datePickerComponent.Instance;
+
+            await comp.InvokeAsync(() => keyInterceptorService.OnKeyDown(datePicker.ElementId, new KeyboardEventArgs { Key = "Enter", Type = "keydown" }));
+            await comp.WaitForAssertionAsync(() => comp.FindAll("div.vek-picker-open").Count.Should().Be(1));
+
+            await comp.InvokeAsync(() => keyInterceptorService.OnKeyDown(datePicker.ElementId, new KeyboardEventArgs { Key = "ArrowRight", Type = "keydown" }));
+            await comp.InvokeAsync(() => keyInterceptorService.OnKeyDown(datePicker.ElementId, new KeyboardEventArgs { Key = "ArrowRight", Type = "keydown" }));
+
+            datePicker.HighlightedDate.Should().Be(new DateTime(2026, 11, 4));
         }
 
         [Test]

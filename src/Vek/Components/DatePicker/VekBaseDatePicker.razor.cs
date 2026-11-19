@@ -239,6 +239,16 @@ namespace Vek
         public Func<DateTime, bool> IsDateDisabledFunc { get; set; } = _ => false;
 
         /// <summary>
+        /// Renders the content of each calendar day button.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to the calendar day number.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public RenderFragment<DatePickerDayContext>? DayCellTemplate { get; set; }
+
+        /// <summary>
         /// The function which returns CSS classes for a date.
         /// </summary>
         /// <remarks>
