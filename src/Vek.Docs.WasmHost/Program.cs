@@ -25,7 +25,7 @@ builder.Services.AddScoped(sp =>
 
     return client;
 });
-builder.Services.TryAddDocsViewServices();
+builder.Services.TryAddDocsViewServices(builder.Configuration);
 //set the capacity max so that content is not queue. Again this is for prerending to serve the entire page back to crawler
 builder.Services.AddScoped<IRenderQueueService>(s => new RenderQueueService { Capacity = int.MaxValue });
 

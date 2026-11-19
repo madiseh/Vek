@@ -24,7 +24,7 @@ if (preRender != "True")
 }
 
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-builder.Services.TryAddDocsViewServices();
+builder.Services.TryAddDocsViewServices(builder.Configuration);
 
 var build = builder.Build();
 
