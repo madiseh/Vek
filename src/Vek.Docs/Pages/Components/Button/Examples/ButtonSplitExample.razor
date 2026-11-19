@@ -1,0 +1,52 @@
+@namespace Vek.Docs.Examples
+
+<VekStack Row="true" Spacing="3" AlignItems="AlignItems.Center" Class="flex-wrap">
+    <VekSplitButton Text="@_primaryAction"
+                    Variant="Variant.Filled"
+                    Color="Color.Primary"
+                    OnClick="@(() => SetLastAction(_primaryAction))">
+        <VekMenuItem OnClick="@(() => SetAction("Reply"))">Reply</VekMenuItem>
+        <VekMenuItem OnClick="@(() => SetAction("Reply All"))">Reply All</VekMenuItem>
+        <VekMenuItem OnClick="@(() => SetAction("Forward"))">Forward</VekMenuItem>
+        <VekMenuItem OnClick="@(() => SetAction("Delete"))">Delete</VekMenuItem>
+    </VekSplitButton>
+
+    <VekSplitButton Text="Save"
+                    Variant="Variant.Outlined"
+                    Color="Color.Secondary"
+                    StartIcon="@Icons.Material.Filled.Save"
+                    OnClick="@(() => SetLastAction("Saved"))">
+        <VekMenuItem OnClick="@(() => SetLastAction("Saved as Draft"))">Save as Draft</VekMenuItem>
+        <VekMenuItem OnClick="@(() => SetLastAction("Saved and Published"))">Save & Publish</VekMenuItem>
+        <VekMenuItem OnClick="@(() => SetLastAction("Exported as Template"))">Export as Template</VekMenuItem>
+    </VekSplitButton>
+
+    <VekDropDownButton Text="Export"
+                       Variant="Variant.Filled"
+                       Color="Color.Tertiary"
+                       StartIcon="@Icons.Material.Filled.FileDownload">
+        <VekMenuItem OnClick="@(() => SetLastAction("Exported PDF"))">PDF Document (.pdf)</VekMenuItem>
+        <VekMenuItem OnClick="@(() => SetLastAction("Exported Excel"))">Excel Spreadsheet (.xlsx)</VekMenuItem>
+        <VekMenuItem OnClick="@(() => SetLastAction("Exported CSV"))">CSV Data File (.csv)</VekMenuItem>
+    </VekDropDownButton>
+
+    <VekText Typo="Typo.body2" Class="ms-2">
+        Last action: <b>@_lastAction</b>
+    </VekText>
+</VekStack>
+
+@code {
+    private string _primaryAction = "Reply";
+    private string _lastAction = "None";
+
+    private void SetAction(string action)
+    {
+        _primaryAction = action;
+        _lastAction = $"{action} selected";
+    }
+
+    private void SetLastAction(string action)
+    {
+        _lastAction = $"{action} executed";
+    }
+}

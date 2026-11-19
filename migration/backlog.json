@@ -386,9 +386,10 @@
       "title": "SplitButton with Dual Actions and DropDown Menu",
       "module": "Button",
       "priority": 33,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/033-split-button-and-dropdown-actions.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:28:59Z"
     },
     {
       "id": "034",
