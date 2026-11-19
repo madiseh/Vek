@@ -1075,10 +1075,12 @@
       "title": "Pagination Integrated Page Size Selector Dropdown and Direct Page Jump Input",
       "module": "Pagination",
       "priority": 98,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/098-pagination-page-size-selector-and-quick-jump.md",
       "dependencies": [],
-      "started_at": "2026-11-19T21:49:00Z"
+      "started_at": "2026-11-19T21:49:00Z",
+      "completed_at": "2026-11-19T22:37:29Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/59"
     },
     {
       "id": "099",
