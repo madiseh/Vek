@@ -1,0 +1,21 @@
+﻿@namespace Vek.Docs.Examples
+<div class="vek-width-full" style="height: 260px">
+    <VekSplitPanel @bind-PaneSize="_paneSize" PaneSizeUnit="SplitPanelSizeUnit.Percentage" MinSize="20" MaxSize="80" Collapsible="true" ResetOnDoubleClick="false" Class="vek-width-full vek-height-full">
+        <FirstPanel>
+            <div class="pa-4">
+                <VekText Typo="Typo.subtitle1">Navigation pane</VekText>
+                <VekText Color="Color.Secondary">Drag the bar, use arrow keys, or double-click to collapse.</VekText>
+            </div>
+        </FirstPanel>
+        <SecondPanel>
+            <div class="pa-4">
+                <VekText Typo="Typo.subtitle1">Workspace</VekText>
+                <VekText Color="Color.Secondary">First pane: @_paneSize?.ToString("0")%</VekText>
+            </div>
+        </SecondPanel>
+    </VekSplitPanel>
+</div>
+
+@code {
+    private double? _paneSize = 32;
+}

@@ -218,3 +218,38 @@ test("build warns about a missing container or an unexpected child count", () =>
         "VekSplitPanel: Invalid child count '1'.",
     ]);
 });
+
+test("percentage sizes, bounds, and collapse/restore update the accessible divider", () => {
+    const elements = renderSplitPanel();
+    VekSplitPanel.build("split", false, false, 50, null, 10, 30, 0, 20, 70, true);
+    const panel = window.splitPanels["split"]!;
+
+    expect(elements.first.style.width).toBe("300px");
+    expect(elements.divider.ariaValueNow).toBe("30.00");
+    key(elements.divider, "End");
+    expect(elements.first.style.width).toBe("700px");
+
+    elements.divider.dispatchEvent(new MouseEvent("dblclick"));
+    expect(elements.first.style.width).toBe("0px");
+    elements.divider.dispatchEvent(new MouseEvent("dblclick"));
+    expect(elements.first.style.width).toBe("700px");
+    panel.destroy();
+});
+
+test("pixel size bounds constrain keyboard and drag resizing", () => {
+    const elements = renderSplitPanel();
+    VekSplitPanel.build("split", false, false, 50, null, 10, 250, 1, 200, 400, false);
+    key(elements.divider, "Home");
+    expect(elements.first.style.width).toBe("200px");
+    key(elements.divider, "End");
+    expect(elements.first.style.width).toBe("400px");
+});
+
+test("dragging reports the updated pane size in the configured unit", () => {
+    const elements = renderSplitPanel();
+    const invokeMethodAsync = jest.fn(() => Promise.resolve());
+    VekSplitPanel.build("split", false, false, 50, null, 10, 30, 0, 20, 70, false, { invokeMethodAsync });
+    key(elements.divider, "ArrowRight");
+
+    expect(invokeMethodAsync).toHaveBeenCalledWith("OnPaneSizeChangedAsync", 31);
+});

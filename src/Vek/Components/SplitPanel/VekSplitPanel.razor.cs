@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Vek.State;
 using Vek.Utilities;
 
 namespace Vek;
@@ -9,6 +10,16 @@ namespace Vek;
 /// </summary>
 public partial class VekSplitPanel : VekComponentBase, IAsyncDisposable
 {
+    private readonly ParameterState<double?> _paneSizeState;
+
+    public VekSplitPanel()
+    {
+        using var registerScope = CreateRegisterScope();
+        _paneSizeState = registerScope.RegisterParameter<double?>(nameof(PaneSize))
+            .WithParameter(() => PaneSize)
+            .WithEventCallback(() => PaneSizeChanged);
+    }
+
     private string Classname => new CssBuilder("vek-split-panel")
         .AddClass("flex-column", Horizontal)
         .AddClass("absolute", UseAsOverlay)
@@ -112,6 +123,48 @@ public partial class VekSplitPanel : VekComponentBase, IAsyncDisposable
     public int? FirstPanelInitialSize { get; set; }
 
     /// <summary>
+    /// The size of the first pane, in the unit selected by <see cref="PaneSizeUnit"/>.
+    /// </summary>
+    /// <remarks>Defaults to an even split. Bind this parameter to receive changes made by dragging or keyboard input.</remarks>
+    [Parameter, ParameterState, Category(CategoryTypes.SplitPanel.Behavior)]
+    public double? PaneSize { get; set; }
+
+    /// <summary>
+    /// Raised when the first pane is resized.
+    /// </summary>
+    [Parameter, Category(CategoryTypes.SplitPanel.Behavior)]
+    public EventCallback<double?> PaneSizeChanged { get; set; }
+
+    /// <summary>
+    /// Selects whether pane sizes and constraints use percentages or pixels.
+    /// </summary>
+    /// <remarks>Defaults to <see cref="SplitPanelSizeUnit.Percentage"/>.
+    /// </remarks>
+    [Parameter, Category(CategoryTypes.SplitPanel.Behavior)]
+    public SplitPanelSizeUnit PaneSizeUnit { get; set; } = SplitPanelSizeUnit.Percentage;
+
+    /// <summary>
+    /// The minimum size of the first pane, in <see cref="PaneSizeUnit"/> units.
+    /// </summary>
+    /// <remarks>Defaults to <c>null</c>; <see cref="MinPanelSize"/> still applies.</remarks>
+    [Parameter, Category(CategoryTypes.SplitPanel.Behavior)]
+    public double? MinSize { get; set; }
+
+    /// <summary>
+    /// The maximum size of the first pane, in <see cref="PaneSizeUnit"/> units.
+    /// </summary>
+    /// <remarks>Defaults to <c>null</c>.</remarks>
+    [Parameter, Category(CategoryTypes.SplitPanel.Behavior)]
+    public double? MaxSize { get; set; }
+
+    /// <summary>
+    /// Allows double-clicking the divider to collapse and restore the first pane.
+    /// </summary>
+    /// <remarks>Defaults to <c>false</c>.</remarks>
+    [Parameter, Category(CategoryTypes.SplitPanel.Behavior)]
+    public bool Collapsible { get; set; }
+
+    /// <summary>
     /// The height and width in pixel each panel can't be made smaller than.
     /// </summary>
     /// <remarks>
@@ -185,6 +238,8 @@ public partial class VekSplitPanel : VekComponentBase, IAsyncDisposable
     // teardown unsubscribes the exact id that was built.
     private string? _builtContainerId;
 
+    private DotNetObjectReference<VekSplitPanel>? _dotNetReference;
+
     private string ResolvedContainerId => _builtContainerId ?? GetEffectiveElementId(_containerId);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -194,7 +249,8 @@ public partial class VekSplitPanel : VekComponentBase, IAsyncDisposable
         if (firstRender)
         {
             _builtContainerId = GetEffectiveElementId(_containerId);
-            await JsRuntime.InvokeVoidAsync("vekSplitPanel.build", _builtContainerId, Horizontal, ResetOnDoubleClick, MinPanelSize, FirstPanelInitialSize, PanelGap);
+            _dotNetReference = DotNetObjectReference.Create(this);
+            await JsRuntime.InvokeVoidAsync("vekSplitPanel.build", _builtContainerId, Horizontal, ResetOnDoubleClick, MinPanelSize, FirstPanelInitialSize, PanelGap, _paneSizeState.Value, PaneSizeUnit, MinSize, MaxSize, Collapsible, _dotNetReference);
         }
     }
 
@@ -204,9 +260,15 @@ public partial class VekSplitPanel : VekComponentBase, IAsyncDisposable
 
         if (IsJSRuntimeAvailable)
         {
-            await JsRuntime.InvokeVoidAsync("vekSplitPanel_update", ResolvedContainerId, Horizontal, ResetOnDoubleClick, MinPanelSize, PanelGap);
+            await JsRuntime.InvokeVoidAsync("vekSplitPanel_update", ResolvedContainerId, Horizontal, ResetOnDoubleClick, MinPanelSize, PanelGap, _paneSizeState.Value, PaneSizeUnit, MinSize, MaxSize, Collapsible);
         }
     }
+
+    /// <summary>
+    /// Updates the bound pane size after an interactive resize.
+    /// </summary>
+    [JSInvokable]
+    public Task OnPaneSizeChangedAsync(double? size) => _paneSizeState.SetValueAsync(size);
 
     /// <summary>
     /// Resets the divider position to its initial value.
@@ -240,6 +302,7 @@ public partial class VekSplitPanel : VekComponentBase, IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         await JsRuntime.InvokeVoidAsyncWithErrorHandling("vekSplitPanel_destroy", ResolvedContainerId);
+        _dotNetReference?.Dispose();
         GC.SuppressFinalize(this);
     }
 }

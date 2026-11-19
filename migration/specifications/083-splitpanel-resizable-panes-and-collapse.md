@@ -4,9 +4,10 @@
 - **Feature ID**: 083
 - **Feature Slug**: splitpanel-resizable-panes-and-collapse
 - **Module**: SplitPanel
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 83
 - **Dependencies**: []
+- **Started At**: 2026-11-19T19:56:48Z
 
 ---
 
