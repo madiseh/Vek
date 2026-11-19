@@ -4,10 +4,12 @@
 - **Feature ID**: 085
 - **Feature Slug**: card-expandable-collapsible-content
 - **Module**: Card
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 85
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/52
 - **Started At**: 2026-11-19T19:56:49Z
+- **Completed At**: 2026-11-19T21:09:23Z
 
 ---
 
