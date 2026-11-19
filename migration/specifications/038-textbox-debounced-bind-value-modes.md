@@ -4,9 +4,10 @@
 - **Feature ID**: 038
 - **Feature Slug**: textbox-debounced-bind-value-modes
 - **Module**: TextField
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 38
 - **Dependencies**: []
+- **Started At**: 2026-11-19T19:54:51Z
 
 ---
 

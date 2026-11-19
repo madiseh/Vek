@@ -11,6 +11,7 @@ namespace Vek
     public abstract class VekDebouncedInput<T> : VekBaseInput<T>
     {
         private DebounceDispatcher? _debouncer;
+        private double _debounceIntervalMilliseconds;
 
         protected VekDebouncedInput()
         {
@@ -23,6 +24,8 @@ namespace Vek
 
         [Inject]
         private TimeProvider TimeProvider { get; set; } = null!;
+
+        protected virtual double EffectiveDebounceInterval => DebounceInterval;
 
         /// <summary>
         /// The number of milliseconds to wait before updating the <see cref="VekBaseInput{T}.Text"/> value.
@@ -41,14 +44,14 @@ namespace Vek
         public EventCallback<string> OnDebounceIntervalElapsed { get; set; }
 
         /// <inheritdoc />
-        protected internal override bool EffectiveImmediate => Immediate || DebounceInterval > 0;
+        protected internal override bool EffectiveImmediate => Immediate || EffectiveDebounceInterval > 0;
 
         /// <inheritdoc />
         protected override Task UpdateTextPropertyAsync(bool updateValue)
         {
             // Don't update text if we're debouncing and the value hasn't actually changed
             var suppressTextUpdate = !updateValue
-                                     && DebounceInterval > 0
+                                       && EffectiveDebounceInterval > 0
                                      && _debouncer is not null
                                      && _debouncer.IsPending;
 
@@ -69,7 +72,7 @@ namespace Vek
                 return base.UpdateValuePropertyAsync(updateText);
             }
             // if debounce interval is 0 or no debouncer, we update immediately
-            if (DebounceInterval <= 0 || _debouncer is null)
+            if (EffectiveDebounceInterval <= 0 || _debouncer is null)
             {
                 return base.UpdateValuePropertyAsync(updateText);
             }
@@ -97,33 +100,53 @@ namespace Vek
             // The DebounceInterval change handler only runs for values that arrive through the ParameterView.
             // A value coming from a property initializer or from the constructor of a derived component never
             // does, so seed the debouncer here from the initial value.
-            _debouncer ??= CreateDebouncer(DebounceInterval);
+            _debouncer ??= CreateDebouncer(EffectiveDebounceInterval);
+            _debounceIntervalMilliseconds = EffectiveDebounceInterval;
         }
 
-        private async Task OnDebounceIntervalChangedAsync(ParameterChangedEventArgs<double> args)
+        private Task OnDebounceIntervalChangedAsync(ParameterChangedEventArgs<double> args)
         {
-            if (args.Value <= 0)
+            return UpdateDebouncerIntervalAsync(EffectiveDebounceInterval);
+        }
+
+        protected async Task UpdateDebouncerIntervalAsync(double intervalMilliseconds)
+        {
+            if (intervalMilliseconds <= 0)
             {
-                // not debounced, dispose debouncer if any
                 _debouncer?.Dispose();
                 _debouncer = null;
+                _debounceIntervalMilliseconds = 0;
                 return;
             }
 
-            // Create debouncer if we don't have one
             if (_debouncer is null)
             {
-                _debouncer = CreateDebouncer(args.Value);
+                _debouncer = CreateDebouncer(intervalMilliseconds);
+                _debounceIntervalMilliseconds = intervalMilliseconds;
+                return;
             }
-            else
+
+            if (!DoubleEpsilonEqualityComparer.Default.Equals(_debounceIntervalMilliseconds, intervalMilliseconds))
             {
-                // Only update interval if it has meaningfully changed
-                // Use DoubleEpsilonEqualityComparer to avoid unnecessary updates due to floating-point precision
-                if (!DoubleEpsilonEqualityComparer.Default.Equals(args.LastValue, args.Value))
-                {
-                    await _debouncer.UpdateIntervalAsync(TimeSpan.FromMilliseconds(args.Value));
-                }
+                await _debouncer.UpdateIntervalAsync(TimeSpan.FromMilliseconds(intervalMilliseconds));
+                _debounceIntervalMilliseconds = intervalMilliseconds;
             }
+        }
+
+        protected async Task CommitTextValueAsync()
+        {
+            if (_debouncer is { IsPending: true })
+            {
+                await _debouncer.CancelAsync();
+            }
+
+            var pendingValue = ConvertGet(ReadText);
+            if (EqualityComparer<T?>.Default.Equals(ReadValue, pendingValue))
+            {
+                return;
+            }
+
+            await SetValueAndUpdateTextAsync(pendingValue, updateText: false);
         }
 
         private DebounceDispatcher? CreateDebouncer(double intervalMilliseconds) => intervalMilliseconds > 0
@@ -132,7 +155,7 @@ namespace Vek
 
         private async Task<bool> SynchronizePendingValueForValidationAsync()
         {
-            if (DebounceInterval <= 0 || _debouncer is null || !_debouncer.IsPending)
+            if (EffectiveDebounceInterval <= 0 || _debouncer is null || !_debouncer.IsPending)
             {
                 return false;
             }
