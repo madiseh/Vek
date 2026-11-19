@@ -4,10 +4,12 @@
 - **Feature ID**: 041
 - **Feature Slug**: spin-edit-mousewheel-and-acceleration
 - **Module**: NumericField
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 41
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/34
 - **Started At**: 2026-11-19T10:29:01Z
+- **Completed At**: 2026-11-19T12:01:25Z
 
 ---
 
