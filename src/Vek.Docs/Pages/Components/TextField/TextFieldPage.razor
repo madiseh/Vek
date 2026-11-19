@@ -48,9 +48,9 @@
         </DocsPageSection>
 
         <DocsPageSection>
-            <SectionHeader Title="Clear Button">
+              <SectionHeader Title="Clear Button Display Modes">
                 <Description>
-                    Enable the <CodeInline>Clearable</CodeInline> property to add a clear button that allows users to quickly empty the text field. This works alongside other adornments.
+                      Set <CodeInline>ClearButtonDisplayMode</CodeInline> to <CodeInline>Never</CodeInline>, <CodeInline>WhileEditing</CodeInline>, or <CodeInline>Always</CodeInline> to control when the clear action appears. The clear action empties the bound value, invokes <CodeInline>OnClearButtonClick</CodeInline>, and returns focus to the input. The legacy <CodeInline>Clearable</CodeInline> parameter remains supported.
                 </Description>
             </SectionHeader>
             <SectionContent Code="@nameof(TextFieldClearableAndInputTypeExample)" ShowCode="false">
