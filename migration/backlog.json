@@ -1001,9 +1001,10 @@
       "title": "Skeleton Pre-Configured Shape Cards, Avatars, and Synchronized Shimmer",
       "module": "Skeleton",
       "priority": 91,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/091-skeleton-bone-shapes-and-shimmer-animation.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:56:59Z"
     },
     {
       "id": "092",

@@ -20,6 +20,7 @@ namespace Vek
             new StyleBuilder()
                 .AddStyle("height", $"{Height}", !string.IsNullOrEmpty(Height))
                 .AddStyle("width", $"{Width}", !string.IsNullOrEmpty(Width))
+                  .AddStyle("border-radius", BorderRadius, !string.IsNullOrEmpty(BorderRadius))
                 .AddStyle(Style)
                 .Build();
 
@@ -42,6 +43,16 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.Skeleton.Appearance)]
         public string? Height { set; get; }
+
+          /// <summary>
+          /// Sets the corner radius for the skeleton shape.
+          /// </summary>
+          /// <remarks>
+          /// Defaults to the shape's built-in radius.
+          /// </remarks>
+          [Parameter]
+          [Category(CategoryTypes.Skeleton.Appearance)]
+          public string? BorderRadius { get; set; }
 
         /// <summary>
         /// The shape of this skeleton.

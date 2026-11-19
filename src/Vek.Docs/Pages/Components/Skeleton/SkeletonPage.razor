@@ -6,10 +6,19 @@
 
         <DocsPageSection>
             <SectionHeader Title="Variants">
-                <Description>The component can take the shape of 3 different variants.</Description>
+                <Description>Choose text, circle, rectangle, or rounded card shapes. Use a circle for an avatar placeholder and set <CodeInline>BorderRadius</CodeInline> when the surrounding content uses a custom radius.</Description>
             </SectionHeader>
             <SectionContent Code="@nameof(SkeletonVariantsExample)" Block="true">
                 <SkeletonVariantsExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Synchronized shimmer for loading cards">
+                <Description>Use <CodeInline>Animation.Shimmer</CodeInline> on related bones so their wave starts together. The loading label can be replaced with a more specific accessible name, and reduced-motion settings stop the animation.</Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(SkeletonShimmerExample)" Block="true">
+                <SkeletonShimmerExample />
             </SectionContent>
         </DocsPageSection>
 
