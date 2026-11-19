@@ -7,8 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using Microsoft.JSInterop.Infrastructure;
 using Moq;
-using Vek.UnitTests.TestComponents.Table;
 using NUnit.Framework;
+using Vek.UnitTests.TestComponents.Table;
 
 namespace Vek.UnitTests.Components
 {

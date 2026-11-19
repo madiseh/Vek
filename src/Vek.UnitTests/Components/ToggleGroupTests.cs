@@ -9,9 +9,9 @@ using Bunit;
 using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NUnit.Framework;
 using Vek.UnitTests.Mocks;
 using Vek.UnitTests.TestComponents.ToggleGroup;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {
@@ -324,7 +324,7 @@ namespace Vek.UnitTests.Components
                 items.Except([currentItem]).All(x => !x.Selected).Should().BeTrue();
                 if (selMode == SelectionMode.ToggleSelection)
                 {
-                        timeProvider.Advance(TimeSpan.FromMilliseconds(301));
+                    timeProvider.Advance(TimeSpan.FromMilliseconds(301));
                     await comp.FindAll(".vek-toggle-item").GetItemByIndex(i).ClickAsync();
                     currentItem.Selected.Should().BeFalse();
                 }

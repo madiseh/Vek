@@ -3,9 +3,9 @@ using AwesomeAssertions;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
+using NUnit.Framework;
 using Vek.Extensions;
 using Vek.UnitTests.TestComponents.Stepper;
-using NUnit.Framework;
 
 #nullable enable
 namespace Vek.UnitTests.Components

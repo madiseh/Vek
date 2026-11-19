@@ -2,9 +2,9 @@
 using AwesomeAssertions;
 using Bunit;
 using Bunit.Rendering;
+using NUnit.Framework;
 using Vek.Extensions;
 using Vek.Utilities;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.State;
 

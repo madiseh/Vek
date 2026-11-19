@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
+using NUnit.Framework;
 using Vek.Extensions;
 using Vek.UnitTests.TestComponents.ThemeProvider;
 using Vek.Utilities;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {

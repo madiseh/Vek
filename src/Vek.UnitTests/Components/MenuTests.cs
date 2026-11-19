@@ -10,9 +10,9 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
+using NUnit.Framework;
 using Vek.Extensions;
 using Vek.UnitTests.TestComponents.Menu;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {
@@ -1448,7 +1448,7 @@ namespace Vek.UnitTests.Components
             menu.GetState(x => x.Open).Should().BeTrue();
 
             // Past the 50ms window, a real click is honored and closes it.
-              await comp.InvokeAsync(() => timeProvider.Advance(TimeSpan.FromMilliseconds(301)));
+            await comp.InvokeAsync(() => timeProvider.Advance(TimeSpan.FromMilliseconds(301)));
             await comp.Find("button.vek-button-root").ClickAsync(new MouseEventArgs { Button = 0 });
             await comp.WaitForAssertionAsync(() => menu.GetState(x => x.Open).Should().BeFalse());
         }

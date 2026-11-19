@@ -2,9 +2,9 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using NUnit.Framework;
 using Vek.Docs.Examples;
 using Vek.UnitTests.TestComponents.ChipSet;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {

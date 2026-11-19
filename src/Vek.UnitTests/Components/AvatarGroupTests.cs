@@ -1,7 +1,7 @@
 ﻿using AwesomeAssertions;
 using Bunit;
-using Vek.UnitTests.TestComponents.AvatarGroup;
 using NUnit.Framework;
+using Vek.UnitTests.TestComponents.AvatarGroup;
 
 namespace Vek.UnitTests.Components
 {

@@ -5,8 +5,8 @@
 using AngleSharp.Dom;
 using AwesomeAssertions;
 using Bunit;
-using Vek.UnitTests.TestComponents.Collapse;
 using NUnit.Framework;
+using Vek.UnitTests.TestComponents.Collapse;
 
 namespace Vek.UnitTests.Components
 {

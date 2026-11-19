@@ -6,8 +6,8 @@ using AngleSharp.Dom;
 using AwesomeAssertions;
 using Bunit;
 using Microsoft.AspNetCore.Components.Web;
-using Vek.UnitTests.TestComponents.DataGrid;
 using NUnit.Framework;
+using Vek.UnitTests.TestComponents.DataGrid;
 
 #nullable enable
 namespace Vek.UnitTests.Components
