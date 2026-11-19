@@ -201,6 +201,16 @@ namespace Vek
         public bool AlwaysShowScrollButtons { get; set; }
 
         /// <summary>
+        /// Controls whether overflowing tab headers can be scrolled and how navigation buttons are shown.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="TabsScrollMode.Auto"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Tabs.Appearance)]
+        public TabsScrollMode ScrollMode { get; set; } = TabsScrollMode.Auto;
+
+        /// <summary>
         /// The maximum height for this component, in pixels.
         /// </summary>
         /// <remarks>
@@ -515,7 +525,8 @@ namespace Vek
         {
             var dragAndDropChanged = parameters.TryGetValue<bool>(nameof(EnableDragAndDrop), out var _);
             var positionChanged = parameters.TryGetValue<Position>(nameof(Position), out var _);
-            if (dragAndDropChanged || positionChanged)
+            var scrollModeChanged = parameters.TryGetValue<TabsScrollMode>(nameof(ScrollMode), out var scrollMode) && scrollMode != ScrollMode;
+            if (dragAndDropChanged || positionChanged || scrollModeChanged)
             {
                 // need to recalculate the layout since drag and drop and position
                 // changes the tab structure more broadly
@@ -858,11 +869,18 @@ namespace Vek
         /// The pixel-based scroll offset for the tab bar, used as the value for the CSS transform property.
         /// For horizontal tabs, _scrollPosition is applied to translateX; for vertical tabs, to translateY.
         /// </summary>
-        protected string WrapperScrollStyle =>
-            new StyleBuilder()
-                .AddStyle("transform", $"translateX({(-1 * _scrollPosition).ToString(CultureInfo.InvariantCulture)}px)", !_isVerticalTabs)
-                .AddStyle("transform", $"translateY({(-1 * _scrollPosition).ToString(CultureInfo.InvariantCulture)}px)", _isVerticalTabs)
-                .Build();
+        protected string WrapperScrollStyle
+        {
+            get
+            {
+                var scrollPosition = ScrollMode == TabsScrollMode.None ? 0 : _scrollPosition;
+
+                return new StyleBuilder()
+                    .AddStyle("transform", $"translateX({(-1 * scrollPosition).ToString(CultureInfo.InvariantCulture)}px)", !_isVerticalTabs)
+                    .AddStyle("transform", $"translateY({(-1 * scrollPosition).ToString(CultureInfo.InvariantCulture)}px)", _isVerticalTabs)
+                    .Build();
+            }
+        }
 
         protected string PanelsClassnames =>
             new CssBuilder("vek-tabs-panels")
@@ -999,7 +1017,14 @@ namespace Vek
         /// </remarks>
         private Task UpdateVisualStateAsync()
         {
-            CenterScrollPositionAroundSelectedItem();
+            if (ScrollMode == TabsScrollMode.None)
+            {
+                _scrollPosition = 0;
+            }
+            else
+            {
+                CenterScrollPositionAroundSelectedItem();
+            }
             SetScrollabilityStates();
             SetSliderState();
             return InvokeAsync(StateHasChanged);
@@ -1142,7 +1167,12 @@ namespace Vek
         /// </summary>
         private void SetScrollButtonVisibility()
         {
-            _showScrollButtons = AlwaysShowScrollButtons || (int)_allTabsSize > (int)_tabBarContentSize;
+            _showScrollButtons = ScrollMode switch
+            {
+                TabsScrollMode.NavButtons => true,
+                TabsScrollMode.None => false,
+                _ => AlwaysShowScrollButtons || (int)_allTabsSize > (int)_tabBarContentSize
+            };
         }
 
         private void ScrollPrev()
@@ -1158,6 +1188,26 @@ namespace Vek
         private void ScrollNext()
         {
             ScrollBy(isNext: true);
+            SetScrollabilityStates();
+        }
+
+        private void HandleWheel(WheelEventArgs args)
+        {
+            if (ScrollMode == TabsScrollMode.None || _isVerticalTabs || _panels.Count == 0)
+            {
+                return;
+            }
+
+            var delta = Math.Abs(args.DeltaX) > 0 ? args.DeltaX : args.DeltaY;
+            if (delta == 0)
+            {
+                return;
+            }
+
+            var isMirrored = RightToLeft;
+            var current = isMirrored ? -_scrollPosition : _scrollPosition;
+            var position = ScrollEdgeAdjust(current + delta, GetPanelLength(_panels[^1]));
+            _scrollPosition = isMirrored ? -position : position;
             SetScrollabilityStates();
         }
 
