@@ -3,6 +3,38 @@
 All notable changes to Vek will be documented in this file.
 For GitHub Releases and downloadable packages, see the [Releases page](https://github.com/madiseh/Vek/releases).
 
+## [v1.2.0] - 2026-11-19
+
+> Vek v1.2.0 adds new input, navigation, selection, and layout options across core Blazor components.
+
+### ✨ Component Features
+- Added configurable TextField clear button display modes. ([PR #28](https://github.com/madiseh/Vek/pull/28))
+- Added loading states that prevent button activation while work is in progress. ([PR #29](https://github.com/madiseh/Vek/pull/29))
+- Added disabled-date predicates and custom day templates to DatePicker. ([PR #30](https://github.com/madiseh/Vek/pull/30))
+- Added cascading tri-state checkbox selection to TreeView. ([PR #31](https://github.com/madiseh/Vek/pull/31))
+- Added Autocomplete virtualization, match highlighting, and custom values. ([PR #32](https://github.com/madiseh/Vek/pull/32))
+- Added accordion expansion modes and icon placement options. ([PR #33](https://github.com/madiseh/Vek/pull/33))
+- Added NumericField spin buttons and opt-in mouse-wheel stepping. ([PR #34](https://github.com/madiseh/Vek/pull/34))
+- Added configurable Tabs scrolling and navigation buttons. ([PR #35](https://github.com/madiseh/Vek/pull/35))
+- Added selector or element-reference targets and keyboard/touch triggers for context menus. ([PR #37](https://github.com/madiseh/Vek/pull/37))
+- Added adaptive ToolBar overflow menus for constrained layouts. ([PR #38](https://github.com/madiseh/Vek/pull/38))
+
+### 🖼️ Feature Screenshots
+![Vek v1.2.0 component feature screenshots](https://github.com/madiseh/Vek/releases/download/v1.2.0/release-slideshow.gif)
+
+1. TextField clear button modes — [PR #28](https://github.com/madiseh/Vek/pull/28)
+2. Button loading state — [PR #29](https://github.com/madiseh/Vek/pull/29)
+3. DatePicker disabled dates and day templates — [PR #30](https://github.com/madiseh/Vek/pull/30)
+4. TreeView tri-state selection — [PR #31](https://github.com/madiseh/Vek/pull/31)
+5. Autocomplete virtualization and custom values — [PR #32](https://github.com/madiseh/Vek/pull/32)
+6. ExpansionPanel accordion modes — [PR #33](https://github.com/madiseh/Vek/pull/33)
+7. NumericField spin buttons and wheel stepping — [PR #34](https://github.com/madiseh/Vek/pull/34)
+8. Tabs scrolling and navigation — [PR #35](https://github.com/madiseh/Vek/pull/35)
+9. ContextMenu targets and triggers — [PR #37](https://github.com/madiseh/Vek/pull/37)
+10. ToolBar adaptive overflow — [PR #38](https://github.com/madiseh/Vek/pull/38)
+
+---
+
 ## [v1.1.1] - 2026-11-19
 
 > Vek v1.1.1 updates documentation-site analytics configuration and automates release-triggered deployment of vekui.dev. The Vek component API is unchanged.
