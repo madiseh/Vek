@@ -1,5 +1,6 @@
 ﻿using AwesomeAssertions;
 using Bunit;
+using Microsoft.AspNetCore.Components;
 using NUnit.Framework;
 
 namespace Vek.UnitTests.Components;
@@ -71,10 +72,43 @@ public class ButtonTests : BunitTest
 
         var label = comp.Find(".vek-button-label");
         label.TextContent.Should().Be("Save");
+        label.QuerySelector(".vek-button-content").Should().BeNull();
         label.Children.Should().HaveCount(2);
         label.Children[0].ClassList.Should().Contain(["vek-button-icon-start", "my-icon"]);
         label.Children[1].ClassList.Should().Contain(["vek-button-icon-end", "my-icon"]);
         comp.FindAll(".vek-button-label svg").Should().AllSatisfy(icon => icon.ClassList.Should().Contain("vek-primary-text"));
+    }
+
+    /// <summary>
+    /// Loading marks the button busy, disables it, and renders the supplied loading content without removing its label.
+    /// </summary>
+    [Test]
+    public void LoadingDisablesButtonAndRendersCustomIndicator()
+    {
+        var comp = Context.Render<VekButton>(parameters => parameters
+            .Add(p => p.Loading, true)
+            .Add(p => p.LoadingTemplate, (RenderFragment)(builder => builder.AddContent(0, "Saving")))
+            .AddChildContent("Save report"));
+
+        var button = comp.Find("button");
+        button.HasAttribute("disabled").Should().BeTrue();
+        button.GetAttribute("aria-busy").Should().Be("true");
+        button.ClassList.Should().Contain("vek-button-loading");
+        comp.Find(".vek-button-label").TextContent.Should().Contain("Save report");
+        comp.Find(".vek-button-loading-indicator").TextContent.Should().Be("Saving");
+    }
+
+    /// <summary>
+    /// A loading button without a custom template renders the standard indeterminate progress indicator.
+    /// </summary>
+    [Test]
+    public void LoadingUsesDefaultProgressIndicator()
+    {
+        var comp = Context.Render<VekButton>(parameters => parameters
+            .Add(p => p.Loading, true)
+            .AddChildContent("Save report"));
+
+        comp.Find(".vek-button-loading-indicator .vek-progress-circular").Should().NotBeNull();
     }
 
     /// <summary>

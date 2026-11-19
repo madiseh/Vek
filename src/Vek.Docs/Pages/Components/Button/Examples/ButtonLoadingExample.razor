@@ -1,24 +1,17 @@
 ﻿@namespace Vek.Docs.Examples
 
-<VekButton Disabled="@_processing" OnClick="ProcessSomething" Variant="Variant.Filled" Color="Color.Primary">
-    @if (_processing)
-    {
-        <VekProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
-        <VekText Class="ms-2">Processing</VekText>
-    }
-    else
-    {
-        <VekText>Click me</VekText>
-    }
+<VekButton Loading="@_processing" LoadingTemplate="@LoadingContent" Variant="Variant.Filled" Color="Color.Primary">
+    Save report
 </VekButton>
+<VekButton Class="ms-2" OnClick="ToggleProcessing">
+    @(_processing ? "Finish saving" : "Start saving")
+</VekButton>
+<VekText Class="ms-2">@(_processing ? "Saving report…" : "Ready to save")</VekText>
 
 @code {
-    private bool _processing = false;
+    private bool _processing;
 
-    async Task ProcessSomething()
-    {
-        _processing = true;
-        await Task.Delay(2000);
-        _processing = false;
-    }
+    private RenderFragment LoadingContent => @<span>Saving…</span>;
+
+    private void ToggleProcessing() => _processing = !_processing;
 }
