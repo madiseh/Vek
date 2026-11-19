@@ -917,10 +917,12 @@
       "title": "SplitPanel Resizable Splitter Bar with Double-Click Pane Collapse",
       "module": "SplitPanel",
       "priority": 83,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/083-splitpanel-resizable-panes-and-collapse.md",
       "dependencies": [],
-      "started_at": "2026-11-19T19:56:48Z"
+      "started_at": "2026-11-19T19:56:48Z",
+      "completed_at": "2026-11-19T21:24:21Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/55"
     },
     {
       "id": "084",

@@ -4,10 +4,12 @@
 - **Feature ID**: 083
 - **Feature Slug**: splitpanel-resizable-panes-and-collapse
 - **Module**: SplitPanel
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 83
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/55
 - **Started At**: 2026-11-19T19:56:48Z
+- **Completed At**: 2026-11-19T21:24:21Z
 
 ---
 
