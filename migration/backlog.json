@@ -587,10 +587,12 @@
       "title": "DatePicker Disabled Date Predicates and Custom Day Cell Templates",
       "module": "DatePicker",
       "priority": 53,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/053-datepicker-disabled-dates-and-custom-rendering.md",
       "dependencies": [],
-      "started_at": "2026-11-19T10:14:14Z"
+      "started_at": "2026-11-19T10:14:14Z",
+      "completed_at": "2026-11-19T10:44:54Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/30"
     },
     {
       "id": "054",

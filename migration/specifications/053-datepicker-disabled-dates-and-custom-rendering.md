@@ -4,10 +4,12 @@
 - **Feature ID**: 053
 - **Feature Slug**: datepicker-disabled-dates-and-custom-rendering
 - **Module**: DatePicker
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 53
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/30
 - **Started At**: 2026-11-19T10:14:14Z
+- **Completed At**: 2026-11-19T10:44:54Z
 
 ---
 
