@@ -48,10 +48,11 @@ For each successful worker result:
 
 1. Review the worker's diff, test/build results, screenshot evidence, target branch, and claim state. Reject accidental scope changes or missing required evidence.
 2. Ensure implementation, tests, docs, and verified screenshots are committed and pushed to the feature branch before creating a PR.
-3. Open a draft PR targeting `master`, with a concise summary, verification results, and all screenshot embeds in reading order under `## UI screenshots`. Check for an existing PR immediately before creation; update an existing open PR instead of creating a duplicate.
-4. In that feature worktree, run `python migration/scripts/orchestrator.py --complete <feature_id> --pr <pr_url>`. This records `Completed` and the PR URL in the feature specification and backlog. Commit and push that status update to the same PR.
-5. After the PR is opened or updated, inspect its `format-check` result. If it fails, read the complete diagnostics, repair all cited changed `src/**` files, rerun the CI-equivalent verification across the full changed-file set, push the fix, and confirm the new format check passes before marking the PR ready.
-6. Verify the PR body, screenshots, base branch, and completion commit. Mark the PR ready for review only after the completion update is pushed and `format-check` passes. Then release the claim ref.
+3. Follow the Git commit and pull request title conventions in `docs/governance/development-rules.md` for every commit subject and PR title. Use `<type>(<scope>): <imperative summary>`; for example, `feat(button): add loading state with auto-disable`. Put `Migration <feature_id>` and its context in the PR description, not as a `[Migration NNN]` title prefix. Reference related GitHub issues in the description with closing keywords.
+4. Open a draft PR targeting `master`, with a concise summary, verification results, and all screenshot embeds in reading order under `## UI screenshots`. Check for an existing PR immediately before creation; update an existing open PR instead of creating a duplicate.
+5. In that feature worktree, run `python migration/scripts/orchestrator.py --complete <feature_id> --pr <pr_url>`. This records `Completed` and the PR URL in the feature specification and backlog. Commit and push that status update to the same PR.
+6. After the PR is opened or updated, inspect its `format-check` result. If it fails, read the complete diagnostics, repair all cited changed `src/**` files, rerun the CI-equivalent verification across the full changed-file set, push the fix, and confirm the new format check passes before marking the PR ready.
+7. Verify the PR body, screenshots, base branch, title, and completion commit. Mark the PR ready for review only after the completion update is pushed and `format-check` passes. Then release the claim ref.
 
 For an already-open PR, do not create a duplicate; report or update that PR as appropriate. For a merged PR, reconcile status if needed and skip it. Do not wait for prior batches' PRs to merge before starting a new batch; exclude their features because their PRs are already open.
 
