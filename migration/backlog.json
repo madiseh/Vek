@@ -567,10 +567,12 @@
       "title": "ContextMenu Target Selector Binding, Long-Press Touch, and Submenus",
       "module": "Menu",
       "priority": 51,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/051-context-menu-target-selector-and-triggers.md",
       "dependencies": [],
-      "started_at": "2026-11-19T11:27:51Z"
+      "started_at": "2026-11-19T11:27:51Z",
+      "completed_at": "2026-11-19T12:16:15Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/37"
     },
     {
       "id": "052",
