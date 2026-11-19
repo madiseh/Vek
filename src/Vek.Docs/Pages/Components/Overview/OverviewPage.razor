@@ -4,689 +4,1050 @@
 <DocsPage DisplayFooter="true">
     <DocsPageHeader Title="Explore Vek">
         <SpecialHeaderContent>
-            <VekText Typo="Typo.h2" Class="docs-title d-inline">Explore&nbsp;</VekText>
-            <VekText Typo="Typo.h2" Class="docs-title d-inline" Color="Color.Primary">Vek</VekText>
-            <br>
-            <VekText Typo="Typo.subtitle1" Class="docs-title-description">Discover our library and all its components to power your next project.</VekText>
+            <div class="vek-bento-hero">
+                <div class="vek-bento-badge">
+                    <span class="vek-bento-badge-dot"></span>
+                    <span>Vek Component Directory</span>
+                    <span class="vek-bento-badge-sep">&bull;</span>
+                    <span class="vek-bento-badge-sub">66 Production-Ready Controls</span>
+                </div>
+                <h1 class="vek-bento-title">
+                    Explore <span class="vek-bento-gradient-text">Vek</span> Components
+                </h1>
+                <p class="vek-bento-subtitle">
+                    A comprehensive, high-performance Blazor component library crafted with modern aesthetics, full WAI-ARIA accessibility, and deep theming flexibility.
+                </p>
+
+                <!-- Search Input -->
+                <div class="vek-bento-search-box">
+                    <VekTextField @bind-Value="_searchQuery"
+                                  Placeholder="Search components by name or keyword (e.g. Button, Table, Dialog, Colors)..."
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Rounded.Search"
+                                  AdornmentColor="Color.Primary"
+                                  Variant="Variant.Outlined"
+                                  Immediate="true"
+                                  Clearable="true"
+                                  Class="docs-search-bar" />
+                </div>
+
+                <!-- Category Filter Chips -->
+                <div class="vek-bento-filters" role="tablist" aria-label="Component Categories">
+                    @foreach (var cat in _categories)
+                    {
+                        <button type="button"
+                                role="tab"
+                                aria-selected="@(_selectedCategory == cat.Key ? "true" : "false")"
+                                class="vek-bento-chip @(_selectedCategory == cat.Key ? "active" : "")"
+                                @onclick="() => SelectCategory(cat.Key)">
+                            <span>@cat.Name</span>
+                            <span class="vek-bento-chip-count">@cat.Count</span>
+                        </button>
+                    }
+                </div>
+            </div>
         </SpecialHeaderContent>
     </DocsPageHeader>
+
     <DocsPageContent>
         <DocsPageSection>
-            <VekGrid>
-                <VekItem xs="12" md="3" Class="mt-16">
-                    <div class="docs-sticky-info explore-text">
-                        <VekText Typo="Typo.h5">Foundation</VekText>
-                        <VekText Typo="Typo.subtitle1">Theming, Colors, Typography…</VekText>
-                    </div>
-                </VekItem>
-                <VekItem xs="12" md="9" Class="mt-16">
-                    <div class="explore-vek-items">
-                        <DocsExploreCard Title="Colors" Link="/features/colors">
-                            <VekPaper Height="24px" Width="24px" Class="relative mb-n6 ml-n8">
-                                <VekPaper Elevation="25" Height="68px" Width="24px" Class="vek-theme-dark absolute" Style="bottom:0;left: 0; transform: rotate(0deg);transform-origin: bottom center;"/>
-                                <VekPaper Elevation="25" Height="68px" Width="24px" Class="vek-theme-tertiary absolute" Style="bottom:0;left: 0; transform: rotate(30deg);transform-origin: bottom center;"/>
-                                <VekPaper Elevation="25" Height="68px" Width="24px" Class="vek-theme-secondary absolute" Style="bottom:0;left: 0; transform: rotate(60deg);transform-origin: bottom center;"/>
-                                <VekPaper Elevation="25" Height="68px" Width="24px" Class="vek-theme-primary d-flex justify-center align-end absolute" Style="bottom:0;left: 0; transform: rotate(90deg);transform-origin: bottom center;">
-                                    <VekPaper Elevation="0" Height="8px" Width="8px" Class="rounded-circle ma-2"/>
-                                </VekPaper>
-                            </VekPaper>
-                        </DocsExploreCard>
-        
-                        <DocsExploreCard Title="Typography" Link="/components/typography">
-                            <VekIcon Icon="@Icons.Material.Filled.TextFields" Color="Color.Primary" Style="font-size:64px;"/>
-                        </DocsExploreCard>
-                        
-                        <DocsExploreCard Title="Shadows" Link="/features/elevation">
-                            <VekPaper Elevation="25" Height="68px" Width="68px" Class="rounded-lg "/>
-                        </DocsExploreCard>
-                        
-                        <DocsExploreCard Title="Icons" Link="/features/icons">
-                            <VekPaper Elevation="25" Class="d-flex justify-center align-center rounded-circle pa-4">
-                                <VekIcon Icon="@Icons.Custom.Brands.Vek" Color="Color.Primary" Size="Size.Large" />
-                            </VekPaper>
-                        </DocsExploreCard>
-                    </div>
-                </VekItem>
-                
-                <VekItem xs="12" md="3" Class="mt-16">
-                    <div class="docs-sticky-info explore-text">
-                        <VekText Typo="Typo.h5">Layout</VekText>
-                        <VekText Typo="Typo.subtitle1">Container, Grid, Surfaces…</VekText>
-                    </div>
-                </VekItem>
-                <VekItem xs="12" md="9" Class="mt-16">
-                    <div class="explore-vek-items">
-                        <DocsExploreCard Title="App Bar">
-                            <VekPaper Elevation="25" Width="100%" Height="68px">
-                                <VekPaper Elevation="0" Width="100%" Height="12px" Square="true" Class="vek-theme-primary rounded-t"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Container">
-                            <VekPaper Elevation="25" Width="100%" Height="68px" Class="px-3">
-                                <VekPaper Elevation="0" Width="100%" Height="100%" Square="true" Class="vek-theme-primary"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Drawer">
-                            <VekPaper Elevation="25" Width="100%" Height="68px">
-                                <VekPaper Elevation="0" Width="24px" Height="100%" Square="true" Class="vek-theme-primary rounded-l"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Grid">
-                            <div class="d-block">
-                                <VekPaper Elevation="25" Class="pa-4 mx-1 flex-grow-1"/>
-                                <VekPaper Elevation="25" Class="pa-4 mx-1 mt-2 flex-grow-1"/>
+            <!-- 1. Foundation -->
+            @if (SectionHasMatches("foundation"))
+            {
+                <div class="vek-bento-section">
+                    <div class="vek-bento-section-header">
+                        <div class="header-left">
+                            <div class="header-icon">
+                                <VekIcon Icon="@Icons.Material.Rounded.Palette" Size="Size.Small" />
                             </div>
-                            <div class="d-block">
-                                <VekPaper Elevation="25" Class="pa-4 mx-1 flex-grow-1 vek-theme-primary"/>
-                                <VekPaper Elevation="25" Class="pa-4 mx-1 mt-2 flex-grow-1"/>
-                            </div>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Hidden"/>
-                        <DocsExploreCard Title="Paper">
-                            <VekPaper Height="80%" Width="80%" Elevation="25" />
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Divider">
-                            <VekPaper Width="100%" Height="1px" Elevation="25" Class="flex-grow-1 vek-theme-primary"/>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Stack">
-                            <VekStack>
-                                <VekPaper Elevation="25" Class="py-2 px-4"/>
-                                <VekPaper Elevation="25" Class="py-2 px-4"/>
-                                <VekPaper Elevation="25" Class="py-2 px-4"/>
-                            </VekStack>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="ToolBar">
-                            <VekPaper Elevation="25" Width="100%" Class="px-2 py-1 d-flex align-center">
-                                <VekPaper Elevation="0" Width="8px" Height="8px" Square="true" Class="vek-theme-primary"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                    </div>
-                </VekItem>
-                
-                <VekItem xs="12" md="3" Class="mt-16">
-                    <div class="docs-sticky-info explore-text">
-                        <VekText Typo="Typo.h5">Buttons</VekText>
-                        <VekText Typo="Typo.subtitle1">Regular, Icon, FAB…</VekText>
-                    </div>
-                </VekItem>
-                <VekItem xs="12" md="9" Class="mt-16">
-                    <div class="explore-vek-items">
-                        <DocsExploreCard Title="Button">
-                            <VekPaper Elevation="25" Class="px-5 py-2 flex-grow-1 rounded-lg vek-theme-primary">
-                                <VekPaper Elevation="0" Class="px-2 py-1" Style="border-radius: 2px;" />
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Button Group">
-                            <VekPaper Elevation="25" Class="pa-2 flex-grow-1 vek-theme-primary d-flex">
-                                <VekPaper Elevation="0" Class="px-2 py-1 flex-grow-1" Style="border-radius: 2px;" />
-                                <VekPaper Elevation="0" Class="px-2 py-1 mx-3 flex-grow-1" Style="border-radius: 2px;" />
-                                <VekPaper Elevation="0" Class="px-2 py-1 flex-grow-1" Style="border-radius: 2px;" />
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Button FAB">
-                            <VekPaper Elevation="25" Class="d-flex justify-center align-center rounded-circle pa-2 vek-theme-primary">
-                                <VekIcon Icon="@Icons.Material.Filled.Add" Color="Color.Inherit" Size="Size.Small" />
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Icon Button">
-                            <VekIcon Icon="@Icons.Material.Filled.Delete" Color="Color.Primary" Size="Size.Small" />
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Toggle Icon Button">
-                            <VekIcon Icon="@Icons.Material.Outlined.DarkMode" Color="Color.Dark" Size="Size.Small" />
-                            <VekIcon Icon="@Icons.Material.Rounded.ArrowRightAlt" Color="Color.Dark" Size="Size.Small" Class="mx-1" />
-                            <VekIcon Icon="@Icons.Material.Outlined.LightMode" Color="Color.Warning" Size="Size.Medium" />
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Scroll To Top">
-                            <VekPaper Elevation="25" Class="d-flex justify-center align-center rounded-circle pa-2 vek-theme-primary">
-                                <VekIcon Icon="@Icons.Material.Rounded.KeyboardArrowUp" Color="Color.Inherit" Size="Size.Small" />
-                            </VekPaper>
-                        </DocsExploreCard>
-                    </div>
-                </VekItem>
-                
-                <VekItem xs="12" md="3" Class="mt-16">
-                    <div class="docs-sticky-info explore-text">
-                        <VekText Typo="Typo.h5">Inputs</VekText>
-                        <VekText Typo="Typo.subtitle1">Forms, Fields, Pickers…</VekText>
-                    </div>
-                </VekItem>
-                <VekItem xs="12" md="9" Class="mt-16">
-                    <div class="explore-vek-items">
-                        <DocsExploreCard Title="Autocomplete">
-                            <div class="d-flex flex-column flex-grow-1">
-                                <VekPaper Elevation="25" Width="100%" Class="px-2 py-1 d-flex align-center">
-                                    <VekIcon Icon="@Icons.Material.Rounded.Search" Color="Color.Primary" Style="font-size:12px;"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="8px" Class="ml-1 docs-gray-bg"/>
-                                </VekPaper>
-                                <VekPaper Elevation="25" Width="100%" Class="pa-2 d-flex flex-column align-start mt-2">
-                                    <VekPaper Elevation="0" Width="80%" Height="8px" Class="docs-gray-bg"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="8px" Class="docs-gray-bg mt-2"/>
-                                </VekPaper>
-                            </div>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Check Box">
-                            <VekPaper Elevation="25" Class="pa-2 rounded-lg d-flex justify-center align-center">
-                                <VekIcon Icon="@Icons.Material.Rounded.Check" Color="Color.Primary" Size="Size.Large" />
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Color Picker">
-                            <VekPaper Elevation="25" Width="100%" Class="pa-2 rounded-lg d-flex align-center">
-                                <VekPaper Elevation="0" Width="100%" Height="12px" Class="mr-1 docs-gray-bg"/>
-                                <VekIcon Icon="@Icons.Material.Outlined.Palette" Color="Color.Primary" Class="my-n2 mr-n1" Size="Size.Small"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Date Picker">
-                            <VekPaper Elevation="25" Width="100%" Class="pa-2 rounded-lg d-flex align-center">
-                                <VekPaper Elevation="0" Width="100%" Height="12px" Class="mr-1 docs-gray-bg"/>
-                                <VekIcon Icon="@Icons.Material.Filled.Event" Color="Color.Primary" Class="my-n2 mr-n1" Size="Size.Small"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Field">
-                            <VekPaper Elevation="25" Width="100%" Class="pa-2 rounded-lg d-flex align-center">
-                                <VekPaper Elevation="0" Width="100%" Height="12px" Class="docs-gray-bg"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="File Upload">
-                            <VekPaper Elevation="25" Width="100%" Class="pa-2 rounded-lg d-flex align-center">
-                                <VekPaper Elevation="0" Width="100%" Height="12px" Class="mr-1 docs-gray-bg"/>
-                                <VekIcon Icon="@Icons.Material.Filled.FileUpload" Color="Color.Primary" Class="my-n2 mr-n1" Size="Size.Small"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Form">
-                            <VekPaper Elevation="25" Width="100%" Class="pa-2 d-flex flex-column align-start">
-                                <VekPaper Elevation="0" Width="100%" Height="8px" Class="docs-gray-bg"/>
-                                <VekPaper Elevation="0" Width="100%" Height="8px" Class="docs-gray-bg mt-2"/>
-                                <VekPaper Elevation="0" Width="100%" Height="8px" Class="docs-gray-bg mt-2"/>
-                                <VekPaper Elevation="0" Width="50%" Height="8px" Class="docs-gray-bg mt-2"/>
-                                <VekPaper Elevation="0" Width="30%" Height="8px" Class="vek-theme-primary ml-auto mt-2"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Focus Trap">
-                            <VekPaper Elevation="25" Width="100%" Class="pa-2 d-flex flex-column">
-                                <VekPaper Elevation="0" Width="100%" Height="12px" Class="docs-gray-bg"/>
-                                <VekPaper Outlined="true" Elevation="0" Width="100%" Height="12px" Class="docs-gray-bg my-2" Style="border-color:var(--vek-palette-primary);"/>
-                                <VekPaper Elevation="0" Width="100%" Height="12px" Class="docs-gray-bg"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Highlighter">
-                            <VekPaper Elevation="25" Width="100%" Class="pa-2 d-flex flex-column align-start">
-                                <VekPaper Elevation="0" Width="80%" Height="8px" Class="docs-gray-bg"/>
-                                <div class="d-flex vek-width-full mt-2">
-                                    <VekPaper Elevation="0" Width="20%" Height="8px" Class="docs-gray-bg mr-1"/>
-                                    <VekPaper Elevation="0" Width="30%" Height="8px" Class="vek-theme-warning mr-1"/>
-                                    <VekPaper Elevation="0" Width="40%" Height="8px" Class="docs-gray-bg"/>
-                                </div>
-                                <VekPaper Elevation="0" Width="100%" Height="8px" Class="docs-gray-bg mt-2"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Numeric Field">
-                            <VekPaper Elevation="25" Width="100%" Class="pa-2 rounded-lg d-flex align-center">
-                                <VekPaper Elevation="0" Width="100%" Height="12px" Class="docs-gray-bg"/>
-                                <VekIcon Icon="@Icons.Material.Rounded.UnfoldMore" Color="Color.Primary" Class="my-n2 mr-n1" Size="Size.Small"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Radio">
-                            <VekPaper Elevation="25" Class="d-flex justify-center align-center rounded-circle pa-1 vek-theme-primary">
-                                <VekPaper Elevation="0" Class="d-flex justify-center align-center rounded-circle docs-gray-bg pa-1">
-                                    <VekPaper Elevation="25" Class="rounded-circle pa-2 vek-theme-primary" />
-                                </VekPaper>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Rating">
-                            <VekIcon Icon="@Icons.Material.Rounded.Star" Color="Color.Warning" Size="Size.Small" />
-                            <VekIcon Icon="@Icons.Material.Rounded.Star" Color="Color.Warning" Size="Size.Small" />
-                            <VekIcon Icon="@Icons.Material.Rounded.StarHalf" Color="Color.Warning" Size="Size.Small" />
-                            <VekIcon Icon="@Icons.Material.Rounded.StarOutline" Color="Color.Warning" Size="Size.Small" />
-                            <VekIcon Icon="@Icons.Material.Rounded.StarOutline" Color="Color.Warning" Size="Size.Small" />
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Select">
-                            <div class="d-flex flex-column flex-grow-1">
-                                <VekPaper Elevation="25" Width="100%" Class="px-2 py-1 d-flex align-center">
-                                    <VekPaper Elevation="0" Width="100%" Height="8px" Class="docs-gray-bg"/>
-                                    <VekIcon Icon="@Icons.Material.Rounded.ArrowDropDown" Color="Color.Primary" Class="my-n2 mr-n1" Size="Size.Small"/>
-                                </VekPaper>
-                                <VekPaper Elevation="25" Width="100%" Class="pa-2 d-flex flex-column align-start mt-2">
-                                    <VekPaper Elevation="0" Width="100%" Height="8px" Class="docs-gray-bg"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="8px" Class="docs-gray-bg mt-2"/>
-                                </VekPaper>
-                            </div>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Slider">
-                            <VekPaper Elevation="25" Width="100%" Height="4px" Class="rounded-lg">
-                                <VekPaper Elevation="25" Width="50%" Height="100%" Class="rounded-lg d-flex align-center justify-end vek-theme-primary relative">
-                                    <VekPaper Elevation="25" Class="pa-2 my-n4 rounded-circle vek-theme-primary"/>
-                                </VekPaper>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Switch">
-                            <VekPaper Elevation="25" Width="100%" Class="pa-1 mx-2 rounded-lg d-flex align-center justify-end rounded-pill">
-                                <VekPaper Elevation="25" Class="pa-3 ma-n1 rounded-circle vek-theme-primary"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Text Field">
-                            <VekPaper Elevation="25" Width="100%" Class="pa-2 rounded-lg d-flex align-center">
-                                <VekPaper Elevation="0" Width="100%" Height="12px" Class="docs-gray-bg"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Time Picker">
-                            <VekPaper Elevation="25" Width="100%" Class="pa-2 rounded-lg d-flex align-center">
-                                <VekPaper Elevation="0" Width="100%" Height="12px" Class="mr-1 docs-gray-bg"/>
-                                <VekIcon Icon="@Icons.Material.Rounded.Schedule" Color="Color.Primary" Class="my-n2 mr-n1" Size="Size.Small"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                    </div>
-                </VekItem>
-                
-                <VekItem xs="12" md="3" Class="mt-16">
-                    <div class="docs-sticky-info explore-text">
-                        <VekText Typo="Typo.h5">Data Display</VekText>
-                        <VekText Typo="Typo.subtitle1">Lists, Tables, Tabs…</VekText>
-                    </div>
-                </VekItem>
-                <VekItem xs="12" md="9" Class="mt-16">
-                    <div class="explore-vek-items">
-                        <DocsExploreCard Title="Avatar">
-                            <VekAvatar Elevation="25" Color="Color.Primary">
-                                <VekIcon Icon="@Icons.Material.Rounded.Person"/>
-                            </VekAvatar>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Card">
-                            <VekPaper Elevation="25" Width="100%" Class="d-flex flex-column align-start">
-                                <VekSkeleton SkeletonType="SkeletonType.Rectangle" Animation="Animation.False" Width="100%" Height="42px" Class="rounded-t" />
-                                <div class="px-2 vek-width-full">
-                                    <VekPaper Elevation="0" Width="80%" Height="4px" Class="docs-gray-bg mt-2"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="4px" Class="docs-gray-bg mt-2"/>
-                                </div>
-                                <div class="px-2 pb-2 d-flex mt-2 vek-width-full">
-                                    <VekPaper Elevation="0" Width="20%" Height="6px" Class="vek-theme-primary mr-1"/>
-                                    <VekPaper Elevation="0" Width="30%" Height="6px" Class="vek-theme-primary"/>
-                                </div>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Carousel">
-                            <VekPaper Elevation="25" Width="100%" Class="d-flex flex-column align-start flex-grow-1">
-                                <div class="d-flex justify-space-between align-center vek-height-full vek-width-full py-5">
-                                    <VekIcon Icon="@Icons.Material.Rounded.KeyboardArrowLeft" Color="Color.Primary" Size="Size.Small"/>
-                                    <VekIcon Icon="@Icons.Material.Rounded.KeyboardArrowRight" Color="Color.Primary" Size="Size.Small"/>
-                                </div>
-                                <div class="d-flex justify-center vek-width-full pb-1">
-                                    <VekPaper Elevation="25" Class="rounded-circle vek-theme-primary pa-1" />
-                                    <VekPaper Elevation="25" Class="rounded-circle docs-gray-bg pa-1 mx-2" />
-                                    <VekPaper Elevation="25" Class="rounded-circle docs-gray-bg pa-1" />
-                                </div>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Chips">
-                            <VekPaper Elevation="25" Class="px-2 py-1 d-flex rounded-pill">
-                                <VekPaper Elevation="0" Width="100%" Class="docs-gray-bg px-4 py-1 rounded-pill mr-1" />
-                                <VekPaper Elevation="25" Class="rounded-circle pa-1 vek-theme-primary mr-n1" />
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Chip Set">
-                            <VekPaper Elevation="25" Class="px-1 py-1 d-flex rounded-pill">
-                                <VekIcon Icon="@Icons.Material.Rounded.Check" Color="Color.Primary" Style="font-size:10px;"/>
-                                <VekPaper Elevation="0" Width="100%" Class="docs-gray-bg px-4 py-1 rounded-pill ml-1"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Data Grid">
-                            <VekPaper Elevation="25" Width="100%" Class="px-2 pb-2 pt-3 rounded-lg">
-                                <div class="d-flex">
-                                    <VekPaper Elevation="0" Width="100%" Height="12px" Class="vek-theme-primary"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="12px" Class="vek-theme-primary mx-1"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="12px" Class="docs-gray-bg"/>
-                                </div>
-                                <div class="d-flex my-1">
-                                    <VekPaper Elevation="0" Width="100%" Height="12px" Class="vek-theme-primary"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="12px" Class="docs-gray-bg mx-1"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="12px" Class="docs-gray-bg"/>
-                                </div>
-                                <div class="d-flex">
-                                    <VekPaper Elevation="0" Width="100%" Height="12px" Class="docs-gray-bg"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="12px" Class="docs-gray-bg mx-1"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="12px" Class="docs-gray-bg"/>
-                                </div>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Drop Zone">
-                            <VekPaper Elevation="25" Class="d-flex flex-wrap pa-1 rounded-lg relative">
-                                <VekPaper Elevation="0" Width="34px" Height="34px" Class="border-2 border-dashed vek-border-primary ma-1"/>
-                                <VekPaper Elevation="0" Width="34px" Height="34px" Class="border-2 border-dashed vek-border-lines-default ma-1"/>
-                                <VekPaper Elevation="0" Width="34px" Height="34px" Class="border-2 border-dashed vek-border-lines-default ma-1"/>
-                                <VekPaper Elevation="0" Width="34px" Height="34px" Class="border-2 border-dashed vek-border-lines-default ma-1"/>
-                                <div class="absolute vek-width-full vek-height-full d-flex justify-center align-center">
-                                    <VekPaper Elevation="25" Width="34px" Height="34px" Class="ml-n6 mt-n6 d-flex justify-center align-center">
-                                        <VekIcon Icon="@Icons.Material.Outlined.Image" Class="vek-text-secondary"/>
-                                    </VekPaper>
-                                </div>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Expansion Panels">
-                            <div class="d-flex flex-column flex-grow-1">
-                                <VekPaper Elevation="25" Width="100%" Class="px-2 py-1 d-flex align-center">
-                                    <VekPaper Elevation="0" Width="30%" Height="8px" Class="docs-gray-bg mr-auto"/>
-                                    <VekIcon Icon="@Icons.Material.Rounded.ArrowDropDown" Class="my-n2 mr-n1" Size="Size.Small"/>
-                                </VekPaper>
-                                <VekPaper Elevation="25" Width="100%" Class="px-2 py-1 d-flex flex-column mt-2">
-                                    <div class="d-flex flex-grow-1">
-                                        <VekPaper Elevation="0" Width="40%" Height="8px" Class="docs-gray-bg mr-auto"/>
-                                        <VekIcon Icon="@Icons.Material.Rounded.ArrowDropUp" Color="Color.Primary" Class="my-n2 mr-n1" Size="Size.Small"/>
-                                    </div>
-                                    <VekPaper Elevation="0" Width="80%" Height="8px" Class="docs-gray-bg mr-auto mt-2"/>
-                                </VekPaper>
-                            </div>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Image">
-                            <VekPaper Elevation="25" Width="100%" Class="px-2 py-9 rounded-lg overflow-hidden relative">
-                                <VekPaper Elevation="25" Class="rounded-circle absolute vek-theme-warning" Width="12px" Height="12px" Style=" left: 8px;top: 8px;"/>
-                                <VekPaper Elevation="25" Class="rounded-lg absolute z-10" Width="52px" Height="52px" Style="background-color: var(--vek-palette-primary-lighten); transform: rotate(45deg); left: 0;bottom: -32px;"/>
-                                <VekPaper Elevation="25" Class="rounded-lg absolute z-0 vek-theme-primary" Width="72px" Height="72px" Style="transform: rotate(45deg); right: 0;bottom: -42px;"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="List">
-                            <div class="d-flex flex-column justify-center align-center">
-                                <div class="d-flex flex-grow-1">
-                                    <VekPaper Elevation="25" Class="rounded-circle pa-1 vek-theme-primary"/>
-                                    <VekPaper Elevation="25" Class="py-1 px-8 ml-1 rounded-pill"/>
-                                </div>
-                                <div class="d-flex flex-grow-1 my-2">
-                                    <VekPaper Elevation="25" Class="rounded-circle pa-1 vek-theme-primary"/>
-                                    <VekPaper Elevation="25" Class="py-1 px-8 ml-1 rounded-pill"/>
-                                </div>
-                                <div class="d-flex flex-grow-1">
-                                    <VekPaper Elevation="25" Class="rounded-circle pa-1 vek-theme-primary"/>
-                                    <VekPaper Elevation="25" Class="py-1 px-8 ml-1 rounded-pill"/>
-                                </div>
-                            </div>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Pagination">
-                            <VekPaper Elevation="25" Class="rounded-circle pa-2 mr-1" />
-                            <VekPaper Elevation="25" Class="rounded-circle pa-2 vek-theme-primary mr-1" />
-                            <VekPaper Elevation="25" Class="rounded-circle pa-2 mr-1" />
-                            <VekPaper Elevation="25" Class="rounded-circle pa-2" />
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Popover">
-                            <div class="d-flex flex-column">
-                                <VekPaper Elevation="25" Class="mx-4 px-3 py-1 flex-grow-0">
-                                    <VekPaper Elevation="0" Class="px-2 py-1 docs-gray-bg"/>
-                                </VekPaper>
-                                <VekPaper Elevation="25" Width="100%" Class="px-10 py-5 d-flex flex-column mt-2 vek-theme-primary"/>
-                            </div>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Simple Table">
-                            <VekPaper Elevation="25" Width="100%" Class="px-2 pb-2 pt-3 rounded-lg">
-                                <div class="d-flex">
-                                    <VekPaper Elevation="0" Width="40%" Height="12px" Class="docs-gray-bg"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="12px" Class="docs-gray-bg ml-1"/>
-                                </div>
-                                <div class="d-flex my-1">
-                                    <VekPaper Elevation="0" Width="40%" Height="12px" Class="docs-gray-bg"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="12px" Class="docs-gray-bg ml-1"/>
-                                </div>
-                                <div class="d-flex">
-                                    <VekPaper Elevation="0" Width="40%" Height="12px" Class="docs-gray-bg"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="12px" Class="docs-gray-bg ml-1"/>
-                                </div>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Stepper">
-                            <div class="d-flex flex-column flex-grow-1">
-                                <VekPaper Elevation="25" Width="100%" Class="px-2 py-1 d-flex">
-                                    <VekPaper Elevation="0" Width="30%" Height="12px" Class="docs-gray-bg mr-1"/>
-                                    <VekPaper Elevation="0" Width="30%" Height="12px" Class="vek-theme-primary mr-1"/>
-                                    <VekPaper Elevation="0" Width="30%" Height="12px" Class="docs-gray-bg mr-1"/>
-                                    <VekPaper Elevation="0" Width="30%" Height="12px" Class="docs-gray-bg"/>
-                                </VekPaper>
-                                <VekPaper Elevation="25" Width="100%" Class="px-2 py-1 d-flex flex-column mt-1">
-                                    <VekPaper Elevation="0" Width="80%" Height="4px" Class="docs-gray-bg mr-auto"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="4px" Class="docs-gray-bg mr-auto mt-2"/>
-                                    <VekPaper Elevation="0" Width="60%" Height="4px" Class="docs-gray-bg mr-auto mt-2"/>
-                                </VekPaper>
-                            </div>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Table">
-                            <VekPaper Elevation="25" Width="100%" Class="px-2 pb-2 pt-3 rounded-lg">
-                                <div class="d-flex">
-                                    <VekPaper Elevation="0" Width="40%" Height="12px" Class="docs-gray-bg"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="12px" Class="vek-theme-primary ml-1"/>
-                                </div>
-                                <div class="d-flex my-1">
-                                    <VekPaper Elevation="0" Width="40%" Height="12px" Class="docs-gray-bg"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="12px" Class="vek-theme-primary ml-1"/>
-                                </div>
-                                <div class="d-flex">
-                                    <VekPaper Elevation="0" Width="40%" Height="12px" Class="docs-gray-bg"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="12px" Class="docs-gray-bg ml-1"/>
-                                </div>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Tabs">
-                            <div class="d-flex flex-column flex-grow-1">
-                                <VekPaper Elevation="25" Width="100%" Class="px-2 py-1 d-flex">
-                                    <VekPaper Elevation="0" Width="30%" Height="12px" Class="docs-gray-bg mr-1"/>
-                                    <VekPaper Elevation="0" Width="30%" Height="12px" Class="vek-theme-primary mr-1"/>
-                                    <VekPaper Elevation="0" Width="30%" Height="12px" Class="docs-gray-bg mr-1"/>
-                                    <VekPaper Elevation="0" Width="30%" Height="12px" Class="docs-gray-bg"/>
-                                </VekPaper>
-                                <VekPaper Elevation="25" Width="100%" Class="px-2 py-1 d-flex flex-column mt-1">
-                                    <VekPaper Elevation="0" Width="80%" Height="4px" Class="docs-gray-bg mr-auto"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="4px" Class="docs-gray-bg mr-auto mt-2"/>
-                                    <VekPaper Elevation="0" Width="60%" Height="4px" Class="docs-gray-bg mr-auto mt-2"/>
-                                </VekPaper>
-                            </div>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Timeline">
-                            <div class="d-flex flex-column justify-center align-center">
-                                <div class="d-flex">
-                                    <VekPaper Elevation="25" Class="py-1 px-4 rounded-pill"/>
-                                    <VekPaper Elevation="25" Class="rounded-circle pa-1 mx-1"/>
-                                    <VekPaper Elevation="0" Class="pa-1 px-4 vek-transparent"/>
-                                </div>
-                                <div class="d-flex mt-2">
-                                    <VekPaper Elevation="0" Class="pa-1 px-4 vek-transparent"/>
-                                    <VekPaper Elevation="25" Class="rounded-circle pa-1 mx-1 vek-theme-primary"/>
-                                    <VekPaper Elevation="25" Class="py-1 px-4 rounded-pill"/>
-                                </div>
-                                <div class="d-flex mt-2">
-                                    <VekPaper Elevation="25" Class="py-1 px-4 rounded-pill"/>
-                                    <VekPaper Elevation="25" Class="rounded-circle pa-1 mx-1"/>
-                                    <VekPaper Elevation="0" Class="pa-1 px-4 vek-transparent"/>
-                                </div>
-                            </div>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Tooltip">
-                            <div class="d-flex flex-column align-center flex-grow-1 px-3">
-                                <VekPaper Elevation="25" Class="d-flex justify-center align-center rounded-circle pa-1">
-                                    <VekIcon Icon="@Icons.Material.Filled.Add" Color="Color.Inherit" Size="Size.Medium" Style="font-size:14px;"/>
-                                </VekPaper>
-                                <VekPaper Elevation="0" Width="100%" Class="pa-2 d-flex flex-column align-start mt-3 vek-theme-primary z-20">
-                                    <VekPaper Elevation="0" Width="100%" Height="4px" Class="docs-gray-bg"/>
-                                </VekPaper>
-                                <VekPaper Elevation="0" Width="18px" Height="18px" Class="vek-theme-primary rounded-0 mt-n6 z-10" Style="transform:rotate(45deg);"/>
-                            </div>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Tree View">
-                            <div class="d-flex flex-column flex-grow-1">
-                                <VekPaper Elevation="25" Width="100%" Class="px-2 py-1 d-flex align-center">
-                                    <VekIcon Icon="@Icons.Material.Rounded.KeyboardArrowDown" Color="Color.Primary" Class="my-n2 ml-n2" Size="Size.Small"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="8px" Class="docs-gray-bg"/>
-                                </VekPaper>
-                                <VekPaper Elevation="25" Width="80%" Class="px-2 py-1 d-flex align-center ml-auto mt-2">
-                                    <VekIcon Icon="@Icons.Material.Rounded.KeyboardArrowRight" Color="Color.Default" Class="my-n2 ml-n2" Size="Size.Small"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="8px" Class="docs-gray-bg"/>
-                                </VekPaper>
-                                <VekPaper Elevation="25" Width="80%" Class="px-2 py-1 d-flex align-center ml-auto mt-2">
-                                    <VekIcon Icon="@Icons.Material.Rounded.KeyboardArrowRight" Color="Color.Default" Class="my-n2 ml-n2" Size="Size.Small"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="8px" Class="docs-gray-bg"/>
-                                </VekPaper>
-                            </div>
-                        </DocsExploreCard>
-                    </div>
-                </VekItem>
-                
-                <VekItem xs="12" md="3" Class="mt-16">
-                    <div class="docs-sticky-info explore-text">
-                        <VekText Typo="Typo.h5">Navigation</VekText>
-                        <VekText Typo="Typo.subtitle1">Links, Menus, Navigation</VekText>
-                    </div>
-                </VekItem>
-                <VekItem xs="12" md="9" Class="mt-16">
-                    <div class="explore-vek-items">
-                        <DocsExploreCard Title="Breadcrumbs">
-                            <div class="d-flex align-center">
-                                <VekPaper Elevation="25" Width="24px" Height="24px" Class="vek-theme-primary z-20"></VekPaper>
-                                <VekPaper Elevation="25" Width="18px" Height="18px" Class="vek-theme-primary ml-n3 z-10" Style="transform:rotate(45deg);"></VekPaper>
-                            </div>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Link">
-                            <VekIcon Icon="@Icons.Material.Filled.Link" Size="Size.Large" Color="Color.Primary" />
-
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Menu">
-                            <div class="d-flex flex-column">
-                                <VekPaper Elevation="25" Class="mx-4 px-3 py-1 flex-grow-0 vek-theme-primary">
-                                    <VekPaper Elevation="0" Height="4px" Class="px-2 docs-gray-bg"/>
-                                </VekPaper>
-                                <VekPaper Elevation="25" Width="100%" Class="pa-2 d-flex flex-column align-start mt-2">
-                                    <VekPaper Elevation="0" Width="80%" Height="8px" Class="docs-gray-bg"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="8px" Class="docs-gray-bg mt-2"/>
-                                </VekPaper>
-                            </div>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Nav Menu">
-                            <VekPaper Elevation="25" Width="100%" Class="pa-2 d-flex flex-column align-start">
-                                <div class="d-flex align-center  vek-width-full">
-                                    <VekPaper Elevation="0" Width="100%" Height="8px" Class="docs-gray-bg"/>
-                                    <VekIcon Icon="@Icons.Material.Rounded.ArrowDropDown" Class="my-n2 mr-n2" Size="Size.Small"/>
-                                </div>
-                                <div class="d-flex align-center vek-width-full mt-3">
-                                    <VekPaper Elevation="0" Width="100%" Height="8px" Class="docs-gray-bg"/>
-                                    <VekIcon Icon="@Icons.Material.Rounded.ArrowDropUp" Color="Color.Primary" Class="my-n2 mr-n2" Size="Size.Small"/>
-                                </div>
-                                <VekPaper Elevation="0" Height="8px" Class="vek-theme-primary mt-3 ml-auto mr-3 px-6"/>
-                                <VekPaper Elevation="0" Height="8px" Class="docs-gray-bg mt-3 ml-auto mr-3 px-6"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                    </div>
-                </VekItem>
-
-                <VekItem xs="12" md="3" Class="mt-16">
-                    <div class="docs-sticky-info explore-text">
-                        <VekText Typo="Typo.h5">Feedback</VekText>
-                        <VekText Typo="Typo.subtitle1">Alerts, Progress, Information</VekText>
-                    </div>
-                </VekItem>
-                <VekItem xs="12" md="9" Class="mt-16">
-                    <div class="explore-vek-items">
-                        <DocsExploreCard Title="Alert">
-                            <VekPaper Elevation="25" Class="pa-2 d-flex">
-                                <VekIcon Icon="@Icons.Material.Rounded.WarningAmber" Color="Color.Warning" Class="ml-n1 my-n1" Size="Size.Small"/>
-                                <VekPaper Elevation="0" Width="100%" Class="docs-gray-bg px-8 py-1 ml-1"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Badge">
-                            <VekPaper Elevation="25" Class="px-3 py-1 flex-grow-0 d-flex">
-                                <VekPaper Elevation="0" Class="px-4 py-1 docs-gray-bg"/>
-                            </VekPaper>
-                            <VekPaper Elevation="25" Height="12px" Width="12px" Class="rounded-circle ml-n2 mt-n3 vek-theme-primary"/>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Dialog">
-                            <VekPaper Elevation="25" Width="100%" Class="d-flex flex-column align-start">
-                                <div class="px-2 vek-width-full">
-                                    <VekPaper Elevation="0" Width="60%" Height="4px" Class="docs-gray-bg mt-2"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="4px" Class="docs-gray-bg mt-2"/>
-                                    <VekPaper Elevation="0" Width="80%" Height="4px" Class="docs-gray-bg mt-2"/>
-                                    <VekPaper Elevation="0" Width="40%" Height="4px" Class="docs-gray-bg mt-2"/>
-                                </div>
-                                <div class="px-2 pb-2 d-flex justify-end mt-4 vek-width-full">
-                                    <VekPaper Elevation="0" Width="20%" Height="6px" Class="docs-gray-bg mr-1"/>
-                                    <VekPaper Elevation="0" Width="20%" Height="6px" Class="vek-theme-primary"/>
-                                </div>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Message Box">
-                            <VekPaper Elevation="25" Width="100%" Class="d-flex flex-column align-start">
-                                <div class="px-2 vek-width-full">
-                                    <VekPaper Elevation="0" Width="60%" Height="4px" Class="docs-gray-bg mt-2"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="4px" Class="docs-gray-bg mt-2"/>
-                                </div>
-                                <div class="px-2 pb-2 d-flex justify-end mt-2 vek-width-full">
-                                    <VekPaper Elevation="0" Width="20%" Height="6px" Class="docs-gray-bg mr-1"/>
-                                    <VekPaper Elevation="0" Width="20%" Height="6px" Class="vek-theme-primary"/>
-                                </div>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Progress">
-                            <VekPaper Elevation="25" Width="100%" Class="pr-6 rounded-pill">
-                                <VekPaper Elevation="0" Class="px-3 py-1 vek-theme-primary rounded-pill"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Skeleton">
-                            <VekPaper Elevation="25" Width="100%" Class="pa-2 d-flex flex-column align-start">
-                                <VekPaper Elevation="0" Width="60%" Height="8px" Class="docs-gray-bg"/>
-                                <VekPaper Elevation="0" Width="14px" Height="14px" Class="docs-gray-bg rounded-circle mt-1"/>
-                                <VekPaper Elevation="0" Width="100%" Height="30px" Class="docs-gray-bg mt-1"/>
-                            </VekPaper>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Snackbar">
-                            <div class="d-flex justify-end align-start vek-height-full vek-width-full">
-                                <VekPaper Elevation="25" Class="pa-1 d-flex mt-n6 align-center mr-n6">
-                                    <VekIcon Icon="@Icons.Material.Rounded.EventNote" Color="Color.Primary" Style="font-size:14px;"/>
-                                    <VekPaper Elevation="0" Width="100%" Class="docs-gray-bg px-6 pt-2 mx-1"/>
-                                    <VekIcon Icon="@Icons.Material.Rounded.Close" Style="font-size:14px;"/>
-                                </VekPaper>
-                            </div>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Overlay">
-                            <VekPaper Elevation="25" Width="100%" Class="d-flex flex-column align-start relative">
-                                <div class="px-2 vek-width-full">
-                                    <VekPaper Elevation="0" Width="60%" Height="4px" Class="docs-gray-bg mt-2"/>
-                                    <VekPaper Elevation="0" Width="100%" Height="4px" Class="docs-gray-bg mt-2"/>
-                                    <VekPaper Elevation="0" Width="80%" Height="4px" Class="docs-gray-bg mt-2"/>
-                                    <VekPaper Elevation="0" Width="40%" Height="4px" Class="docs-gray-bg mt-2"/>
-                                </div>
-                                <div class="px-2 pb-2 d-flex justify-end mt-4 vek-width-full">
-                                    <VekPaper Elevation="0" Width="20%" Height="6px" Class="docs-gray-bg mr-1"/>
-                                    <VekPaper Elevation="0" Width="20%" Height="6px" Class="vek-theme-primary"/>
-                                </div>
-                                <VekOverlay Visible="true" DarkBackground="true" Absolute="true" />
-                            </VekPaper>
-                        </DocsExploreCard>
-                    </div>
-                </VekItem>
-                
-                <VekItem xs="12" md="3" Class="mt-16">
-                    <div class="docs-sticky-info explore-text">
-                        <VekText Typo="Typo.h5">Utilities</VekText>
-                        <VekText Typo="Typo.subtitle1">CSS Class Utilities</VekText>
-                    </div>
-                </VekItem>
-                <VekItem xs="12" md="9" Class="mt-16">
-                    <div class="explore-vek-items">
-                        <DocsExploreCard Title="Border Radius" Link="/utilities/border-radius">
-                            <VekPaper Elevation="25" Height="68px" Width="68px" Class="rounded-tr-xl rounded-bl-xl rounded-tl-lg rounded-br-lg"/>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Display" Link="/utilities/display">
                             <div>
-                                <VekPaper Elevation="25" Height="32px" Width="32px"/>
-                                <VekPaper Elevation="25" Height="32px" Width="32px" Class="mt-2"/>
+                                <h2 class="header-title">Foundation</h2>
+                                <p class="header-desc">Theming, color palette, typographic scale, and design tokens.</p>
                             </div>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Flex" Link="/utilities/flex">
-                            <VekPaper Elevation="25" Height="32px" Width="32px"/>
-                            <VekPaper Elevation="25" Height="32px" Width="32px" Class="ml-2"/>
-                        </DocsExploreCard>
-                        <DocsExploreCard Title="Spacing" Link="/utilities/spacing">
-                            <VekPaper Elevation="25" Class="pa-2 ma-2"/>
-                            <VekPaper Elevation="25" Class="pa-3 ma-2"/>
-                            <VekPaper Elevation="25" Class="pa-4 ma-2"/>
-                        </DocsExploreCard>
+                        </div>
+                        <span class="header-badge">4 components</span>
                     </div>
-                </VekItem>
-            </VekGrid>
+
+                    <div class="vek-bento-grid">
+                        @if (Matches("Colors", "foundation", "Theming color palette, dark mode contrasts, and semantic design tokens."))
+                        {
+                            <DocsExploreCard Title="Colors" Category="Foundation" Link="/features/colors" Description="Theming color palette, status tones, and semantic design tokens.">
+                                <div class="vek-mini-swatches">
+                                    <span class="swatch" style="background:#2563EB;"></span>
+                                    <span class="swatch" style="background:#7C3AED;"></span>
+                                    <span class="swatch" style="background:#10B981;"></span>
+                                    <span class="swatch" style="background:#F59E0B;"></span>
+                                    <span class="swatch" style="background:#EF4444;"></span>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Typography", "foundation", "Standardized typographic scale, font hierarchy, and responsive text styles."))
+                        {
+                            <DocsExploreCard Title="Typography" Category="Foundation" Link="/components/typography" Description="Standardized typographic scale, font hierarchy, and responsive text styles.">
+                                <div class="vek-mini-typo">
+                                    <span class="big-a">Aa</span>
+                                    <span class="font-meta">Inter &bull; 16px</span>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Shadows", "foundation", "Layered surface elevation system with 25 distinct shadow depth levels."))
+                        {
+                            <DocsExploreCard Title="Shadows" Category="Foundation" Link="/features/elevation" Description="Layered surface elevation system with 25 distinct shadow depth levels.">
+                                <div class="vek-mini-shadow">
+                                    <span>Elevation 8</span>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Icons", "foundation", "Curated Material, Custom, and FontAwesome vector SVG icon collections."))
+                        {
+                            <DocsExploreCard Title="Icons" Category="Foundation" Link="/features/icons" Description="Curated Material, Custom, and FontAwesome vector SVG icon collections.">
+                                <div class="vek-mini-icons">
+                                    <div class="icon-box"><VekIcon Icon="@Icons.Material.Rounded.Dashboard" Color="Color.Primary" Size="Size.Small"/></div>
+                                    <div class="icon-box"><VekIcon Icon="@Icons.Material.Rounded.Bolt" Color="Color.Warning" Size="Size.Small"/></div>
+                                    <div class="icon-box"><VekIcon Icon="@Icons.Material.Rounded.Layers" Color="Color.Secondary" Size="Size.Small"/></div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- 2. Layout -->
+            @if (SectionHasMatches("layout"))
+            {
+                <div class="vek-bento-section">
+                    <div class="vek-bento-section-header">
+                        <div class="header-left">
+                            <div class="header-icon">
+                                <VekIcon Icon="@Icons.Material.Rounded.ViewQuilt" Size="Size.Small" />
+                            </div>
+                            <div>
+                                <h2 class="header-title">Layout</h2>
+                                <p class="header-desc">Grid systems, containers, toolbars, and responsive surface structures.</p>
+                            </div>
+                        </div>
+                        <span class="header-badge">10 components</span>
+                    </div>
+
+                    <div class="vek-bento-grid">
+                        @if (Matches("App Bar", "layout", "Top application navigation bar with actions, titles, and branding."))
+                        {
+                            <DocsExploreCard Title="App Bar" Category="Layout" Description="Top application navigation bar with actions, titles, and branding.">
+                                <div class="vek-mini-appbar">
+                                    <div class="appbar-top"><span class="dot"></span><span class="dot"></span></div>
+                                    <div class="appbar-body"><div class="line" style="width:60%;"></div><div class="line" style="width:30%;"></div></div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Container", "layout", "Responsive horizontal centering container with standard breakpoint constraints."))
+                        {
+                            <DocsExploreCard Title="Container" Category="Layout" Description="Responsive horizontal centering container with standard breakpoint constraints.">
+                                <VekPaper Elevation="0" Outlined="true" Class="px-5 py-2 rounded-lg docs-gray-bg d-flex align-center justify-center">
+                                    <span style="font-size:0.75rem; font-weight:600; color:var(--vek-palette-primary);">MaxWidth.Large</span>
+                                </VekPaper>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Drawer", "layout", "Collapsible navigation sidebar drawer supporting docked, persistent, or modal modes."))
+                        {
+                            <DocsExploreCard Title="Drawer" Category="Layout" Description="Collapsible navigation sidebar drawer supporting docked, persistent, or modal modes.">
+                                <div style="width:130px; height:56px;" class="d-flex rounded-lg overflow-hidden border border-solid vek-border-lines-default">
+                                    <div style="width:36px; height:100%;" class="vek-theme-primary d-flex flex-column pa-1 gap-1">
+                                        <div style="height:3px; width:12px; background:#fff; border-radius:1px;"></div>
+                                        <div style="height:3px; width:16px; background:#fff; border-radius:1px;"></div>
+                                    </div>
+                                    <div class="flex-grow-1 docs-gray-bg pa-2 d-flex flex-column gap-1">
+                                        <div style="height:4px; width:70%;" class="border border-solid vek-border-lines-default rounded"></div>
+                                    </div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Grid", "layout", "Fluid 12-column responsive flex grid system with spacing and alignment options."))
+                        {
+                            <DocsExploreCard Title="Grid" Category="Layout" Description="Fluid 12-column responsive flex grid system with spacing and alignment options.">
+                                <div style="width:130px;" class="d-flex gap-1">
+                                    <div class="flex-grow-1 pa-2 rounded vek-theme-primary" style="height:42px;"></div>
+                                    <div class="flex-grow-1 pa-2 rounded docs-gray-bg border border-solid vek-border-lines-default" style="height:42px;"></div>
+                                    <div class="flex-grow-1 pa-2 rounded docs-gray-bg border border-solid vek-border-lines-default" style="height:42px;"></div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Hidden", "layout", "Conditionally render or hide DOM elements based on active viewport breakpoints."))
+                        {
+                            <DocsExploreCard Title="Hidden" Category="Layout" Description="Conditionally render or hide DOM elements based on active viewport breakpoints.">
+                                <div class="d-flex align-center gap-1">
+                                    <VekChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">xs: Hidden</VekChip>
+                                    <VekChip T="string" Size="Size.Small" Color="Color.Default" Variant="Variant.Outlined">md: Visible</VekChip>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Paper", "layout", "Elevated surface card container with customizable elevation, outline, and borders."))
+                        {
+                            <DocsExploreCard Title="Paper" Category="Layout" Description="Elevated surface card container with customizable elevation, outline, and borders.">
+                                <VekPaper Elevation="4" Class="pa-3 rounded-lg d-flex align-center justify-center" Style="width:110px; height:48px;">
+                                    <span style="font-size:0.75rem; font-weight:600;">Surface</span>
+                                </VekPaper>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Divider", "layout", "Thin separator line dividing content sections horizontally or vertically."))
+                        {
+                            <DocsExploreCard Title="Divider" Category="Layout" Description="Thin separator line dividing content sections horizontally or vertically.">
+                                <div style="width:130px;" class="d-flex flex-column gap-2">
+                                    <div style="height:5px; width:60%; border-radius:2px;" class="docs-gray-bg"></div>
+                                    <VekDivider />
+                                    <div style="height:5px; width:80%; border-radius:2px;" class="docs-gray-bg"></div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Stack", "layout", "Linear layout container for organizing child components along vertical or horizontal axes."))
+                        {
+                            <DocsExploreCard Title="Stack" Category="Layout" Description="Linear layout container for organizing child components along vertical or horizontal axes.">
+                                <div class="d-flex gap-2">
+                                    <div style="width:28px; height:28px;" class="rounded-lg vek-theme-primary d-flex align-center justify-center text-caption font-weight-bold text-white">1</div>
+                                    <div style="width:28px; height:28px;" class="rounded-lg docs-gray-bg border border-solid vek-border-lines-default d-flex align-center justify-center text-caption font-weight-bold">2</div>
+                                    <div style="width:28px; height:28px;" class="rounded-lg docs-gray-bg border border-solid vek-border-lines-default d-flex align-center justify-center text-caption font-weight-bold">3</div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("ToolBar", "layout", "Flexible header and action toolbar with dense mode and responsive gutter control."))
+                        {
+                            <DocsExploreCard Title="ToolBar" Category="Layout" Description="Flexible header and action toolbar with dense mode and responsive gutter control.">
+                                <VekPaper Elevation="0" Outlined="true" Class="px-3 py-1 rounded-lg d-flex align-center gap-2" Style="width:130px;">
+                                    <VekIcon Icon="@Icons.Material.Rounded.Menu" Size="Size.Small" Color="Color.Primary"/>
+                                    <div style="height:4px; width:40px; border-radius:2px;" class="docs-gray-bg"></div>
+                                    <VekSpacer />
+                                    <VekIcon Icon="@Icons.Material.Rounded.MoreVert" Size="Size.Small" Color="Color.Default"/>
+                                </VekPaper>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Split Panel", "layout", "Interactive draggable split panes allowing users to resize adjacent views."))
+                        {
+                            <DocsExploreCard Title="Split Panel" Category="Layout" Badge="New" Description="Interactive draggable split panes allowing users to resize adjacent views.">
+                                <div style="width:130px; height:46px;" class="d-flex border border-solid vek-border-lines-default rounded-lg overflow-hidden">
+                                    <div style="width:45%; height:100%;" class="pa-1 docs-gray-bg"></div>
+                                    <div style="width:4px; height:100%; background:var(--vek-palette-primary);"></div>
+                                    <div style="width:55%; height:100%;" class="pa-1"></div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- 3. Buttons & Actions -->
+            @if (SectionHasMatches("buttons"))
+            {
+                <div class="vek-bento-section">
+                    <div class="vek-bento-section-header">
+                        <div class="header-left">
+                            <div class="header-icon">
+                                <VekIcon Icon="@Icons.Material.Rounded.SmartButton" Size="Size.Small" />
+                            </div>
+                            <div>
+                                <h2 class="header-title">Buttons &amp; Actions</h2>
+                                <p class="header-desc">Interactive triggers, grouped actions, floating action buttons, and icons.</p>
+                            </div>
+                        </div>
+                        <span class="header-badge">6 components</span>
+                    </div>
+
+                    <div class="vek-bento-grid">
+                        @if (Matches("Button", "buttons", "Interactive button with filled, outlined, and text variants plus loading states."))
+                        {
+                            <DocsExploreCard Title="Button" Category="Buttons" Description="Interactive button with filled, outlined, and text variants plus loading states.">
+                                <VekButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" EndIcon="@Icons.Material.Rounded.ArrowForward">Primary</VekButton>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Button Group", "buttons", "Group related action buttons together into a single segmented horizontal strip."))
+                        {
+                            <DocsExploreCard Title="Button Group" Category="Buttons" Description="Group related action buttons together into a single segmented horizontal strip.">
+                                <VekButtonGroup Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small">
+                                    <VekButton>Day</VekButton>
+                                    <VekButton Variant="Variant.Filled">Week</VekButton>
+                                    <VekButton>Month</VekButton>
+                                </VekButtonGroup>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Button FAB", "buttons", "Floating action button for emphasizing the primary call-to-action on a view."))
+                        {
+                            <DocsExploreCard Title="Button FAB" Category="Buttons" Description="Floating action button for emphasizing the primary call-to-action on a view.">
+                                <VekFab Color="Color.Primary" StartIcon="@Icons.Material.Rounded.Add" Size="Size.Small" />
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Icon Button", "buttons", "Compact circular clickable icon button for toolbars and compact interfaces."))
+                        {
+                            <DocsExploreCard Title="Icon Button" Category="Buttons" Description="Compact circular clickable icon button for toolbars and compact interfaces.">
+                                <div class="d-flex gap-2">
+                                    <VekIconButton Icon="@Icons.Material.Rounded.Favorite" Color="Color.Error" Size="Size.Small" Variant="Variant.Filled" />
+                                    <VekIconButton Icon="@Icons.Material.Rounded.Bookmark" Color="Color.Primary" Size="Size.Small" Variant="Variant.Outlined" />
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Toggle Icon Button", "buttons", "Two-state toggle button switching between icons and colors upon interaction."))
+                        {
+                            <DocsExploreCard Title="Toggle Icon Button" Category="Buttons" Description="Two-state toggle button switching between icons and colors upon interaction.">
+                                <VekToggleIconButton Toggled="true" Icon="@Icons.Material.Outlined.DarkMode" ToggledIcon="@Icons.Material.Filled.LightMode" ToggledColor="Color.Warning" Color="Color.Default" Size="Size.Medium" />
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Scroll To Top", "buttons", "Floating button that smoothly returns the viewport to the top of the page."))
+                        {
+                            <DocsExploreCard Title="Scroll To Top" Category="Buttons" Description="Floating button that smoothly returns the viewport to the top of the page.">
+                                <VekFab Color="Color.Primary" StartIcon="@Icons.Material.Rounded.KeyboardArrowUp" Size="Size.Small" />
+                            </DocsExploreCard>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- 4. Forms & Inputs -->
+            @if (SectionHasMatches("inputs"))
+            {
+                <div class="vek-bento-section">
+                    <div class="vek-bento-section-header">
+                        <div class="header-left">
+                            <div class="header-icon">
+                                <VekIcon Icon="@Icons.Material.Rounded.EditCalendar" Size="Size.Small" />
+                            </div>
+                            <div>
+                                <h2 class="header-title">Forms &amp; Inputs</h2>
+                                <p class="header-desc">Form controls, validation, pickers, selection inputs, and text fields.</p>
+                            </div>
+                        </div>
+                        <span class="header-badge">17 components</span>
+                    </div>
+
+                    <div class="vek-bento-grid">
+                        @if (Matches("Autocomplete", "inputs", "Searchable text input with dynamic asynchronous suggestions and keyboard navigation."))
+                        {
+                            <DocsExploreCard Title="Autocomplete" Category="Inputs" Description="Searchable text input with dynamic asynchronous suggestions and keyboard navigation.">
+                                <div class="vek-mini-ac">
+                                    <div class="ac-field"><span>Blazor</span><VekIcon Icon="@Icons.Material.Rounded.ArrowDropDown" Size="Size.Small"/></div>
+                                    <div class="ac-dropdown"><span class="selected">&check; Blazor</span><span>Bootstrap</span></div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Check Box", "inputs", "Standard binary toggle checkbox for forms, multi-selections, and lists."))
+                        {
+                            <DocsExploreCard Title="Check Box" Category="Inputs" Description="Standard binary toggle checkbox for forms, multi-selections, and lists.">
+                                <div class="d-flex align-center">
+                                    <VekCheckBox T="bool" Value="true" Color="Color.Primary" ReadOnly="true" Dense="true" />
+                                    <span style="font-size:0.8rem; font-weight:600;">Accepted</span>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Color Picker", "inputs", "Full interactive RGB, HSL, and Hex color selector with palette swatches."))
+                        {
+                            <DocsExploreCard Title="Color Picker" Category="Inputs" Description="Full interactive RGB, HSL, and Hex color selector with palette swatches.">
+                                <div class="d-flex align-center gap-2 pa-1 rounded-lg border border-solid vek-border-lines-default" style="width:125px;">
+                                    <div style="width:24px; height:24px; background:#2563EB; border-radius:4px;"></div>
+                                    <span style="font-size:0.75rem; font-family:monospace; font-weight:600;">#2563EB</span>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Date Picker", "inputs", "Calendar date selector popup with range selection, culture, and masking support."))
+                        {
+                            <DocsExploreCard Title="Date Picker" Category="Inputs" Description="Calendar date selector popup with range selection, culture, and masking support.">
+                                <VekPaper Outlined="true" Class="px-3 py-1 rounded-lg d-flex align-center gap-2" Style="width:130px;">
+                                    <VekIcon Icon="@Icons.Material.Rounded.Event" Size="Size.Small" Color="Color.Primary"/>
+                                    <span style="font-size:0.75rem; font-weight:600;">2026-11-19</span>
+                                </VekPaper>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Field", "inputs", "Base wrapper control providing labels, helper text, and validation messages."))
+                        {
+                            <DocsExploreCard Title="Field" Category="Inputs" Description="Base wrapper control providing labels, helper text, and validation messages.">
+                                <div style="width:130px;">
+                                    <div style="font-size:0.6875rem; font-weight:600; color:var(--vek-palette-primary); margin-bottom:2px;">Label</div>
+                                    <div style="height:24px;" class="rounded border border-solid vek-border-primary pa-1 docs-gray-bg"></div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("File Upload", "inputs", "File selection button or drop target supporting multi-file and type filters."))
+                        {
+                            <DocsExploreCard Title="File Upload" Category="Inputs" Description="File selection button or drop target supporting multi-file and type filters.">
+                                <VekButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Rounded.CloudUpload">Upload</VekButton>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Form", "inputs", "Form orchestrator managing validation state, model binding, and submission."))
+                        {
+                            <DocsExploreCard Title="Form" Category="Inputs" Description="Form orchestrator managing validation state, model binding, and submission.">
+                                <div style="width:130px;" class="d-flex flex-column gap-1">
+                                    <div style="height:5px; width:40%; border-radius:2px;" class="docs-gray-bg"></div>
+                                    <div style="height:14px; border-radius:4px;" class="border border-solid vek-border-lines-default"></div>
+                                    <div style="height:10px; width:45px; border-radius:3px; background:var(--vek-palette-primary); margin-left:auto; margin-top:2px;"></div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Focus Trap", "inputs", "Traps keyboard tab navigation within a specified boundary for accessible modals."))
+                        {
+                            <DocsExploreCard Title="Focus Trap" Category="Inputs" Description="Traps keyboard tab navigation within a specified boundary for accessible modals.">
+                                <div class="pa-2 rounded border-2 border-dashed vek-border-primary d-flex align-center justify-center" style="width:120px;">
+                                    <span style="font-size:0.7rem; font-weight:600; color:var(--vek-palette-primary);">[ Focus Trap ]</span>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Highlighter", "inputs", "Highlights search query matches and substrings within text blocks."))
+                        {
+                            <DocsExploreCard Title="Highlighter" Category="Inputs" Description="Highlights search query matches and substrings within text blocks.">
+                                <div style="font-size:0.78rem;">
+                                    Find <mark style="background:rgba(37,99,235,0.2); color:var(--vek-palette-primary); padding:1px 4px; border-radius:2px; font-weight:700;">keyword</mark> here
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Numeric Field", "inputs", "Specialized number input with min/max bounds, step incrementors, and formats."))
+                        {
+                            <DocsExploreCard Title="Numeric Field" Category="Inputs" Description="Specialized number input with min/max bounds, step incrementors, and formats.">
+                                <VekPaper Outlined="true" Class="px-2 py-1 rounded-lg d-flex align-center justify-space-between" Style="width:120px;">
+                                    <span style="font-size:0.8rem; font-weight:700;">42</span>
+                                    <div class="d-flex flex-column">
+                                        <VekIcon Icon="@Icons.Material.Rounded.ArrowDropUp" Size="Size.Small" Class="my-n2" Color="Color.Primary"/>
+                                        <VekIcon Icon="@Icons.Material.Rounded.ArrowDropDown" Size="Size.Small" Class="my-n2" Color="Color.Primary"/>
+                                    </div>
+                                </VekPaper>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Radio", "inputs", "Mutually exclusive single-selection radio button for grouped options."))
+                        {
+                            <DocsExploreCard Title="Radio" Category="Inputs" Description="Mutually exclusive single-selection radio button for grouped options.">
+                                <div class="d-flex align-center gap-2">
+                                    <VekRadioGroup Value="1" T="int" ReadOnly="true">
+                                        <VekRadio Value="1" Color="Color.Primary" Dense="true">Option A</VekRadio>
+                                    </VekRadioGroup>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Rating", "inputs", "Interactive star rating component for customer reviews, feedback, and scoring."))
+                        {
+                            <DocsExploreCard Title="Rating" Category="Inputs" Description="Interactive star rating component for customer reviews, feedback, and scoring.">
+                                <VekRating SelectedValue="4" MaxValue="5" ReadOnly="true" Size="Size.Small" Color="Color.Warning" />
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Select", "inputs", "Dropdown picker menu supporting single or multiple item selection."))
+                        {
+                            <DocsExploreCard Title="Select" Category="Inputs" Description="Dropdown picker menu supporting single or multiple item selection.">
+                                <VekPaper Outlined="true" Class="px-3 py-1 rounded-lg d-flex align-center justify-space-between" Style="width:130px;">
+                                    <span style="font-size:0.75rem; font-weight:600;">Active</span>
+                                    <VekIcon Icon="@Icons.Material.Rounded.ArrowDropDown" Size="Size.Small" Color="Color.Primary"/>
+                                </VekPaper>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Slider", "inputs", "Fluid range slider for selecting continuous or discrete numeric values."))
+                        {
+                            <DocsExploreCard Title="Slider" Category="Inputs" Description="Fluid range slider for selecting continuous or discrete numeric values.">
+                                <div style="width:120px;">
+                                    <VekSlider T="int" Value="60" Min="0" Max="100" Color="Color.Primary" Disabled="true" />
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Switch", "inputs", "Smooth interactive toggle switch for boolean preferences and settings."))
+                        {
+                            <DocsExploreCard Title="Switch" Category="Inputs" Description="Smooth interactive toggle switch for boolean preferences and settings.">
+                                <VekSwitch T="bool" Value="true" Color="Color.Primary" ReadOnly="true" />
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Text Field", "inputs", "Versatile single-line and multiline text input with masking and adornments."))
+                        {
+                            <DocsExploreCard Title="Text Field" Category="Inputs" Description="Versatile single-line and multiline text input with masking and adornments.">
+                                <VekPaper Outlined="true" Class="px-3 py-1 rounded-lg d-flex align-center gap-2" Style="width:130px;">
+                                    <VekIcon Icon="@Icons.Material.Rounded.Edit" Size="Size.Small" Color="Color.Primary"/>
+                                    <span style="font-size:0.75rem; color:var(--vek-palette-text-secondary);">Input text...</span>
+                                </VekPaper>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Time Picker", "inputs", "Time selector popup featuring 12-hour AM/PM and 24-hour clock views."))
+                        {
+                            <DocsExploreCard Title="Time Picker" Category="Inputs" Description="Time selector popup featuring 12-hour AM/PM and 24-hour clock views.">
+                                <VekPaper Outlined="true" Class="px-3 py-1 rounded-lg d-flex align-center gap-2" Style="width:130px;">
+                                    <VekIcon Icon="@Icons.Material.Rounded.Schedule" Size="Size.Small" Color="Color.Primary"/>
+                                    <span style="font-size:0.75rem; font-weight:600;">14:30 PM</span>
+                                </VekPaper>
+                            </DocsExploreCard>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- 5. Data Display -->
+            @if (SectionHasMatches("data"))
+            {
+                <div class="vek-bento-section">
+                    <div class="vek-bento-section-header">
+                        <div class="header-left">
+                            <div class="header-icon">
+                                <VekIcon Icon="@Icons.Material.Rounded.TableChart" Size="Size.Small" />
+                            </div>
+                            <div>
+                                <h2 class="header-title">Data Display</h2>
+                                <p class="header-desc">Data tables, enterprise grids, cards, lists, avatars, and accordions.</p>
+                            </div>
+                        </div>
+                        <span class="header-badge">19 components</span>
+                    </div>
+
+                    <div class="vek-bento-grid">
+                        @if (Matches("Avatar", "data", "User identity visual displaying profile images, letter initials, or icons."))
+                        {
+                            <DocsExploreCard Title="Avatar" Category="Data Display" Description="User identity visual displaying profile images, letter initials, or icons.">
+                                <VekAvatarGroup Max="3" Spacing="2">
+                                    <VekAvatar Color="Color.Primary" Size="Size.Small">V</VekAvatar>
+                                    <VekAvatar Color="Color.Secondary" Size="Size.Small">E</VekAvatar>
+                                    <VekAvatar Color="Color.Tertiary" Size="Size.Small">K</VekAvatar>
+                                </VekAvatarGroup>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Card", "data", "Structured container grouping related images, headlines, text, and action buttons."))
+                        {
+                            <DocsExploreCard Title="Card" Category="Data Display" Description="Structured container grouping related images, headlines, text, and action buttons.">
+                                <div class="vek-mini-card-mock">
+                                    <div class="card-img"></div>
+                                    <div class="card-body"><div class="c-line" style="width:80%;"></div><div class="c-line" style="width:50%;"></div></div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Carousel", "data", "Interactive slideshow for cycling through images, cards, or custom panels."))
+                        {
+                            <DocsExploreCard Title="Carousel" Category="Data Display" Description="Interactive slideshow for cycling through images, cards, or custom panels.">
+                                <div style="width:130px; height:50px;" class="d-flex align-center justify-space-between px-2 rounded-lg border border-solid vek-border-lines-default docs-gray-bg">
+                                    <VekIcon Icon="@Icons.Material.Rounded.ChevronLeft" Size="Size.Small" Color="Color.Primary"/>
+                                    <div class="d-flex gap-1"><span style="width:12px; height:4px; border-radius:2px; background:var(--vek-palette-primary);"></span><span style="width:4px; height:4px; border-radius:50%; background:var(--vek-palette-divider);"></span></div>
+                                    <VekIcon Icon="@Icons.Material.Rounded.ChevronRight" Size="Size.Small" Color="Color.Primary"/>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Chips", "data", "Compact badge pill for tags, attributes, selections, and categorical values."))
+                        {
+                            <DocsExploreCard Title="Chips" Category="Data Display" Description="Compact badge pill for tags, attributes, selections, and categorical values.">
+                                <div class="d-flex gap-1">
+                                    <VekChip T="string" Color="Color.Primary" Size="Size.Small" Variant="Variant.Filled">Active</VekChip>
+                                    <VekChip T="string" Color="Color.Default" Size="Size.Small" Variant="Variant.Outlined">Filter</VekChip>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Chip Set", "data", "Collection wrapper managing selectable, filterable, or dismissible chips."))
+                        {
+                            <DocsExploreCard Title="Chip Set" Category="Data Display" Description="Collection wrapper managing selectable, filterable, or dismissible chips.">
+                                <div class="d-flex gap-1">
+                                    <VekChip T="string" Color="Color.Primary" Size="Size.Small" Variant="Variant.Outlined">Tag 1</VekChip>
+                                    <VekChip T="string" Color="Color.Secondary" Size="Size.Small" Variant="Variant.Outlined">Tag 2</VekChip>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Data Grid", "data", "High-performance enterprise grid with sorting, filtering, grouping, and virtualization."))
+                        {
+                            <DocsExploreCard Title="Data Grid" Category="Data Display" Badge="Popular" Description="High-performance enterprise grid with sorting, filtering, grouping, and virtualization.">
+                                <div class="vek-mini-table">
+                                    <div class="t-row hdr"><div class="t-cell primary" style="width:40%;"></div><div class="t-cell primary" style="width:50%;"></div></div>
+                                    <div class="t-row"><div class="t-cell" style="width:35%;"></div><div class="t-cell" style="width:45%;"></div></div>
+                                    <div class="t-row"><div class="t-cell" style="width:30%;"></div><div class="t-cell" style="width:55%;"></div></div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Drop Zone", "data", "Drag-and-drop orchestration container for kanban boards and item reordering."))
+                        {
+                            <DocsExploreCard Title="Drop Zone" Category="Data Display" Description="Drag-and-drop orchestration container for kanban boards and item reordering.">
+                                <div style="width:130px; height:48px;" class="border-2 border-dashed vek-border-primary rounded-lg d-flex align-center justify-center gap-1 docs-gray-bg">
+                                    <VekIcon Icon="@Icons.Material.Rounded.DragIndicator" Size="Size.Small" Color="Color.Primary"/>
+                                    <span style="font-size:0.7rem; font-weight:600; color:var(--vek-palette-primary);">Drop Area</span>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Expansion Panels", "data", "Collapsible accordion panels for condensing secondary details into compact lists."))
+                        {
+                            <DocsExploreCard Title="Expansion Panels" Category="Data Display" Description="Collapsible accordion panels for condensing secondary details into compact lists.">
+                                <div style="width:130px;" class="d-flex flex-column gap-1">
+                                    <div class="pa-1 rounded border border-solid vek-border-lines-default d-flex align-center justify-space-between"><span style="font-size:0.65rem; font-weight:600;">Panel 1</span><VekIcon Icon="@Icons.Material.Rounded.KeyboardArrowDown" Size="Size.Small"/></div>
+                                    <div class="pa-1 rounded border border-solid vek-border-primary d-flex align-center justify-space-between"><span style="font-size:0.65rem; font-weight:600; color:var(--vek-palette-primary);">Expanded</span><VekIcon Icon="@Icons.Material.Rounded.KeyboardArrowUp" Color="Color.Primary" Size="Size.Small"/></div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Image", "data", "Responsive image container with lazy loading, object fit, and placeholder support."))
+                        {
+                            <DocsExploreCard Title="Image" Category="Data Display" Description="Responsive image container with lazy loading, object fit, and placeholder support.">
+                                <div style="width:110px; height:50px; background:linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);" class="rounded-lg d-flex align-center justify-center text-white">
+                                    <VekIcon Icon="@Icons.Material.Rounded.Image" Size="Size.Medium" />
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("List", "data", "Vertical list container for items with avatars, icons, subheaders, and selection."))
+                        {
+                            <DocsExploreCard Title="List" Category="Data Display" Description="Vertical list container for items with avatars, icons, subheaders, and selection.">
+                                <div style="width:130px;" class="d-flex flex-column gap-1 pa-1 rounded border border-solid vek-border-lines-default docs-gray-bg">
+                                    <div class="d-flex align-center gap-1"><span style="width:6px; height:6px; border-radius:50%; background:var(--vek-palette-primary);"></span><div style="height:4px; width:70%;" class="border border-solid vek-border-lines-default rounded"></div></div>
+                                    <div class="d-flex align-center gap-1"><span style="width:6px; height:6px; border-radius:50%; background:var(--vek-palette-divider);"></span><div style="height:4px; width:50%;" class="border border-solid vek-border-lines-default rounded"></div></div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Pagination", "data", "Page navigation bar for stepping through large collections and datasets."))
+                        {
+                            <DocsExploreCard Title="Pagination" Category="Data Display" Description="Page navigation bar for stepping through large collections and datasets.">
+                                <div class="d-flex gap-1 align-center">
+                                    <span class="pa-1 rounded docs-gray-bg text-caption font-weight-bold">&lt;</span>
+                                    <span class="pa-1 rounded vek-theme-primary text-caption font-weight-bold text-white px-2">1</span>
+                                    <span class="pa-1 rounded docs-gray-bg text-caption font-weight-bold px-2">2</span>
+                                    <span class="pa-1 rounded docs-gray-bg text-caption font-weight-bold">&gt;</span>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Popover", "data", "Anchored floating container rendering contextual menus, dialogs, or dropdowns."))
+                        {
+                            <DocsExploreCard Title="Popover" Category="Data Display" Description="Anchored floating container rendering contextual menus, dialogs, or dropdowns.">
+                                <div class="d-flex flex-column align-center">
+                                    <div class="pa-2 rounded-lg border border-solid vek-border-primary docs-gray-bg shadow-sm" style="font-size:0.7rem; font-weight:600;">Floating Popover</div>
+                                    <div style="width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent; border-top:5px solid var(--vek-palette-primary);"></div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Simple Table", "data", "Lightweight HTML table component for straightforward tabular records."))
+                        {
+                            <DocsExploreCard Title="Simple Table" Category="Data Display" Description="Lightweight HTML table component for straightforward tabular records.">
+                                <div class="vek-mini-table">
+                                    <div class="t-row hdr"><div class="t-cell" style="width:40%;"></div><div class="t-cell" style="width:40%;"></div></div>
+                                    <div class="t-row"><div class="t-cell" style="width:30%;"></div><div class="t-cell" style="width:50%;"></div></div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Stepper", "data", "Multi-step wizard progress indicator guiding users through multi-stage tasks."))
+                        {
+                            <DocsExploreCard Title="Stepper" Category="Data Display" Description="Multi-step wizard progress indicator guiding users through multi-stage tasks.">
+                                <div class="d-flex align-center gap-1">
+                                    <span style="width:20px; height:20px; border-radius:50%; font-size:0.65rem;" class="vek-theme-primary text-white d-flex align-center justify-center font-weight-bold">&check;</span>
+                                    <span style="width:20px; height:2px; background:var(--vek-palette-primary);"></span>
+                                    <span style="width:20px; height:20px; border-radius:50%; font-size:0.65rem;" class="border border-solid vek-border-primary text-primary d-flex align-center justify-center font-weight-bold">2</span>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Table", "data", "Feature-rich table with pagination, multi-column sorting, and row selection."))
+                        {
+                            <DocsExploreCard Title="Table" Category="Data Display" Description="Feature-rich table with pagination, multi-column sorting, and row selection.">
+                                <div class="vek-mini-table">
+                                    <div class="t-row hdr"><div class="t-cell primary" style="width:30%;"></div><div class="t-cell primary" style="width:60%;"></div></div>
+                                    <div class="t-row"><div class="t-cell" style="width:40%;"></div><div class="t-cell" style="width:40%;"></div></div>
+                                    <div class="t-row"><div class="t-cell" style="width:25%;"></div><div class="t-cell" style="width:65%;"></div></div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Tabs", "data", "Tabbed navigation bar switching between multiple views and content panels."))
+                        {
+                            <DocsExploreCard Title="Tabs" Category="Data Display" Description="Tabbed navigation bar switching between multiple views and content panels.">
+                                <div class="d-flex gap-1 pa-1 rounded-pill border border-solid vek-border-lines-default docs-gray-bg">
+                                    <span class="px-2 py-1 rounded-pill vek-theme-primary text-white text-caption font-weight-bold">Overview</span>
+                                    <span class="px-2 py-1 rounded-pill text-caption font-weight-medium">API</span>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Timeline", "data", "Chronological activity and milestone stream with custom icons and dots."))
+                        {
+                            <DocsExploreCard Title="Timeline" Category="Data Display" Description="Chronological activity and milestone stream with custom icons and dots.">
+                                <div class="d-flex align-center gap-2">
+                                    <span style="width:10px; height:10px; border-radius:50%; background:var(--vek-palette-primary);"></span>
+                                    <span style="width:24px; height:2px; background:var(--vek-palette-divider);"></span>
+                                    <span style="width:10px; height:10px; border-radius:50%; background:var(--vek-palette-success);"></span>
+                                    <span style="width:24px; height:2px; background:var(--vek-palette-divider);"></span>
+                                    <span style="width:10px; height:10px; border-radius:50%; background:var(--vek-palette-warning);"></span>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Tooltip", "data", "Informative floating popup bubble shown when hovering or focusing an element."))
+                        {
+                            <DocsExploreCard Title="Tooltip" Category="Data Display" Description="Informative floating popup bubble shown when hovering or focusing an element.">
+                                <div class="d-flex flex-column align-center">
+                                    <div class="px-2 py-1 rounded text-caption font-weight-bold text-white vek-theme-primary mb-1">Helpful Tip</div>
+                                    <VekIcon Icon="@Icons.Material.Rounded.Info" Size="Size.Small" Color="Color.Primary"/>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Tree View", "data", "Hierarchical tree structure for directory browsing, nesting, and multi-selection."))
+                        {
+                            <DocsExploreCard Title="Tree View" Category="Data Display" Description="Hierarchical tree structure for directory browsing, nesting, and multi-selection.">
+                                <div style="width:130px;" class="d-flex flex-column gap-1">
+                                    <div class="d-flex align-center gap-1"><VekIcon Icon="@Icons.Material.Rounded.FolderOpen" Size="Size.Small" Color="Color.Primary"/><span style="font-size:0.7rem; font-weight:600;">src/</span></div>
+                                    <div class="d-flex align-center gap-1 ml-3"><VekIcon Icon="@Icons.Material.Rounded.Description" Size="Size.Small" Color="Color.Default"/><span style="font-size:0.7rem;">App.razor</span></div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- 6. Navigation -->
+            @if (SectionHasMatches("navigation"))
+            {
+                <div class="vek-bento-section">
+                    <div class="vek-bento-section-header">
+                        <div class="header-left">
+                            <div class="header-icon">
+                                <VekIcon Icon="@Icons.Material.Rounded.AltRoute" Size="Size.Small" />
+                            </div>
+                            <div>
+                                <h2 class="header-title">Navigation</h2>
+                                <p class="header-desc">Navigation menus, breadcrumbs, hyperlinks, and drawer menus.</p>
+                            </div>
+                        </div>
+                        <span class="header-badge">4 components</span>
+                    </div>
+
+                    <div class="vek-bento-grid">
+                        @if (Matches("Breadcrumbs", "navigation", "Hierarchical trail helping users navigate back through parent page levels."))
+                        {
+                            <DocsExploreCard Title="Breadcrumbs" Category="Navigation" Description="Hierarchical trail helping users navigate back through parent page levels.">
+                                <div class="d-flex align-center gap-1" style="font-size:0.75rem; font-weight:500;">
+                                    <span style="color:var(--vek-palette-primary)">Home</span>
+                                    <span>&rsaquo;</span>
+                                    <span style="color:var(--vek-palette-text-secondary)">Docs</span>
+                                    <span>&rsaquo;</span>
+                                    <span style="font-weight:700;">Overview</span>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Link", "navigation", "Accessible hyperlink component with underline styles and security defaults."))
+                        {
+                            <DocsExploreCard Title="Link" Category="Navigation" Description="Accessible hyperlink component with underline styles and security defaults.">
+                                <div class="d-flex align-center gap-1">
+                                    <VekIcon Icon="@Icons.Material.Rounded.Link" Color="Color.Primary" Size="Size.Small"/>
+                                    <span style="font-size:0.8rem; font-weight:600; color:var(--vek-palette-primary); text-decoration:underline;">vek.dev/docs</span>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Menu", "navigation", "Contextual popup menu displaying a list of selectable actions and options."))
+                        {
+                            <DocsExploreCard Title="Menu" Category="Navigation" Description="Contextual popup menu displaying a list of selectable actions and options.">
+                                <div class="d-flex flex-column pa-1 rounded border border-solid vek-border-lines-default docs-gray-bg shadow-sm" style="width:120px;">
+                                    <div class="px-2 py-1 rounded text-caption font-weight-bold vek-theme-primary text-white">Profile</div>
+                                    <div class="px-2 py-1 rounded text-caption">Settings</div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Nav Menu", "navigation", "Sidebar navigation component featuring expandable nested groups and links."))
+                        {
+                            <DocsExploreCard Title="Nav Menu" Category="Navigation" Description="Sidebar navigation component featuring expandable nested groups and links.">
+                                <div class="d-flex flex-column gap-1 pa-1 rounded border border-solid vek-border-lines-default docs-gray-bg" style="width:130px;">
+                                    <div class="d-flex align-center gap-1 px-1"><VekIcon Icon="@Icons.Material.Rounded.Folder" Size="Size.Small" Color="Color.Primary"/><span style="font-size:0.7rem; font-weight:600;">Getting Started</span></div>
+                                    <div class="d-flex align-center gap-1 px-1 ml-2"><VekIcon Icon="@Icons.Material.Rounded.Widgets" Size="Size.Small" Color="Color.Secondary"/><span style="font-size:0.7rem; font-weight:500;">Components</span></div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- 7. Feedback & Overlays -->
+            @if (SectionHasMatches("feedback"))
+            {
+                <div class="vek-bento-section">
+                    <div class="vek-bento-section-header">
+                        <div class="header-left">
+                            <div class="header-icon">
+                                <VekIcon Icon="@Icons.Material.Rounded.NotificationsActive" Size="Size.Small" />
+                            </div>
+                            <div>
+                                <h2 class="header-title">Feedback &amp; Overlays</h2>
+                                <p class="header-desc">Alerts, snackbars, modal dialogs, progress bars, and loading skeletons.</p>
+                            </div>
+                        </div>
+                        <span class="header-badge">8 components</span>
+                    </div>
+
+                    <div class="vek-bento-grid">
+                        @if (Matches("Alert", "feedback", "Contextual notification banner communicating Success, Info, Warning, or Error."))
+                        {
+                            <DocsExploreCard Title="Alert" Category="Feedback" Description="Contextual notification banner communicating Success, Info, Warning, or Error.">
+                                <VekAlert Severity="Severity.Success" Variant="Variant.Filled" Dense="true" Class="py-1 px-3 text-caption">Changes saved!</VekAlert>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Badge", "feedback", "Small notification badge displaying item counts, status dots, or icons."))
+                        {
+                            <DocsExploreCard Title="Badge" Category="Feedback" Description="Small notification badge displaying item counts, status dots, or icons.">
+                                <VekBadge Content="5" Color="Color.Error" Overlap="true">
+                                    <VekIcon Icon="@Icons.Material.Rounded.Notifications" Size="Size.Large" Color="Color.Primary" />
+                                </VekBadge>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Dialog", "feedback", "Modal dialog window for confirming actions, alerts, or focused data entry."))
+                        {
+                            <DocsExploreCard Title="Dialog" Category="Feedback" Description="Modal dialog window for confirming actions, alerts, or focused data entry.">
+                                <div class="vek-mini-dialog">
+                                    <div class="d-title"></div>
+                                    <div class="d-line"></div>
+                                    <div class="d-actions"><div class="d-btn"></div><div class="d-btn primary"></div></div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Message Box", "feedback", "Streamlined confirmation and prompt dialog service with Promise-style return."))
+                        {
+                            <DocsExploreCard Title="Message Box" Category="Feedback" Description="Streamlined confirmation and prompt dialog service with Promise-style return.">
+                                <VekPaper Outlined="true" Class="pa-2 rounded-lg d-flex flex-column gap-1" Style="width:130px;">
+                                    <span style="font-size:0.7rem; font-weight:700;">Delete Item?</span>
+                                    <span style="font-size:0.6rem; color:var(--vek-palette-text-secondary);">This action is permanent.</span>
+                                </VekPaper>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Progress", "feedback", "Circular and linear progress indicators showing indeterminate or determinate loading."))
+                        {
+                            <DocsExploreCard Title="Progress" Category="Feedback" Description="Circular and linear progress indicators showing indeterminate or determinate loading.">
+                                <div style="width:120px;" class="d-flex flex-column gap-2 align-center">
+                                    <VekProgressLinear Color="Color.Primary" Value="72" Rounded="true" Size="Size.Small" />
+                                    <VekProgressCircular Color="Color.Primary" Value="72" Size="Size.Small" />
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Skeleton", "feedback", "Animated shimmering placeholder preview simulating content before it loads."))
+                        {
+                            <DocsExploreCard Title="Skeleton" Category="Feedback" Description="Animated shimmering placeholder preview simulating content before it loads.">
+                                <div style="width:120px;" class="d-flex flex-column gap-1">
+                                    <VekSkeleton Width="100%" Height="12px" Animation="Animation.Wave" />
+                                    <VekSkeleton Width="65%" Height="10px" Animation="Animation.Wave" />
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Snackbar", "feedback", "Temporary floating toast notification message with action buttons."))
+                        {
+                            <DocsExploreCard Title="Snackbar" Category="Feedback" Description="Temporary floating toast notification message with action buttons.">
+                                <div class="vek-mini-toast">
+                                    <VekIcon Icon="@Icons.Material.Rounded.CheckCircle" Color="Color.Success" Size="Size.Small" />
+                                    <span>Notification sent</span>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Overlay", "feedback", "Dimmed background backdrop layer with loading indicators or focus lock."))
+                        {
+                            <DocsExploreCard Title="Overlay" Category="Feedback" Description="Dimmed background backdrop layer with loading indicators or focus lock.">
+                                <div style="width:130px; height:50px; position:relative;" class="rounded-lg overflow-hidden border border-solid vek-border-lines-default docs-gray-bg d-flex align-center justify-center">
+                                    <div style="position:absolute; inset:0; background:rgba(0,0,0,0.45);" class="d-flex align-center justify-center">
+                                        <VekProgressCircular Color="Color.Surface" Indeterminate="true" Size="Size.Small"/>
+                                    </div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- 8. Utilities -->
+            @if (SectionHasMatches("utilities"))
+            {
+                <div class="vek-bento-section">
+                    <div class="vek-bento-section-header">
+                        <div class="header-left">
+                            <div class="header-icon">
+                                <VekIcon Icon="@Icons.Material.Rounded.Build" Size="Size.Small" />
+                            </div>
+                            <div>
+                                <h2 class="header-title">Utilities</h2>
+                                <p class="header-desc">CSS helper utility classes for border radius, display, flexbox, and spacing.</p>
+                            </div>
+                        </div>
+                        <span class="header-badge">4 components</span>
+                    </div>
+
+                    <div class="vek-bento-grid">
+                        @if (Matches("Border Radius", "utilities", "CSS utility classes for applying standard rounded corner radii."))
+                        {
+                            <DocsExploreCard Title="Border Radius" Category="Utilities" Link="/utilities/border-radius" Description="CSS utility classes for applying standard rounded corner radii.">
+                                <div style="width:48px; height:48px; border-radius:14px; background:var(--vek-palette-primary);" class="shadow-sm"></div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Display", "utilities", "CSS utility classes for controlling element display, hidden states, and block flow."))
+                        {
+                            <DocsExploreCard Title="Display" Category="Utilities" Link="/utilities/display" Description="CSS utility classes for controlling element display, hidden states, and block flow.">
+                                <div class="d-flex gap-1">
+                                    <span class="pa-1 rounded docs-gray-bg text-caption font-weight-bold">d-flex</span>
+                                    <span class="pa-1 rounded docs-gray-bg text-caption font-weight-bold">d-none</span>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Flex", "utilities", "Flexbox layout utility helpers for alignment, justification, wrapping, and direction."))
+                        {
+                            <DocsExploreCard Title="Flex" Category="Utilities" Link="/utilities/flex" Description="Flexbox layout utility helpers for alignment, justification, wrapping, and direction.">
+                                <div class="d-flex justify-space-between align-center px-2 py-1 rounded border border-solid vek-border-lines-default" style="width:130px;">
+                                    <span style="font-size:0.65rem; font-weight:600;">Start</span>
+                                    <span style="font-size:0.65rem; font-weight:600; color:var(--vek-palette-primary);">Between</span>
+                                    <span style="font-size:0.65rem; font-weight:600;">End</span>
+                                </div>
+                            </DocsExploreCard>
+                        }
+
+                        @if (Matches("Spacing", "utilities", "Comprehensive margin and padding spacing utility classes (ma-*, pa-*)."))
+                        {
+                            <DocsExploreCard Title="Spacing" Category="Utilities" Link="/utilities/spacing" Description="Comprehensive margin and padding spacing utility classes (ma-*, pa-*).">
+                                <div class="pa-2 rounded border-2 border-dashed vek-border-primary docs-gray-bg">
+                                    <div class="pa-2 rounded vek-theme-primary text-white text-caption font-weight-bold">pa-4 ma-2</div>
+                                </div>
+                            </DocsExploreCard>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Empty Search State -->
+            @if (GetTotalVisibleCount() == 0)
+            {
+                <div class="vek-bento-empty">
+                    <VekIcon Icon="@Icons.Material.Rounded.SearchOff" Style="font-size: 48px;" Color="Color.Default" Class="mb-3" />
+                    <VekText Typo="Typo.h6">No components found</VekText>
+                    <VekText Typo="Typo.body2" Class="text-secondary mt-1">We couldn't find any components matching "@_searchQuery".</VekText>
+                    <VekButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ClearSearch" Class="mt-4" Size="Size.Small">
+                        Clear Filter
+                    </VekButton>
+                </div>
+            }
         </DocsPageSection>
     </DocsPageContent>
 </DocsPage>
 
 @code {
-    [Inject] IMenuService MenuService { get; set; } 
+    [Inject] IMenuService MenuService { get; set; }
+
+    private string _searchQuery = "";
+    private string _selectedCategory = "all";
+
+    private record CategoryInfo(string Key, string Name, int Count);
+
+    private readonly List<CategoryInfo> _categories = new()
+    {
+        new("all", "All", 66),
+        new("foundation", "Foundation", 4),
+        new("layout", "Layout", 10),
+        new("buttons", "Buttons", 6),
+        new("inputs", "Forms & Inputs", 17),
+        new("data", "Data Display", 19),
+        new("navigation", "Navigation", 4),
+        new("feedback", "Feedback", 8),
+        new("utilities", "Utilities", 4)
+    };
+
+    private readonly Dictionary<string, string[]> _sectionItems = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["foundation"] = ["Colors", "Typography", "Shadows", "Icons"],
+        ["layout"] = ["App Bar", "Container", "Drawer", "Grid", "Hidden", "Paper", "Divider", "Stack", "ToolBar", "Split Panel"],
+        ["buttons"] = ["Button", "Button Group", "Button FAB", "Icon Button", "Toggle Icon Button", "Scroll To Top"],
+        ["inputs"] = ["Autocomplete", "Check Box", "Color Picker", "Date Picker", "Field", "File Upload", "Form", "Focus Trap", "Highlighter", "Numeric Field", "Radio", "Rating", "Select", "Slider", "Switch", "Text Field", "Time Picker"],
+        ["data"] = ["Avatar", "Card", "Carousel", "Chips", "Chip Set", "Data Grid", "Drop Zone", "Expansion Panels", "Image", "List", "Pagination", "Popover", "Simple Table", "Stepper", "Table", "Tabs", "Timeline", "Tooltip", "Tree View"],
+        ["navigation"] = ["Breadcrumbs", "Link", "Menu", "Nav Menu"],
+        ["feedback"] = ["Alert", "Badge", "Dialog", "Message Box", "Progress", "Skeleton", "Snackbar", "Overlay"],
+        ["utilities"] = ["Border Radius", "Display", "Flex", "Spacing"]
+    };
+
+    private bool Matches(string title, string category, string description = "")
+    {
+        if (_selectedCategory != "all" && !string.Equals(_selectedCategory, category, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_searchQuery))
+        {
+            return true;
+        }
+
+        var q = _searchQuery.Trim();
+        return title.Contains(q, StringComparison.OrdinalIgnoreCase)
+            || category.Contains(q, StringComparison.OrdinalIgnoreCase)
+            || (!string.IsNullOrEmpty(description) && description.Contains(q, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private bool SectionHasMatches(string sectionKey)
+    {
+        if (_selectedCategory != "all" && !string.Equals(_selectedCategory, sectionKey, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_searchQuery))
+        {
+            return true;
+        }
+
+        if (!_sectionItems.TryGetValue(sectionKey, out var items))
+        {
+            return true;
+        }
+
+        return items.Any(item => Matches(item, sectionKey));
+    }
+
+    private int GetTotalVisibleCount()
+    {
+        int count = 0;
+        foreach (var (sec, items) in _sectionItems)
+        {
+            if (_selectedCategory == "all" || string.Equals(_selectedCategory, sec, StringComparison.OrdinalIgnoreCase))
+            {
+                count += items.Count(item => Matches(item, sec));
+            }
+        }
+        return count;
+    }
+
+    private void SelectCategory(string categoryKey)
+    {
+        _selectedCategory = categoryKey;
+    }
+
+    private void ClearSearch()
+    {
+        _searchQuery = string.Empty;
+        _selectedCategory = "all";
+    }
 }
