@@ -204,6 +204,19 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Closable Tabs">
+                <Description>
+                    Tabs can display a close button by setting <CodeInline>Closeable</CodeInline> on <CodeInline>VekTabs</CodeInline> or individual <CodeInline>VekTabPanel</CodeInline> components.
+                    Lifecycle events <CodeInline>OnTabClosing</CodeInline> and <CodeInline>OnTabClosed</CodeInline> support prompting before close or cancelling the operation. When an active tab is closed, adjacent tabs are automatically activated.
+                    The <CodeInline>CloseButtonDisplayMode</CodeInline> property controls whether close buttons appear <CodeInline>Always</CodeInline>, <CodeInline>OnHover</CodeInline>, or for the <CodeInline>ActiveTabOnly</CodeInline>.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TabsClosableExample)" ShowCode="true" Block="true">
+                <TabsClosableExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Dynamic Tabs">
                 <Description>
                     A browser-like tab experience can be enabled, allowing users to dynamically add and close tabs.

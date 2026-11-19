@@ -99,6 +99,63 @@ public partial class VekTabPanel : VekComponentBase
     public bool ShowCloseIcon { get; set; } = true;
 
     /// <summary>
+    /// Controls whether this tab can be closed.
+    /// </summary>
+    /// <remarks>
+    /// When set, overrides <see cref="VekTabs.Closeable"/>. Defaults to <c>null</c>.
+    /// </remarks>
+    [Parameter]
+    [Category(CategoryTypes.Tabs.Behavior)]
+    public bool? Closeable { get; set; }
+
+    /// <summary>
+    /// Specifies when the close button is displayed for this tab.
+    /// </summary>
+    /// <remarks>
+    /// When set, overrides <see cref="VekTabs.CloseButtonDisplayMode"/>. Defaults to <c>null</c>.
+    /// </remarks>
+    [Parameter]
+    [Category(CategoryTypes.Tabs.Appearance)]
+    public CloseButtonDisplayMode? CloseButtonDisplayMode { get; set; }
+
+    /// <summary>
+    /// The icon used for the close button on this tab.
+    /// </summary>
+    /// <remarks>
+    /// When set, overrides <see cref="VekTabs.CloseIcon"/>. Defaults to <c>null</c>.
+    /// </remarks>
+    [Parameter]
+    [Category(CategoryTypes.Tabs.Appearance)]
+    public string? CloseIcon { get; set; }
+
+    /// <summary>
+    /// The CSS classes applied to this tab's close button.
+    /// </summary>
+    /// <remarks>
+    /// Defaults to <c>null</c>. Multiple classes must be separated by spaces.
+    /// </remarks>
+    [Parameter]
+    [Category(CategoryTypes.Tabs.Appearance)]
+    public string? CloseIconClass { get; set; }
+
+    /// <summary>
+    /// Tooltip text for this tab's close button.
+    /// </summary>
+    /// <remarks>
+    /// When set, overrides <see cref="VekTabs.CloseIconToolTip"/>. Defaults to <c>null</c>.
+    /// </remarks>
+    [Parameter]
+    [Category(CategoryTypes.Tabs.Behavior)]
+    public string? CloseIconToolTip { get; set; }
+
+    /// <summary>
+    /// Occurs before this tab is closed, allowing the closing action to be cancelled.
+    /// </summary>
+    [Parameter]
+    [Category(CategoryTypes.Tabs.Behavior)]
+    public EventCallback<TabClosingEventArgs> OnClose { get; set; }
+
+    /// <summary>
     /// The badge shown for this tab.
     /// </summary>
     /// <remarks>
@@ -257,6 +314,15 @@ public partial class VekTabPanel : VekComponentBase
 
         if (Parent != null)
             await Parent.AddPanelAsync(this);
+    }
+
+    /// <summary>
+    /// Requests this tab panel to close.
+    /// </summary>
+    /// <returns>A task returning <c>true</c> if the tab closed successfully; otherwise, <c>false</c>.</returns>
+    public Task<bool> CloseAsync()
+    {
+        return Parent is not null ? Parent.CloseTabAsync(this) : Task.FromResult(false);
     }
 
     /// <inheritdoc/>

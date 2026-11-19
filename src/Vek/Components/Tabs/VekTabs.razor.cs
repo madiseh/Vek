@@ -42,6 +42,8 @@ namespace Vek
         private VekDropContainer<VekTabPanel>? _dropContainer;
         private readonly Lazy<ThrottleDispatcher> _throttleDispatcher;
         private readonly ParameterState<int> _activePanelIndexState;
+        private readonly ParameterState<bool> _closeableState;
+        private readonly ParameterState<CloseButtonDisplayMode> _closeButtonDisplayModeState;
         private readonly Dictionary<ElementReference, BoundingClientRect> _tabSizes = [];
         /// <summary>
         /// Unique identifier for this VekTabs component instance.
@@ -481,6 +483,78 @@ namespace Vek
         public IComparer<VekTabPanel>? SortComparer { get; set; }
 
         /// <summary>
+        /// Enables close buttons on tab headers.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. When <c>true</c>, tabs can be closed via a close button or keyboard shortcuts.
+        /// Individual tabs can override this via <see cref="VekTabPanel.Closeable"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.Tabs.Behavior)]
+        public bool Closeable { get; set; }
+
+        /// <summary>
+        /// Specifies when close buttons are displayed on closable tabs.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="CloseButtonDisplayMode.Always"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.Tabs.Appearance)]
+        public CloseButtonDisplayMode CloseButtonDisplayMode { get; set; } = CloseButtonDisplayMode.Always;
+
+        /// <summary>
+        /// The icon used for the tab close button.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Icons.Material.Filled.Close"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Tabs.Appearance)]
+        public string CloseIcon { get; set; } = Icons.Material.Filled.Close;
+
+        /// <summary>
+        /// The CSS classes applied to tab close buttons.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>""</c>. Multiple classes must be separated by spaces.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Tabs.Appearance)]
+        public string CloseIconClass { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The text shown when the user hovers over a tab close button.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>""</c>. When <c>null</c> or empty, no tooltip will be shown.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Tabs.Behavior)]
+        public string CloseIconToolTip { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Occurs before a tab is closed, allowing the closing action to be cancelled.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.Tabs.Behavior)]
+        public EventCallback<TabClosingEventArgs> OnTabClosing { get; set; }
+
+        /// <summary>
+        /// Occurs after a tab has been closed.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.Tabs.Behavior)]
+        public EventCallback<VekTabPanel> OnTabClosed { get; set; }
+
+        /// <summary>
+        /// Occurs before a tab is closed, allowing the closing action to be cancelled.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.Tabs.Behavior)]
+        public EventCallback<TabClosingEventArgs> OnClose { get; set; }
+
+        /// <summary>
         /// Can be used in derived class to add a class to the main container. If not overwritten return an empty string
         /// </summary>
         protected virtual string InternalClassName { get; } = string.Empty;
@@ -498,6 +572,10 @@ namespace Vek
                 .WithParameter(() => ActivePanelIndex)
                 .WithEventCallback(() => ActivePanelIndexChanged)
                 .WithChangeHandler(HandleActivePanelIndexChanged);
+            _closeableState = registerScope.RegisterParameter<bool>(nameof(Closeable))
+                .WithParameter(() => Closeable);
+            _closeButtonDisplayModeState = registerScope.RegisterParameter<CloseButtonDisplayMode>(nameof(CloseButtonDisplayMode))
+                .WithParameter(() => CloseButtonDisplayMode);
         }
 
         /// <inheritdoc />
@@ -672,9 +750,13 @@ namespace Vek
             if (_isDisposed)
                 return;
 
-            await _resizeObserver!.Unobserve(tabPanel.PanelRef);
+            if (_resizeObserver is not null)
+                await _resizeObserver.Unobserve(tabPanel.PanelRef);
 
             var index = _panels.IndexOf(tabPanel);
+            if (index == -1)
+                return;
+
             var wasActive = _activePanelIndexState.Value == index;
             var activePanel = ActivePanel;
 
@@ -704,6 +786,131 @@ namespace Vek
                 _redraw = true;
                 await InvokeAsync(StateHasChanged);
             }
+        }
+
+        /// <summary>
+        /// Determines whether the specified tab panel is closable.
+        /// </summary>
+        /// <param name="panel">The tab panel to check.</param>
+        /// <returns><c>true</c> if the tab is closable; otherwise, <c>false</c>.</returns>
+        public bool IsTabCloseable(VekTabPanel panel)
+        {
+            if (panel is null)
+            {
+                return false;
+            }
+
+            if (panel.Closeable.HasValue)
+            {
+                return panel.Closeable.Value;
+            }
+
+            if (!panel.ShowCloseIcon)
+            {
+                return false;
+            }
+
+            return _closeableState.Value;
+        }
+
+        /// <summary>
+        /// Determines whether the close button should be rendered for the specified tab panel.
+        /// </summary>
+        /// <param name="panel">The tab panel to check.</param>
+        /// <returns><c>true</c> if the close button should be rendered; otherwise, <c>false</c>.</returns>
+        private bool ShouldRenderCloseButton(VekTabPanel panel)
+        {
+            var mode = panel.CloseButtonDisplayMode ?? _closeButtonDisplayModeState.Value;
+            if (mode == CloseButtonDisplayMode.Never)
+            {
+                return false;
+            }
+
+            if (mode == CloseButtonDisplayMode.ActiveTabOnly && panel != ActivePanel)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private string GetCloseIcon(VekTabPanel panel) =>
+            panel.CloseIcon ?? CloseIcon;
+
+        private string? GetCloseIconToolTip(VekTabPanel panel) =>
+            !string.IsNullOrEmpty(panel.CloseIconToolTip) ? panel.CloseIconToolTip : CloseIconToolTip;
+
+        private string GetCloseIconClass(VekTabPanel panel) =>
+            new CssBuilder("vek-tab-close-button")
+                .AddClass(CloseIconClass)
+                .AddClass(panel.CloseIconClass)
+                .Build();
+
+        /// <summary>
+        /// Closes the specified tab panel, raising lifecycle events and updating active tab selection.
+        /// </summary>
+        /// <param name="panel">The tab panel to close.</param>
+        /// <returns><c>true</c> if the tab was closed; <c>false</c> if cancelled or not found.</returns>
+        public async Task<bool> CloseTabAsync(VekTabPanel panel)
+        {
+            if (panel is null || !_panels.Contains(panel) || IsPanelDisabled(panel))
+            {
+                return false;
+            }
+
+            var index = _panels.IndexOf(panel);
+            var args = new TabClosingEventArgs(panel, index);
+
+            if (panel.OnClose.HasDelegate)
+            {
+                await panel.OnClose.InvokeAsync(args);
+                if (args.Cancel)
+                {
+                    return false;
+                }
+            }
+
+            if (OnTabClosing.HasDelegate)
+            {
+                await OnTabClosing.InvokeAsync(args);
+                if (args.Cancel)
+                {
+                    return false;
+                }
+            }
+
+            if (OnClose.HasDelegate)
+            {
+                await OnClose.InvokeAsync(args);
+                if (args.Cancel)
+                {
+                    return false;
+                }
+            }
+
+            await RemovePanel(panel);
+
+            if (OnTabClosed.HasDelegate)
+            {
+                await OnTabClosed.InvokeAsync(panel);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Closes the tab panel at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index of the tab panel to close.</param>
+        /// <returns><c>true</c> if the tab was closed; <c>false</c> if cancelled or out of range.</returns>
+        public Task<bool> CloseTabAsync(int index)
+        {
+            if (index < 0 || index >= _panels.Count)
+            {
+                return Task.FromResult(false);
+            }
+
+            return CloseTabAsync(_panels[index]);
         }
 
         /// <summary>
@@ -856,6 +1063,8 @@ namespace Vek
                 .AddClass($"vek-tabs-border-{ConvertPosition(Position).ToStringFast(true)}", Border)
                 .AddClass($"vek-paper-outlined", !ApplyEffectsToContainer && Outlined)
                 .AddClass($"vek-elevation-{Elevation}", !ApplyEffectsToContainer && Elevation != 0)
+                .AddClass("vek-tabs-close-on-hover", _closeButtonDisplayModeState.Value == CloseButtonDisplayMode.OnHover)
+                .AddClass("vek-tabs-close-active-only", _closeButtonDisplayModeState.Value == CloseButtonDisplayMode.ActiveTabOnly)
                 .AddClass(TabHeaderClass)
                 .Build();
 
@@ -942,12 +1151,17 @@ namespace Vek
 
         private string GetTabClass(VekTabPanel panel)
         {
+            var isClosable = IsTabCloseable(panel);
+            var mode = panel.CloseButtonDisplayMode ?? _closeButtonDisplayModeState.Value;
             var tabClass = new CssBuilder("vek-tab")
               .AddClass($"vek-tab-active", panel == ActivePanel)
               .AddClass($"vek-disabled", IsPanelDisabled(panel))
               .AddClass($"vek-ripple", Ripple)
               .AddClass(ActiveTabClass, panel == ActivePanel)
               .AddClass(TabButtonsClass)
+              .AddClass("vek-tab-closable", isClosable)
+              .AddClass("vek-tab-close-on-hover", isClosable && mode == CloseButtonDisplayMode.OnHover)
+              .AddClass("vek-tab-close-active-only", isClosable && mode == CloseButtonDisplayMode.ActiveTabOnly)
               .AddClass(panel.Classname)
               .Build();
 
@@ -1361,6 +1575,14 @@ namespace Vek
                     // considered a click
                     var args = new MouseEventArgs() { Type = e.Key, Detail = 1, ClientX = 0, ClientY = 0 };
                     await ActivatePanelClickAsync(panel, args);
+                    break;
+
+                case "Delete":
+                case "Backspace":
+                    if (this is not VekDynamicTabs && IsTabCloseable(panel))
+                    {
+                        await CloseTabAsync(panel);
+                    }
                     break;
 
                 case "ArrowLeft":
