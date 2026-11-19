@@ -200,9 +200,19 @@
   }
 
   .vek-slider-tickmarks {
-    display: flex;
-    justify-content: space-between;
+      position: relative;
+      display: block;
     flex-grow: 1;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .vek-slider-tickmark {
+      position: absolute;
+      top: 50%;
+      align-items: center;
+      transform: translateX(-50%);
   }
 
   .vek-slider-track-tick {
@@ -212,7 +222,8 @@
 
   .vek-slider-track-tick-label {
     position: absolute;
-    top: 0;
+      top: 100%;
     left: 50%;
+      white-space: nowrap;
   }
 }
