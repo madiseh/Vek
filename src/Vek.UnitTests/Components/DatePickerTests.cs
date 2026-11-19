@@ -4,10 +4,10 @@ using AngleSharp.Html.Dom;
 using AwesomeAssertions;
 using Bunit;
 using Microsoft.AspNetCore.Components.Web;
+using NUnit.Framework;
 using Vek.Extensions;
 using Vek.UnitTests.TestComponents.DatePicker;
 using Vek.UnitTests.Utilities;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {
