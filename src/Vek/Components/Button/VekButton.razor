@@ -12,7 +12,36 @@
     private void RenderLabel(RenderTreeBuilder __builder)
     {
         <span class="vek-button-label">
-            <span class="vek-button-content">
+            @if (IsLoading)
+            {
+                <span class="vek-button-content">
+                    @if (!string.IsNullOrWhiteSpace(StartIcon))
+                    {
+                        <span class="@StartIconClass">
+                            <VekIcon Disabled="@Disabled" Icon="@StartIcon" Size="@(IconSize ?? Size)" Color="@IconColor" />
+                        </span>
+                    }
+                    @ChildContent
+                    @if (!string.IsNullOrWhiteSpace(EndIcon))
+                    {
+                        <span class="@EndIconClass">
+                            <VekIcon Disabled="@Disabled" Icon="@EndIcon" Size="@(IconSize ?? Size)" Color="@IconColor" />
+                        </span>
+                    }
+                </span>
+                <span class="vek-button-loading-indicator" aria-hidden="true">
+                    @if (LoadingTemplate is null)
+                    {
+                        <VekProgressCircular Size="Size.Small" Indeterminate="true" />
+                    }
+                    else
+                    {
+                        @LoadingTemplate
+                    }
+                </span>
+            }
+            else
+            {
                 @if (!string.IsNullOrWhiteSpace(StartIcon))
                 {
                     <span class="@StartIconClass">
@@ -26,19 +55,6 @@
                         <VekIcon Disabled="@Disabled" Icon="@EndIcon" Size="@(IconSize ?? Size)" Color="@IconColor" />
                     </span>
                 }
-            </span>
-            @if (IsLoading)
-            {
-                <span class="vek-button-loading-indicator" aria-hidden="true">
-                    @if (LoadingTemplate is null)
-                    {
-                        <VekProgressCircular Size="Size.Small" Indeterminate="true" />
-                    }
-                    else
-                    {
-                        @LoadingTemplate
-                    }
-                </span>
             }
         </span>
     }

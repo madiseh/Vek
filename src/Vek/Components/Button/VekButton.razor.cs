@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Vek.Utilities;
 using Vek.State;
+using Vek.Utilities;
 
 namespace Vek
 {

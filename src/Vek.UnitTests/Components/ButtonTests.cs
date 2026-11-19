@@ -72,10 +72,10 @@ public class ButtonTests : BunitTest
 
         var label = comp.Find(".vek-button-label");
         label.TextContent.Should().Be("Save");
-        var content = label.QuerySelector(".vek-button-content")!;
-        content.Children.Should().HaveCount(2);
-        content.Children[0].ClassList.Should().Contain(["vek-button-icon-start", "my-icon"]);
-        content.Children[1].ClassList.Should().Contain(["vek-button-icon-end", "my-icon"]);
+        label.QuerySelector(".vek-button-content").Should().BeNull();
+        label.Children.Should().HaveCount(2);
+        label.Children[0].ClassList.Should().Contain(["vek-button-icon-start", "my-icon"]);
+        label.Children[1].ClassList.Should().Contain(["vek-button-icon-end", "my-icon"]);
         comp.FindAll(".vek-button-label svg").Should().AllSatisfy(icon => icon.ClassList.Should().Contain("vek-primary-text"));
     }
 
