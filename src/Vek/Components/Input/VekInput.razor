@@ -110,6 +110,18 @@
                        @attributes="ClearButtonAttributes" />
     }
 
+    @if (ShowPasswordToggleButton())
+    {
+        <VekIconButton Class="@PasswordToggleClassname"
+                       Color="@Color.Default"
+                       Icon="@GetPasswordToggleIcon()"
+                       Size="@Size.Small"
+                       OnClick="@HandlePasswordToggleAsync"
+                       Disabled="@GetDisabledState()"
+                       aria-label="@GetPasswordToggleAriaLabel()"
+                       @onmousedown:preventDefault />
+    }
+
     @if (Adornment == Adornment.End)
     {
         <VekInputAdornment Class="@AdornmentClassname"

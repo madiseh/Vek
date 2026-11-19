@@ -86,6 +86,17 @@
 </DocsPageSection>
 
 <DocsPageSection>
+    <SectionHeader Title="Password Visibility Toggle">
+        <Description>
+            Enable <CodeInline>ShowPasswordToggle</CodeInline> on password inputs (<CodeInline>InputType="InputType.Password"</CodeInline>) to display an interactive visibility toggle button switching between masked password and plain text. The toggle button features dynamic ARIA announcements (<CodeInline>Show password</CodeInline> / <CodeInline>Hide password</CodeInline>), supports custom visibility icons, preserves cursor focus, and cleanly integrates with <CodeInline>Clearable</CodeInline> and adornments.
+        </Description>
+    </SectionHeader>
+    <SectionContent Code="@nameof(TextFieldPasswordToggleExample)">
+        <TextFieldPasswordToggleExample />
+    </SectionContent>
+</DocsPageSection>
+
+<DocsPageSection>
     <SectionHeader Title="Character Counter">
         <Description>
             Display character counts and enforce length limits to help users stay within content boundaries. Set <CodeInline>Counter</CodeInline> to show the count,
