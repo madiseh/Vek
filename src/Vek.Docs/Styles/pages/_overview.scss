@@ -1,3 +1,12 @@
+// Copyright (c) Vek 2021
+// Vek licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+// ============================================================================
+// Vek Bento Modern Component Directory Showcase
+// ============================================================================
+
+// Legacy fallback classes (kept for backwards-compatibility)
 .explore-vek-items {
   display: flex;
   flex-wrap: wrap;
@@ -27,13 +36,700 @@
   }
 }
 
-@media (max-width:600px) {
-  .explore-card {
-    height: 138px;
-    width: 138px;
+// ============================================================================
+// Hero Section
+// ============================================================================
+.vek-bento-hero {
+  position: relative;
+  margin-top: 16px;
+  margin-bottom: 40px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    left: 20%;
+    width: 60%;
+    height: 220px;
+    background: radial-gradient(ellipse at 50% 30%, rgba(37, 99, 235, 0.12) 0%, rgba(59, 130, 246, 0.03) 60%, transparent 80%);
+    pointer-events: none;
+    z-index: 0;
   }
 
-  .explore-vek-items {
+  .vek-bento-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    background: rgba(37, 99, 235, 0.08);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    color: var(--vek-palette-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    backdrop-filter: blur(8px);
+    position: relative;
+    z-index: 1;
+
+    .vek-bento-badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--vek-palette-primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+      animation: vek-bento-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .vek-bento-badge-sep {
+      opacity: 0.35;
+    }
+
+    .vek-bento-badge-sub {
+      color: var(--vek-palette-text-secondary);
+      font-weight: 500;
+    }
+  }
+
+  .vek-bento-title {
+    font-size: clamp(2rem, 3.8vw, 3.1rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin: 0 0 12px 0;
+    color: var(--vek-palette-text-primary);
+    position: relative;
+    z-index: 1;
+  }
+
+  .vek-bento-gradient-text {
+    background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .vek-bento-subtitle {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--vek-palette-text-secondary);
+    max-width: 680px;
+    margin: 0 0 28px 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .vek-bento-search-box {
+    max-width: 580px;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+
+    .vek-input-control {
+      background-color: var(--vek-palette-surface);
+      border-radius: 12px;
+      border: 1px solid var(--vek-palette-divider);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s ease;
+
+      &:focus-within {
+        border-color: var(--vek-palette-primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15), 0 8px 20px -4px rgba(37, 99, 235, 0.12);
+      }
+    }
+  }
+
+  .vek-bento-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+
+    .vek-bento-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 9999px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      background-color: var(--vek-palette-surface);
+      border: 1px solid var(--vek-palette-divider);
+      color: var(--vek-palette-text-secondary);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+
+      &:hover {
+        border-color: var(--vek-palette-primary);
+        color: var(--vek-palette-primary);
+        transform: translateY(-1px);
+      }
+
+      &.active {
+        background-color: var(--vek-palette-primary);
+        border-color: var(--vek-palette-primary);
+        color: #ffffff;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.32);
+
+        .vek-bento-chip-count {
+          background-color: rgba(255, 255, 255, 0.24);
+          color: #ffffff;
+        }
+      }
+
+      .vek-bento-chip-count {
+        font-size: 0.6875rem;
+        font-weight: 700;
+        padding: 1px 7px;
+        border-radius: 9999px;
+        background-color: var(--vek-palette-background-gray);
+        color: var(--vek-palette-text-secondary);
+        transition: all 0.2s ease;
+      }
+    }
+  }
+}
+
+// ============================================================================
+// Section Headers
+// ============================================================================
+.vek-bento-section {
+  margin-bottom: 48px;
+
+  .vek-bento-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--vek-palette-divider);
+    margin-bottom: 20px;
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background-color: rgba(37, 99, 235, 0.08);
+      color: var(--vek-palette-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .header-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--vek-palette-text-primary);
+      margin: 0;
+    }
+
+    .header-desc {
+      font-size: 0.8125rem;
+      color: var(--vek-palette-text-secondary);
+      margin: 2px 0 0 0;
+    }
+
+    .header-badge {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--vek-palette-text-secondary);
+      background-color: var(--vek-palette-background-gray);
+      border: 1px solid var(--vek-palette-divider);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      flex-shrink: 0;
+    }
+  }
+}
+
+// ============================================================================
+// Bento Grid & Cards
+// ============================================================================
+.vek-bento-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.vek-bento-card-link {
+  text-decoration: none !important;
+  color: inherit;
+  display: flex;
+  height: 100%;
+
+  &:focus-visible {
+    outline: 2px solid var(--vek-palette-primary);
+    outline-offset: 2px;
+    border-radius: 14px;
+  }
+}
+
+.vek-bento-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: var(--vek-palette-surface);
+  border: 1px solid var(--vek-palette-divider);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+
+  @media(hover: hover) and (pointer: fine) {
+    &:hover {
+      border-color: var(--vek-palette-primary);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px -6px rgba(37, 99, 235, 0.16), 0 0 0 1px var(--vek-palette-primary);
+      cursor: pointer;
+
+      .vek-bento-card-arrow {
+        transform: translateX(4px);
+        color: var(--vek-palette-primary);
+      }
+
+      .vek-bento-card-title {
+        color: var(--vek-palette-primary);
+      }
+
+      .vek-bento-card-preview {
+        background-color: var(--vek-palette-action-default-hover);
+      }
+    }
+  }
+
+  &:active {
+    transform: translateY(-1px);
+  }
+}
+
+.vek-bento-card-preview {
+  height: 124px;
+  background-color: var(--vek-palette-background-gray);
+  border-bottom: 1px solid var(--vek-palette-divider);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 16px;
+  transition: background-color 0.2s ease;
+  background-image: radial-gradient(var(--vek-palette-divider) 1px, transparent 1px);
+  background-size: 16px 16px;
+
+  .vek-bento-card-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    background-color: var(--vek-palette-primary);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+    z-index: 2;
+  }
+
+  .vek-bento-preview-content {
+    display: flex;
+    align-items: center;
     justify-content: center;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+}
+
+.vek-bento-card-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+
+  .body-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .vek-bento-card-category {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--vek-palette-primary);
+  }
+
+  .vek-bento-card-arrow {
+    color: var(--vek-palette-text-secondary);
+    display: inline-flex;
+    align-items: center;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
+  .vek-bento-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--vek-palette-text-primary);
+    margin: 0 0 4px 0;
+    transition: color 0.2s ease;
+  }
+
+  .vek-bento-card-desc {
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: var(--vek-palette-text-secondary);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+// ============================================================================
+// Micro-Visual Previews
+// ============================================================================
+.vek-mini-swatches {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+
+  .swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    border: 2px solid var(--vek-palette-surface);
+  }
+}
+
+.vek-mini-typo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+
+  .big-a {
+    font-size: 2.25rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--vek-palette-primary) 0%, #818CF8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .font-meta {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--vek-palette-text-secondary);
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+}
+
+.vek-mini-shadow {
+  width: 64px;
+  height: 48px;
+  border-radius: 8px;
+  background: var(--vek-palette-surface);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.18), 0 8px 10px -6px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--vek-palette-divider);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--vek-palette-primary);
+}
+
+.vek-mini-icons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  .icon-box {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--vek-palette-surface);
+    border: 1px solid var(--vek-palette-divider);
+  }
+}
+
+.vek-mini-appbar {
+  width: 140px;
+  height: 58px;
+  border-radius: 6px;
+  background: var(--vek-palette-surface);
+  border: 1px solid var(--vek-palette-divider);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  .appbar-top {
+    height: 16px;
+    background: var(--vek-palette-primary);
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    gap: 4px;
+
+    .dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #ffffff;
+    }
+  }
+
+  .appbar-body {
+    flex: 1;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .line {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--vek-palette-divider);
+    }
+  }
+}
+
+.vek-mini-table {
+  width: 140px;
+  border-radius: 6px;
+  background: var(--vek-palette-surface);
+  border: 1px solid var(--vek-palette-divider);
+  overflow: hidden;
+
+  .t-row {
+    display: flex;
+    padding: 4px 6px;
+    gap: 6px;
+    border-bottom: 1px solid var(--vek-palette-divider);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &.hdr {
+      background: rgba(37, 99, 235, 0.08);
+    }
+
+    .t-cell {
+      height: 6px;
+      border-radius: 2px;
+      background: var(--vek-palette-divider);
+
+      &.primary {
+        background: var(--vek-palette-primary);
+      }
+    }
+  }
+}
+
+.vek-mini-dialog {
+  width: 130px;
+  border-radius: 8px;
+  background: var(--vek-palette-surface);
+  border: 1px solid var(--vek-palette-divider);
+  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .d-title {
+    height: 6px;
+    width: 60%;
+    background: var(--vek-palette-primary);
+    border-radius: 2px;
+  }
+
+  .d-line {
+    height: 4px;
+    width: 100%;
+    background: var(--vek-palette-divider);
+    border-radius: 2px;
+  }
+
+  .d-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+    margin-top: 4px;
+
+    .d-btn {
+      height: 8px;
+      width: 18px;
+      border-radius: 2px;
+      background: var(--vek-palette-divider);
+
+      &.primary {
+        background: var(--vek-palette-primary);
+      }
+    }
+  }
+}
+
+.vek-mini-toast {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--vek-palette-surface);
+  border: 1px solid var(--vek-palette-divider);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--vek-palette-text-primary);
+}
+
+.vek-mini-ac {
+  width: 130px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  .ac-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 6px;
+    border-radius: 4px;
+    background: var(--vek-palette-surface);
+    border: 1px solid var(--vek-palette-primary);
+    font-size: 0.6875rem;
+    font-weight: 500;
+  }
+
+  .ac-dropdown {
+    border-radius: 4px;
+    background: var(--vek-palette-surface);
+    border: 1px solid var(--vek-palette-divider);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    padding: 3px 6px;
+    font-size: 0.625rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    color: var(--vek-palette-text-secondary);
+
+    .selected {
+      color: var(--vek-palette-primary);
+      font-weight: 600;
+    }
+  }
+}
+
+.vek-mini-card-mock {
+  width: 120px;
+  height: 64px;
+  border-radius: 6px;
+  background: var(--vek-palette-surface);
+  border: 1px solid var(--vek-palette-divider);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  .card-img {
+    height: 28px;
+    background: rgba(37, 99, 235, 0.12);
+  }
+
+  .card-body {
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    .c-line {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--vek-palette-divider);
+    }
+  }
+}
+
+.vek-bento-empty {
+  padding: 64px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--vek-palette-surface);
+  border: 1px dashed var(--vek-palette-divider);
+  border-radius: 16px;
+  margin: 32px 0;
+}
+
+// ============================================================================
+// Keyframe Animations
+// ============================================================================
+@keyframes vek-bento-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.92);
+  }
+}
+
+// ============================================================================
+// Responsive Breakpoints
+// ============================================================================
+@media (max-width: 960px) {
+  .vek-bento-hero {
+    .vek-bento-title {
+      font-size: 2.25rem;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .vek-bento-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vek-bento-hero {
+    .vek-bento-title {
+      font-size: 1.85rem;
+    }
+
+    .vek-bento-subtitle {
+      font-size: 1rem;
+    }
+  }
+
+  .vek-bento-section-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 8px;
+
+    .header-badge {
+      align-self: flex-start;
+    }
   }
 }
