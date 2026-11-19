@@ -363,6 +363,12 @@
   <data name="VekInput_Increment" xml:space="preserve">
     <value>Increment</value>
   </data>
+  <data name="VekInput_ShowPassword" xml:space="preserve">
+    <value>Show password</value>
+  </data>
+  <data name="VekInput_HidePassword" xml:space="preserve">
+    <value>Hide password</value>
+  </data>
   <data name="VekRangeInput_Start" xml:space="preserve">
     <value>Start</value>
   </data>
