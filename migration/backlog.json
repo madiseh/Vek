@@ -429,10 +429,12 @@
       "title": "TextBox Password Masking with Interactive Visibility Toggle",
       "module": "TextField",
       "priority": 37,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/037-textbox-password-visibility-toggle.md",
       "dependencies": [],
-      "started_at": "2026-11-19T19:31:07Z"
+      "started_at": "2026-11-19T19:31:07Z",
+      "completed_at": "2026-11-19T20:39:44Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/51"
     },
     {
       "id": "038",
