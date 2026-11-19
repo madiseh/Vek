@@ -2,8 +2,8 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Vek.UnitTests.TestComponents.Badge;
 using NUnit.Framework;
+using Vek.UnitTests.TestComponents.Badge;
 
 namespace Vek.UnitTests.Components
 {
