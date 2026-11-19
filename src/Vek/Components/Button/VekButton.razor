@@ -3,7 +3,7 @@
 @implements IDisposable
 
 @{
-    OpenRoot(__builder, Classname);
+    OpenRoot(__builder, Classname, IsLoading);
     RenderLabel(__builder);
     __builder.CloseElement();
 }
@@ -12,18 +12,49 @@
     private void RenderLabel(RenderTreeBuilder __builder)
     {
         <span class="vek-button-label">
-            @if (!string.IsNullOrWhiteSpace(StartIcon))
+            @if (IsLoading)
             {
-                <span class="@StartIconClass">
-                    <VekIcon Disabled="@Disabled" Icon="@StartIcon" Size="@(IconSize ?? Size)" Color="@IconColor" />
+                <span class="vek-button-content">
+                    @if (!string.IsNullOrWhiteSpace(StartIcon))
+                    {
+                        <span class="@StartIconClass">
+                            <VekIcon Disabled="@Disabled" Icon="@StartIcon" Size="@(IconSize ?? Size)" Color="@IconColor" />
+                        </span>
+                    }
+                    @ChildContent
+                    @if (!string.IsNullOrWhiteSpace(EndIcon))
+                    {
+                        <span class="@EndIconClass">
+                            <VekIcon Disabled="@Disabled" Icon="@EndIcon" Size="@(IconSize ?? Size)" Color="@IconColor" />
+                        </span>
+                    }
+                </span>
+                <span class="vek-button-loading-indicator" aria-hidden="true">
+                    @if (LoadingTemplate is null)
+                    {
+                        <VekProgressCircular Size="Size.Small" Indeterminate="true" />
+                    }
+                    else
+                    {
+                        @LoadingTemplate
+                    }
                 </span>
             }
-            @ChildContent
-            @if (!string.IsNullOrWhiteSpace(EndIcon))
+            else
             {
-                <span class="@EndIconClass">
-                    <VekIcon Disabled="@Disabled" Icon="@EndIcon" Size="@(IconSize ?? Size)" Color="@IconColor" />
-                </span>
+                @if (!string.IsNullOrWhiteSpace(StartIcon))
+                {
+                    <span class="@StartIconClass">
+                        <VekIcon Disabled="@Disabled" Icon="@StartIcon" Size="@(IconSize ?? Size)" Color="@IconColor" />
+                    </span>
+                }
+                @ChildContent
+                @if (!string.IsNullOrWhiteSpace(EndIcon))
+                {
+                    <span class="@EndIconClass">
+                        <VekIcon Disabled="@Disabled" Icon="@EndIcon" Size="@(IconSize ?? Size)" Color="@IconColor" />
+                    </span>
+                }
             }
         </span>
     }

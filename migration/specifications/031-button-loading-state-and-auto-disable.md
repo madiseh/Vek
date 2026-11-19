@@ -4,9 +4,12 @@
 - **Feature ID**: 031
 - **Feature Slug**: button-loading-state-and-auto-disable
 - **Module**: Button
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 31
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/29
+- **Started At**: 2026-11-19T10:00:35Z
+- **Completed At**: 2026-11-19T10:28:19Z
 
 ---
 
