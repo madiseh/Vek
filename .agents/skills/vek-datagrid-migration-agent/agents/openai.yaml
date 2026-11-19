@@ -1,7 +1,0 @@
-interface:
-  display_name: "Vek DataGrid Migration Agent"
-  short_description: "Implement a DataGrid migration and open a PR"
-  default_prompt: "Use $vek-datagrid-migration-agent to complete the next ready DataGrid migration and open a PR to master."
-
-policy:
-  allow_implicit_invocation: true
