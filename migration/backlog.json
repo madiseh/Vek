@@ -897,10 +897,12 @@
       "title": "Rating Fractional/Half-Star Precision and Live Hover Score Preview",
       "module": "Rating",
       "priority": 81,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/081-rating-half-star-precision-and-hover-preview.md",
       "dependencies": [],
-      "started_at": "2026-11-19T19:56:46Z"
+      "started_at": "2026-11-19T19:56:46Z",
+      "completed_at": "2026-11-19T21:21:49Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/54"
     },
     {
       "id": "082",
