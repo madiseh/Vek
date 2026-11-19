@@ -229,6 +229,7 @@ namespace Vek.UnitTests.Components
         {
             // Arrange
 
+            var timeProvider = Context.AddFakeTimeProvider();
             var comp = Context.Render<VekDialogProvider>();
             var sup = Context.Render<InlineDialogShowMethodTest>();
 
@@ -254,6 +255,7 @@ namespace Vek.UnitTests.Components
 
             // Act : Reopen the dialog
 
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await sup.Find(".open-dialog-button").ClickAsync();
 
             // Assert : Dialog should be open
@@ -298,6 +300,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task InlineDialog_Should_UpdateIsVisibleOnClose()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var comp = Context.Render<VekDialogProvider>();
             comp.Markup.Trim().Should().BeEmpty();
             var service = Context.Services.GetRequiredService<IDialogService>();
@@ -307,6 +310,7 @@ namespace Vek.UnitTests.Components
             await comp.WaitForAssertionAsync(() => comp.FindAll("div.vek-dialog-container").Count.Should().Be(1));
             await comp.InvokeAsync(() => comp.WaitForElement("div.vek-overlay").Click());
             await comp.WaitForAssertionAsync(() => comp.Markup.Trim().Should().BeEmpty(), TimeSpan.FromSeconds(5));
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp1.InvokeAsync(() => comp1.Find("button").Click());
             await comp.WaitForAssertionAsync(() => comp.FindAll("div.vek-dialog-container").Count.Should().Be(1),
                 TimeSpan.FromSeconds(5));
@@ -631,6 +635,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task DialogToggleFullscreenOptions()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var comp = Context.Render<VekDialogProvider>();
             comp.Markup.Trim().Should().BeEmpty();
 
@@ -644,6 +649,7 @@ namespace Vek.UnitTests.Components
             comp.Find("div.vek-dialog").GetAttribute("class").Should().Be("vek-dialog vek-dialog-width-sm");
             comp.Find("button").Click();
             comp.Find("div.vek-dialog").GetAttribute("class").Should().Be("vek-dialog vek-dialog-fullscreen");
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             comp.Find("button").Click();
             comp.Find("div.vek-dialog").GetAttribute("class").Should().Be("vek-dialog vek-dialog-width-sm");
         }
@@ -977,6 +983,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task AsyncDialogToggleFullscreenOptions()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var comp = Context.Render<VekDialogProvider>();
             comp.Markup.Trim().Should().BeEmpty();
 
@@ -991,6 +998,7 @@ namespace Vek.UnitTests.Components
             comp.Find("div.vek-dialog").GetAttribute("class").Should().Be("vek-dialog vek-dialog-width-sm");
             comp.Find("button").Click();
             comp.Find("div.vek-dialog").GetAttribute("class").Should().Be("vek-dialog vek-dialog-fullscreen");
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             comp.Find("button").Click();
             comp.Find("div.vek-dialog").GetAttribute("class").Should().Be("vek-dialog vek-dialog-width-sm");
         }

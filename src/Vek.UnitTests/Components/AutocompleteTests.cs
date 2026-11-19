@@ -1153,6 +1153,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task Autocomplete_BoundValueChange_UpdatesText()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var comp = Context.Render<AutocompleteChangeBoundObjectTest>();
             var autocompleteComponent = comp.FindComponent<VekAutocomplete<string>>();
             var autocomplete = autocompleteComponent.Instance;
@@ -1160,6 +1161,7 @@ namespace Vek.UnitTests.Components
 
             async Task ToggleBoundObjectAsync(string expected)
             {
+                timeProvider.Advance(TimeSpan.FromMilliseconds(301));
                 await comp.Find(".toggle-value-button").ClickAsync();
                 await comp.WaitForAssertionAsync(() => Input().GetAttribute("value").Should().Be(expected));
                 autocomplete.ReadValue.Should().Be(expected);

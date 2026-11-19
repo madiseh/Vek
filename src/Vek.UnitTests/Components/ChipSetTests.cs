@@ -459,6 +459,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task Should_provide_accessible_keyboard_navigation()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var onCloseCount = 0;
             var comp = Context.Render<ChipSetKeyboardNavigationTests>(parameters => parameters
                 .Add(p => p.AreChipsClosable, false)
@@ -466,6 +467,7 @@ namespace Vek.UnitTests.Components
 
             // add two chips
             await comp.Find("#add-chip-button").ClickAsync();
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.Find("#add-chip-button").ClickAsync();
 
             comp.FindComponent<VekChipSet<string>>().Instance.SelectedValues.Should().BeNullOrEmpty();
@@ -507,6 +509,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task Should_not_accept_keyboard_inputs_when_disabled_or_readonly()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var onCloseCount = 0;
             var comp = Context.Render<ChipSetKeyboardNavigationTests>(parameters => parameters
                 .Add(p => p.AreChipsClosable, true)
@@ -515,6 +518,7 @@ namespace Vek.UnitTests.Components
 
             // add two chips
             await comp.Find("#add-chip-button").ClickAsync();
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.Find("#add-chip-button").ClickAsync();
 
             comp.FindComponent<VekChipSet<string>>().Instance.SelectedValues.Should().BeNullOrEmpty();

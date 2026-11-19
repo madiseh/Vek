@@ -280,6 +280,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task ActiveIndex_ShouldBeTwoWayBindable()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var comp = Context.Render<StepperTwoWayBindingTestComponent>();
             var stepper1 = comp.FindComponents<VekStepper>()[0];
             var stepper2 = comp.FindComponents<VekStepper>()[1];
@@ -294,6 +295,7 @@ namespace Vek.UnitTests.Components
             stepper1.Find(".vek-stepper-content").TextContent.Trimmed().Should().Contain("Step B");
             stepper2.Find(".vek-stepper-content").TextContent.Trimmed().Should().Contain("Step Y");
             // next
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await stepper1.Find(".vek-stepper-button-next").ClickAsync();
             stepper1.Instance.ActiveStep?.Title.Should().Be("C");
             stepper2.Instance.ActiveStep?.Title.Should().Be("Z");
@@ -698,6 +700,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task ResetButton_ShouldTriggerResetStepActionOnAllStepsThenActivateFirstStep()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var cancel = false;
             var actions = new List<StepAction>();
             var index = -1;
@@ -725,6 +728,7 @@ namespace Vek.UnitTests.Components
             index.Should().Be(0);
             actions[0].Should().Be(StepAction.Complete);
             stepper.Instance.GetState<int>(nameof(VekStepper.ActiveIndex)).Should().Be(1);
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await stepper.Find(".vek-stepper-button-next").ClickAsync();
             index.Should().Be(1);
             actions[1].Should().Be(StepAction.Complete);
@@ -742,6 +746,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task ResetButton_ShouldTriggerResetStepActionForSkippedSteps()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var cancel = false;
             var actions = new List<StepAction>();
             var index = -1;
@@ -768,6 +773,7 @@ namespace Vek.UnitTests.Components
             index.Should().Be(0);
             actions[0].Should().Be(StepAction.Skip);
             stepper.Instance.GetState<int>(nameof(VekStepper.ActiveIndex)).Should().Be(1);
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await stepper.Find(".vek-stepper-button-skip").ClickAsync();
             index.Should().Be(1);
             actions[1].Should().Be(StepAction.Skip);
@@ -886,6 +892,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task Stepper_ControlledNavigation()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var cancel = false;
             var actions = new List<StepAction>();
             var index = -1;
@@ -913,6 +920,7 @@ namespace Vek.UnitTests.Components
             index.Should().Be(0);
             actions[0].Should().Be(StepAction.Complete);
             stepper.Instance.GetState<int>(nameof(VekStepper.ActiveIndex)).Should().Be(1);
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await stepper.Find(".vek-stepper-button-next").ClickAsync();
             index.Should().Be(1);
             actions[1].Should().Be(StepAction.Complete);
@@ -930,12 +938,14 @@ namespace Vek.UnitTests.Components
             actions[6].Should().Be(StepAction.Activate);
             stepper.Instance.GetState<int>(nameof(VekStepper.ActiveIndex)).Should().Be(0);
             cancel = true; // this should cancel the completion of step 1
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await stepper.Find(".vek-stepper-button-next").ClickAsync();
             actions[7].Should().Be(StepAction.Complete);
             stepper.Instance.GetState<int>(nameof(VekStepper.ActiveIndex)).Should().Be(0);
 
             // cancel previous
             cancel = false;
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await stepper.Find(".vek-stepper-button-next").ClickAsync(); // go to step2
             actions[8].Should().Be(StepAction.Complete);
             stepper.Instance.GetState<int>(nameof(VekStepper.ActiveIndex)).Should().Be(1);

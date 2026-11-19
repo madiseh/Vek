@@ -26,6 +26,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task AddingAndRemovingTabPanels()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var comp = Context.Render<TabsAddingRemovingTabsTest>();
             comp.Find("div.vek-tabs-panels").InnerHtml.Trim().Should().BeEmpty();
             comp.FindAll("div.vek-tab").Should().BeEmpty();
@@ -41,6 +42,7 @@ namespace Vek.UnitTests.Components
             comp.FindComponents<VekTabPanel>().First().Instance.Should().Be(comp.Instance.Tabs.Panels[0]);
 
             // add another
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.FindAll("button")[0].ClickAsync();
             comp.FindAll("div.vek-tab").Count.Should().Be(2);
 
@@ -55,6 +57,7 @@ namespace Vek.UnitTests.Components
             await comp.FindAll("div.vek-tab")[1].ClickAsync();
             comp.Find("p.vek-typography").TrimmedText().Should().Be("Tab 1");
             // remove tab1
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.FindAll("button")[1].ClickAsync();
             comp.FindAll("div.vek-tab").Count.Should().Be(1);
             comp.FindAll("p.vek-typography").Count.Should().Be(1);
@@ -65,6 +68,7 @@ namespace Vek.UnitTests.Components
             // we should be on tab0 again
             comp.Find("p.vek-typography").TrimmedText().Should().Be("Tab 0");
             // remove another
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.FindAll("button")[1].ClickAsync();
             comp.Find("div.vek-tabs-panels").InnerHtml.Trim().Should().BeEmpty();
             comp.FindAll("div.vek-tab").Should().BeEmpty();
@@ -79,6 +83,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task KeepTabsAlive()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var comp = Context.Render<TabsKeepAliveTest>();
             // all panels should be evident in the markup:
             comp.FindAll("button").Count.Should().Be(3);
@@ -103,6 +108,7 @@ namespace Vek.UnitTests.Components
             comp.FindAll("div.vek-tabs-panels > div")[2].ClassList.Should().NotContain("vek-tab-panel-active");
             // click second button twice and show button click counters. the click of the first button should still be evident
             await comp.FindAll("button")[1].ClickAsync();
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.FindAll("button")[1].ClickAsync();
             comp.FindAll("button")[0].TrimmedText().Should().Be("Panel 1=1");
             comp.FindAll("button")[1].TrimmedText().Should().Be("Panel 2=2");
@@ -136,6 +142,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task KeepTabs_Not_Alive()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var comp = Context.Render<TabsKeepAliveTest>(parameters => parameters.Add(p => p.KeepPanelsAlive, false));
             // only one panel should be evident in the markup:
             comp.FindAll("button").Count.Should().Be(1);
@@ -158,6 +165,7 @@ namespace Vek.UnitTests.Components
             comp.FindAll("button")[0].TrimmedText().Should().Be("Panel 2=0");
             // click the button twice
             await comp.FindAll("button")[0].ClickAsync();
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.FindAll("button")[0].ClickAsync();
             comp.FindAll("button")[0].TrimmedText().Should().Be("Panel 2=2");
             // switch to the third tab:
@@ -183,6 +191,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task KeepTabsAliveWithLazyLoadPanels()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var comp = Context.Render<TabsKeepAliveTest>(parameters => parameters.Add(p => p.LazyLoadPanels, true));
             // only one panel should be evident in the markup
             comp.FindAll("div.vek-tabs-panels > div").Count.Should().Be(1);
@@ -211,6 +220,7 @@ namespace Vek.UnitTests.Components
             // click the second button twice and check click counters
             comp.FindAll("button")[1].TrimmedText().Should().Be("Panel 2=0");
             await comp.FindAll("button")[1].ClickAsync();
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.FindAll("button")[1].ClickAsync();
             comp.FindAll("button")[1].TrimmedText().Should().Be("Panel 2=2");
 

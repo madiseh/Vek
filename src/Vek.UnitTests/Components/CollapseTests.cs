@@ -16,6 +16,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task Collapse_TwoWayBinding_Test1()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var comp = Context.Render<CollapseBindingTest>();
             var collapse = comp.FindComponent<VekCollapse>();
 
@@ -32,6 +33,7 @@ namespace Vek.UnitTests.Components
             VekSwitch().Find("input").HasAttribute("checked").Should().BeFalse();
 
             // Expand via button
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await Button().ClickAsync();
             VekSwitch().Find("input").HasAttribute("checked").Should().BeTrue();
 

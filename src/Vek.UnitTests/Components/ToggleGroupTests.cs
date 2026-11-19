@@ -51,6 +51,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task ToggleGroup_SelectionMode()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var comp = Context.Render<ToggleGroupBindMultiSelectionTest>();
             var group1 = comp.FindComponents<VekToggleGroup<string>>().First();
             var group2 = comp.FindComponents<VekToggleGroup<string>>().Last();
@@ -65,6 +66,7 @@ namespace Vek.UnitTests.Components
             await ToggleItemThird().ClickAsync();
             group1.Instance.Values.Should().BeEquivalentTo("Item Two", "Item Three");
             group2.Instance.Values.Should().Contain("Item Three");
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await ToggleItemSecond().ClickAsync();
             group1.Instance.Values.Should().BeEquivalentTo("Item Three");
             group2.Instance.Values.Should().Contain("Item Three");
@@ -90,6 +92,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task ToggleGroup_ToggleSelection_InterceptedValue()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var comp = Context.Render<ToggleGroupToggleSelectionTest>();
             var toggle = comp.FindComponent<VekToggleGroup<string>>();
             IElement ToggleItem() => comp.FindAll(".vek-toggle-item").GetItemByIndex(0);
@@ -97,6 +100,7 @@ namespace Vek.UnitTests.Components
             toggle.Instance.Value.Should().BeNull();
             await ToggleItem().ClickAsync();
             toggle.Instance.Value.Should().Be("Item One");
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await ToggleItem().ClickAsync();
             toggle.Instance.Value.Should().BeNull();
         }
@@ -298,6 +302,7 @@ namespace Vek.UnitTests.Components
         [TestCase(SelectionMode.ToggleSelection)]
         public async Task ToggleGroup_UnselectPreviousValue_OnToggle(SelectionMode selMode)
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             // Arrange
             var comp = Context.Render<VekToggleGroup<string>>(parameters => parameters
                 .Add(p => p.SelectionMode, selMode)
@@ -319,6 +324,7 @@ namespace Vek.UnitTests.Components
                 items.Except([currentItem]).All(x => !x.Selected).Should().BeTrue();
                 if (selMode == SelectionMode.ToggleSelection)
                 {
+                        timeProvider.Advance(TimeSpan.FromMilliseconds(301));
                     await comp.FindAll(".vek-toggle-item").GetItemByIndex(i).ClickAsync();
                     currentItem.Selected.Should().BeFalse();
                 }
