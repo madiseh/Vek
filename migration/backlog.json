@@ -473,9 +473,10 @@
       "title": "ComboBox Incremental Live Filtering and Virtualized Dropdown",
       "module": "Autocomplete",
       "priority": 42,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/042-combobox-incremental-filtering-and-virtual-scroll.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T10:48:51Z"
     },
     {
       "id": "043",
