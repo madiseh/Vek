@@ -101,6 +101,16 @@ namespace Vek
         public string Icon { get; set; } = Icons.Material.Filled.ExpandMore;
 
         /// <summary>
+        /// Positions the expand icon before or after the title.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="AccordionExpandIconPosition.End"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.ExpansionPanel.Appearance)]
+        public AccordionExpandIconPosition IconPosition { get; set; } = AccordionExpandIconPosition.End;
+
+        /// <summary>
         /// Removes vertical padding from the panel.
         /// </summary>
         /// <remarks>
@@ -195,7 +205,7 @@ namespace Vek
         /// </remarks>
         public async Task ToggleExpansionAsync()
         {
-            if (Disabled)
+            if (Disabled || _expandedState.Value && Parent is not null && !Parent.CanCollapse(this))
             {
                 return;
             }
@@ -224,6 +234,11 @@ namespace Vek
         /// </summary>
         public async Task CollapseAsync()
         {
+            if (_expandedState.Value && Parent is not null && !Parent.CanCollapse(this))
+            {
+                return;
+            }
+
             await _expandedState.SetValueAsync(false);
             if (Parent is not null)
             {

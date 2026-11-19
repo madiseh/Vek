@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Vek.State;
 using Vek.Interfaces;
 using Vek.Utilities;
 
@@ -12,6 +13,7 @@ namespace Vek
     public partial class VekExpansionPanels : VekComponentBase
     {
         private readonly List<VekExpansionPanel> _panels = new();
+        private readonly ParameterState<AccordionExpandMode> _expandModeState;
 
         public VekExpansionPanels()
         {
@@ -19,6 +21,9 @@ namespace Vek
             registerScope.RegisterParameter<int>(nameof(Elevation))
                 .WithParameter(() => Elevation)
                 .WithChangeHandler(RenderPanels);
+            _expandModeState = registerScope.RegisterParameter<AccordionExpandMode>(nameof(ExpandMode))
+                .WithParameter(() => ExpandMode)
+                .WithChangeHandler(OnExpandModeChangedAsync);
             registerScope.RegisterParameter<bool>(nameof(Dense))
                 .WithParameter(() => Dense)
                 .WithChangeHandler(RenderPanels);
@@ -47,10 +52,20 @@ namespace Vek
         public bool Square { get; set; }
 
         /// <summary>
+        /// Controls how many panels can be expanded at the same time.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="AccordionExpandMode.SingleOrNone"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.ExpansionPanel.Behavior)]
+        public AccordionExpandMode ExpandMode { get; set; } = AccordionExpandMode.SingleOrNone;
+
+        /// <summary>
         /// Allows multiple panels to be expanded at the same time.
         /// </summary>
         /// <remarks>
-        /// Defaults to <c>false</c>.
+        /// Use <see cref="ExpandMode"/> instead. Defaults to <c>false</c>.
         /// </remarks>
         [Parameter]
         [Category(CategoryTypes.ExpansionPanel.Behavior)]
@@ -123,14 +138,26 @@ namespace Vek
                 panel.StateHasChanged();
         }
 
+        private AccordionExpandMode EffectiveExpandMode => MultiExpansion ? AccordionExpandMode.Multiple : _expandModeState.Value;
+
+        internal bool CanCollapse(VekExpansionPanel panel) =>
+            EffectiveExpandMode != AccordionExpandMode.Single || _panels.Any(other => other != panel && other._expandedState.Value);
+
         internal async Task AddPanelAsync(VekExpansionPanel panel)
         {
-            if (!MultiExpansion && _panels.Any(p => p._expandedState.Value))
+            var hasExpandedPanel = _panels.Any(existing => existing._expandedState.Value);
+            _panels.Add(panel);
+
+            if (EffectiveExpandMode != AccordionExpandMode.Multiple && hasExpandedPanel && panel._expandedState.Value)
             {
                 await panel.CollapseAsync();
+                return;
             }
 
-            _panels.Add(panel);
+            if (EffectiveExpandMode == AccordionExpandMode.Single && !hasExpandedPanel && !panel.Disabled)
+            {
+                await panel.ExpandAsync();
+            }
         }
 
         internal void RemovePanel(VekExpansionPanel panel)
@@ -145,7 +172,13 @@ namespace Vek
 
         internal async Task NotifyPanelsChanged(VekExpansionPanel panel)
         {
-            if (!MultiExpansion && panel._expandedState.Value)
+            if (EffectiveExpandMode == AccordionExpandMode.Single && !panel._expandedState.Value && !_panels.Any(existing => existing._expandedState.Value))
+            {
+                await panel.ExpandAsync();
+                return;
+            }
+
+            if (EffectiveExpandMode != AccordionExpandMode.Multiple && panel._expandedState.Value)
             {
                 await CollapseAllExceptAsync(panel);
                 return;
@@ -169,6 +202,7 @@ namespace Vek
 
                 last = panel;
             }
+            RenderPanels();
             StateHasChanged();
 
             return Task.CompletedTask;
@@ -193,6 +227,11 @@ namespace Vek
         /// </summary>
         public async Task CollapseAllAsync()
         {
+            if (EffectiveExpandMode == AccordionExpandMode.Single)
+            {
+                return;
+            }
+
             foreach (var expansionPanel in _panels)
             {
                 await expansionPanel.CollapseAsync();
@@ -210,6 +249,32 @@ namespace Vek
                 await expansionPanel.ExpandAsync();
             }
             await InvokeAsync(UpdateAllAsync);
+        }
+
+        private async Task OnExpandModeChangedAsync(ParameterChangedEventArgs<AccordionExpandMode> args)
+        {
+            if (args.Value == AccordionExpandMode.Single)
+            {
+                var expandedPanel = _panels.FirstOrDefault(panel => panel._expandedState.Value);
+                var panelToKeep = expandedPanel ?? _panels.FirstOrDefault(panel => !panel.Disabled);
+
+                foreach (var panel in _panels)
+                {
+                    if (panel == panelToKeep)
+                    {
+                        continue;
+                    }
+
+                    await panel.CollapseAsync();
+                }
+
+                if (panelToKeep is not null && !panelToKeep._expandedState.Value)
+                {
+                    await panelToKeep.ExpandAsync();
+                }
+            }
+
+            RenderPanels();
         }
     }
 }

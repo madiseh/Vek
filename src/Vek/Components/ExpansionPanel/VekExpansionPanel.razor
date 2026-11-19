@@ -3,6 +3,10 @@
 
 <div @attributes="UserAttributes" class="@Classname" style="@Style">
     <div class="@HeaderClassname" @onclick="ToggleExpansionAsync" tabindex="@(Disabled ? null : "0")" @onkeydown="HandleKeyDownAsync">
+          @if (!HideIcon && IconPosition == AccordionExpandIconPosition.Start)
+          {
+              <VekIcon Icon="@Icon" class="@(_expandedState.Value ? "vek-expand-panel-icon vek-transform" : "vek-expand-panel-icon")" />
+          }
         <div class="vek-expand-panel-text">
             @if (TitleContent is not null)
             {
@@ -13,7 +17,7 @@
                 @Text
             }
         </div>
-        @if (!HideIcon)
+          @if (!HideIcon && IconPosition == AccordionExpandIconPosition.End)
         {
             <VekIcon Icon="@Icon" class="@(_expandedState.Value ? "vek-expand-panel-icon vek-transform" : "vek-expand-panel-icon")" />
         }
