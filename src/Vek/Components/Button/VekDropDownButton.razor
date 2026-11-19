@@ -1,0 +1,75 @@
+@namespace Vek
+@inherits VekComponentBase
+
+<div id="@FieldId"
+     class="@Classname"
+     style="@Style"
+     @attributes="UserAttributes"
+     @onkeydown="HandleRootKeyDownAsync">
+    @if (MenuItems is not null && ChildContent is not null)
+    {
+        <VekMenu @ref="_menuRef"
+                 Class="@MenuClassname"
+                 PopoverClass="@PopoverClass"
+                 Dense="@Dense"
+                 AnchorOrigin="@(AnchorOrigin ?? Origin.BottomLeft)"
+                 TransformOrigin="@TransformOrigin"
+                 MaxHeight="@MaxHeight"
+                 Open="@_openState.Value"
+                 OpenChanged="@HandleOpenChangedAsync"
+                 AriaLabel="@AriaLabel">
+            <ActivatorContent>
+                <VekButton Color="@_colorState.Value"
+                           Variant="@_variantState.Value"
+                           Size="@_sizeState.Value"
+                           Disabled="@_disabledState.Value"
+                           Ripple="@Ripple"
+                           DropShadow="@DropShadow"
+                           StartIcon="@StartIcon"
+                           EndIcon="@(EndIcon ?? DropDownIcon)"
+                           IconColor="@IconColor"
+                           IconSize="@IconSize"
+                           IconClass="@IconClass"
+                           Class="@ButtonClassname"
+                           aria-label="@AriaLabel">
+                    @ChildContent
+                </VekButton>
+            </ActivatorContent>
+            <ChildContent>
+                @MenuItems
+            </ChildContent>
+        </VekMenu>
+    }
+    else
+    {
+        <VekMenu @ref="_menuRef"
+                 Class="@MenuClassname"
+                 PopoverClass="@PopoverClass"
+                 Label="@Text"
+                 StartIcon="@StartIcon"
+                 EndIcon="@(EndIcon ?? DropDownIcon)"
+                 IconColor="@IconColor"
+                 Color="@_colorState.Value"
+                 Variant="@_variantState.Value"
+                 Size="@_sizeState.Value"
+                 Disabled="@_disabledState.Value"
+                 Ripple="@Ripple"
+                 DropShadow="@DropShadow"
+                 Dense="@Dense"
+                 AnchorOrigin="@(AnchorOrigin ?? Origin.BottomLeft)"
+                 TransformOrigin="@TransformOrigin"
+                 MaxHeight="@MaxHeight"
+                 Open="@_openState.Value"
+                 OpenChanged="@HandleOpenChangedAsync"
+                 AriaLabel="@AriaLabel">
+            @if (MenuItems is not null)
+            {
+                @MenuItems
+            }
+            else
+            {
+                @ChildContent
+            }
+        </VekMenu>
+    }
+</div>

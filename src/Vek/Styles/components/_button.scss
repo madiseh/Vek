@@ -337,3 +337,50 @@
 .vek-button-icon-size-large > *:first-child {
   font-size: 22px;
 }
+
+.vek-split-button-root {
+  display: inline-flex;
+  vertical-align: middle;
+  position: relative;
+
+  .vek-split-button-menu,
+  .vek-menu {
+    align-self: stretch;
+    display: inline-flex;
+
+    .vek-button-root {
+      height: 100%;
+      min-width: unset;
+    }
+  }
+
+  &.vek-width-full {
+    width: 100%;
+    display: flex;
+
+    .vek-split-button-primary {
+      flex: 1 1 auto;
+    }
+  }
+}
+
+.vek-dropdown-button-root {
+  display: inline-flex;
+  vertical-align: middle;
+  position: relative;
+
+  .vek-menu {
+    width: 100%;
+  }
+
+  &.vek-width-full {
+    width: 100%;
+    display: flex;
+
+    .vek-menu,
+    .vek-button-root {
+      width: 100%;
+    }
+  }
+}
+
