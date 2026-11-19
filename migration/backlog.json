@@ -647,10 +647,12 @@
       "title": "TreeView Recursive Tri-State Hierarchical Checkbox Selection",
       "module": "TreeView",
       "priority": 59,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/059-treeview-checkbox-tri-state-selection.md",
       "dependencies": [],
-      "started_at": "2026-11-19T10:19:51Z"
+      "started_at": "2026-11-19T10:19:51Z",
+      "completed_at": "2026-11-19T11:11:38Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/31"
     },
     {
       "id": "060",

@@ -4,10 +4,12 @@
 - **Feature ID**: 059
 - **Feature Slug**: treeview-checkbox-tri-state-selection
 - **Module**: TreeView
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 59
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/31
 - **Started At**: 2026-11-19T10:19:51Z
+- **Completed At**: 2026-11-19T11:11:38Z
 
 ---
 
