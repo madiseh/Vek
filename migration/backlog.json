@@ -386,10 +386,12 @@
       "title": "SplitButton with Dual Actions and DropDown Menu",
       "module": "Button",
       "priority": 33,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/033-split-button-and-dropdown-actions.md",
       "dependencies": [],
-      "started_at": "2026-11-19T19:28:59Z"
+      "started_at": "2026-11-19T19:28:59Z",
+      "completed_at": "2026-11-19T20:11:57Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/45"
     },
     {
       "id": "034",

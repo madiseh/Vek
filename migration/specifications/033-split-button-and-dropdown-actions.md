@@ -4,10 +4,12 @@
 - **Feature ID**: 033
 - **Feature Slug**: split-button-and-dropdown-actions
 - **Module**: Button
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 33
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/45
 - **Started At**: 2026-11-19T19:28:59Z
+- **Completed At**: 2026-11-19T20:11:57Z
 
 ---
 
