@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using Microsoft.JSInterop.Infrastructure;
 using Moq;
+using NUnit.Framework;
 using Vek.Extensions;
 using Vek.Resources;
 using Vek.UnitTests.Dummy;
@@ -18,7 +19,6 @@ using Vek.UnitTests.TestComponents.Form;
 using Vek.UnitTests.TestComponents.TextField;
 using Vek.UnitTests.Utilities;
 using Vek.Utilities;
-using NUnit.Framework;
 
 #nullable enable
 namespace Vek.UnitTests.Components
