@@ -396,9 +396,10 @@
       "title": "Button Click Debounce and Double-Click Protection",
       "module": "Button",
       "priority": 34,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/034-button-double-click-and-debounce-guard.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:54:50Z"
     },
     {
       "id": "035",

@@ -97,6 +97,15 @@
                     </SectionContent>
                 </DocsPageSection>
 
+                  <DocsPageSection>
+                      <SectionHeader Title="Click Rate Limiting">
+                          <Description><CodeInline>ClickDebounceInterval</CodeInline> limits how often <CodeInline>OnClick</CodeInline> runs. A second click within <CodeInline>DoubleClickThreshold</CodeInline> raises <CodeInline>OnDoubleClick</CodeInline>. The debounce interval independently decides whether that click also invokes <CodeInline>OnClick</CodeInline>.</Description>
+                      </SectionHeader>
+                      <SectionContent Code="@nameof(ButtonClickDebounceExample)">
+                          <ButtonClickDebounceExample />
+                      </SectionContent>
+                  </DocsPageSection>
+
                 <DocsPageSection>
                     <SectionHeader Title="Split Button">
                         <Description>A <CodeInline>VekMenu</CodeInline> and <CodeInline>VekButtonGroup</CodeInline> can be used to create a split button.</Description>

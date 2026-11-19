@@ -1,6 +1,7 @@
 ﻿using AwesomeAssertions;
 using Bunit;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using NUnit.Framework;
 
 namespace Vek.UnitTests.Components;
@@ -22,6 +23,8 @@ public class ButtonTests : BunitTest
         var classes = comp.Find("button").ClassList;
         classes.Should().Contain(["vek-button-root", "vek-button", "vek-button-text", "vek-button-text-default", "vek-button-text-size-medium", "vek-ripple"]);
         classes.Should().NotContain(["vek-width-full", "vek-button-disable-elevation"]);
+        comp.Instance.ClickDebounceInterval.Should().Be(300);
+        comp.Instance.DoubleClickThreshold.Should().Be(300);
     }
 
     /// <summary>
@@ -146,5 +149,121 @@ public class ButtonTests : BunitTest
             iconSpan.ClassList.Should().Contain($"vek-button-icon-size-{expectedSize}");
             iconSpan.QuerySelector("svg")!.ClassList.Should().Contain($"vek-icon-size-{expectedSize}");
         }
+    }
+
+    /// <summary>
+    /// Rapid repeated clicks invoke the click callback once until its debounce interval expires.
+    /// </summary>
+    [Test]
+    public async Task ClickDebounceInterval_SuppressesRapidDuplicateClicks()
+    {
+        var timeProvider = Context.AddFakeTimeProvider();
+        var clickCount = 0;
+        var doubleClickCount = 0;
+        var comp = Context.Render<VekButton>(parameters => parameters
+            .Add(p => p.ClickDebounceInterval, 300)
+            .Add(p => p.DoubleClickThreshold, 0)
+            .Add(p => p.OnClick, (MouseEventArgs _) => clickCount++)
+            .Add(p => p.OnDoubleClick, (MouseEventArgs _) => doubleClickCount++));
+
+        await comp.Find("button").ClickAsync();
+        await comp.Find("button").ClickAsync();
+        clickCount.Should().Be(1);
+        doubleClickCount.Should().Be(0);
+
+        timeProvider.Advance(TimeSpan.FromMilliseconds(300));
+        await comp.Find("button").ClickAsync();
+
+        clickCount.Should().Be(2);
+    }
+
+    /// <summary>
+    /// A zero click debounce interval allows both clicks while the double-click callback still receives the pair.
+    /// </summary>
+    [Test]
+    public async Task ClickDebounceInterval_ZeroAllowsEachClick()
+    {
+        var timeProvider = Context.AddFakeTimeProvider();
+        var clickCount = 0;
+        var doubleClickCount = 0;
+        var comp = Context.Render<VekButton>(parameters => parameters
+            .Add(p => p.ClickDebounceInterval, 0)
+            .Add(p => p.DoubleClickThreshold, 200)
+            .Add(p => p.OnClick, (MouseEventArgs _) => clickCount++)
+            .Add(p => p.OnDoubleClick, (MouseEventArgs _) => doubleClickCount++));
+
+        await comp.Find("button").ClickAsync();
+        timeProvider.Advance(TimeSpan.FromMilliseconds(100));
+        await comp.Find("button").ClickAsync();
+
+        clickCount.Should().Be(2);
+        doubleClickCount.Should().Be(1);
+    }
+
+    /// <summary>
+    /// A second click within the configured threshold raises OnDoubleClick without invoking OnClick twice.
+    /// </summary>
+    [Test]
+    public async Task OnDoubleClick_RecognizesConfiguredThreshold()
+    {
+        var timeProvider = Context.AddFakeTimeProvider();
+        var clickCount = 0;
+        var doubleClickCount = 0;
+        var comp = Context.Render<VekButton>(parameters => parameters
+            .Add(p => p.ClickDebounceInterval, 300)
+            .Add(p => p.DoubleClickThreshold, 200)
+            .Add(p => p.OnClick, (MouseEventArgs _) => clickCount++)
+            .Add(p => p.OnDoubleClick, (MouseEventArgs _) => doubleClickCount++));
+
+        await comp.Find("button").ClickAsync();
+        timeProvider.Advance(TimeSpan.FromMilliseconds(150));
+        await comp.Find("button").ClickAsync();
+
+        clickCount.Should().Be(1);
+        doubleClickCount.Should().Be(1);
+    }
+
+    /// <summary>
+    /// A click outside the configured double-click threshold does not raise OnDoubleClick.
+    /// </summary>
+    [Test]
+    public async Task OnDoubleClick_IgnoresClicksOutsideThreshold()
+    {
+        var timeProvider = Context.AddFakeTimeProvider();
+        var clickCount = 0;
+        var doubleClickCount = 0;
+        var comp = Context.Render<VekButton>(parameters => parameters
+            .Add(p => p.ClickDebounceInterval, 300)
+            .Add(p => p.DoubleClickThreshold, 100)
+            .Add(p => p.OnClick, (MouseEventArgs _) => clickCount++)
+            .Add(p => p.OnDoubleClick, (MouseEventArgs _) => doubleClickCount++));
+
+        await comp.Find("button").ClickAsync();
+        timeProvider.Advance(TimeSpan.FromMilliseconds(150));
+        await comp.Find("button").ClickAsync();
+
+        clickCount.Should().Be(1);
+        doubleClickCount.Should().Be(0);
+    }
+
+    /// <summary>
+    /// A disabled button does not invoke either click callback.
+    /// </summary>
+    [Test]
+    public async Task DisabledButton_DoesNotInvokeClickCallbacks()
+    {
+        Context.AddFakeTimeProvider();
+        var clickCount = 0;
+        var doubleClickCount = 0;
+        var comp = Context.Render<VekButton>(parameters => parameters
+            .Add(p => p.Disabled, true)
+            .Add(p => p.OnClick, (MouseEventArgs _) => clickCount++)
+            .Add(p => p.OnDoubleClick, (MouseEventArgs _) => doubleClickCount++));
+
+        await comp.Find("button").ClickAsync();
+        await comp.Find("button").ClickAsync();
+
+        clickCount.Should().Be(0);
+        doubleClickCount.Should().Be(0);
     }
 }

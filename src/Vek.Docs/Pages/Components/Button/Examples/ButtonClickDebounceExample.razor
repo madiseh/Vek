@@ -1,0 +1,25 @@
+@namespace Vek.Docs.Examples
+
+<VekButton ClickDebounceInterval="500"
+           DoubleClickThreshold="400"
+           OnClick="HandleClick"
+           OnDoubleClick="HandleDoubleClick"
+           Variant="Variant.Filled"
+           Color="Color.Primary">
+    Submit order
+</VekButton>
+<VekText Class="ms-2">@_status</VekText>
+
+@code {
+    private string _status = "Ready to submit";
+
+    private void HandleClick(MouseEventArgs _)
+    {
+        _status = "Order submitted once";
+    }
+
+    private void HandleDoubleClick(MouseEventArgs _)
+    {
+        _status = "Double click detected; the click action was not repeated";
+    }
+}
