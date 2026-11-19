@@ -4,10 +4,12 @@
 - **Feature ID**: 052
 - **Feature Slug**: toolbar-adaptive-collapse-and-overflow-menu
 - **Module**: ToolBar
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 52
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/38
 - **Started At**: 2026-11-19T11:38:15Z
+- **Completed At**: 2026-11-19T12:16:51Z
 
 ---
 
