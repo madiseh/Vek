@@ -1075,9 +1075,10 @@
       "title": "Pagination Integrated Page Size Selector Dropdown and Direct Page Jump Input",
       "module": "Pagination",
       "priority": 98,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/098-pagination-page-size-selector-and-quick-jump.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T21:49:00Z"
     },
     {
       "id": "099",

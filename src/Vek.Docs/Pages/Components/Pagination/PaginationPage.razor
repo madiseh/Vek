@@ -96,6 +96,17 @@
         </DocsPageSection>
 
         <DocsPageSection>
+              <SectionHeader Title="Page size and direct page jump">
+                  <Description>
+                      Show <CodeInline>ShowPageSizeSelector</CodeInline> to let users choose how many items each page contains, and <CodeInline>ShowDirectPageJump</CodeInline> to navigate by page number. Set <CodeInline>TotalItems</CodeInline> to display the current item range and derive the page count from <CodeInline>PageSize</CodeInline>.
+                  </Description>
+              </SectionHeader>
+              <SectionContent Code="@nameof(PaginationPageSizeAndJumpExample)">
+                  <PaginationPageSizeAndJumpExample />
+              </SectionContent>
+          </DocsPageSection>
+
+          <DocsPageSection>
             <SectionHeader Title="Table pagination">
                 <Description>
                     The <CodeInline>SelectedChanged</CodeInline> event callback can be used to control a different component. This example shows how to navigate through the pages of a <VekLink Href="/components/table">VekTable</VekLink>.

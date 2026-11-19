@@ -3,9 +3,9 @@ using AngleSharp.Dom;
 using AwesomeAssertions;
 using Bunit;
 using Microsoft.AspNetCore.Components;
+using NUnit.Framework;
 using Vek.Extensions;
 using Vek.UnitTests.TestComponents.Pagination;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {
@@ -388,6 +388,60 @@ namespace Vek.UnitTests.Components
             var ellipses = comp.FindAll("li").Where(li => li.TextContent.Trim() == "…").ToList();
             ellipses.Should().NotBeEmpty();
             ellipses.Should().OnlyContain(li => li.FirstElementChild!.GetAttribute("aria-hidden") == "true");
+        }
+
+        /// <summary>
+        /// Changing page size updates the page range, page count, and callback value.
+        /// </summary>
+        [Test]
+        public async Task PageSizeSelector_UpdatesPageCountAndItemRange()
+        {
+            int? changedPageSize = null;
+            var comp = Context.Render<VekPagination>(parameters => parameters
+                .Add(p => p.Count, 10)
+                .Add(p => p.TotalItems, 46)
+                .Add(p => p.ShowPageSizeSelector, true)
+                .Add(p => p.ShowFirstButton, true)
+                .Add(p => p.ShowLastButton, true)
+                .Add(p => p.PageSizeChanged, EventCallback.Factory.Create<int>(this, pageSize => changedPageSize = pageSize)));
+
+            await comp.Find("select[aria-label='Items per page']").ChangeAsync("25");
+
+            comp.Instance.GetState(p => p.PageSize).Should().Be(25);
+            changedPageSize.Should().Be(25);
+            comp.Find(".vek-pagination-item-range").TextContent.Should().Be("1-25 of 46 items");
+            comp.FindAll(".vek-pagination-item button").Count.Should().Be(6);
+        }
+
+        /// <summary>
+        /// Direct page entry clamps an out-of-range value to the final page.
+        /// </summary>
+        [Test]
+        public async Task DirectPageJump_ClampsToAvailablePages()
+        {
+            var comp = Context.Render<VekPagination>(parameters => parameters
+                .Add(p => p.TotalItems, 80)
+                .Add(p => p.ShowDirectPageJump, true));
+            var input = comp.Find("input[aria-label='Go to page']");
+
+            await input.InputAsync("99");
+            await comp.Find("form.vek-pagination-page-jump-form").TriggerEventAsync("onsubmit", new EventArgs());
+
+            comp.Instance.GetState(p => p.Selected).Should().Be(8);
+            comp.Find(".vek-pagination-item-range").TextContent.Should().Be("71-80 of 80 items");
+            input.GetAttribute("value").Should().Be("8");
+        }
+
+        /// <summary>
+        /// Optional page size and page jump controls stay hidden by default.
+        /// </summary>
+        [Test]
+        public void Pagination_OptionalControlsAreHiddenByDefault()
+        {
+            var comp = Context.Render<VekPagination>();
+
+            comp.FindAll("select[aria-label='Items per page']").Should().BeEmpty();
+            comp.FindAll("input[aria-label='Go to page']").Should().BeEmpty();
         }
 
         /// <summary>

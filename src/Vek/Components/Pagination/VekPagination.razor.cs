@@ -17,6 +17,47 @@ namespace Vek
         private readonly ParameterState<int> _selectedState;
         private readonly ParameterState<int> _middleCountState;
         private readonly ParameterState<int> _boundaryCountState;
+        private readonly ParameterState<int> _pageSizeState;
+        private readonly ParameterState<int> _totalItemsState;
+        private string _pageJumpValue = "1";
+
+        private int PageCount => _totalItemsState.Value > 0
+            ? (int)Math.Max(1, ((long)_totalItemsState.Value + Math.Max(1, _pageSizeState.Value) - 1) / Math.Max(1, _pageSizeState.Value))
+            : _countState.Value;
+
+        private string ItemRangeText
+        {
+            get
+            {
+                var totalItems = Math.Max(0, _totalItemsState.Value);
+                var pageSize = Math.Max(1, _pageSizeState.Value);
+                var firstItem = totalItems == 0 ? 0 : Math.Min(((long)(_selectedState.Value - 1) * pageSize) + 1, totalItems);
+                var lastItem = totalItems == 0 ? 0 : Math.Min((long)_selectedState.Value * pageSize, totalItems);
+
+                return Localizer[Vek.Resources.LanguageResource.VekPagination_ItemRangeText, firstItem, lastItem, totalItems];
+            }
+        }
+
+        private IEnumerable<int> EffectivePageSizeOptions
+        {
+            get
+            {
+                var currentPageSize = Math.Max(1, _pageSizeState.Value);
+                var options = PageSizeOptions ?? [];
+                if (!options.Contains(currentPageSize))
+                {
+                    yield return currentPageSize;
+                }
+
+                foreach (var option in options)
+                {
+                    if (option > 0 && option != currentPageSize)
+                    {
+                        yield return option;
+                    }
+                }
+            }
+        }
 
         private string Classname =>
             new CssBuilder("vek-pagination")
@@ -53,6 +94,13 @@ namespace Vek
             _boundaryCountState = register.RegisterParameter<int>(nameof(BoundaryCount))
                 .WithParameter(() => BoundaryCount)
                 .WithChangeHandler(args => SetBoundaryCount(args.Value));
+            _pageSizeState = register.RegisterParameter<int>(nameof(PageSize))
+                .WithParameter(() => PageSize)
+                .WithEventCallback(() => PageSizeChanged)
+                .WithChangeHandler(args => OnPageSizeChangedAsync(args.Value));
+            _totalItemsState = register.RegisterParameter<int>(nameof(TotalItems))
+                .WithParameter(() => TotalItems)
+                .WithChangeHandler(args => OnTotalItemsChangedAsync(args.Value));
         }
 
         /// <summary>
@@ -211,6 +259,62 @@ namespace Vek
         public bool ShowPageButtons { get; set; } = true;
 
         /// <summary>
+        /// Shows a selector for the number of items displayed on each page.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Pagination.Behavior)]
+        public bool ShowPageSizeSelector { get; set; }
+
+        /// <summary>
+        /// Offers page sizes in the page size selector.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>10</c>, <c>25</c>, <c>50</c>, and <c>100</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Pagination.Behavior)]
+        public int[] PageSizeOptions { get; set; } = [10, 25, 50, 100];
+
+        /// <summary>
+        /// The number of items displayed on each page.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>10</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.Pagination.Behavior)]
+        public int PageSize { get; set; } = 10;
+
+        /// <summary>
+        /// Occurs when the selected page size changes.
+        /// </summary>
+        [Parameter]
+        public EventCallback<int> PageSizeChanged { get; set; }
+
+        /// <summary>
+        /// Shows an input for navigating directly to a page number.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Pagination.Behavior)]
+        public bool ShowDirectPageJump { get; set; }
+
+        /// <summary>
+        /// The total number of items represented by the pages.
+        /// </summary>
+        /// <remarks>
+        /// When this value is greater than zero, it determines the page count together with <see cref="PageSize"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.Pagination.Behavior)]
+        public int TotalItems { get; set; }
+
+        /// <summary>
         /// Occurs when the First, Previous, Next, or Last button is clicked.
         /// </summary>
         [Parameter]
@@ -268,10 +372,10 @@ namespace Vek
         private int[] GeneratePagination()
         {
             //return array {1, ..., Count} if Count is small
-            if (_countState.Value <= 4 || _countState.Value <= (2 * _boundaryCountState.Value) + _middleCountState.Value + 2)
+            if (PageCount <= 4 || PageCount <= (2 * _boundaryCountState.Value) + _middleCountState.Value + 2)
             {
-                var result = new int[_countState.Value];
-                for (var i = 0; i < _countState.Value; i++)
+                var result = new int[PageCount];
+                for (var i = 0; i < PageCount; i++)
                 {
                     result[i] = i + 1;
                 }
@@ -283,7 +387,7 @@ namespace Vek
             //The path below would then show one page more than MiddleCount, so use a plain sliding window.
             if (_boundaryCountState.Value == 0)
             {
-                var maxStart = _countState.Value - _middleCountState.Value + 1;
+                var maxStart = PageCount - _middleCountState.Value + 1;
                 var start = Math.Clamp(_selectedState.Value - (_middleCountState.Value / 2), 1, maxStart);
 
                 var window = new List<int>(_middleCountState.Value + 2);
@@ -297,7 +401,7 @@ namespace Vek
                     window.Add(start + i);
                 }
 
-                if (start + _middleCountState.Value - 1 < _countState.Value)
+                if (start + _middleCountState.Value - 1 < PageCount)
                 {
                     window.Add(-1);
                 }
@@ -317,7 +421,7 @@ namespace Vek
             //set end boundary items, e.g. if BoundaryCount == 3 and Count == 11 => [..., 9, 10, 11]
             for (var i = 0; i < _boundaryCountState.Value; i++)
             {
-                pages[length - i - 1] = _countState.Value - i;
+                pages[length - i - 1] = PageCount - i;
             }
 
             //calculate start value for middle items
@@ -326,9 +430,9 @@ namespace Vek
             {
                 startValue = _boundaryCountState.Value + 2;
             }
-            else if (_selectedState.Value >= _countState.Value - _boundaryCountState.Value - (_middleCountState.Value / 2))
+            else if (_selectedState.Value >= PageCount - _boundaryCountState.Value - (_middleCountState.Value / 2))
             {
-                startValue = _countState.Value - _boundaryCountState.Value - _middleCountState.Value;
+                startValue = PageCount - _boundaryCountState.Value - _middleCountState.Value;
             }
             else
             {
@@ -345,7 +449,7 @@ namespace Vek
             pages[_boundaryCountState.Value] = (_boundaryCountState.Value + (_middleCountState.Value / 2) + 1 < _selectedState.Value) ? -1 : _boundaryCountState.Value + 1;
 
             //set end delimiter "..." when selected page is far enough to the start, dots are represented as -1
-            pages[length - _boundaryCountState.Value - 1] = (_countState.Value - _boundaryCountState.Value - (_middleCountState.Value / 2) > _selectedState.Value) ? -1 : _countState.Value - _boundaryCountState.Value;
+            pages[length - _boundaryCountState.Value - 1] = (PageCount - _boundaryCountState.Value - (_middleCountState.Value / 2) > _selectedState.Value) ? -1 : PageCount - _boundaryCountState.Value;
 
             //remove ellipsis if difference is small enough, e.g convert [..., 5 , -1 , 7, ...] to [..., 5, 6, 7, ...]
             for (var i = 0; i < length - 2; i++)
@@ -376,8 +480,8 @@ namespace Vek
             var newPageIndex = page switch
             {
                 Page.First => 1,
-                Page.Last => Math.Max(1, _countState.Value),
-                Page.Next => Math.Min(_selectedState.Value + 1, _countState.Value),
+                Page.Last => Math.Max(1, PageCount),
+                Page.Next => Math.Min(_selectedState.Value + 1, PageCount),
                 Page.Previous => Math.Max(1, _selectedState.Value - 1),
                 _ => _selectedState.Value
             };
@@ -424,9 +528,44 @@ namespace Vek
                 return;
             }
 
-            var newPageIndex = Math.Max(1, Math.Min(pageIndex, _countState.Value));
+            var newPageIndex = Math.Max(1, Math.Min(pageIndex, PageCount));
 
             await _selectedState.SetValueAsync(newPageIndex);
+            _pageJumpValue = newPageIndex.ToString();
+        }
+
+        private async Task OnPageSizeChangedAsync(int pageSize)
+        {
+            var normalizedPageSize = Math.Max(1, pageSize);
+            if (normalizedPageSize != pageSize)
+            {
+                await _pageSizeState.SetValueAsync(normalizedPageSize);
+                return;
+            }
+
+            await SetSelectedAsync(Math.Min(_selectedState.Value, PageCount));
+        }
+
+        private Task OnTotalItemsChangedAsync(int _) => SetSelectedAsync(Math.Min(_selectedState.Value, PageCount));
+
+        private async Task OnPageSizeSelectionChangedAsync(ChangeEventArgs args)
+        {
+            if (int.TryParse(args.Value?.ToString(), out var pageSize) && pageSize > 0)
+            {
+                await _pageSizeState.SetValueAsync(pageSize);
+            }
+        }
+
+        private async Task JumpToPageAsync()
+        {
+            if (int.TryParse(_pageJumpValue, out var pageNumber))
+            {
+                await SetSelectedAsync(pageNumber);
+            }
+            else
+            {
+                _pageJumpValue = _selectedState.Value.ToString();
+            }
         }
     }
 }
