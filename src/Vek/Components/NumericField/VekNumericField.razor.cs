@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using Vek.Extensions;
 using Vek.Services;
 using Vek.Utilities;
@@ -31,12 +32,17 @@ namespace Vek
         private bool _cultureParameterSpecified;
         private VekInput<string> _elementReference = null!;
         private readonly string _elementId = Identifier.Create("numericField");
+        private DotNetObjectReference<VekNumericField<T>>? _dotNetReference;
+        private bool _numericFieldJsInitialized;
         private const string DefaultKeyFilterPattern = @"[0-9,.\-]";
 
         private readonly Comparer<T> _comparer = Comparer<T>.Default;
 
         [Inject]
         private IKeyInterceptorService KeyInterceptorService { get; set; } = null!;
+
+        [Inject]
+        private IJSRuntime JSRuntime { get; set; } = null!;
 
         public VekNumericField()
         {
@@ -129,7 +135,7 @@ namespace Vek
 
         protected string Classname =>
             new CssBuilder("vek-input-input-control vek-input-number-control")
-                .AddClass(HideSpinButtons ? "vek-input-nospin" : "vek-input-showspin")
+                .AddClass(!ShowSpinButtons || HideSpinButtons ? "vek-input-nospin" : "vek-input-showspin")
                 .AddClass(Class)
                 .Build();
 
@@ -405,6 +411,17 @@ namespace Vek
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+            if (firstRender && IsJSRuntimeAvailable)
+            {
+                _dotNetReference = DotNetObjectReference.Create(this);
+                await JSRuntime.InvokeVoidAsync("vekNumericField.init", InputElementId, _dotNetReference, AllowMouseWheel);
+                _numericFieldJsInitialized = true;
+            }
+            else if (_numericFieldJsInitialized && IsJSRuntimeAvailable)
+            {
+                await JSRuntime.InvokeVoidAsync("vekNumericField.update", InputElementId, AllowMouseWheel);
+            }
+
             if (firstRender)
             {
                 var keyOptions = new List<KeyOptions>
@@ -428,6 +445,12 @@ namespace Vek
             }
 
             await base.OnAfterRenderAsync(firstRender);
+        }
+
+        [JSInvokable]
+        public Task ChangeByInputInteraction(int direction, int multiplier = 1)
+        {
+            return Change(direction * (double)Math.Max(1, multiplier));
         }
 
         protected override async Task OnInitializedAsync()
@@ -529,6 +552,26 @@ namespace Vek
         public bool HideSpinButtons { get; set; }
 
         /// <summary>
+        /// Shows the increment and decrement controls.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>. <see cref="HideSpinButtons"/> remains available for compatibility.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public bool ShowSpinButtons { get; set; } = true;
+
+        /// <summary>
+        /// Increments or decrements the value with the mouse wheel while this field is focused.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool AllowMouseWheel { get; set; }
+
+        /// <summary>
         /// The type of value collected by this field.
         /// </summary>
         /// <remarks>
@@ -613,7 +656,14 @@ namespace Vek
             if (IsJSRuntimeAvailable)
             {
                 await KeyInterceptorService.UnsubscribeAsync(_elementId);
+                if (_numericFieldJsInitialized)
+                {
+                    await JSRuntime.InvokeVoidAsync("vekNumericField.destroy", InputElementId);
+                }
             }
+
+            _dotNetReference?.Dispose();
+            _dotNetReference = null;
         }
     }
 }

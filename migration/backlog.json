@@ -463,9 +463,10 @@
       "title": "SpinEdit Stepper Controls, Mouse Wheel Scrolling, and Acceleration",
       "module": "NumericField",
       "priority": 41,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/041-spin-edit-mousewheel-and-acceleration.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T10:29:01Z"
     },
     {
       "id": "042",

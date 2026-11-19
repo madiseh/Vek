@@ -39,11 +39,22 @@
                 <DocsPageSection>
                     <SectionHeader Title="Spin Buttons">
                         <Description>
-                            By default, numeric fields display up/down spin buttons for easy value adjustment. Set <CodeInline>HideSpinButtons="true"</CodeInline> to hide these controls while preserving keyboard navigation (arrow keys) and manual input.
+                        By default, numeric fields display up/down spin buttons for easy value adjustment. Set <CodeInline>ShowSpinButtons="false"</CodeInline> to hide them while preserving keyboard navigation and manual input. Press and hold a stepper to repeat with increasing increments. Set <CodeInline>AllowMouseWheel="true"</CodeInline> to adjust a focused field with the wheel.
                         </Description>
                     </SectionHeader>
                     <SectionContent Class="demo-numericfield" Code="@nameof(NumericFieldHideButtonsExample)" ShowCode="false">
                         <NumericFieldHideButtonsExample/>
+                    </SectionContent>
+                </DocsPageSection>
+
+                <DocsPageSection>
+                    <SectionHeader Title="Wheel and Accelerated Stepping">
+                        <Description>
+                            Enable <CodeInline>AllowMouseWheel</CodeInline> when users need quick adjustments without leaving the field. Wheel input only changes the focused field, and the stepper accelerates while a button is held. <CodeInline>Min</CodeInline> and <CodeInline>Max</CodeInline> stop values at their configured boundaries.
+                        </Description>
+                    </SectionHeader>
+                    <SectionContent Code="@nameof(NumericFieldStepperInteractionsExample)">
+                        <NumericFieldStepperInteractionsExample />
                     </SectionContent>
                 </DocsPageSection>
 

@@ -1101,6 +1101,24 @@ namespace Vek.UnitTests.Components
                 .Should().Be(2);
         }
 
+        /// <summary>
+        /// ShowSpinButtons hides the steppers while preserving the legacy HideSpinButtons behavior.
+        /// </summary>
+        [Test]
+        public async Task ShowSpinButtonsControlsStepperVisibility()
+        {
+            var comp = Context.Render<VekNumericField<int>>();
+            comp.FindAll(".vek-input-numeric-spin button").Count.Should().Be(2);
+
+            await comp.SetParametersAndRenderAsync(parameters => parameters.Add(x => x.ShowSpinButtons, false));
+            comp.FindAll(".vek-input-numeric-spin button").Should().BeEmpty();
+
+            await comp.SetParametersAndRenderAsync(parameters => parameters
+                .Add(x => x.ShowSpinButtons, true)
+                .Add(x => x.HideSpinButtons, true));
+            comp.FindAll(".vek-input-numeric-spin button").Should().BeEmpty();
+        }
+
         [TestCaseSource(nameof(TypeCases))]
         public async Task NumericFieldNullable_Increment_Decrement<T>(T value) where T : struct
         {

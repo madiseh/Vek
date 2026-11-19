@@ -92,6 +92,11 @@ exports[`window API surface is unchanged 1`] = `
     "disconnect": "function(1)",
     "updatekey": "function(2)",
   },
+  "vekNumericField": {
+    "destroy": "function(1)",
+    "init": "function(3)",
+    "update": "function(2)",
+  },
   "vekObserveElementSize": "function(2)",
   "vekPointerCapture": {
     "capture": "function(2)",

@@ -47,7 +47,7 @@
                       Immediate="@EffectiveImmediate"
                       Margin="@Margin"
                       MaxLength="@MaxLength"
-                      HideSpinButtons="@HideSpinButtons"
+                      HideSpinButtons="@(!ShowSpinButtons || HideSpinButtons)"
                       min="@(_minHasValue ? FormatParam(_min) : null)"
                       max="@(_maxHasValue ? FormatParam(_max) : null)"
                       step="@(_stepHasValue ? FormatParam(_step) : "any")"
