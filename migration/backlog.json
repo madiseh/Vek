@@ -557,10 +557,12 @@
       "title": "Accordion Expand Modes (Single, Multiple, SingleOrNone) and Animation",
       "module": "ExpansionPanel",
       "priority": 50,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/050-accordion-expand-modes-and-animation.md",
       "dependencies": [],
-      "started_at": "2026-11-19T11:07:13Z"
+      "started_at": "2026-11-19T11:07:13Z",
+      "completed_at": "2026-11-19T11:36:43Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/33"
     },
     {
       "id": "051",
