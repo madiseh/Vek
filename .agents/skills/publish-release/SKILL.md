@@ -59,16 +59,22 @@ Use this workflow when the user asks to prepare or publish a Vek release. Treat 
 2. Confirm the workflow built version `X.Y.Z`, produced `.nupkg` and `.snupkg` artifacts, and passed all package checks. The checks must confirm `Vek.min.css`, `Vek.min.js`, and assemblies for `net8.0`, `net9.0`, `net10.0`, and `net11.0` are present.
 3. Confirm publication completed to both NuGet.org and GitHub Packages, and the package symbols and NuGet package are attached to the matching GitHub Release.
 4. Confirm the exact version is visible in the NuGet package feed and the release page links to the intended tag and commit. Account for normal NuGet indexing delay by polling the package page/API; do not report success until the version is visible.
-5. If any workflow or verification step fails, stop and report the run URL, failed step, and already completed side effects. Do not create another version tag or retry by manually dispatching the package workflow unless the user explicitly chooses a recovery plan.
+5. A stable version tag also starts the `Deploy vekui.dev` job after the `deploy-nuget` job succeeds. Before tagging, ensure GitHub Actions has the VPS configuration below; secrets cannot be recovered from GitHub after they are saved, so never ask the user to paste them into chat.
+   - Secrets: `VPS_HOST`, `VPS_USER`, `VPS_SSH_PRIVATE_KEY`, and `VPS_KNOWN_HOSTS`.
+   - Repository or `production` environment variables: `VPS_DEPLOY_PATH` (absolute Linux path) and `VPS_SERVICE_NAME` (systemd unit ending in `.service`). `VPS_SSH_PORT` is optional and defaults to `22`.
+   - The VPS must be Linux x64, accept SSH from GitHub-hosted runners, allow the deploy user to write releases under `VPS_DEPLOY_PATH`, and allow passwordless `systemctl restart` and `systemctl is-active` for the configured service. The service must run `VPS_DEPLOY_PATH/current/Vek.Docs.WasmHost` with `VPS_DEPLOY_PATH/current` as its working directory, listen behind the configured Nginx/Caddy reverse proxy, and serve valid HTTPS at `https://vekui.dev/`.
+6. Wait for the `deploy-website` job and the reusable `Deploy vekui.dev` run to finish. Confirm the exact `vX.Y.Z` source was deployed and the HTTPS health check succeeded. On a failed health check, the workflow attempts to restore the previous release; report the rollback outcome and deployment failure clearly.
+7. If any workflow or verification step fails, stop and report the run URL, failed step, and completed side effects. In particular, NuGet may already be published when VPS deployment fails. Do not create another version tag or retry by manually dispatching the package workflow unless the user explicitly chooses a recovery plan.
 
 ## Repository release automation reference
 
 - `.github/workflows/build-test-vek.yml`: formatting, unit, docs, analyzer, and build-only checks. It currently runs on PRs and pushes to `dev`.
 - `.github/workflows/publish-nuget.yml`: publishes to NuGet.org and GitHub Packages when a `v*.*.*` tag is pushed; it also attaches `.nupkg` and `.snupkg` files to the matching Release.
+- `.github/workflows/deploy-vek.yml`: reusable/manual Linux VPS deployment for `vekui.dev`. The release workflow invokes it after NuGet publication succeeds.
 - `.github/workflows/nuntia-release-notes.yml`: runs on a published Release but currently skips in the configured `madiseh/Vek` repository because its job is conditional on the owner being `Vek`. Manually verify the release notes unless that condition is updated.
 - `.github/release.yml`: release-note categories and excluded labels.
 - `CHANGELOG.md`: human-maintained version history and release summaries.
 
 ## Final report
 
-Report the version, tag, source SHA, release URL, PRs included, slideshow and JUnit test-results assets, per-project test counts, CI run, NuGet.org and GitHub Packages status, and any caveats. Clearly distinguish verified completion from a queued run or delayed package indexing.
+Report the version, tag, source SHA, release URL, PRs included, slideshow and JUnit test-results assets, per-project test counts, CI run, NuGet.org and GitHub Packages status, VPS deployment run, and the `https://vekui.dev/` health-check result. Clearly distinguish verified completion from a queued run, delayed package indexing, or a rolled-back site deployment.
