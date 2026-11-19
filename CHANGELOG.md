@@ -11,6 +11,12 @@ For GitHub Releases and downloadable packages, see the [Releases page](https://g
 - Display the current package version dynamically from `Metadata.Version` in documentation navigation and hero badges. ([PR #44](https://github.com/madiseh/Vek/pull/44))
 - Enforce package version alignment with `VersionPrefix` in build and release workflows. ([PR #44](https://github.com/madiseh/Vek/pull/44))
 
+### ✅ Test Results
+- Unit tests: 6,457 passed, 2 skipped, 0 failed (6,459 total).
+- Documentation tests: 1,469 passed, 0 skipped, 0 failed.
+- Analyzer tests: 391 passed, 0 skipped, 0 failed.
+- [Download the JUnit test reports](https://github.com/madiseh/Vek/releases/download/v1.2.1/test-results-v1.2.1.zip) from [candidate CI run 44597121943](https://github.com/madiseh/Vek/actions/runs/44597121943), for commit `b34da4f4d7608529cd6b85ffcf61441116452828`.
+
 ---
 
 ## [v1.2.0] - 2026-11-19
