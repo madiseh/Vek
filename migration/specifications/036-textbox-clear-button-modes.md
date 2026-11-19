@@ -4,10 +4,12 @@
 - **Feature ID**: 036
 - **Feature Slug**: textbox-clear-button-modes
 - **Module**: TextField
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 36
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/28
 - **Started At**: 2026-11-19T10:01:06Z
+- **Completed At**: 2026-11-19T10:20:08Z
 
 ---
 
