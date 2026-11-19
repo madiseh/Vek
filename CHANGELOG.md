@@ -33,6 +33,12 @@ For GitHub Releases and downloadable packages, see the [Releases page](https://g
 9. ContextMenu targets and triggers — [PR #37](https://github.com/madiseh/Vek/pull/37)
 10. ToolBar adaptive overflow — [PR #38](https://github.com/madiseh/Vek/pull/38)
 
+### ✅ Test Results
+- Unit tests: 6,457 passed, 2 skipped, 0 failed (6,459 total).
+- Documentation tests: 1,469 passed, 0 skipped, 0 failed.
+- Analyzer tests: 391 passed, 0 skipped, 0 failed.
+- [Download the JUnit test reports](https://github.com/madiseh/Vek/releases/download/v1.2.0/test-results-v1.2.0.zip) from [candidate CI run 44585554333](https://github.com/madiseh/Vek/actions/runs/44585554333), for commit `ff0d02ce77989d3d630a42ae4589abd4974ba508`.
+
 ---
 
 ## [v1.1.1] - 2026-11-19
