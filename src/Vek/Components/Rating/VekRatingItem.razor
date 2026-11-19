@@ -1,5 +1,6 @@
 ﻿@namespace Vek
 @inherits VekComponentBase
+@using System.Globalization
 
 <span class="@ClassName"
       style="@Style"
@@ -10,7 +11,7 @@
            class="vek-rating-input"
            type="radio"
            tabindex="-1"
-           value="@ItemValue"
+           value="@((PreciseItemValue ?? ItemValue).ToString(CultureInfo.InvariantCulture))"
            name="@Rating?.Name"
            disabled="@Disabled"
            checked="@Checked" />

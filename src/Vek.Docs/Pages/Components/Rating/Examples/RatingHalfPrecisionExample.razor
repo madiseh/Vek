@@ -1,0 +1,19 @@
+﻿@namespace Vek.Docs.Examples
+
+<div class="d-flex flex-column align-center">
+    <VekRating Precision="RatingPrecision.Half"
+               @bind-Value="rating"
+               HoveredScoreChanged="HandlePreviewChanged" />
+    <VekText Typo="Typo.subtitle2" Class="mt-2">@PreviewText</VekText>
+</div>
+
+@code {
+    private double rating = 3.5;
+    private double? preview;
+
+    private void HandlePreviewChanged(double? value) => preview = value;
+
+    private string PreviewText => preview.HasValue
+        ? $"Preview: {preview.Value:0.0} / 5"
+        : $"Selected rating: {rating:0.0} / 5";
+}

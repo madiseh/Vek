@@ -897,9 +897,10 @@
       "title": "Rating Fractional/Half-Star Precision and Live Hover Score Preview",
       "module": "Rating",
       "priority": 81,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/081-rating-half-star-precision-and-hover-preview.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:56:46Z"
     },
     {
       "id": "082",

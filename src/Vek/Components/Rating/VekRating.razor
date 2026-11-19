@@ -10,19 +10,21 @@
 <span tabindex="@(Disabled ? -1 : 0)" role="radiogroup" aria-label="@Localizer[LanguageResource.VekRating_Label]" aria-readonly="@(ReadOnly.ToString().ToLowerInvariant())"
       @onkeydown="HandleKeyDownAsync" @attributes="UserAttributes" class="@ClassName" style="@Style">
     <CascadingValue Value="this">
-        @for (var i = 1; i <= MaxValue; i++)
+        @for (var i = 1; i <= MaxValue * (Precision == RatingPrecision.Half ? 2 : 1); i++)
         {
-            var currentValue = i;
+            var currentValue = Precision == RatingPrecision.Half ? i / 2d : i;
             <VekRatingItem Class="@RatingItemsClass"
                            Style="@RatingItemsStyle"
-                           ItemValue="@currentValue"
+                           ItemValue="@(Precision == RatingPrecision.Half ? i : (int)currentValue)"
+                           PreciseItemValue="@(Precision == RatingPrecision.Half ? currentValue : null)"
+                           HalfPosition="@(Precision == RatingPrecision.Half ? (i % 2 == 1 ? "left" : "right") : null)"
                            Ripple="@Ripple"
                            Disabled="Disabled"
                            ReadOnly="ReadOnly"
                            Color="Color"
                            Size="Size"
-                           ItemClicked="HandleItemClickedAsync"
-                           ItemHovered="HandleItemHoveredAsync"
+                           PreciseItemClicked="HandleItemClickedAsync"
+                           PreciseItemHovered="HandleItemHoveredAsync"
                            aria-label="@Localizer[LanguageResource.VekRatingItem_Label, $"{currentValue}"]"/>
         }
     </CascadingValue>
