@@ -3,6 +3,16 @@
 All notable changes to Vek will be documented in this file.
 For GitHub Releases and downloadable packages, see the [Releases page](https://github.com/madiseh/Vek/releases).
 
+## [v1.2.1] - 2026-11-19
+
+> Vek v1.2.1 centralizes release version resolution from build configuration and updates documentation version labels. The Vek component API is unchanged.
+
+### 🌐 Documentation & Versioning
+- Display the current package version dynamically from `Metadata.Version` in documentation navigation and hero badges. ([PR #44](https://github.com/madiseh/Vek/pull/44))
+- Enforce package version alignment with `VersionPrefix` in build and release workflows. ([PR #44](https://github.com/madiseh/Vek/pull/44))
+
+---
+
 ## [v1.2.0] - 2026-11-19
 
 > Vek v1.2.0 adds new input, navigation, selection, and layout options across core Blazor components.
