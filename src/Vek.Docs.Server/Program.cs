@@ -11,7 +11,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddHttpClient<GitHubApiClient>();
-builder.Services.TryAddDocsViewServices();
+builder.Services.TryAddDocsViewServices(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped(sp =>

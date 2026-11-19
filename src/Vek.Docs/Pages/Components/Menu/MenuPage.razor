@@ -164,8 +164,20 @@
                 <DocsPageSection>
                     <SectionHeader Title="Context Menu">
                         <Description>
-                            The previous example can be extended to create a contextual menu.
-                            When <CodeInline>Label</CodeInline>, <CodeInline>Icon</CodeInline>, and <CodeInline>ActivatorContent</CodeInline> are unset, no button is rendered and the menu can only be opened programmatically.
+                            Bind <CodeInline>VekContextMenu</CodeInline> to any matching element with <CodeInline>TargetSelector</CodeInline>, or pass an <CodeInline>ElementReference</CodeInline> with <CodeInline>TargetElement</CodeInline>.
+                            Right-click, touch and hold, or press the Context Menu key (or Shift+F10) on the target to open its menu. Keep the target focusable and give it an accessible name so keyboard users can open the same actions.
+                        </Description>
+                    </SectionHeader>
+                    <SectionContent Code="@nameof(MenuContextTargetExample)" ShowCode="false">
+                        <MenuContextTargetExample />
+                    </SectionContent>
+                </DocsPageSection>
+
+                <DocsPageSection>
+                    <SectionHeader Title="Programmatic Context Menu">
+                        <Description>
+                            Call <CodeInline>OpenMenuAsync</CodeInline> with the triggering mouse event to position a menu at that event's cursor coordinates.
+                            This approach is useful when the target's event handling is already owned by the surrounding markup.
                         </Description>
                     </SectionHeader>
                     <SectionContent Code="@nameof(MenuContextMenuExample)" ShowCode="false">

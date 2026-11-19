@@ -134,7 +134,9 @@
             <SectionHeader Title="Scrolling Tabs">
                 <Description>
                     If the total size of all tabs exceeds the size of the container, scroll buttons are automatically added.
-                    The <CodeInline>AlwaysShowScrollButtons</CodeInline> property keeps the scroll buttons visible at all times.
+                    <CodeInline>ScrollMode</CodeInline> controls this behavior: <CodeInline>Auto</CodeInline> adds buttons when needed,
+                    <CodeInline>NavButtons</CodeInline> keeps them visible, and <CodeInline>None</CodeInline> disables header scrolling.
+                    Mouse wheel input scrolls overflowing horizontal headers, and selecting a tab smoothly brings it into view.
                 </Description>
             </SectionHeader>
             <SectionContent Code="@nameof(TabsScrollExample)" ShowCode="false" Block="true" FullWidth="true">

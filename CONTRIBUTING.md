@@ -71,16 +71,7 @@ dotnet build src/Vek -f net10.0
 - You must include tests when your Pull Requests alters any logic. This also ensures that your feature will not break in the future under changes from other contributors. For more information on testing, see the appropriate section below
 - Before working on a large change, it is recommended to first open an issue to discuss it with others
 - If your Pull Request is still in progress, convert it to a draft Pull Request
-- The PR Title should follow the following format: 
-```
-<component name>: <short description of changes in imperative> (<linked issue>)
-```
-
-For example:
-
-```
- DateRangePicker: Fix initializing DateRange with null values (#1997)
-```
+- Use the [Git commit and pull request title conventions](docs/governance/development-rules.md#6-git-commit-and-pull-request-titles) for commit subjects and PR titles. Reference related issues in the PR description with `Fixes #<issue>` or `Closes #<issue>`.
 - To keep your branch up to date with the `dev` branch simply merge the main repo's (upstream) `dev`. **Don't rebase** because if you rebase the wrong direction your PR will include tons of unrelated commits from dev.
 - Your Pull Request should not include any unnecessary refactoring
 - If there are visual changes, you should include a screenshot, gif or video

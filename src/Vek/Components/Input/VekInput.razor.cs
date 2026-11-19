@@ -122,6 +122,13 @@ namespace Vek
         public bool Clearable { get; set; } = false;
 
         /// <summary>
+        /// Controls when the clear button is displayed.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public ClearButtonDisplayMode? ClearButtonDisplayMode { get; set; }
+
+        /// <summary>
         /// Occurs when the clear button is clicked.
         /// </summary>
         /// <remarks>
@@ -325,7 +332,8 @@ namespace Vek
                 return false;
             }
 
-            if (!Clearable)
+            var displayMode = ClearButtonDisplayMode ?? (Clearable ? Vek.ClearButtonDisplayMode.WhileEditing : Vek.ClearButtonDisplayMode.Never);
+            if (displayMode == Vek.ClearButtonDisplayMode.Never)
             {
                 return false;
             }
@@ -334,6 +342,11 @@ namespace Vek
             if (SubscribeToParentForm && GetReadOnlyState())
             {
                 return false;
+            }
+
+            if (displayMode == Vek.ClearButtonDisplayMode.Always)
+            {
+                return true;
             }
 
             if (ReadValue is string stringValue)

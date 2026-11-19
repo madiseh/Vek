@@ -1,6 +1,7 @@
 ﻿using Blazor.Analytics;
 using Blazored.LocalStorage;
 using BytexDigital.Blazor.Components.CookieConsent;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Vek.Docs.Pages.Consent.Prompt;
 using Vek.Docs.Services;
@@ -13,7 +14,7 @@ namespace Vek.Docs.Extensions
 {
     public static class DocsViewExtension
     {
-        public static void TryAddDocsViewServices(this IServiceCollection services)
+        public static void TryAddDocsViewServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddVekServices(config =>
             {
@@ -48,7 +49,11 @@ namespace Vek.Docs.Extensions
             services.AddSingleton<IPeriodicTableService, PeriodicTableService>();
             services.AddSingleton<IRenderQueueService, RenderQueueService>();
             services.AddScoped<LayoutService>();
-            services.AddGoogleAnalytics("G-PRYNCB61NV");
+            var googleAnalyticsMeasurementId = configuration["GoogleAnalytics:MeasurementId"];
+            if (!string.IsNullOrWhiteSpace(googleAnalyticsMeasurementId))
+            {
+                services.AddGoogleAnalytics(googleAnalyticsMeasurementId);
+            }
             services.AddCookieConsent(options =>
             {
                 options.ImportJsAutomatically = false;

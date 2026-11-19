@@ -348,7 +348,8 @@ namespace Vek
                                 // move to first day of current month when we overflow to next month
                                 if (newDay.Month != currentDay.Month || _selectedDate == null)
                                     newDay = currentDay.StartOfMonth(GetCulture());
-                                HighlightedDate = _selectedDate = newDay;
+                                if (TryFindEnabledDate(newDay, 1, out var enabledDay))
+                                    HighlightedDate = _selectedDate = enabledDay;
                                 break;
                             case OpenTo.Month:
                                 MoveToNextMonth();
@@ -372,7 +373,8 @@ namespace Vek
                                 // move to last day of current month when we overflow to previous month
                                 if (newDay.Month != currentDay.Month || _selectedDate == null)
                                     newDay = currentDay.EndOfMonth(GetCulture());
-                                HighlightedDate = _selectedDate = newDay;
+                                if (TryFindEnabledDate(newDay, -1, out var enabledDay))
+                                    HighlightedDate = _selectedDate = enabledDay;
                                 break;
                             case OpenTo.Month:
                                 MoveToPreviousMonth();
@@ -412,7 +414,8 @@ namespace Vek
                                     newDay = currentDay.LastWeekDayOfMonth(currentDay.DayOfWeek, GetCulture());
                                 }
 
-                                HighlightedDate = _selectedDate = newDay;
+                                if (TryFindEnabledDate(newDay, -7, out var enabledDay))
+                                    HighlightedDate = _selectedDate = enabledDay;
                                 break;
                         }
                     }
@@ -444,7 +447,8 @@ namespace Vek
                                 // move to same week day of beginning of current month when we overflow to next month
                                 if (newDay.Month != currentDay.Month || _selectedDate == null)
                                     newDay = currentDay.FirstWeekDayOfMonth(currentDay.DayOfWeek, GetCulture());
-                                HighlightedDate = _selectedDate = newDay;
+                                if (TryFindEnabledDate(newDay, 7, out var enabledDay))
+                                    HighlightedDate = _selectedDate = enabledDay;
                                 break;
                         }
                     }
@@ -506,6 +510,36 @@ namespace Vek
             }
 
             StateHasChanged();
+        }
+
+        private bool TryFindEnabledDate(DateTime date, int stepDays, out DateTime enabledDate)
+        {
+            var culture = GetCulture();
+            var calendar = culture.Calendar;
+            var candidate = date;
+
+            for (var attempt = 0; attempt < 366; attempt++)
+            {
+                if (candidate >= calendar.MinSupportedDateTime &&
+                    candidate <= calendar.MaxSupportedDateTime &&
+                    !IsDayDisabled(candidate.Date))
+                {
+                    enabledDate = candidate;
+                    return true;
+                }
+
+                try
+                {
+                    candidate = candidate.AddDays(stepDays);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    break;
+                }
+            }
+
+            enabledDate = date;
+            return false;
         }
 
         private async Task CommitView()

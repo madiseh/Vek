@@ -416,9 +416,12 @@
       "title": "TextBox Clear Button Display Modes and Action Hooks",
       "module": "TextField",
       "priority": 36,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/036-textbox-clear-button-modes.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T10:01:06Z",
+      "completed_at": "2026-11-19T10:20:08Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/28"
     },
     {
       "id": "037",
@@ -476,9 +479,12 @@
       "title": "ComboBox Incremental Live Filtering and Virtualized Dropdown",
       "module": "Autocomplete",
       "priority": 42,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/042-combobox-incremental-filtering-and-virtual-scroll.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T10:48:51Z",
+      "completed_at": "2026-11-19T11:26:52Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/32"
     },
     {
       "id": "043",
@@ -486,7 +492,7 @@
       "title": "ComboBox Multi-Selection with Removable Chip Tags",
       "module": "Select",
       "priority": 43,
-      "status": "backlog",
+      "status": "ready",
       "specification": "specifications/043-combobox-multi-selection-and-chip-tags.md",
       "dependencies": [
         "042"
@@ -498,9 +504,12 @@
       "title": "Tabs Overflow Scrolling with Interactive Navigation Buttons",
       "module": "Tabs",
       "priority": 44,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/044-tabs-scroll-and-navigation-buttons.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T11:07:46Z",
+      "completed_at": "2026-11-19T12:02:11Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/35"
     },
     {
       "id": "045",
@@ -538,7 +547,7 @@
       "title": "Tabs Interactive Drag-and-Drop Tab Reordering",
       "module": "Tabs",
       "priority": 48,
-      "status": "backlog",
+      "status": "ready",
       "specification": "specifications/048-tabs-drag-and-drop-reorder.md",
       "dependencies": [
         "044"
@@ -560,9 +569,12 @@
       "title": "Accordion Expand Modes (Single, Multiple, SingleOrNone) and Animation",
       "module": "ExpansionPanel",
       "priority": 50,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/050-accordion-expand-modes-and-animation.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T11:07:13Z",
+      "completed_at": "2026-11-19T11:36:43Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/33"
     },
     {
       "id": "051",
@@ -570,9 +582,12 @@
       "title": "ContextMenu Target Selector Binding, Long-Press Touch, and Submenus",
       "module": "Menu",
       "priority": 51,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/051-context-menu-target-selector-and-triggers.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T11:27:51Z",
+      "completed_at": "2026-11-19T12:16:15Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/37"
     },
     {
       "id": "052",
@@ -580,9 +595,12 @@
       "title": "Toolbar Adaptive Layout with Overflow Dropdown Menu",
       "module": "ToolBar",
       "priority": 52,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/052-toolbar-adaptive-collapse-and-overflow-menu.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T11:38:15Z",
+      "completed_at": "2026-11-19T12:16:51Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/38"
     },
     {
       "id": "053",
@@ -590,9 +608,12 @@
       "title": "DatePicker Disabled Date Predicates and Custom Day Cell Templates",
       "module": "DatePicker",
       "priority": 53,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/053-datepicker-disabled-dates-and-custom-rendering.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T10:14:14Z",
+      "completed_at": "2026-11-19T10:44:54Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/30"
     },
     {
       "id": "054",
@@ -650,9 +671,12 @@
       "title": "TreeView Recursive Tri-State Hierarchical Checkbox Selection",
       "module": "TreeView",
       "priority": 59,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/059-treeview-checkbox-tri-state-selection.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T10:19:51Z",
+      "completed_at": "2026-11-19T11:11:38Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/31"
     },
     {
       "id": "060",

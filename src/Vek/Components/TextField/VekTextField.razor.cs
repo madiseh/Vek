@@ -50,6 +50,16 @@ namespace Vek
         public bool Clearable { get; set; }
 
         /// <summary>
+        /// Controls when the clear button is displayed.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to the legacy <see cref="Clearable"/> setting. When omitted, a clearable field shows its button only while it has a value.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public ClearButtonDisplayMode? ClearButtonDisplayMode { get; set; }
+
+        /// <summary>
         /// The icon to display when <see cref="Clearable"/> is <c>true</c>.
         /// </summary>
         /// <remarks>
@@ -299,9 +309,13 @@ namespace Vek
 
         private bool ShowClearButton()
         {
-            if (SubscribeToParentForm)
-                return Clearable && !GetReadOnlyState() && !GetDisabledState();
-            return Clearable && !GetDisabledState();
+            var displayMode = ClearButtonDisplayMode ?? (Clearable ? Vek.ClearButtonDisplayMode.WhileEditing : Vek.ClearButtonDisplayMode.Never);
+            if (displayMode == Vek.ClearButtonDisplayMode.Never || GetDisabledState())
+            {
+                return false;
+            }
+
+            return !SubscribeToParentForm || !GetReadOnlyState();
         }
 
         private async Task OnInnerValueChangedAsync(string? text)

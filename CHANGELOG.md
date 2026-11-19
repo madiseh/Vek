@@ -3,6 +3,18 @@
 All notable changes to Vek will be documented in this file.
 For GitHub Releases and downloadable packages, see the [Releases page](https://github.com/madiseh/Vek/releases).
 
+## [v1.1.1] - 2026-11-19
+
+> Vek v1.1.1 updates documentation-site analytics configuration and automates release-triggered deployment of vekui.dev. The Vek component API is unchanged.
+
+### 🌐 Documentation Site Analytics
+- Read the Google Analytics measurement ID from host configuration for the Server, WASM Host, and WASM apps. ([PR #36](https://github.com/madiseh/Vek/pull/36))
+
+### 🚀 Release Website Deployment
+- Deploy vekui.dev after NuGet publication, with an HTTPS health check and rollback attempt. ([PR #40](https://github.com/madiseh/Vek/pull/40))
+
+---
+
 ## [v1.1.0] - 2026-11-19
 
 > Vek v1.1.0 adds comprehensive keyboard navigation and accessibility support for DataGrid, plus configurable custom grouping intervals.

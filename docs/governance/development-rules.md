@@ -100,7 +100,32 @@ Vek ships first-party Roslyn analyzers (`src/Vek.Analyzers`) and code fixes (`sr
 
 ---
 
-## 6. Clean-Room Implementation & Brand Anonymity Policy
+## 6. Git Commit and Pull Request Titles
+
+Use the Conventional Commits format for commit subjects and pull request titles:
+
+```text
+<type>(<scope>): <imperative summary>
+```
+
+- Use a lowercase type and scope. Choose a type that describes the change: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, or `revert`.
+- Use a concise scope for the affected component or area, such as `button`, `datepicker`, `unit-tests`, or `docs`. Omit the scope only when the change is repository-wide.
+- Start the summary with an imperative verb, keep it concise, and omit the final period.
+- Use `!` after the type or scope to mark a breaking change, and include a `BREAKING CHANGE:` footer in the commit body when additional migration detail is needed.
+- Make the PR title describe the full PR and use the same format as its intended squash commit subject. Do not prefix titles with `[Migration NNN]`; put migration identifiers and context in the PR description instead.
+- Reference related GitHub issues in the PR description with GitHub closing keywords such as `Fixes #123` or `Closes #123`, rather than treating migration IDs as issue numbers.
+
+Examples:
+
+```text
+feat(button): add loading state with auto-disable
+fix(menu): preserve focus when closing with Escape
+docs(governance): define commit and pull request title rules
+```
+
+---
+
+## 7. Clean-Room Implementation & Brand Anonymity Policy
 
 - **Zero Third-Party Brand Traces**: Never mention, reference, or leave traces of third-party commercial UI vendors, product lines, or proprietary component suites (e.g. commercial grid/component packages) anywhere in commit messages, branch names, PR titles, PR descriptions, source code, comments, or documentation.
 - **Clean-Room Reverse Engineering**: When features are inspired by, reverse-engineered from, or benchmarked against external UI libraries:

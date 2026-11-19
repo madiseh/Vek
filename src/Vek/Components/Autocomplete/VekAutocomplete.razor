@@ -1,4 +1,5 @@
-﻿@namespace Vek
+@namespace Vek
+@using Microsoft.AspNetCore.Components.Web.Virtualization
 @inherits VekBaseInput<T>
 @typeparam T
 
@@ -88,32 +89,68 @@
                                     @BeforeItemsTemplate
                                 </div>
                             }
-                            @for (var index = 0; index < _items.Length; index++)
+                            @if (Virtualize)
                             {
-                                var item = _items[index];
-                                bool isSelected = index == _selectedListItemIndex;
-                                bool isDisabled = _itemDisabled[index];
-                                bool showSelectedTemplate = ItemSelectedTemplate is not null && isSelected;
-                                bool showDisabledTemplate = ItemDisabledTemplate is not null && isDisabled;
-                                var captureIndex = index;
-                                <VekListItem T="T" Value="@item" @key="@item" id="@GetListItemId(captureIndex)" aria-selected="@(isSelected ? "true" : "false")" Disabled="@(isDisabled)" KeyboardEnabled="false" OnClick="@(async () => await ListItemOnClickAsync(item))" OnClickPreventDefault="true" Class="@GetListItemClassname(isSelected)">
-                                    @if (showDisabledTemplate)
-                                    {
-                                        @ItemDisabledTemplate!(item)
-                                    }
-                                    else if (showSelectedTemplate)
-                                    {
-                                        @ItemSelectedTemplate!(item)
-                                    }
-                                    else if (ItemTemplate is not null)
-                                    {
-                                        @ItemTemplate(item)
-                                    }
-                                    else
-                                    {
-                                        @GetItemString(item)
-                                    }
-                                </VekListItem>
+                                <Virtualize TItem="AutocompleteItem" Items="@_virtualizedItems" Context="entry" ItemSize="48" OverscanCount="2" @ref="_virtualize">
+                                    <ItemContent>
+                                        @{
+                                            var item = entry.Value;
+                                            var index = entry.Index;
+                                            bool isSelected = index == _selectedListItemIndex;
+                                            bool isDisabled = _itemDisabled[index];
+                                            bool showSelectedTemplate = ItemSelectedTemplate is not null && isSelected;
+                                            bool showDisabledTemplate = ItemDisabledTemplate is not null && isDisabled;
+                                        }
+                                        <VekListItem T="T" Value="@item" @key="@entry.Index" id="@GetListItemId(entry.Index)" aria-selected="@(isSelected ? "true" : "false")" Disabled="@(isDisabled)" KeyboardEnabled="false" OnClick="@(async () => await ListItemOnClickAsync(item))" OnClickPreventDefault="true" Class="@GetListItemClassname(isSelected)">
+                                            @if (showDisabledTemplate)
+                                            {
+                                                @ItemDisabledTemplate!(item)
+                                            }
+                                            else if (showSelectedTemplate)
+                                            {
+                                                @ItemSelectedTemplate!(item)
+                                            }
+                                            else if (ItemTemplate is not null)
+                                            {
+                                                @ItemTemplate(item)
+                                            }
+                                            else
+                                            {
+                                                @RenderHighlightedText(GetItemString(item))
+                                            }
+                                        </VekListItem>
+                                    </ItemContent>
+                                </Virtualize>
+                            }
+                            else
+                            {
+                                @for (var index = 0; index < _items.Length; index++)
+                                {
+                                    var item = _items[index];
+                                    bool isSelected = index == _selectedListItemIndex;
+                                    bool isDisabled = _itemDisabled[index];
+                                    bool showSelectedTemplate = ItemSelectedTemplate is not null && isSelected;
+                                    bool showDisabledTemplate = ItemDisabledTemplate is not null && isDisabled;
+                                    var captureIndex = index;
+                                    <VekListItem T="T" Value="@item" @key="@item" id="@GetListItemId(captureIndex)" aria-selected="@(isSelected ? "true" : "false")" Disabled="@(isDisabled)" KeyboardEnabled="false" OnClick="@(async () => await ListItemOnClickAsync(item))" OnClickPreventDefault="true" Class="@GetListItemClassname(isSelected)">
+                                        @if (showDisabledTemplate)
+                                        {
+                                            @ItemDisabledTemplate!(item)
+                                        }
+                                        else if (showSelectedTemplate)
+                                        {
+                                            @ItemSelectedTemplate!(item)
+                                        }
+                                        else if (ItemTemplate is not null)
+                                        {
+                                            @ItemTemplate(item)
+                                        }
+                                        else
+                                        {
+                                            @RenderHighlightedText(GetItemString(item))
+                                        }
+                                    </VekListItem>
+                                }
                             }
                             @if (MoreItemsTemplate is not null && _returnedItemsCount > MaxItems)
                             {

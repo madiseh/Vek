@@ -1,4 +1,4 @@
-﻿<VekTabs Elevation="1" @ref="_tabElement" MaxHeight="@_maxHeight" AlwaysShowScrollButtons="AlwaysShowScrollButtons" Position="Position">
+﻿<VekTabs Elevation="1" @ref="_tabElement" MaxHeight="@_maxHeight" AlwaysShowScrollButtons="AlwaysShowScrollButtons" ScrollMode="ScrollMode" Position="Position">
     @foreach (var tab in _tabs)
     {
         <VekTabPanel @key="tab" Text="@tab">
@@ -29,6 +29,9 @@
 
     [Parameter]
     public bool AlwaysShowScrollButtons { get; set; } = true;
+
+    [Parameter]
+    public TabsScrollMode ScrollMode { get; set; } = TabsScrollMode.Auto;
 
     public Task ChangePositionAsync(bool isVertical)
     {

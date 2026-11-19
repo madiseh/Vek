@@ -81,11 +81,11 @@
         </DocsPageSection>
 
         <DocsPageSection>
-            <SectionHeader Title="Multi Selection">
+              <SectionHeader Title="Hierarchical Checkbox Selection">
                 <Description>
-                    Set <CodeInline>SelectionMode</CodeInline> to <CodeInline>SelectionMode.MultiSelection</CodeInline> to allow users to select multiple items. Each selectable item will render a checkbox.
-                    Use <CodeInline>@@bind-SelectedValues</CodeInline> to manage the collection of selected items. The color of the checkboxes can be customized with the <CodeInline>CheckBoxColor</CodeInline> property.
-                    This example demonstrates how to bind the selection to a set of chips.
+                      Set <CodeInline>SelectionMode</CodeInline> to <CodeInline>SelectionMode.MultiSelection</CodeInline> to show a checkbox for every selectable node. Selecting a parent checks its descendants, and <CodeInline>@@bind-SelectedValues</CodeInline> keeps the selected values in sync.
+                      With <CodeInline>TriState</CodeInline> enabled, a parent shows an indeterminate checkbox while its descendants have a mixed selection. <CodeInline>AutoSelectParent</CodeInline> adds a parent value only after all selectable descendants are checked.
+                      The example binds the same values to chips and lets you toggle read-only mode, indeterminate display, and parent synchronization.
                 </Description>
             </SectionHeader>
             <SectionContent Code="@nameof(TreeViewMultiSelectionExample)" ShowCode="false">
