@@ -4,10 +4,12 @@
 - **Feature ID**: 043
 - **Feature Slug**: combobox-multi-selection-and-chip-tags
 - **Module**: Select
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 43
 - **Dependencies**: ["042"]
+- **Pull Request**: https://github.com/madiseh/Vek/pull/46
 - **Started At**: 2026-11-19T19:31:10Z
+- **Completed At**: 2026-11-19T20:15:20Z
 
 ---
 
