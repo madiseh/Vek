@@ -2,8 +2,8 @@
 using AwesomeAssertions;
 using Bunit;
 using Microsoft.AspNetCore.Components.Web;
-using Vek.UnitTests.TestComponents.ExpansionPanel;
 using NUnit.Framework;
+using Vek.UnitTests.TestComponents.ExpansionPanel;
 
 namespace Vek.UnitTests.Components
 {
@@ -11,84 +11,84 @@ namespace Vek.UnitTests.Components
     public class ExpansionPanelTests : BunitTest
     {
 
-          /// <summary>
-          /// Single mode keeps one available panel open and prevents collapsing the active panel.
-          /// </summary>
-          [Test]
-          public async Task AccordionSingleModeKeepsOnePanelExpanded()
-          {
-              var comp = Context.Render<VekExpansionPanels>(parameters => parameters
-                  .Add(p => p.ExpandMode, AccordionExpandMode.Single)
-                  .Add(p => p.ChildContent, builder =>
-                  {
-                      builder.OpenComponent<VekExpansionPanel>(0);
-                      builder.AddAttribute(1, nameof(VekExpansionPanel.Text), "Account details");
-                      builder.CloseComponent();
-                      builder.OpenComponent<VekExpansionPanel>(2);
-                      builder.AddAttribute(3, nameof(VekExpansionPanel.Text), "Notification settings");
-                      builder.CloseComponent();
-                  }));
+        /// <summary>
+        /// Single mode keeps one available panel open and prevents collapsing the active panel.
+        /// </summary>
+        [Test]
+        public async Task AccordionSingleModeKeepsOnePanelExpanded()
+        {
+            var comp = Context.Render<VekExpansionPanels>(parameters => parameters
+                .Add(p => p.ExpandMode, AccordionExpandMode.Single)
+                .Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<VekExpansionPanel>(0);
+                    builder.AddAttribute(1, nameof(VekExpansionPanel.Text), "Account details");
+                    builder.CloseComponent();
+                    builder.OpenComponent<VekExpansionPanel>(2);
+                    builder.AddAttribute(3, nameof(VekExpansionPanel.Text), "Notification settings");
+                    builder.CloseComponent();
+                }));
 
-              comp.FindAll(".vek-panel-expanded").Count.Should().Be(1);
-              await comp.FindAll(".vek-expand-panel-header")[1].ClickAsync();
-              comp.FindAll(".vek-panel-expanded").Count.Should().Be(1);
-              await comp.FindAll(".vek-expand-panel-header")[1].ClickAsync();
-              comp.FindAll(".vek-panel-expanded").Count.Should().Be(1);
-              comp.FindAll(".vek-panel-expanded")[0].TextContent.Should().Contain("Notification settings");
-          }
+            comp.FindAll(".vek-panel-expanded").Count.Should().Be(1);
+            await comp.FindAll(".vek-expand-panel-header")[1].ClickAsync();
+            comp.FindAll(".vek-panel-expanded").Count.Should().Be(1);
+            await comp.FindAll(".vek-expand-panel-header")[1].ClickAsync();
+            comp.FindAll(".vek-panel-expanded").Count.Should().Be(1);
+            comp.FindAll(".vek-panel-expanded")[0].TextContent.Should().Contain("Notification settings");
+        }
 
-          /// <summary>
-          /// Single-or-none mode lets the active panel close and multiple mode keeps independent panels open.
-          /// </summary>
-          [Test]
-          public async Task AccordionExpandModesAllowTheirConfiguredStates()
-          {
-              var singleOrNone = Context.Render<VekExpansionPanels>(parameters => parameters
-                  .Add(p => p.ExpandMode, AccordionExpandMode.SingleOrNone)
-                  .Add(p => p.ChildContent, builder =>
-                  {
-                      builder.OpenComponent<VekExpansionPanel>(0);
-                      builder.AddAttribute(1, nameof(VekExpansionPanel.Text), "Shipping address");
-                      builder.AddAttribute(2, nameof(VekExpansionPanel.Expanded), true);
-                      builder.CloseComponent();
-                  }));
+        /// <summary>
+        /// Single-or-none mode lets the active panel close and multiple mode keeps independent panels open.
+        /// </summary>
+        [Test]
+        public async Task AccordionExpandModesAllowTheirConfiguredStates()
+        {
+            var singleOrNone = Context.Render<VekExpansionPanels>(parameters => parameters
+                .Add(p => p.ExpandMode, AccordionExpandMode.SingleOrNone)
+                .Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<VekExpansionPanel>(0);
+                    builder.AddAttribute(1, nameof(VekExpansionPanel.Text), "Shipping address");
+                    builder.AddAttribute(2, nameof(VekExpansionPanel.Expanded), true);
+                    builder.CloseComponent();
+                }));
 
-              await singleOrNone.Find(".vek-expand-panel-header").ClickAsync();
-              singleOrNone.FindAll(".vek-panel-expanded").Should().BeEmpty();
+            await singleOrNone.Find(".vek-expand-panel-header").ClickAsync();
+            singleOrNone.FindAll(".vek-panel-expanded").Should().BeEmpty();
 
-              var multiple = Context.Render<VekExpansionPanels>(parameters => parameters
-                  .Add(p => p.ExpandMode, AccordionExpandMode.Multiple)
-                  .Add(p => p.ChildContent, builder =>
-                  {
-                      builder.OpenComponent<VekExpansionPanel>(0);
-                      builder.AddAttribute(1, nameof(VekExpansionPanel.Text), "Delivery options");
-                      builder.CloseComponent();
-                      builder.OpenComponent<VekExpansionPanel>(2);
-                      builder.AddAttribute(3, nameof(VekExpansionPanel.Text), "Payment methods");
-                      builder.CloseComponent();
-                  }));
+            var multiple = Context.Render<VekExpansionPanels>(parameters => parameters
+                .Add(p => p.ExpandMode, AccordionExpandMode.Multiple)
+                .Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<VekExpansionPanel>(0);
+                    builder.AddAttribute(1, nameof(VekExpansionPanel.Text), "Delivery options");
+                    builder.CloseComponent();
+                    builder.OpenComponent<VekExpansionPanel>(2);
+                    builder.AddAttribute(3, nameof(VekExpansionPanel.Text), "Payment methods");
+                    builder.CloseComponent();
+                }));
 
-              foreach (var header in multiple.FindAll(".vek-expand-panel-header"))
-              {
-                  await header.ClickAsync();
-              }
-              multiple.FindAll(".vek-panel-expanded").Count.Should().Be(2);
-          }
+            foreach (var header in multiple.FindAll(".vek-expand-panel-header"))
+            {
+                await header.ClickAsync();
+            }
+            multiple.FindAll(".vek-panel-expanded").Count.Should().Be(2);
+        }
 
-          /// <summary>
-          /// The expansion icon can be rendered before the panel title.
-          /// </summary>
-          [Test]
-          public void ExpansionPanelIconCanBePlacedAtStart()
-          {
-              var comp = Context.Render<VekExpansionPanel>(parameters => parameters
-                  .Add(p => p.IconPosition, AccordionExpandIconPosition.Start)
-                  .Add(p => p.Text, "Billing history"));
+        /// <summary>
+        /// The expansion icon can be rendered before the panel title.
+        /// </summary>
+        [Test]
+        public void ExpansionPanelIconCanBePlacedAtStart()
+        {
+            var comp = Context.Render<VekExpansionPanel>(parameters => parameters
+                .Add(p => p.IconPosition, AccordionExpandIconPosition.Start)
+                .Add(p => p.Text, "Billing history"));
 
-              var header = comp.Find(".vek-expand-panel-header");
-              header.Children[0].ClassList.Should().Contain("vek-expand-panel-icon");
-              header.Children[1].ClassList.Should().Contain("vek-expand-panel-text");
-          }
+            var header = comp.Find(".vek-expand-panel-header");
+            header.Children[0].ClassList.Should().Contain("vek-expand-panel-icon");
+            header.Children[1].ClassList.Should().Contain("vek-expand-panel-text");
+        }
 
         [OneTimeSetUp]
         public static void Init()

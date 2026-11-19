@@ -205,7 +205,7 @@ namespace Vek
         /// </remarks>
         public async Task ToggleExpansionAsync()
         {
-            if (Disabled || _expandedState.Value && Parent is not null && !Parent.CanCollapse(this))
+            if (Disabled || (_expandedState.Value && Parent is not null && !Parent.CanCollapse(this)))
             {
                 return;
             }
