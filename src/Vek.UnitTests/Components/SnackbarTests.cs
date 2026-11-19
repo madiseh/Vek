@@ -3,8 +3,8 @@ using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Time.Testing;
-using Vek.UnitTests.TestComponents.Snackbar;
 using NUnit.Framework;
+using Vek.UnitTests.TestComponents.Snackbar;
 
 namespace Vek.UnitTests.Components
 {
