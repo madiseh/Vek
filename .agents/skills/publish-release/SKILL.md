@@ -48,8 +48,8 @@ Use this workflow when the user asks to prepare or publish a Vek release. Treat 
 1. Present the selected version, candidate SHA, release summary, and any blocking uncertainty before publication if the user has not clearly asked to publish. When the user has asked to publish, proceed with the explicitly requested release.
 2. Create the annotated tag `vX.Y.Z` on the recorded candidate SHA. Verify locally that `git rev-parse vX.Y.Z^{}` equals the candidate SHA.
 3. Push only that tag to `origin`. Do not push unrelated commits or branches.
-4. Create a GitHub draft Release for that tag and target SHA using the verified release notes. Upload `release-slideshow.gif` as a Release asset and embed it using its GitHub Release download URL. Include the static captions and PR links below the animation.
-5. Review the draft page: version, target commit, changelog text, links, image display, and attached asset must all be correct before publishing the Release.
+4. Create a GitHub draft Release for that tag and target SHA using the verified release notes. Set the GitHub Release title to exactly `vX.Y.Z`, with no product-name prefix (for example, `v1.1.0`, not `Vek 1.1.0` or `Vek v1.1.0`). Upload `release-slideshow.gif` as a Release asset and embed it using its GitHub Release download URL. Include the static captions and PR links below the animation.
+5. Review the draft page: confirm the title is exactly `vX.Y.Z`, and verify the tag, target commit, changelog text, links, image display, and attached asset before publishing the Release.
 6. Publish the GitHub Release. This triggers `.github/workflows/nuntia-release-notes.yml`, but in the current `madiseh/Vek` repository the job is expected to skip because its owner condition is hard-coded to `Vek`. Confirm the workflow result. Keep the manually verified release notes as the source of truth; if Nuntia ran, failed, or changed the notes unexpectedly, repair the Release body and verify the slideshow and captions remain present.
 
 ## 5. Monitor NuGet publication and verify the result
