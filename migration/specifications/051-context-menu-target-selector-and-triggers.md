@@ -4,9 +4,10 @@
 - **Feature ID**: 051
 - **Feature Slug**: context-menu-target-selector-and-triggers
 - **Module**: Menu
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 51
 - **Dependencies**: []
+- **Started At**: 2026-11-19T11:27:51Z
 
 ---
 

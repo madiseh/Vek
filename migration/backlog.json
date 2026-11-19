@@ -567,9 +567,10 @@
       "title": "ContextMenu Target Selector Binding, Long-Press Touch, and Submenus",
       "module": "Menu",
       "priority": 51,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/051-context-menu-target-selector-and-triggers.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T11:27:51Z"
     },
     {
       "id": "052",
