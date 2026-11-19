@@ -3,8 +3,8 @@ using AwesomeAssertions;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Vek.Extensions;
 using NUnit.Framework;
+using Vek.Extensions;
 
 namespace Vek.UnitTests.Components
 {
