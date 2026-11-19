@@ -4,13 +4,42 @@
   display: flex;
   position: relative;
   align-items: center;
+  --vek-internal-toolbar-horizontal-padding: 0px;
   --vek-internal-toolbar-height: 56px;
   height: var(--vek-internal-toolbar-height);
+}
+
+.vek-toolbar-content-measure {
+  position: absolute;
+  inset-inline: var(--vek-internal-toolbar-horizontal-padding);
+  height: 1px;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.vek-toolbar-item,
+.vek-toolbar-overflow-activator {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+.vek-toolbar-item-overflow-measure,
+.vek-toolbar-overflow-activator-hidden {
+  position: absolute;
+  inset-inline-start: -10000px;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.vek-toolbar-item-overflow-measure {
+  width: max-content;
 }
 
 .vek-toolbar-gutters {
   padding-left: 16px;
   padding-right: 16px;
+  --vek-internal-toolbar-horizontal-padding: 16px;
 }
 
 @media (min-width:$breakpoint-xs) and (orientation: landscape) {
@@ -27,6 +56,7 @@
   .vek-toolbar-gutters {
     padding-left: 24px;
     padding-right: 24px;
+    --vek-internal-toolbar-horizontal-padding: 24px;
   }
 }
 

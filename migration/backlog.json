@@ -577,9 +577,10 @@
       "title": "Toolbar Adaptive Layout with Overflow Dropdown Menu",
       "module": "ToolBar",
       "priority": 52,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/052-toolbar-adaptive-collapse-and-overflow-menu.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T11:38:15Z"
     },
     {
       "id": "053",

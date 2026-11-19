@@ -23,5 +23,16 @@
                 <ToolBarWrapContentExample />
             </SectionContent>
         </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Adaptive Overflow">
+                <Description>
+                    Set <CodeInline>AdaptiveOverflow</CodeInline> to move actions that do not fit into an overflow menu. Wrap each collapsible action in <CodeInline>VekToolBarItem</CodeInline>, provide its menu label and click handler, and use <CodeInline>CollapsePriority</CodeInline> to choose which actions move first. Lower priority values collapse first.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(ToolBarAdaptiveOverflowExample)" Block="true" ShowCode="false">
+                <ToolBarAdaptiveOverflowExample />
+            </SectionContent>
+        </DocsPageSection>
     </DocsPageContent>
 </DocsPage>

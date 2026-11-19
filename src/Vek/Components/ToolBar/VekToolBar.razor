@@ -2,5 +2,34 @@
 @inherits VekComponentBase
 
 <div role="toolbar" @attributes="UserAttributes" class="@Classname" style="@Style">
-    @ChildContent
+    <CascadingValue Value="this" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+
+    @if (AdaptiveOverflow)
+    {
+        <span @ref="_toolbarContentElement" class="vek-toolbar-content-measure" aria-hidden="true" inert></span>
+        <span @ref="_overflowActivatorElement"
+              class="@OverflowActivatorClassname"
+              aria-hidden="@(HasOverflow ? "false" : "true")"
+              inert="@(!HasOverflow)">
+            <VekMenu AriaLabel="More toolbar actions">
+                <ActivatorContent>
+                    <VekIconButton Icon="@Icons.Material.Outlined.MoreHoriz"
+                                   Color="Color.Inherit"
+                                   aria-label="More toolbar actions"
+                                   OnClick="@context.ToggleAsync" />
+                </ActivatorContent>
+                <ChildContent>
+                    @foreach (var item in OverflowItems)
+                    {
+                        <VekMenuItem Label="@item.Label"
+                                     Icon="@item.Icon"
+                                     Disabled="@item.Disabled"
+                                     OnClick="@item.OnOverflowClick" />
+                    }
+                </ChildContent>
+            </VekMenu>
+        </span>
+    }
 </div>
