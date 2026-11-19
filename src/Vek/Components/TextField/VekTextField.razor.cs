@@ -17,7 +17,12 @@ namespace Vek
         private VekMask? _maskReference;
         private readonly ParameterState<global::Vek.BindValueMode?> _bindValueModeState;
         private readonly ParameterState<double> _inputDelayState;
+        private readonly ParameterState<bool> _showPasswordToggleState;
+        private readonly ParameterState<bool> _passwordVisibleState;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VekTextField{T}"/> class.
+        /// </summary>
         public VekTextField()
         {
             using var registerScope = CreateRegisterScope();
@@ -27,6 +32,11 @@ namespace Vek
             _inputDelayState = registerScope.RegisterParameter<double>(nameof(InputDelay))
                 .WithParameter(() => InputDelay)
                 .WithChangeHandler(OnInputDelayChangedAsync);
+            _showPasswordToggleState = registerScope.RegisterParameter<bool>(nameof(ShowPasswordToggle))
+                .WithParameter(() => ShowPasswordToggle);
+            _passwordVisibleState = registerScope.RegisterParameter<bool>(nameof(PasswordVisible))
+                .WithParameter(() => PasswordVisible)
+                .WithEventCallback(() => PasswordVisibleChanged);
         }
 
         protected override double EffectiveDebounceInterval => _bindValueModeState.Value switch
@@ -126,6 +136,78 @@ namespace Vek
         /// </remarks>
         [Parameter]
         public EventCallback<MouseEventArgs> OnClearButtonClick { get; set; }
+
+        /// <summary>
+        /// Shows an interactive button to toggle password visibility between masked and plain text.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. Only applies when <see cref="InputType"/> is <see cref="InputType.Password"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool ShowPasswordToggle { get; set; }
+
+        /// <summary>
+        /// Indicates whether the password is currently visible in plain text.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. Supports two-way binding.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool PasswordVisible { get; set; }
+
+        /// <summary>
+        /// Occurs when the password visibility changes.
+        /// </summary>
+        [Parameter]
+        public EventCallback<bool> PasswordVisibleChanged { get; set; }
+
+        /// <summary>
+        /// Occurs when the password toggle button is clicked.
+        /// </summary>
+        [Parameter]
+        public EventCallback<MouseEventArgs> OnPasswordToggleClick { get; set; }
+
+        /// <summary>
+        /// The icon to display when the password is hidden, allowing the user to reveal it.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Icons.Material.Filled.Visibility"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string PasswordHiddenIcon { get; set; } = Icons.Material.Filled.Visibility;
+
+        /// <summary>
+        /// The icon to display when the password is visible, allowing the user to hide it.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Icons.Material.Filled.VisibilityOff"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string PasswordVisibleIcon { get; set; } = Icons.Material.Filled.VisibilityOff;
+
+        /// <summary>
+        /// The <c>aria-label</c> for the password toggle button when the password is hidden.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to the localized equivalent of "Show password".
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string? PasswordHiddenAriaLabel { get; set; }
+
+        /// <summary>
+        /// The <c>aria-label</c> for the password toggle button when the password is visible.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to the localized equivalent of "Hide password".
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string? PasswordVisibleAriaLabel { get; set; }
 
         /// <summary>
         /// The mask to apply to text values.
@@ -353,8 +435,88 @@ namespace Vek
             return base.SetTextAndUpdateValueAsync(text, updateValue);
         }
 
+        protected internal InputType EffectiveInputType =>
+            (_showPasswordToggleState.Value && InputType == InputType.Password && _passwordVisibleState.Value)
+                ? InputType.Text
+                : InputType;
+
         /// <inheritdoc />
-        protected internal override InputType GetInputType() => InputType;
+        protected internal override InputType GetInputType() => EffectiveInputType;
+
+        /// <summary>
+        /// Toggles the visibility of the password between masked and plain text.
+        /// </summary>
+        public async Task TogglePasswordVisibilityAsync()
+        {
+            var caret = -1;
+            if (_isFocused && IsJSRuntimeAvailable && InputReference != null)
+            {
+                var (success, pos) = await JsRuntime.InvokeAsyncWithErrorHandling(-1, "vekInput.getCaretPosition", InputReference.ElementReference);
+                if (success)
+                {
+                    caret = pos;
+                }
+            }
+
+            var next = !_passwordVisibleState.Value;
+            await _passwordVisibleState.SetValueAsync(next);
+            StateHasChanged();
+
+            if (_isFocused && IsJSRuntimeAvailable && InputReference != null)
+            {
+                if (caret >= 0)
+                {
+                    await SelectRangeAsync(caret, caret);
+                }
+                else
+                {
+                    await FocusAsync();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets the visibility of the password.
+        /// </summary>
+        /// <param name="visible">Whether the password should be displayed as plain text.</param>
+        public async Task SetPasswordVisibleAsync(bool visible)
+        {
+            if (_passwordVisibleState.Value == visible)
+            {
+                return;
+            }
+
+            var caret = -1;
+            if (_isFocused && IsJSRuntimeAvailable && InputReference != null)
+            {
+                var (success, pos) = await JsRuntime.InvokeAsyncWithErrorHandling(-1, "vekInput.getCaretPosition", InputReference.ElementReference);
+                if (success)
+                {
+                    caret = pos;
+                }
+            }
+
+            await _passwordVisibleState.SetValueAsync(visible);
+            StateHasChanged();
+
+            if (_isFocused && IsJSRuntimeAvailable && InputReference != null)
+            {
+                if (caret >= 0)
+                {
+                    await SelectRangeAsync(caret, caret);
+                }
+                else
+                {
+                    await FocusAsync();
+                }
+            }
+        }
+
+        private Task OnInnerPasswordVisibleChangedAsync(bool visible)
+        {
+            StateHasChanged();
+            return _passwordVisibleState.SetValueAsync(visible);
+        }
 
         private bool ShowClearButton()
         {

@@ -4,9 +4,12 @@
 - **Feature ID**: 037
 - **Feature Slug**: textbox-password-visibility-toggle
 - **Module**: TextField
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 37
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/51
+- **Started At**: 2026-11-19T19:31:07Z
+- **Completed At**: 2026-11-19T20:39:44Z
 
 ---
 

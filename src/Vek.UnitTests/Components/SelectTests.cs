@@ -4,12 +4,12 @@ using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using Vek.Extensions;
 using Vek.Resources;
 using Vek.UnitTests.Dummy;
 using Vek.UnitTests.TestComponents.Select;
 using Vek.UnitTests.TestData;
-using NUnit.Framework;
 using static Vek.UnitTests.TestComponents.Select.SelectWithEnumTest;
 
 namespace Vek.UnitTests.Components
@@ -2595,6 +2595,220 @@ namespace Vek.UnitTests.Components
             await provider.WaitForAssertionAsync(() => provider.FindAll("div.vek-list-item").Should().ContainSingle());
             await provider.Find("div.vek-list-item").ClickAsync();
             await comp.WaitForAssertionAsync(() => comp.Instance.ReadValue.Should().Be(1));
+        }
+
+        /// <summary>
+        /// MultiSelection with Chips renders selected items as compact removable VekChip elements inside the input.
+        /// </summary>
+        [Test]
+        public void MultiSelect_Chips_RendersCompactVekChips()
+        {
+            var comp = Context.Render<VekSelect<string>>(parameters => parameters
+                .Add(x => x.MultiSelection, true)
+                .Add(x => x.Chips, true)
+                .Add(x => x.SelectedValues, (IReadOnlyCollection<string?>)["Apple", "Banana"])
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Apple"))
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Banana"))
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Orange")));
+
+            var chips = comp.FindAll("div.vek-chip");
+            chips.Should().HaveCount(2);
+            chips[0].TextContent.Should().Contain("Apple");
+            chips[1].TextContent.Should().Contain("Banana");
+            chips[0].ClassList.Should().Contain("vek-chip-size-small");
+            chips[1].ClassList.Should().Contain("vek-chip-size-small");
+
+            // Close buttons should be present
+            var closeButtons = comp.FindAll("button.vek-chip-close-button");
+            closeButtons.Should().HaveCount(2);
+        }
+
+        /// <summary>
+        /// Clicking a chip's close button removes it from SelectedValues and raises OnChipClose / OnChipRemoved events.
+        /// </summary>
+        [Test]
+        public async Task MultiSelect_Chips_CloseButtonRemovesChipAndUpdatesState()
+        {
+            string? closedChip = null;
+            string? removedChip = null;
+            IReadOnlyCollection<string?>? currentSelection = null;
+
+            var comp = Context.Render<VekSelect<string>>(parameters => parameters
+                .Add(x => x.MultiSelection, true)
+                .Add(x => x.Chips, true)
+                .Add(x => x.SelectedValues, (IReadOnlyCollection<string?>)["Apple", "Banana"])
+                .Add(x => x.SelectedValuesChanged, values => currentSelection = values)
+                .Add(x => x.OnChipClose, val => closedChip = val)
+                .Add(x => x.OnChipRemoved, val => removedChip = val)
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Apple"))
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Banana"))
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Orange")));
+
+            var closeButtons = comp.FindAll("button.vek-chip-close-button");
+            await closeButtons[0].ClickAsync();
+
+            await comp.WaitForAssertionAsync(() =>
+            {
+                comp.FindAll("div.vek-chip").Should().HaveCount(1);
+                comp.Find("div.vek-chip").TextContent.Should().Contain("Banana");
+            });
+
+            closedChip.Should().Be("Apple");
+            removedChip.Should().Be("Apple");
+            currentSelection.Should().BeEquivalentTo(new[] { "Banana" });
+        }
+
+        /// <summary>
+        /// MaxDisplayedTags limits the number of visible chips and renders an overflow badge with '+N more'.
+        /// </summary>
+        [Test]
+        public async Task MultiSelect_Chips_MaxDisplayedTags_RendersOverflowBadge()
+        {
+            var comp = Context.Render<VekSelect<string>>(parameters => parameters
+                .Add(x => x.MultiSelection, true)
+                .Add(x => x.Chips, true)
+                .Add(x => x.MaxDisplayedTags, 2)
+                .Add(x => x.SelectedValues, (IReadOnlyCollection<string?>)["Apple", "Banana", "Cherry", "Date"])
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Apple"))
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Banana"))
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Cherry"))
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Date")));
+
+            // Should render 2 value chips plus 1 overflow chip
+            var chips = comp.FindAll("div.vek-chip");
+            chips.Should().HaveCount(3);
+            chips[0].TextContent.Should().Contain("Apple");
+            chips[1].TextContent.Should().Contain("Banana");
+
+            var overflow = comp.Find(".vek-select-overflow-badge");
+            overflow.TextContent.Should().Contain("+2 more");
+
+            // Close the first chip ("Apple"), now 3 remain: 2 displayed ("Banana", "Cherry"), overflow becomes "+1 more"
+            var closeButtons = comp.FindAll("button.vek-chip-close-button");
+            await closeButtons[0].ClickAsync();
+
+            await comp.WaitForAssertionAsync(() =>
+            {
+                var updatedChips = comp.FindAll("div.vek-chip");
+                updatedChips.Should().HaveCount(3);
+                updatedChips[0].TextContent.Should().Contain("Banana");
+                updatedChips[1].TextContent.Should().Contain("Cherry");
+                comp.Find(".vek-select-overflow-badge").TextContent.Should().Contain("+1 more");
+            });
+        }
+
+        /// <summary>
+        /// MaxSelectedLabels acts as an alias for MaxDisplayedTags.
+        /// </summary>
+        [Test]
+        public void MultiSelect_Chips_MaxSelectedLabels_ActsAsAlias()
+        {
+            var comp = Context.Render<VekSelect<string>>(parameters => parameters
+                .Add(x => x.MultiSelection, true)
+                .Add(x => x.MaxSelectedLabels, 1)
+                .Add(x => x.SelectedValues, (IReadOnlyCollection<string?>)["Alpha", "Beta", "Gamma"])
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Alpha"))
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Beta"))
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Gamma")));
+
+            var chips = comp.FindAll("div.vek-chip");
+            chips.Should().HaveCount(2); // 1 displayed + 1 overflow
+            chips[0].TextContent.Should().Contain("Alpha");
+            comp.Find(".vek-select-overflow-badge").TextContent.Should().Contain("+2 more");
+        }
+
+        /// <summary>
+        /// Select All combined with Chips updates all selected chips and updates tri-state icon when a chip is closed.
+        /// </summary>
+        [Test]
+        public async Task MultiSelect_Chips_SelectAll_SynchronizesWithChips()
+        {
+            var provider = Context.Render<VekPopoverProvider>();
+            var comp = Context.Render<VekSelect<string>>(parameters => parameters
+                .Add(x => x.MultiSelection, true)
+                .Add(x => x.Chips, true)
+                .Add(x => x.SelectAll, true)
+                .Add(x => x.MaxDisplayedTags, 2)
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Red"))
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Green"))
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Blue")));
+
+            await comp.Find("div.vek-input-control").MouseDownAsync();
+            await provider.WaitForAssertionAsync(() => provider.FindAll("div.vek-list-item").Should().NotBeEmpty());
+
+            // Click select all
+            await provider.FindAll("div.vek-list-item")[0].ClickAsync();
+
+            await comp.WaitForAssertionAsync(() =>
+            {
+                comp.FindAll("div.vek-chip").Should().HaveCount(3); // 2 tags + 1 overflow "+1 more"
+                CheckboxState(provider.FindAll("div.vek-list-item")[0]).Should().Be("checked");
+            });
+
+            // Close one chip
+            var closeButtons = comp.FindAll("button.vek-chip-close-button");
+            await closeButtons[0].ClickAsync();
+
+            await comp.WaitForAssertionAsync(() =>
+            {
+                // After removing one, 2 remain selected; max displayed tags is 2, so 2 chips and no overflow badge
+                comp.FindAll("div.vek-chip").Should().HaveCount(2);
+                comp.FindAll(".vek-select-overflow-badge").Should().BeEmpty();
+                CheckboxState(provider.FindAll("div.vek-list-item")[0]).Should().Be("indeterminate");
+            });
+        }
+
+        /// <summary>
+        /// In disabled or read-only mode, chip close buttons are not available and removal is prevented.
+        /// </summary>
+        [Test]
+        public void MultiSelect_Chips_DisabledAndReadOnly_NoCloseButtons()
+        {
+            var compDisabled = Context.Render<VekSelect<string>>(parameters => parameters
+                .Add(x => x.MultiSelection, true)
+                .Add(x => x.Chips, true)
+                .Add(x => x.Disabled, true)
+                .Add(x => x.SelectedValues, (IReadOnlyCollection<string?>)["One", "Two"])
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "One"))
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Two")));
+
+            compDisabled.FindAll("button.vek-chip-close-button").Should().BeEmpty();
+
+            var compReadOnly = Context.Render<VekSelect<string>>(parameters => parameters
+                .Add(x => x.MultiSelection, true)
+                .Add(x => x.Chips, true)
+                .Add(x => x.ReadOnly, true)
+                .Add(x => x.SelectedValues, (IReadOnlyCollection<string?>)["One", "Two"])
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "One"))
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Two")));
+
+            compReadOnly.FindAll("button.vek-chip-close-button").Should().BeEmpty();
+        }
+
+        /// <summary>
+        /// Clearable button clears all chips and selection.
+        /// </summary>
+        [Test]
+        public async Task MultiSelect_Chips_ClearButton_RemovesAllChips()
+        {
+            var comp = Context.Render<VekSelect<string>>(parameters => parameters
+                .Add(x => x.MultiSelection, true)
+                .Add(x => x.Chips, true)
+                .Add(x => x.Clearable, true)
+                .Add(x => x.SelectedValues, (IReadOnlyCollection<string?>)["One", "Two"])
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "One"))
+                .AddChildContent<VekSelectItem<string>>(item => item.Add(x => x.Value, "Two")));
+
+            comp.FindAll("div.vek-chip").Should().HaveCount(2);
+
+            var clearButton = comp.Find("button.vek-input-clear-button");
+            await clearButton.ClickAsync();
+
+            await comp.WaitForAssertionAsync(() =>
+            {
+                comp.FindAll("div.vek-chip").Should().BeEmpty();
+                comp.Instance.GetState(x => x.SelectedValues).Should().BeEmpty();
+            });
         }
 
         /// <summary>

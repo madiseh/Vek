@@ -1,0 +1,12 @@
+@namespace Vek.Docs.Examples
+
+<div class="d-flex flex-column gap-6">
+    <VekSlider Min="0" Max="100" Step="5" TickInterval="25" ShowTicks="true" TickMarkLabelFormatter="FormatTick" @bind-Value="value" aria-label="Volume" />
+    <VekText Typo="Typo.body2">Volume: @value%</VekText>
+</div>
+
+@code {
+    private double value = 50;
+
+    private static string FormatTick(double tickValue) => $"{tickValue:0}%";
+}

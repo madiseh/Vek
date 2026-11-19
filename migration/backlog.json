@@ -386,9 +386,12 @@
       "title": "SplitButton with Dual Actions and DropDown Menu",
       "module": "Button",
       "priority": 33,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/033-split-button-and-dropdown-actions.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:28:59Z",
+      "completed_at": "2026-11-19T20:11:57Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/45"
     },
     {
       "id": "034",
@@ -429,9 +432,12 @@
       "title": "TextBox Password Masking with Interactive Visibility Toggle",
       "module": "TextField",
       "priority": 37,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/037-textbox-password-visibility-toggle.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:31:07Z",
+      "completed_at": "2026-11-19T20:39:44Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/51"
     },
     {
       "id": "038",
@@ -498,11 +504,14 @@
       "title": "ComboBox Multi-Selection with Removable Chip Tags",
       "module": "Select",
       "priority": 43,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/043-combobox-multi-selection-and-chip-tags.md",
       "dependencies": [
         "042"
-      ]
+      ],
+      "started_at": "2026-11-19T19:31:10Z",
+      "completed_at": "2026-11-19T20:15:20Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/46"
     },
     {
       "id": "044",
@@ -870,9 +879,12 @@
       "title": "Slider Discrete Step Snapping, Custom Ticks, and Scale Value Labels",
       "module": "Slider",
       "priority": 78,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/078-slider-tick-marks-and-labeled-steps.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:54:53Z",
+      "completed_at": "2026-11-19T20:30:20Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/48"
     },
     {
       "id": "079",

@@ -15,7 +15,7 @@
                 <div class="vek-slider-filled" style="@($"width:{Width}%;")"></div>
             </div>
         }
-        @if (TickMarks)
+                @if (ShouldShowTicks)
         {
             <div class="vek-slider-inner-container">
                 <div class="vek-slider-tickmarks">
@@ -23,11 +23,11 @@
                     {
                         int current = i;
 
-                        <div class="d-flex flex-column relative">
+                                <div class="d-flex flex-column relative vek-slider-tickmark" style="@GetTickMarkPositionStyle(current)">
                             <span class="vek-slider-track-tick" />
-                            @if (TickMarkLabels != null && current < TickMarkLabels.Length)
+                                    @if (TickMarkLabels != null && current < TickMarkLabels.Length || TickMarkLabelFormatter is not null)
                             {
-                                <VekText Class="vek-slider-track-tick-label" Typo="Typo.body2">@TickMarkLabels[current]</VekText>
+                                        <VekText Class="vek-slider-track-tick-label" Typo="Typo.body2">@GetTickMarkLabel(current)</VekText>
                             }
                         </div>
                     }

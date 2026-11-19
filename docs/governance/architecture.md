@@ -170,7 +170,7 @@ Vek integrates targeted TypeScript helpers for interactions that require direct 
   - `src/Vek/TScripts/`: Contains TypeScript sources (`vekHelpers.ts`, `vekRipple.ts`, observers, popover positioning).
   - `entrypoint.ts`: Central export file bundled into `vek.js`.
 - **Shipped Bundle Hygiene**: Unit test files (`*.test.ts`) are executed by `bun test` and must **never** be imported into `entrypoint.ts` to prevent test harnesses from leaking into shipped production bundles.
-- **Frontend Sources and Generated Minified Assets**: Keep style changes in `src/Vek/Styles/**/*.scss` and script changes in `src/Vek/TScripts/**/*.ts`. Do not edit or include generated `*.min.*` bundles or their source maps from `src/Vek/wwwroot/` in feature PRs. If a local build regenerates these outputs, restore them before committing. Include or update minified bundles and maps only when preparing release artifacts.
+- **Frontend Sources and Generated Minified Assets (Strict No-Commit Policy)**: Keep style changes in `src/Vek/Styles/**/*.scss` or `src/Vek.Docs/Styles/**/*.scss` and script changes in `src/Vek/TScripts/**/*.ts`. Do not edit, stage, or include generated `*.min.*` bundles or their source maps from any project (including `src/Vek/wwwroot/` and `src/Vek.Docs/wwwroot/`) in feature, fix, or documentation PRs. Because local builds automatically regenerate these outputs, always restore them before committing (`git checkout -- "**/wwwroot/*.min.*" "**/wwwroot/*.map"`). Include or update minified bundles and maps only when preparing release artifacts.
 
 ---
 

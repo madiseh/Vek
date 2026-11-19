@@ -134,3 +134,14 @@ docs(governance): define commit and pull request title rules
   3. Never copy-paste decompiled third-party proprietary source code or naming artifacts.
 - **Functional Naming Discipline**: Always use vendor-neutral, functional terminology that describes the feature's role in the library (e.g., "DataGrid Search Panel with Live Match Highlighting", "word grouping parser", "multi-column search evaluator").
 - **Subfolder Discipline for Compound Components**: Complex compound components (particularly `DataGrid`) must strictly enforce subfolder separation. Never place new models, helpers, or sub-components directly into the component's root folder when dedicated functional subdirectories (`Filtering/`, `Models/`, `Cells/`, `Columns/`, `Grouping/`) exist.
+
+---
+
+## 8. Frontend Assets & Minified Bundles Policy
+
+- **No Minified Assets in PRs**: Never commit generated minified files (`*.min.css`, `*.min.js`, `*.min.*`) or their source maps (`*.map`) from any project (`src/Vek/wwwroot/`, `src/Vek.Docs/wwwroot/`, etc.) in feature, bug-fix, or documentation PRs.
+- **Auto-Regeneration Guard**: Building the project or running frontend asset pipelines regenerates minified files locally. Before staging and committing changes, always inspect `git status` and restore any generated minified files:
+  ```bash
+  git checkout -- "**/wwwroot/*.min.*" "**/wwwroot/*.map"
+  ```
+- **Release-Only Scope**: Generated minified bundles and maps are committed strictly during official release publication routines (`publish-release`), never in regular feature or maintenance pull requests.

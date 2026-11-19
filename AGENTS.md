@@ -105,10 +105,11 @@ dotnet test --project src/Vek.UnitTests/Vek.UnitTests.csproj --no-build --no-res
 dotnet test --project src/Vek.UnitTests/Vek.UnitTests.csproj --no-build --no-restore -- --filter "FullyQualifiedName~PopoverTests" --output Normal --no-ansi --hangdump --hangdump-timeout 30s
 ```
 
-### Bun
+### Bun & Minified Assets Policy
 - Frontend asset builds use the local `bundotnet.cli` tool from `.config/dotnet-tools.json`, not a separately installed global Bun. If Bun-related commands fail after tool or config changes, re-run the tool restore.
 - `-p:SkipBunCompile=true` skips the Bun-driven frontend asset compilation that normally runs during build. Use it for C#, Razor, test, and documentation changes that do not depend on regenerated frontend assets.
 - Do not use it when changes touch `TScripts`, styles, CSS, SCSS, asset-pipeline inputs such as `src/package.json` or `src/bun.lock`, or when verification depends on rebuilt JavaScript, CSS, or other static assets. When unsure, run the normal scoped build without it.
+- **NEVER commit minified files**: Never edit, stage, or commit generated `*.min.css`, `*.min.js`, or any `*.min.*` bundle files or their source maps (`*.map`) from ANY project (e.g. `src/Vek/wwwroot/`, `src/Vek.Docs/wwwroot/`) in feature or docs PRs. Local builds regenerate them; always restore them before committing: `git checkout -- "**/wwwroot/*.min.*" "**/wwwroot/*.map"`. Minified bundles are updated ONLY during release publication (`publish-release`).
 
 ### Formatting
 Run `dotnet format whitespace --folder --include <path/to/changed/files>` once at the very end of the task as a final pre-PR pass to catch whitespace/newline/charset/etc mistakes. It does not fix `using` order or other code style, which CI's format check also enforces. Do not run it repeatedly during the normal edit-build-test loop.

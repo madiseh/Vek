@@ -80,6 +80,42 @@
     }
   }
 
+  &.vek-select--chips,
+  &:has(.vek-select-chips) {
+    .vek-input-slot {
+      white-space: normal;
+      overflow: visible;
+      display: flex !important;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px;
+      min-height: 24px;
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
+  }
+
+  .vek-select-chips {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+    width: 100%;
+  }
+
+  .vek-select-chip-wrapper {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .vek-select-chip {
+    margin: 2px 0;
+  }
+
+  .vek-select-overflow-badge {
+    font-weight: 500;
+  }
+
   .vek-disabled {
     .vek-select-input {
       cursor: default;

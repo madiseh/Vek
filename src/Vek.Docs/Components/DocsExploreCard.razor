@@ -1,22 +1,49 @@
-﻿<a href="@GetLink()">
-    <VekPaper Outlined="true" Class="pa-2 rounded-lg d-flex flex-column">
-        <VekPaper Elevation="0" Class="rounded-lg docs-gray-bg explore-card" role="img" aria-label="Component visualization">
-            <div class="d-flex justify-center align-center relative pa-8 vek-height-full vek-width-full">
+﻿@namespace Vek.Docs.Components
+
+<a href="@GetLink()" class="vek-bento-card-link">
+    <div class="vek-bento-card">
+        <div class="vek-bento-card-preview" role="img" aria-label="@($"Visualization for {Title}")">
+            @if (!string.IsNullOrEmpty(Badge))
+            {
+                <span class="vek-bento-card-badge">@Badge</span>
+            }
+            <div class="vek-bento-preview-content">
                 @ChildContent
             </div>
-        </VekPaper>
-        <VekText Typo="Typo.subtitle2" Class="mt-3">@Title</VekText>
-    </VekPaper>
+        </div>
+        <div class="vek-bento-card-body">
+            <div class="body-meta">
+                @if (!string.IsNullOrEmpty(Category))
+                {
+                    <span class="vek-bento-card-category">@Category</span>
+                }
+                <span class="vek-bento-card-arrow ms-auto" aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </span>
+            </div>
+            <h3 class="vek-bento-card-title">@Title</h3>
+            @if (!string.IsNullOrEmpty(Description))
+            {
+                <p class="vek-bento-card-desc">@Description</p>
+            }
+        </div>
+    </div>
 </a>
 
 @code {
     [Parameter] public string Title { get; set; }
     [Parameter] public string Link { get; set; }
+    [Parameter] public string Description { get; set; }
+    [Parameter] public string Category { get; set; }
+    [Parameter] public string Badge { get; set; }
     [Parameter] public RenderFragment ChildContent { get; set; }
 
     private string GetLink()
     {
-        if (String.IsNullOrEmpty(Link))
+        if (string.IsNullOrEmpty(Link))
         {
             return $"/components/{Title.Replace(" ", "").ToLowerInvariant()}";
         }

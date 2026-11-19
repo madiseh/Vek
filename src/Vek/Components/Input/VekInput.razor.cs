@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using Vek.Resources;
 using Vek.Utilities;
 
 namespace Vek
@@ -49,6 +50,15 @@ namespace Vek
 
         protected string ClearButtonClassname =>
             new CssBuilder("vek-input-clear-button")
+                .AddClass("me-n1", (Adornment == Adornment.End || ShowPasswordToggleButton()) && !HideSpinButtons)
+                .AddClass("vek-icon-button-edge-end", (Adornment == Adornment.End || ShowPasswordToggleButton()) && HideSpinButtons)
+                .AddClass("me-6", Adornment != Adornment.End && !ShowPasswordToggleButton() && !HideSpinButtons)
+                .AddClass("vek-icon-button-edge-margin-end", Adornment != Adornment.End && !ShowPasswordToggleButton() && HideSpinButtons)
+                .AddClass("vek-no-activator")
+                .Build();
+
+        protected string PasswordToggleClassname =>
+            new CssBuilder("vek-input-password-toggle-button")
                 .AddClass("me-n1", Adornment == Adornment.End && !HideSpinButtons)
                 .AddClass("vek-icon-button-edge-end", Adornment == Adornment.End && HideSpinButtons)
                 .AddClass("me-6", Adornment != Adornment.End && !HideSpinButtons)
@@ -56,9 +66,12 @@ namespace Vek
                 .AddClass("vek-no-activator")
                 .Build();
 
-        protected internal override InputType GetInputType() => InputType;
+        protected internal override InputType GetInputType() =>
+            (ShowPasswordToggle && InputType == InputType.Password && PasswordVisible)
+                ? InputType.Text
+                : InputType;
 
-        protected string InputTypeString => InputType.ToStringFast(true);
+        protected string InputTypeString => GetInputType().ToStringFast(true);
 
         internal bool IsClearing { get; set; }
 
@@ -120,6 +133,78 @@ namespace Vek
         /// </remarks>
         [Parameter]
         public bool Clearable { get; set; } = false;
+
+        /// <summary>
+        /// Shows an interactive button to toggle password visibility between masked and plain text.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. Only applies when <see cref="InputType"/> is <see cref="InputType.Password"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool ShowPasswordToggle { get; set; }
+
+        /// <summary>
+        /// Indicates whether the password is currently visible in plain text.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool PasswordVisible { get; set; }
+
+        /// <summary>
+        /// Occurs when the password visibility changes.
+        /// </summary>
+        [Parameter]
+        public EventCallback<bool> PasswordVisibleChanged { get; set; }
+
+        /// <summary>
+        /// Occurs when the password toggle button is clicked.
+        /// </summary>
+        [Parameter]
+        public EventCallback<MouseEventArgs> OnPasswordToggleClick { get; set; }
+
+        /// <summary>
+        /// The icon to display when the password is hidden, allowing the user to reveal it.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Icons.Material.Filled.Visibility"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string PasswordHiddenIcon { get; set; } = Icons.Material.Filled.Visibility;
+
+        /// <summary>
+        /// The icon to display when the password is visible, allowing the user to hide it.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Icons.Material.Filled.VisibilityOff"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string PasswordVisibleIcon { get; set; } = Icons.Material.Filled.VisibilityOff;
+
+        /// <summary>
+        /// The <c>aria-label</c> for the password toggle button when the password is hidden.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to the localized equivalent of "Show password".
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string? PasswordHiddenAriaLabel { get; set; }
+
+        /// <summary>
+        /// The <c>aria-label</c> for the password toggle button when the password is visible.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to the localized equivalent of "Hide password".
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string? PasswordVisibleAriaLabel { get; set; }
 
         /// <summary>
         /// Controls when the clear button is displayed.
@@ -369,6 +454,49 @@ namespace Vek
             finally
             {
                 IsClearing = false;
+            }
+        }
+
+        private bool ShowPasswordToggleButton()
+        {
+            return ShowPasswordToggle && (InputType == InputType.Password || PasswordVisible);
+        }
+
+        private string GetPasswordToggleIcon() =>
+            PasswordVisible ? PasswordVisibleIcon : PasswordHiddenIcon;
+
+        private string GetPasswordToggleAriaLabel() =>
+            PasswordVisible
+                ? (PasswordVisibleAriaLabel ?? Localizer[LanguageResource.VekInput_HidePassword])
+                : (PasswordHiddenAriaLabel ?? Localizer[LanguageResource.VekInput_ShowPassword]);
+
+        private async Task HandlePasswordToggleAsync(MouseEventArgs args)
+        {
+            var caret = -1;
+            if (_isFocused && IsJSRuntimeAvailable)
+            {
+                var (success, pos) = await JsRuntime.InvokeAsyncWithErrorHandling(-1, "vekInput.getCaretPosition", ElementReference);
+                if (success)
+                {
+                    caret = pos;
+                }
+            }
+
+            var next = !PasswordVisible;
+            PasswordVisible = next;
+            await PasswordVisibleChanged.InvokeAsync(next);
+            await OnPasswordToggleClick.InvokeAsync(args);
+
+            if (_isFocused && IsJSRuntimeAvailable)
+            {
+                if (caret >= 0)
+                {
+                    await ElementReference.VekSelectRangeAsync(caret, caret);
+                }
+                else
+                {
+                    await FocusAsync();
+                }
             }
         }
 
