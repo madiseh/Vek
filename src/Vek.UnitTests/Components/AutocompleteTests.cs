@@ -7,16 +7,71 @@ using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using Vek.Resources;
 using Vek.UnitTests.Dummy;
 using Vek.UnitTests.TestComponents.Autocomplete;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {
     [TestFixture]
     public class AutocompleteTests : BunitTest
     {
+        /// <summary>
+        /// Enter commits the typed text when custom values are enabled and the search has no matches.
+        /// </summary>
+        [Test]
+        public async Task Autocomplete_AllowCustomValues_CommitsTypedText()
+        {
+            Context.Render<VekPopoverProvider>();
+            var comp = Context.Render<VekAutocomplete<string>>(parameters => parameters
+                .Add(x => x.AllowCustomValues, true)
+                .Add(x => x.DebounceInterval, 0)
+                .Add(x => x.SearchFunc, (_, _) => Task.FromResult<IEnumerable<string>>([])));
+
+            await comp.Find("input").InputAsync("New category");
+            await comp.Find("input").KeyUpAsync(new KeyboardEventArgs { Key = "Enter" });
+
+            await comp.WaitForAssertionAsync(() => comp.Instance.ReadValue.Should().Be("New category"));
+        }
+
+        /// <summary>
+        /// Long result lists render only the visible rows when virtualization is enabled.
+        /// </summary>
+        [Test]
+        public async Task Autocomplete_Virtualize_RendersVisibleRowsOnly()
+        {
+            var provider = Context.Render<VekPopoverProvider>();
+            var items = Enumerable.Range(0, 200).Select(index => $"Option {index}").ToArray();
+            var comp = Context.Render<VekAutocomplete<string>>(parameters => parameters
+                .Add(x => x.DebounceInterval, 0)
+                .Add(x => x.MaxItems, null)
+                .Add(x => x.Virtualize, true)
+                .Add(x => x.SearchFunc, (_, _) => Task.FromResult<IEnumerable<string>>(items)));
+
+            await comp.Find("input").InputAsync("option");
+            await provider.WaitForAssertionAsync(() => provider.FindComponents<VekListItem<string>>().Should().NotBeEmpty());
+
+            provider.FindComponents<VekListItem<string>>().Should().HaveCountLessThan(items.Length);
+        }
+
+        /// <summary>
+        /// Matching parts of default result text are highlighted case-insensitively.
+        /// </summary>
+        [Test]
+        public async Task Autocomplete_HighlightsMatchingText()
+        {
+            var provider = Context.Render<VekPopoverProvider>();
+            var comp = Context.Render<VekAutocomplete<string>>(parameters => parameters
+                .Add(x => x.DebounceInterval, 0)
+                .Add(x => x.SearchFunc, (_, _) => Task.FromResult<IEnumerable<string>>(["Alabama"])));
+
+            await comp.Find("input").InputAsync("al");
+            await provider.WaitForAssertionAsync(() => provider.Find("mark").TextContent.Should().Be("Al"));
+
+            provider.Find("mark").TextContent.Should().Be("Al");
+        }
+
         /// <summary>
         /// Autocomplete owns result keyboard navigation without installing an interceptor for every result.
         /// </summary>

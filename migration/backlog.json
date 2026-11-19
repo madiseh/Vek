@@ -476,9 +476,12 @@
       "title": "ComboBox Incremental Live Filtering and Virtualized Dropdown",
       "module": "Autocomplete",
       "priority": 42,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/042-combobox-incremental-filtering-and-virtual-scroll.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T10:48:51Z",
+      "completed_at": "2026-11-19T11:26:52Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/32"
     },
     {
       "id": "043",
@@ -486,7 +489,7 @@
       "title": "ComboBox Multi-Selection with Removable Chip Tags",
       "module": "Select",
       "priority": 43,
-      "status": "backlog",
+      "status": "ready",
       "specification": "specifications/043-combobox-multi-selection-and-chip-tags.md",
       "dependencies": [
         "042"
