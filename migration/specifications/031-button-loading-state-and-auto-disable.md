@@ -4,9 +4,10 @@
 - **Feature ID**: 031
 - **Feature Slug**: button-loading-state-and-auto-disable
 - **Module**: Button
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 31
 - **Dependencies**: []
+- **Started At**: 2026-11-19T10:00:35Z
 
 ---
 

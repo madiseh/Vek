@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Vek.Utilities;
+using Vek.State;
 
 namespace Vek
 {
@@ -17,11 +18,14 @@ namespace Vek
     /// <seealso cref="VekToggleIconButton" />
     public partial class VekButton : VekBaseButton, IDisposable
     {
+        private readonly ParameterState<bool> _loadingState;
+
         protected string Classname => new CssBuilder("vek-button-root vek-button")
             .AddClass($"vek-button-{Variant.ToStringFast(true)}")
             .AddClass($"vek-button-{Variant.ToStringFast(true)}-{Color.ToStringFast(true)}")
             .AddClass($"vek-button-{Variant.ToStringFast(true)}-size-{Size.ToStringFast(true)}")
             .AddClass($"vek-width-full", GetRealFullWith())
+              .AddClass("vek-button-loading", IsLoading)
             .AddClass($"vek-ripple", Ripple)
             .AddClass($"vek-button-disable-elevation", !DropShadow)
             .AddClass(Class)
@@ -140,6 +144,45 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.Button.Behavior)]
         public RenderFragment? ChildContent { get; set; }
+
+        /// <summary>
+        /// Shows a loading indicator and prevents the button from being activated.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.Button.Behavior)]
+        public bool Loading { get; set; }
+
+        /// <summary>
+        /// Receives changes to <see cref="Loading"/> when it is bound.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.Button.Behavior)]
+        public EventCallback<bool> LoadingChanged { get; set; }
+
+        /// <summary>
+        /// Supplies custom content for the loading indicator.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to a small indeterminate progress indicator.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Button.Behavior)]
+        public RenderFragment? LoadingTemplate { get; set; }
+
+        public VekButton()
+        {
+            using var registerScope = CreateRegisterScope();
+            _loadingState = registerScope.RegisterParameter<bool>(nameof(Loading))
+                .WithParameter(() => Loading)
+                .WithEventCallback(() => LoadingChanged);
+        }
+
+        protected bool IsLoading => _loadingState.Value;
+
+        protected override bool GetDisabledState() => IsLoading || base.GetDisabledState();
 
         protected override void OnInitialized()
         {

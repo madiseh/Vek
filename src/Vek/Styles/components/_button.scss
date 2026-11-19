@@ -266,6 +266,7 @@
 .vek-button-label {
   width: 100%;
   display: inherit;
+  position: relative;
   align-items: inherit;
   justify-content: inherit;
 
@@ -296,6 +297,29 @@
       margin-inline-start: 8px;
     }
   }
+}
+
+.vek-button-content {
+  display: inherit;
+  align-items: inherit;
+  justify-content: inherit;
+}
+
+.vek-button-loading {
+  .vek-button-content {
+    opacity: 0;
+  }
+}
+
+.vek-button-loading-indicator {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 
