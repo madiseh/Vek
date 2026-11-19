@@ -1,0 +1,11 @@
+@namespace Vek
+@inherits VekComponentBase
+
+<span @ref="ElementReference"
+      class="@Classname"
+      style="@Style"
+      @attributes="UserAttributes"
+      aria-hidden="@(IsOverflowed ? "true" : "false")"
+      inert="@IsOverflowed">
+    @ChildContent
+</span>
