@@ -7,10 +7,10 @@ using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using Vek.Resources;
 using Vek.UnitTests.Dummy;
 using Vek.UnitTests.TestComponents.Autocomplete;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {
