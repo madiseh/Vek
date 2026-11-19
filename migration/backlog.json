@@ -624,10 +624,12 @@
       "title": "DatePicker Dual Calendar Range Selection with Preset Ranges",
       "module": "DatePicker",
       "priority": 54,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/054-datepicker-range-picker-mode.md",
       "dependencies": [],
-      "started_at": "2026-11-19T19:31:16Z"
+      "started_at": "2026-11-19T19:31:16Z",
+      "completed_at": "2026-11-19T21:11:58Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/53"
     },
     {
       "id": "055",
