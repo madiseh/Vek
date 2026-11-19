@@ -1021,9 +1021,11 @@
       "title": "Badge Status Indicator Dots, Max Value Truncation (99+), and Placement Anchors",
       "module": "Badge",
       "priority": 93,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/093-badge-status-dots-and-overlap-positions.md",
-      "dependencies": []
+      "dependencies": [],
+      "completed_at": "2026-11-19T22:03:47Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/57"
     },
     {
       "id": "094",

@@ -4,9 +4,11 @@
 - **Feature ID**: 093
 - **Feature Slug**: badge-status-dots-and-overlap-positions
 - **Module**: Badge
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 93
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/57
+- **Completed At**: 2026-11-19T22:03:47Z
 
 ---
 
