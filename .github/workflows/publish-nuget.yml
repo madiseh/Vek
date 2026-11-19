@@ -5,11 +5,6 @@ on:
     tags:
       - 'v*.*.*'
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version to publish (e.g. 1.0.1)'
-        required: false
-        default: '1.0.1'
 
 env:
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
@@ -20,15 +15,18 @@ jobs:
     outputs:
       VERSION: ${{ steps.get-version.outputs.VERSION }}
     steps:
+      - uses: actions/checkout@v7
+
       - name: Get version
         id: get-version
         run: |
-          if [ -n "${{ github.event.inputs.version }}" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-          else
-            VERSION="${{ github.ref_name }}"
+          VERSION="$(sed -n 's/.*<VersionPrefix>\([^<]*\)<\/VersionPrefix>.*/\1/p' src/Directory.Build.props | head -n 1)"
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Invalid VersionPrefix: $VERSION" >&2; exit 1; }
+          if [ "${GITHUB_EVENT_NAME}" = "push" ] && [ "${GITHUB_REF_NAME#v}" != "$VERSION" ]; then
+            echo "Release tag ${GITHUB_REF_NAME} does not match VersionPrefix $VERSION in src/Directory.Build.props." >&2
+            exit 1
           fi
-          echo "VERSION=${VERSION#v}" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
   deploy-nuget:
     runs-on: ubuntu-latest

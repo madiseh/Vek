@@ -60,6 +60,11 @@ graph TD
 - **Shipped Analyzers**: `Vek.Analyzers.dll` and `Vek.Analyzers.CodeFixes.dll` are packed side-by-side into `analyzers/dotnet/cs` of the primary `Vek` NuGet package. They target Roslyn 4.7.0 (via `<VekRoslynShippedVersion>`) ensuring full compatibility with consuming consumer IDEs and build compilers.
 - **Client Assets**: Bun-compiled JavaScript bundles and CSS styles are embedded and packaged as Static Web Assets (`wwwroot/`).
 
+### Release Version Flow
+- `src/Directory.Build.props` holds the current stable version in `VersionPrefix` for local builds.
+- Release builds use `VersionPrefix` as the package and assembly version, and the publish workflow rejects a release tag that does not match it.
+- The public `Vek.Metadata.Version` property reads the generated assembly version. Documentation UI version labels use this property instead of hard-coded version text.
+
 ---
 
 ## 2. Component Architecture & Rendering Invariants
