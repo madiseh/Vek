@@ -4,9 +4,10 @@
 - **Feature ID**: 037
 - **Feature Slug**: textbox-password-visibility-toggle
 - **Module**: TextField
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 37
 - **Dependencies**: []
+- **Started At**: 2026-11-19T19:31:07Z
 
 ---
 

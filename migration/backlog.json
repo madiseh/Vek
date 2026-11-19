@@ -429,9 +429,10 @@
       "title": "TextBox Password Masking with Interactive Visibility Toggle",
       "module": "TextField",
       "priority": 37,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/037-textbox-password-visibility-toggle.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:31:07Z"
     },
     {
       "id": "038",
