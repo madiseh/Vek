@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <PropertyGroup>
-    <!-- Current stable Vek release; release tags override this for tagged builds. -->
+    <!-- Single source of truth for the current release; package publishing requires a matching vX.Y.Z tag. -->
     <VersionPrefix>1.2.0</VersionPrefix>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <LangVersion>latest</LangVersion>
