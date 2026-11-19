@@ -31,6 +31,7 @@ import VekSplitPanel, {
 import VekTableCell from "./vekTableCell";
 import VekThemeProvider from "./vekThemeProvider";
 import VekTimePicker from "./vekTimePicker";
+import VekNumericField from "./vekNumericField";
 import VekWindow from "./VekWindow";
 
 declare global {
@@ -68,6 +69,7 @@ declare global {
         vekTableCell: VekTableCell;
         vekThemeProvider: VekThemeProvider;
         vekTimePicker: VekTimePicker;
+        vekNumericField: VekNumericField;
         vekWindow: VekWindow;
         serializeParameter: typeof serializeParameter;
         splitPanels: Record<string, VekSplitPanel>;
@@ -118,6 +120,7 @@ window.vekSplitPanel_update = vekSplitPanel_update;
 window.vekTableCell = new VekTableCell();
 window.vekThemeProvider = new VekThemeProvider();
 window.vekTimePicker = new VekTimePicker();
+window.vekNumericField = new VekNumericField();
 window.vekWindow = new VekWindow();
 window.serializeParameter = serializeParameter;
 

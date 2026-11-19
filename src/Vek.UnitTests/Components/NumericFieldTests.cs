@@ -11,10 +11,10 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.Web.HtmlRendering;
 using Microsoft.Extensions.Logging.Abstractions;
+using NUnit.Framework;
 using Vek.Extensions;
 using Vek.UnitTests.Dummy;
 using Vek.UnitTests.TestComponents.NumericField;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {
@@ -1099,6 +1099,24 @@ namespace Vek.UnitTests.Components
             Context.JSInterop.Invocations
                 .Count(x => x.Identifier == "Blazor._internal.domWrapper.focus")
                 .Should().Be(2);
+        }
+
+        /// <summary>
+        /// ShowSpinButtons hides the steppers while preserving the legacy HideSpinButtons behavior.
+        /// </summary>
+        [Test]
+        public async Task ShowSpinButtonsControlsStepperVisibility()
+        {
+            var comp = Context.Render<VekNumericField<int>>();
+            comp.FindAll(".vek-input-numeric-spin button").Count.Should().Be(2);
+
+            await comp.SetParametersAndRenderAsync(parameters => parameters.Add(x => x.ShowSpinButtons, false));
+            comp.FindAll(".vek-input-numeric-spin button").Should().BeEmpty();
+
+            await comp.SetParametersAndRenderAsync(parameters => parameters
+                .Add(x => x.ShowSpinButtons, true)
+                .Add(x => x.HideSpinButtons, true));
+            comp.FindAll(".vek-input-numeric-spin button").Should().BeEmpty();
         }
 
         [TestCaseSource(nameof(TypeCases))]
