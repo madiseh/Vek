@@ -2,10 +2,10 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using NUnit.Framework;
 using Vek.Extensions;
 using Vek.UnitTests.TestComponents;
 using Vek.UnitTests.TestComponents.TreeView;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {
@@ -450,6 +450,28 @@ namespace Vek.UnitTests.Components
         }
 
         /// <summary>
+        /// A parent remains indeterminate until every selectable descendant under value-less branches is selected.
+        /// </summary>
+        [Test]
+        public async Task TreeViewWith_MultiSelection_AutoSelectParent_ChecksOnlyAfterAllNestedValuesAreSelected()
+        {
+            var comp = Context.Render<TreeViewNoValueIntermediateTest>(self => self
+                .Add(x => x.SelectedValues, ["parent-child"]));
+
+            ItemCheckboxState(comp, "parent").Should().Be("vek-checkbox-null");
+
+            await comp.Find("li.parent-group-child-1 > .vek-treeview-item-content").ClickAsync();
+
+            comp.Find("p.selected-values").TrimmedText().Should().Be("parent-child, parent-group-child-1");
+            ItemCheckboxState(comp, "parent").Should().Be("vek-checkbox-null");
+
+            await comp.Find("li.parent-group-child-2 > .vek-treeview-item-content").ClickAsync();
+
+            comp.Find("p.selected-values").TrimmedText().Should().Be("parent, parent-child, parent-group-child-1, parent-group-child-2");
+            ItemCheckboxState(comp, "parent").Should().Be("vek-checkbox-true");
+        }
+
+        /// <summary>
         /// Items without a value don't keep their parent partially checked when the selection comes from <see cref="VekTreeView{T}.SelectedValues"/> (#13233).
         /// </summary>
         [Test]
@@ -468,6 +490,13 @@ namespace Vek.UnitTests.Components
         /// Gets the state class of an item's own checkbox in <see cref="TreeViewMultiSelectionNoValueTest"/>: <c>vek-checkbox-true</c>, <c>vek-checkbox-false</c> or <c>vek-checkbox-null</c>.
         /// </summary>
         private static string ItemCheckboxState(IRenderedComponent<TreeViewMultiSelectionNoValueTest> comp, string itemClass) =>
+            comp.Find($"li.{itemClass} > .vek-treeview-item-content .vek-checkbox span").ClassList
+                .Single(x => x is "vek-checkbox-true" or "vek-checkbox-false" or "vek-checkbox-null");
+
+        /// <summary>
+        /// Gets the rendered checkbox state for a tree item in the nested value-less group scenario.
+        /// </summary>
+        private static string ItemCheckboxState(IRenderedComponent<TreeViewNoValueIntermediateTest> comp, string itemClass) =>
             comp.Find($"li.{itemClass} > .vek-treeview-item-content .vek-checkbox span").ClassList
                 .Single(x => x is "vek-checkbox-true" or "vek-checkbox-false" or "vek-checkbox-null");
 

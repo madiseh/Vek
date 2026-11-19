@@ -121,6 +121,13 @@ namespace Vek
         public bool Clearable { get; set; } = false;
 
         /// <summary>
+        /// Controls when the clear button is displayed.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public ClearButtonDisplayMode? ClearButtonDisplayMode { get; set; }
+
+        /// <summary>
         /// Occurs when the clear button is clicked.
         /// </summary>
         [Parameter]
@@ -139,6 +146,13 @@ namespace Vek
             if (ReadText != Mask.Text)
                 await SetTextAndUpdateValueAsync(Mask.Text, updateValue: false);
             await base.OnInitializedAsync();
+            UpdateClearable();
+        }
+
+        protected override void OnParametersSet()
+        {
+            base.OnParametersSet();
+            UpdateClearable();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -260,7 +274,9 @@ namespace Vek
 
         private void UpdateClearable()
         {
-            var showClearable = Clearable && !string.IsNullOrWhiteSpace(ReadText);
+            var displayMode = ClearButtonDisplayMode ?? (Clearable ? Vek.ClearButtonDisplayMode.WhileEditing : Vek.ClearButtonDisplayMode.Never);
+            var showClearable = displayMode == Vek.ClearButtonDisplayMode.Always
+                || (displayMode == Vek.ClearButtonDisplayMode.WhileEditing && !string.IsNullOrWhiteSpace(ReadText));
 
             if (_showClearable != showClearable)
             {
@@ -279,7 +295,7 @@ namespace Vek
             try
             {
                 await base.SetTextAndUpdateValueAsync(text, updateValue: false);
-                if (Clearable)
+                if (Clearable || ClearButtonDisplayMode is not null)
                     UpdateClearable();
                 var v = ConvertGet(cleanText);
                 await SetValueCoreAsync(v);

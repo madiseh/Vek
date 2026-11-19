@@ -4,7 +4,7 @@
 - **Feature ID**: 043
 - **Feature Slug**: combobox-multi-selection-and-chip-tags
 - **Module**: Select
-- **Status**: Backlog
+- **Status**: Ready
 - **Priority**: 43
 - **Dependencies**: ["042"]
 

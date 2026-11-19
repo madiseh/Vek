@@ -1,0 +1,13 @@
+﻿@namespace Vek.Docs.Examples
+
+<div class="d-flex align-center" style="min-height: 12rem;">
+    <VekButton id="project-actions" Variant="Variant.Outlined">Project actions</VekButton>
+
+    <VekContextMenu TargetSelector="#project-actions">
+        <VekMenuItem Label="Open project" />
+        <VekMenu Label="Manage access">
+            <VekMenuItem Label="Invite a teammate" />
+            <VekMenuItem Label="Copy project link" />
+        </VekMenu>
+    </VekContextMenu>
+</div>

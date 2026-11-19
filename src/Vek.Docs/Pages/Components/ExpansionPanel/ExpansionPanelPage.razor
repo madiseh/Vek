@@ -14,10 +14,19 @@
         </DocsPageSection>
 
         <DocsPageSection>
-            <SectionHeader Title="Multiple Expanded Panels">
-                <Description>Multiple expansion panels can be opened at the same time by setting <CodeInline>MultiExpansion</CodeInline>.</Description>
+              <SectionHeader Title="Accordion Expand Modes">
+                  <Description>Choose whether an accordion keeps one panel open, allows one or none, or lets several panels stay open. The interactive example also shows how to position the expand icon.</Description>
             </SectionHeader>
-            <SectionContent DarkenBackground="true" Code="@nameof(ExpansionPanelMultiExample)" Block="true" FullWidth="true">
+              <SectionContent DarkenBackground="true" Code="@nameof(ExpansionPanelModesExample)" Block="true" FullWidth="true">
+                  <ExpansionPanelModesExample />
+              </SectionContent>
+          </DocsPageSection>
+
+          <DocsPageSection>
+              <SectionHeader Title="Multiple Expanded Panels">
+                  <Description>Use <CodeInline>AccordionExpandMode.Multiple</CodeInline> when panels can stay open independently.</Description>
+              </SectionHeader>
+              <SectionContent DarkenBackground="true" Code="@nameof(ExpansionPanelMultiExample)" Block="true" FullWidth="true">
                 <ExpansionPanelMultiExample />
             </SectionContent>
         </DocsPageSection>

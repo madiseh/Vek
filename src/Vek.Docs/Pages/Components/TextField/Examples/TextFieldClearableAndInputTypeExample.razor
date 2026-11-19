@@ -1,9 +1,13 @@
 ﻿@namespace Vek.Docs.Examples
 
-<VekTextField @bind-Value="_string" Label="Clearable Standard" Variant="Variant.Text" Clearable="true" Adornment="Adornment.End" AdornmentIcon="@Icons.Custom.Brands.Vek" AdornmentColor="Color.Primary" Immediate="true" />
-<VekTextField @bind-Value="_string" Label="Clearable Filled" Variant="Variant.Filled" Clearable="true" Immediate="true" />
-<VekTextField @bind-Value="_string" Label="Clearable Outlined" Variant="Variant.Outlined" Clearable="true" />
+<VekTextField @bind-Value="_whileEditing" Label="While editing" ClearButtonDisplayMode="ClearButtonDisplayMode.WhileEditing" Immediate="true" />
+<VekTextField @bind-Value="_always" Label="Always visible" ClearButtonDisplayMode="ClearButtonDisplayMode.Always" Immediate="true" />
+<VekTextField @bind-Value="_never" Label="Never shown" ClearButtonDisplayMode="ClearButtonDisplayMode.Never" Immediate="true" />
+<VekTextField @bind-Value="_legacy" Label="Legacy Clearable" Clearable="true" Immediate="true" />
 
 @code {
-    string _string;
+    string _whileEditing = "Type to clear this value";
+    string _always = string.Empty;
+    string _never = "This field has no clear button";
+    string _legacy = "Clearable remains supported";
 }

@@ -120,3 +120,16 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload "v${{ needs.get-version.outputs.VERSION }}" ./src/Vek/nupkgs/*.nupkg ./src/Vek/nupkgs/*.snupkg --clobber
+
+  deploy-website:
+    name: Deploy vekui.dev
+    needs: [get-version, deploy-nuget]
+    if: startsWith(github.ref, 'refs/tags/v')
+    uses: ./.github/workflows/deploy-vek.yml
+    with:
+      version: ${{ needs.get-version.outputs.VERSION }}
+    secrets:
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_USER: ${{ secrets.VPS_USER }}
+      VPS_SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+      VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}

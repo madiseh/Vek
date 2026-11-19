@@ -131,5 +131,19 @@
             </SectionContent>
         </DocsPageSection>
 
+        <DocsPageSection>
+            <SectionHeader Title="Large result lists and custom values">
+                <Description>
+                    <VekText>Use <CodeInline>Virtualize</CodeInline> to render only the visible results in a long list. Set <CodeInline>MaxItems</CodeInline> to <CodeInline>null</CodeInline> when the search should return all matching results.</VekText>
+                    <VekText>By default, matching tokens are highlighted in result text. A custom <CodeInline>ItemTemplate</CodeInline> can provide its own presentation.</VekText>
+                    <VekText>Enable <CodeInline>AllowCustomValues</CodeInline> to let Enter commit the typed text through the configured converter when no result is selected.</VekText>
+                    <VekText>This example filters each search token across a large customer list and permits a new customer name.</VekText>
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(AutocompleteVirtualizedValuesExample)">
+                <AutocompleteVirtualizedValuesExample />
+            </SectionContent>
+        </DocsPageSection>
+
     </DocsPageContent>
 </DocsPage>

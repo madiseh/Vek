@@ -6,10 +6,10 @@ using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using Vek.Services;
 using Vek.UnitTests.TestComponents.Tabs;
 using Vek.UnitTests.TestComponents.Tabs.KeepTabsAlive;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {
@@ -531,6 +531,78 @@ namespace Vek.UnitTests.Components
                 styleAttr.Should().Be($"transform:translateX(-{expectedTranslation.ToString(CultureInfo.InvariantCulture)}px);");
                 GetSliderValue(comp).Should().Be(0);
             }
+        }
+
+        /// <summary>
+        /// The automatic scroll mode moves the tab strip when users wheel over overflowing headers.
+        /// </summary>
+        [Test]
+        public async Task MouseWheelScrollsTabHeaders()
+        {
+            var observer = new MockResizeObserver
+            {
+                PanelSize = 100.0,
+                PanelTotalSize = 200.0,
+            };
+
+            Context.Services.Add(new ServiceDescriptor(typeof(IResizeObserverFactory), new MockResizeObserverFactory(observer)));
+            var comp = Context.Render<ScrollableTabsTest>();
+
+            await comp.Find(".vek-tabs-tabbar-content").TriggerEventAsync("onwheel", new WheelEventArgs { DeltaY = 50 });
+
+            comp.Find(".vek-tabs-tabbar-wrapper").GetAttribute("style")
+                .Should().Be("transform:translateX(-50px);");
+        }
+
+        /// <summary>
+        /// The navigation button mode keeps its controls available when all tab headers fit.
+        /// </summary>
+        [Test]
+        public async Task ScrollModeNavButtonsKeepsControlsVisibleWhenTabsFit()
+        {
+            var observer = new MockResizeObserver
+            {
+                PanelSize = 100.0,
+                PanelTotalSize = 1000.0,
+            };
+
+            Context.Services.Add(new ServiceDescriptor(typeof(IResizeObserverFactory), new MockResizeObserverFactory(observer)));
+            var comp = Context.Render<ScrollableTabsTest>();
+
+            await comp.SetParametersAndRenderAsync(parameters => parameters
+                .Add(tabs => tabs.AlwaysShowScrollButtons, false)
+                .Add(tabs => tabs.ScrollMode, TabsScrollMode.NavButtons));
+
+            comp.FindComponents<VekIconButton>().Should().HaveCount(2);
+        }
+
+        /// <summary>
+        /// The disabled scroll mode hides navigation buttons and keeps selected tabs at the starting position.
+        /// </summary>
+        [Test]
+        public async Task ScrollModeNoneDisablesHeaderScrolling()
+        {
+            var observer = new MockResizeObserver
+            {
+                PanelSize = 100.0,
+                PanelTotalSize = 200.0,
+            };
+
+            Context.Services.Add(new ServiceDescriptor(typeof(IResizeObserverFactory), new MockResizeObserverFactory(observer)));
+            var comp = Context.Render<ScrollableTabsTest>();
+
+            await comp.SetParametersAndRenderAsync(parameters => parameters.Add(tabs => tabs.ScrollMode, TabsScrollMode.None));
+            await comp.Instance.SetPanelActiveAsync(5);
+            await comp.Find(".vek-tabs-tabbar-content").TriggerEventAsync("onwheel", new WheelEventArgs { DeltaY = 50 });
+
+            comp.FindComponents<VekIconButton>().Should().BeEmpty();
+            comp.Find(".vek-tabs-tabbar-wrapper").GetAttribute("style")
+                .Should().MatchRegex("transform:translateX\\(-?0px\\);");
+
+            await comp.SetParametersAndRenderAsync(parameters => parameters.Add(tabs => tabs.ScrollMode, TabsScrollMode.Auto));
+
+            comp.Find(".vek-tabs-tabbar-wrapper").GetAttribute("style")
+                .Should().Be("transform:translateX(-400px);");
         }
 
         [Test]

@@ -32,6 +32,7 @@ type ReferenceElement = HTMLElement & {
 export default class VekElementReference {
     listenerId = 0;
     eventListeners: Record<number, EventListener> = {};
+    private contextMenuListeners: Record<number, { cleanup: () => void; setExpanded: (open: boolean) => void }> = {};
 
     /**
      * Some input types (e.g., "email" and "number") can surface caret APIs but still throw at runtime when selecting ranges.
@@ -312,5 +313,168 @@ export default class VekElementReference {
             element.removeEventListener('blur', element._vekBlurHandler);
             delete element._vekBlurHandler;
         }
+    }
+
+    /**
+     * Attaches context-menu, keyboard, and touch long-press listeners to all matching elements.
+     */
+    addContextMenuListenerForSelector(selector: string, dotNetReference: DotNet.DotNetObject, longPressDelay: number) {
+        let elements: Element[];
+        try {
+            elements = [...document.querySelectorAll(selector)];
+        } catch {
+            return 0;
+        }
+
+        return this._attachContextMenuListeners(elements, dotNetReference, longPressDelay);
+    }
+
+    /**
+     * Attaches context-menu, keyboard, and touch long-press listeners to an element reference.
+     */
+    addContextMenuListenerForElement(element: Element | null | undefined, dotNetReference: DotNet.DotNetObject, longPressDelay: number) {
+        return this._attachContextMenuListeners(element ? [element] : [], dotNetReference, longPressDelay);
+    }
+
+    /**
+     * Removes listeners previously attached by one of the addContextMenuListener methods.
+     */
+    removeContextMenuListener(listenerId: number) {
+        this.contextMenuListeners[listenerId]?.cleanup();
+        delete this.contextMenuListeners[listenerId];
+    }
+
+    /**
+     * Updates the expanded state on targets that did not already provide their own state.
+     */
+    updateContextMenuExpanded(listenerId: number, open: boolean) {
+        this.contextMenuListeners[listenerId]?.setExpanded(open);
+    }
+
+    private _attachContextMenuListeners(elements: Element[], dotNetReference: DotNet.DotNetObject, longPressDelay: number) {
+        if (elements.length === 0) {
+            return 0;
+        }
+
+        const cleanupFunctions: Array<() => void> = [];
+        const expandedStateFunctions: Array<(open: boolean) => void> = [];
+        const listenerId = ++this.listenerId;
+
+        for (const element of elements) {
+            const originalHasPopup = element.getAttribute('aria-haspopup');
+            const originalExpanded = element.getAttribute('aria-expanded');
+            if (originalHasPopup === null) {
+                element.setAttribute('aria-haspopup', 'menu');
+            }
+            if (originalExpanded === null) {
+                element.setAttribute('aria-expanded', 'false');
+            }
+
+            let longPressTimer: number | undefined;
+            let ignoreContextMenuUntil = 0;
+            let pointerStart: { pointerId: number; x: number; y: number } | undefined;
+
+            const openAt = (pageX: number, pageY: number, clientX: number, clientY: number) => {
+                void dotNetReference.invokeMethodAsync('OpenAtAsync', pageX, pageY, clientX, clientY)
+                    .catch(() => this.removeContextMenuListener(listenerId));
+            };
+
+            const clearLongPress = () => {
+                if (longPressTimer !== undefined) {
+                    window.clearTimeout(longPressTimer);
+                    longPressTimer = undefined;
+                }
+                pointerStart = undefined;
+            };
+
+            const onContextMenu = (event: Event) => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                if (Date.now() < ignoreContextMenuUntil) {
+                    return;
+                }
+
+                const mouseEvent = event as MouseEvent;
+                openAt(mouseEvent.pageX, mouseEvent.pageY, mouseEvent.clientX, mouseEvent.clientY);
+            };
+
+            const onPointerDown = (event: PointerEvent) => {
+                if (event.pointerType !== 'touch' || !event.isPrimary || event.button !== 0) {
+                    return;
+                }
+
+                clearLongPress();
+                pointerStart = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+                longPressTimer = window.setTimeout(() => {
+                    longPressTimer = undefined;
+                    ignoreContextMenuUntil = Date.now() + 1000;
+                    openAt(event.pageX, event.pageY, event.clientX, event.clientY);
+                }, Math.max(0, longPressDelay));
+            };
+
+            const onPointerMove = (event: PointerEvent) => {
+                if (!pointerStart || pointerStart.pointerId !== event.pointerId) {
+                    return;
+                }
+
+                if (Math.hypot(event.clientX - pointerStart.x, event.clientY - pointerStart.y) > 8) {
+                    clearLongPress();
+                }
+            };
+
+            const onPointerEnd = (event: PointerEvent) => {
+                if (!pointerStart || pointerStart.pointerId === event.pointerId) {
+                    clearLongPress();
+                }
+            };
+
+            const onKeyDown = (event: KeyboardEvent) => {
+                if (event.key !== 'ContextMenu' && !(event.key === 'F10' && event.shiftKey)) {
+                    return;
+                }
+
+                event.preventDefault();
+                const rect = element.getBoundingClientRect();
+                const clientX = rect.left + rect.width / 2;
+                const clientY = rect.top + rect.height / 2;
+                openAt(clientX + window.scrollX, clientY + window.scrollY, clientX, clientY);
+            };
+
+            element.addEventListener('contextmenu', onContextMenu);
+            element.addEventListener('pointerdown', onPointerDown as EventListener);
+            element.addEventListener('pointermove', onPointerMove as EventListener);
+            element.addEventListener('pointerup', onPointerEnd as EventListener);
+            element.addEventListener('pointercancel', onPointerEnd as EventListener);
+            element.addEventListener('lostpointercapture', onPointerEnd as EventListener);
+            element.addEventListener('keydown', onKeyDown as EventListener);
+
+            cleanupFunctions.push(() => {
+                clearLongPress();
+                element.removeEventListener('contextmenu', onContextMenu);
+                element.removeEventListener('pointerdown', onPointerDown as EventListener);
+                element.removeEventListener('pointermove', onPointerMove as EventListener);
+                element.removeEventListener('pointerup', onPointerEnd as EventListener);
+                element.removeEventListener('pointercancel', onPointerEnd as EventListener);
+                element.removeEventListener('lostpointercapture', onPointerEnd as EventListener);
+                element.removeEventListener('keydown', onKeyDown as EventListener);
+                if (originalHasPopup === null) {
+                    element.removeAttribute('aria-haspopup');
+                }
+                if (originalExpanded === null) {
+                    element.removeAttribute('aria-expanded');
+                }
+            });
+
+            if (originalExpanded === null) {
+                expandedStateFunctions.push(open => element.setAttribute('aria-expanded', String(open)));
+            }
+        }
+
+        this.contextMenuListeners[listenerId] = {
+            cleanup: () => cleanupFunctions.forEach(cleanup => cleanup()),
+            setExpanded: open => expandedStateFunctions.forEach(setExpanded => setExpanded(open))
+        };
+        return listenerId;
     }
 }

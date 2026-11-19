@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.Extensions.Logging;
 using Vek.Utilities;
 
@@ -33,9 +34,13 @@ namespace Vek
         private int _searchVersion;
         private ITimer? _debounceTimer;
         private T[]? _items;
+        private AutocompleteItem[]? _virtualizedItems;
+        private Virtualize<AutocompleteItem>? _virtualize;
         private bool[] _itemDisabled = [];
         private List<int> _enabledItemIndices = [];
         private bool _handleNextFocus;
+
+        private readonly record struct AutocompleteItem(T Value, int Index);
 
         [Inject]
         private IScrollManager ScrollManager { get; set; } = null!;
@@ -231,6 +236,26 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.FormComponent.ListBehavior)]
         public int? MaxItems { get; set; } = 10;
+
+        /// <summary>
+        /// Renders only visible results when the result list is long.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. Set <see cref="MaxItems"/> to <c>null</c> to virtualize the full search result set.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListBehavior)]
+        public bool Virtualize { get; set; }
+
+        /// <summary>
+        /// Allows the user to commit typed text as a value when no result is selected.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. The text is converted with the input's configured converter.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool AllowCustomValues { get; set; }
 
         /// <summary>
         /// The minimum number of characters typed to initiate a search.
@@ -879,6 +904,7 @@ namespace Vek
             }
 
             _items = searchedItems;
+            _virtualizedItems = searchedItems.Select((item, index) => new AutocompleteItem(item, index)).ToArray();
             _itemDisabled = itemDisabled;
             _enabledItemIndices = enabledItemIndices;
             if (searchingWhileSelected) //compute the index of the currently select value, if it exists
@@ -967,6 +993,60 @@ namespace Vek
             return "null";
         }
 
+        private RenderFragment RenderHighlightedText(string? text)
+        {
+            if (string.IsNullOrEmpty(text) || string.IsNullOrWhiteSpace(ReadText))
+            {
+                return builder => builder.AddContent(0, text);
+            }
+
+            var tokens = ReadText.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var matches = new List<(int Start, int Length)>();
+            foreach (var token in tokens)
+            {
+                var searchIndex = 0;
+                while (searchIndex < text.Length)
+                {
+                    var matchIndex = text.IndexOf(token, searchIndex, StringComparison.OrdinalIgnoreCase);
+                    if (matchIndex < 0)
+                    {
+                        break;
+                    }
+
+                    matches.Add((matchIndex, token.Length));
+                    searchIndex = matchIndex + token.Length;
+                }
+            }
+
+            if (matches.Count == 0)
+            {
+                return builder => builder.AddContent(0, text);
+            }
+
+            matches.Sort(static (left, right) => left.Start.CompareTo(right.Start));
+            return builder =>
+            {
+                var position = 0;
+                var sequence = 0;
+                foreach (var match in matches)
+                {
+                    if (match.Start < position)
+                    {
+                        continue;
+                    }
+
+                    builder.AddContent(sequence++, text[position..match.Start]);
+                    builder.OpenElement(sequence++, "mark");
+                    builder.AddAttribute(sequence++, "class", "vek-table-cell-highlight");
+                    builder.AddContent(sequence++, text.Substring(match.Start, match.Length));
+                    builder.CloseElement();
+                    position = match.Start + match.Length;
+                }
+
+                builder.AddContent(sequence, text[position..]);
+            };
+        }
+
         private async Task OnInputKeyDownAsync(KeyboardEventArgs args)
         {
             // A genuine keystroke on the input starts with keydown, so any pending stray-keyup suppression is over.
@@ -1031,6 +1111,12 @@ namespace Vek
                     }
                     else
                     {
+                        if (AllowCustomValues)
+                        {
+                            await SelectCustomValueAsync();
+                            break;
+                        }
+
                         // The menu stays closed when a search finds nothing, so Enter must coerce the value here rather than through OnEnterKeyAsync.
                         // When Immediate is enabled the value was already coerced by TextChanged.
                         if (!Immediate)
@@ -1097,12 +1183,19 @@ namespace Vek
         /// Scrolls the list of items to the item at the specified index.
         /// </summary>
         /// <param name="index">The index of the item to scroll to.</param>
-        public ValueTask ScrollToListItemAsync(int index)
+        public async ValueTask ScrollToListItemAsync(int index)
         {
+            if (Virtualize && _virtualize is not null)
+            {
+#if NET11_0_OR_GREATER
+                await _virtualize.ScrollToItemAsync(index);
+#endif
+            }
+
             var id = GetListItemId(index);
 
             //id of the scrolled element
-            return ScrollManager.ScrollToListItemAsync(id);
+            await ScrollManager.ScrollToListItemAsync(id);
         }
 
         /// <summary>
@@ -1158,6 +1251,12 @@ namespace Vek
         {
             if (!Open || _items == null || _items.Length == 0)
             {
+                if (AllowCustomValues)
+                {
+                    await SelectCustomValueAsync();
+                    return;
+                }
+
                 // When Immediate is enabled, then the CoerceValue is set by TextChanged
                 // So only coerce the value on enter when Immediate is disabled
                 if (!Immediate)
@@ -1171,12 +1270,27 @@ namespace Vek
             {
                 if (_selectedListItemIndex >= 0 && _selectedListItemIndex < _items.Length)
                     await SelectOptionAsync(_items[_selectedListItemIndex]);
+                else if (AllowCustomValues)
+                    await SelectCustomValueAsync();
             }
             finally
             {
                 if (Open)
                     Open = false;
             }
+        }
+
+        private async Task SelectCustomValueAsync()
+        {
+            if (string.IsNullOrWhiteSpace(ReadText))
+                return;
+
+            var value = ConvertGet(ReadText);
+            await SetValueAndUpdateTextAsync(value, updateText: false);
+            _isValueCoerced = true;
+            await BeginValidateAsync();
+            Open = false;
+            StateHasChanged();
         }
 
         private Task OnInputClickedAsync()

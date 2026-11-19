@@ -62,6 +62,18 @@
             </SectionContent>
         </DocsPageSection>
 
+            <DocsPageSection>
+                <SectionHeader Title="Customize day content">
+                    <Description>
+                        Use <CodeInline>DayCellTemplate</CodeInline> to render each day with a <CodeInline>DatePickerDayContext</CodeInline>.
+                        Disabled dates stay unavailable, and the date picker keeps an accessible full-date name on each day button.
+                    </Description>
+                </SectionHeader>
+                <SectionContent Code="@nameof(DatePickerDayCellTemplateExample)" ShowCode="false" FullWidth="false">
+                    <DatePickerDayCellTemplateExample />
+                </SectionContent>
+            </DocsPageSection>
+
         <DocsPageSection>
             <SectionHeader Title="Action Buttons">
                 <Description>You can add buttons by using the <CodeInline>PickerActions</CodeInline> render fragment. If <CodeInline>AutoClose</CodeInline> is set to true and PickerActions are defined, selecting a day will close the VekDatePicker.</Description>

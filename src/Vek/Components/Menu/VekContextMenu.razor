@@ -1,0 +1,11 @@
+﻿@namespace Vek
+@inherits VekComponentBase
+
+<VekMenu @ref="_menu"
+         @attributes="UserAttributes"
+         PositionAtCursor="true"
+         Disabled="@_disabledState.Value"
+         Open="@_open"
+         OpenChanged="OnMenuOpenChangedAsync">
+    @_childContentState.Value
+</VekMenu>
