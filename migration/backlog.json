@@ -413,9 +413,10 @@
       "title": "TextBox Clear Button Display Modes and Action Hooks",
       "module": "TextField",
       "priority": 36,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/036-textbox-clear-button-modes.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T10:01:06Z"
     },
     {
       "id": "037",

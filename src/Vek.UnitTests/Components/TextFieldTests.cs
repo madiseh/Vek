@@ -861,6 +861,40 @@ namespace Vek.UnitTests.Components
             comp.FindAll(".vek-input-clear-button").Should().BeEmpty();
         }
 
+        /// <summary>
+        /// Always keeps the clear button available after the field value is cleared.
+        /// </summary>
+        [Test]
+        public async Task TextField_ClearButtonDisplayMode_Always_RemainsVisibleAfterClear()
+        {
+            var value = "Initial value";
+            var comp = Context.Render<VekTextField<string>>(parameters => parameters
+                .Add(parameter => parameter.ClearButtonDisplayMode, ClearButtonDisplayMode.Always)
+                .Add(parameter => parameter.Value, value)
+                .Add(parameter => parameter.ValueChanged, EventCallback.Factory.Create<string?>(this, nextValue => value = nextValue)));
+
+            comp.Find(".vek-input-clear-button").Should().NotBeNull();
+
+            await comp.Find(".vek-input-clear-button").ClickAsync();
+
+            value.Should().BeNullOrEmpty();
+            comp.Find(".vek-input-clear-button").Should().NotBeNull();
+        }
+
+        /// <summary>
+        /// An explicit Never mode takes precedence over the legacy clearable flag.
+        /// </summary>
+        [Test]
+        public void TextField_ClearButtonDisplayMode_NeverOverridesLegacyClearable()
+        {
+            var comp = Context.Render<VekTextField<string>>(parameters => parameters
+                .Add(parameter => parameter.Clearable, true)
+                .Add(parameter => parameter.ClearButtonDisplayMode, ClearButtonDisplayMode.Never)
+                .Add(parameter => parameter.Value, "Initial value"));
+
+            comp.FindAll(".vek-input-clear-button").Should().BeEmpty();
+        }
+
         [Test]
         public void TextField_ClearButton_TabIndex()
         {

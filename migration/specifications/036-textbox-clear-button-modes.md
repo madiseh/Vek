@@ -4,9 +4,10 @@
 - **Feature ID**: 036
 - **Feature Slug**: textbox-clear-button-modes
 - **Module**: TextField
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 36
 - **Dependencies**: []
+- **Started At**: 2026-11-19T10:01:06Z
 
 ---
 
