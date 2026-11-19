@@ -2,10 +2,10 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using NUnit.Framework;
 using Vek.Extensions;
 using Vek.UnitTests.TestComponents;
 using Vek.UnitTests.TestComponents.TreeView;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {
