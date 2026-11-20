@@ -68,6 +68,15 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Half-star precision and hover preview">
+                <Description>Set <CodeInline>Precision</CodeInline> to <CodeInline>RatingPrecision.Half</CodeInline> to select half-star values. The preview follows the pointer and updates the value only after selection.</Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(RatingHalfPrecisionExample)">
+                <RatingHalfPrecisionExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Accessibility">
                 <Description>
                     <VekText Class="mb-2">
@@ -86,13 +95,13 @@
                             <td>
                                 <CodeInline>ArrowLeft</CodeInline>
                             </td>
-                            <td>Decrease rating by 1</td>
+                            <td>Decrease by one increment (0.5 with half-star precision)</td>
                         </tr>
                         <tr>
                             <td>
                                 <CodeInline>ArrowRight</CodeInline>
                             </td>
-                            <td>Increase rating by 1</td>
+                            <td>Increase by one increment (0.5 with half-star precision)</td>
                         </tr>
                         <tr>
                             <td>

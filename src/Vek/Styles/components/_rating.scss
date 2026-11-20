@@ -12,12 +12,23 @@
 }
 
 .vek-rating-item {
+  position: relative;
   cursor: pointer;
   --vek-ripple-color: currentColor;
   transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 
   &.vek-rating-item-active {
     transform: scale(1.2);
+  }
+
+  &.vek-rating-item-half-left,
+  &.vek-rating-item-half-right {
+    width: 0.5em;
+    overflow: hidden;
+  }
+
+  &.vek-rating-item-half-right > .vek-icon-root {
+    margin-left: -0.5em;
   }
 
   &.vek-disabled {

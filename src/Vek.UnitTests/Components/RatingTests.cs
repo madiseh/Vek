@@ -1,9 +1,10 @@
 ﻿using AngleSharp.Dom;
 using AwesomeAssertions;
 using Bunit;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Vek.Extensions;
 using NUnit.Framework;
+using Vek.Extensions;
 
 namespace Vek.UnitTests.Components
 {
@@ -338,6 +339,45 @@ namespace Vek.UnitTests.Components
             var comp = Context.Render<VekRating>(parameters => parameters.AddUnmatched("aria-label", "Quality"));
 
             comp.Find("span.vek-rating-root").GetAttribute("aria-label").Should().Be("Quality");
+        }
+
+        /// <summary>
+        /// Half-star hover previews a fractional score without changing the selected value until clicked.
+        /// </summary>
+        [Test]
+        public async Task Rating_HalfPrecision_PreviewsAndSelectsFractionalValue()
+        {
+            double? preview = null;
+            var comp = Context.Render<VekRating>(parameters => parameters
+                .Add(p => p.Precision, RatingPrecision.Half)
+                .Add(p => p.Value, 2d)
+                .Add(p => p.ValueChanged, EventCallback.Factory.Create<double>(this, _ => { }))
+                .Add(p => p.HoveredScoreChanged, EventCallback.Factory.Create<double?>(this, value => preview = value)));
+            IReadOnlyList<IElement> items() => comp.FindAll("span.vek-rating-item");
+
+            items().Count.Should().Be(10);
+            await items()[4].PointerOverAsync();
+            preview.Should().Be(2.5);
+            comp.Instance.GetState(x => x.Value).Should().Be(2);
+
+            await items()[4].ClickAsync();
+            comp.Instance.GetState(x => x.Value).Should().Be(2.5);
+            comp.Find("input[value='2.5']").HasAttribute("checked").Should().BeTrue();
+        }
+
+        /// <summary>
+        /// Half-star precision moves keyboard selection by half steps.
+        /// </summary>
+        [Test]
+        public async Task Rating_HalfPrecision_KeyboardMovesByHalfSteps()
+        {
+            var comp = Context.Render<VekRating>(parameters => parameters
+                .Add(p => p.Precision, RatingPrecision.Half)
+                .Add(p => p.Value, 1d)
+                .Add(p => p.ValueChanged, EventCallback.Factory.Create<double>(this, _ => { })));
+
+            await comp.InvokeAsync(() => comp.Instance.HandleKeyDownAsync(new KeyboardEventArgs { Key = "ArrowRight" }));
+            comp.Instance.GetState(x => x.Value).Should().Be(1.5);
         }
     }
 }

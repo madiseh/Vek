@@ -5,6 +5,16 @@ using Vek.Utilities;
 
 namespace Vek
 {
+    /// <summary>
+    /// The selectable increments supported by a rating.
+    /// </summary>
+    public enum RatingPrecision
+    {
+        /// <summary>Allows whole-number ratings.</summary>
+        Full,
+        /// <summary>Allows half-step ratings.</summary>
+        Half
+    }
 
     /// <summary>
     /// Ratings provide insight regarding other's opinions and experiences with a product. Collecting user feedback via ratings is a simple analytic that can provide a lot of feedback to your product or application.
@@ -13,7 +23,9 @@ namespace Vek
     public partial class VekRating : VekComponentBase
     {
         private readonly ParameterState<int> _selectedValueState;
-        private int? _hoveredValue = null;
+        private readonly ParameterState<double> _valueState;
+        private double? _hoveredValue;
+        private bool _hasValueInteraction;
 
         public VekRating()
         {
@@ -21,6 +33,9 @@ namespace Vek
             _selectedValueState = registerScope.RegisterParameter<int>(nameof(SelectedValue))
                 .WithParameter(() => SelectedValue)
                 .WithEventCallback(() => SelectedValueChanged);
+            _valueState = registerScope.RegisterParameter<double>(nameof(Value))
+                .WithParameter(() => Value)
+                .WithEventCallback(() => ValueChanged);
         }
 
         /// <summary>
@@ -73,6 +88,27 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.Rating.Behavior)]
         public int MaxValue { get; set; } = 5;
+
+        /// <summary>
+        /// Selects whole-star or half-star increments.
+        /// </summary>
+        /// <remarks>Defaults to <see cref="RatingPrecision.Full"/>.</remarks>
+        [Parameter]
+        [Category(CategoryTypes.Rating.Behavior)]
+        public RatingPrecision Precision { get; set; }
+
+        /// <summary>
+        /// The selected rating, including half-step values when <see cref="Precision"/> is <see cref="RatingPrecision.Half"/>.
+        /// </summary>
+        /// <remarks>Defaults to <c>0</c>.</remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.Rating.Data)]
+        public double Value { get; set; }
+
+        /// <summary>Occurs when <see cref="Value"/> changes.</summary>
+        [Parameter]
+        [Category(CategoryTypes.Rating.Data)]
+        public EventCallback<double> ValueChanged { get; set; }
 
         /// <summary>
         /// The icon displayed for selected items.
@@ -195,9 +231,15 @@ namespace Vek
         /// <remarks>
         /// Defaults to <c>null</c>.  When the value is selected, <see cref="SelectedValue"/> will change.
         /// </remarks>
-        internal int? HoveredValue => _hoveredValue;
+        internal double? HoveredValue => _hoveredValue;
 
-        internal Task SetHoveredValueAsync(int? hoveredValue)
+        internal double CurrentValue => UsesValueApi ? _valueState.Value : _selectedValueState.Value;
+
+        internal bool UsesValueApi => ValueChanged.HasDelegate || _valueState.Value != 0 || _hasValueInteraction;
+
+        private bool UsesDoubleValue => UsesValueApi || Precision == RatingPrecision.Half;
+
+        internal Task SetHoveredValueAsync(double? hoveredValue)
         {
             if (_hoveredValue == hoveredValue)
             {
@@ -205,14 +247,32 @@ namespace Vek
             }
 
             _hoveredValue = hoveredValue;
-            return HoveredValueChanged.InvokeAsync(hoveredValue);
+            var legacyValue = hoveredValue.HasValue ? (int?)Math.Ceiling(hoveredValue.Value) : null;
+            return Task.WhenAll(HoveredValueChanged.InvokeAsync(legacyValue), HoveredScoreChanged.InvokeAsync(hoveredValue));
         }
+
+        /// <summary>Occurs when the live hover preview changes.</summary>
+        [Parameter]
+        [Category(CategoryTypes.Rating.Data)]
+        public EventCallback<double?> HoveredScoreChanged { get; set; }
 
         internal bool IsRatingHover => HoveredValue.HasValue;
 
-        private async Task HandleItemClickedAsync(int itemValue)
+        private async Task HandleItemClickedAsync(double itemValue)
         {
-            await _selectedValueState.SetValueAsync(itemValue);
+            if (UsesDoubleValue)
+            {
+                await _valueState.SetValueAsync(itemValue);
+                _hasValueInteraction = true;
+                if (itemValue % 1 == 0)
+                {
+                    await _selectedValueState.SetValueAsync((int)itemValue);
+                }
+            }
+            else
+            {
+                await _selectedValueState.SetValueAsync((int)itemValue);
+            }
 
             if (itemValue == 0)
             {
@@ -220,7 +280,7 @@ namespace Vek
             }
         }
 
-        internal Task HandleItemHoveredAsync(int? itemValue)
+        internal Task HandleItemHoveredAsync(double? itemValue)
         {
             if (ReadOnly || Disabled)
             {
@@ -230,12 +290,25 @@ namespace Vek
             return SetHoveredValueAsync(itemValue);
         }
 
-        private async Task IncreaseValueAsync(int val)
+        private async Task IncreaseValueAsync(double val)
         {
-            if ((_selectedValueState.Value != MaxValue || val <= 0) && (_selectedValueState.Value != 0 || val >= 0))
+            var currentValue = CurrentValue;
+            if ((currentValue != MaxValue || val <= 0) && (currentValue != 0 || val >= 0))
             {
-                var value = _selectedValueState.Value + val;
-                await _selectedValueState.SetValueAsync(value);
+                var value = Math.Clamp(currentValue + val, 0, MaxValue);
+                if (UsesDoubleValue)
+                {
+                    await _valueState.SetValueAsync(value);
+                    _hasValueInteraction = true;
+                    if (value % 1 == 0)
+                    {
+                        await _selectedValueState.SetValueAsync((int)value);
+                    }
+                }
+                else
+                {
+                    await _selectedValueState.SetValueAsync((int)value);
+                }
             }
         }
 
@@ -257,16 +330,16 @@ namespace Vek
             switch (keyboardEventArgs.Key)
             {
                 case "ArrowRight" when keyboardEventArgs.ShiftKey:
-                    await IncreaseValueAsync(MaxValue - _selectedValueState.Value);
+                    await IncreaseValueAsync(MaxValue - CurrentValue);
                     break;
                 case "ArrowRight":
-                    await IncreaseValueAsync(1);
+                    await IncreaseValueAsync(Precision == RatingPrecision.Half ? 0.5 : 1);
                     break;
                 case "ArrowLeft" when keyboardEventArgs.ShiftKey:
-                    await IncreaseValueAsync(-_selectedValueState.Value);
+                    await IncreaseValueAsync(-CurrentValue);
                     break;
                 case "ArrowLeft":
-                    await IncreaseValueAsync(-1);
+                    await IncreaseValueAsync(Precision == RatingPrecision.Half ? -0.5 : -1);
                     break;
             }
         }
