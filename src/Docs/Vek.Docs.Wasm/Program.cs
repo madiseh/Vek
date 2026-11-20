@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using Vek.Docs.Extensions;
 using Vek.Docs.Models;
-using Vek.Docs.Services.Notifications;
 using Vek.Docs.Wasm;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -28,11 +27,6 @@ builder.Services.TryAddDocsViewServices(builder.Configuration);
 
 var build = builder.Build();
 
-var notificationService = build.Services.GetService<INotificationService>();
-if (notificationService is InMemoryNotificationService inMemoryService)
-{
-    inMemoryService.Preload();
-}
 // Warm up the type documentation, which is what most of the site reads.
 // Member documentation is built a type at a time by whichever page asks for it, so there is nothing to warm up here.
 ApiDocumentation.GetType("VekAlert");

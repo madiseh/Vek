@@ -7,7 +7,6 @@ using Microsoft.Extensions.Hosting;
 using Vek.Docs.Extensions;
 using Vek.Docs.Models;
 using Vek.Docs.Services;
-using Vek.Docs.Services.Notifications;
 using Vek.Docs.WasmHost.Prerender;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -60,12 +59,6 @@ app.MapFallbackToPage("/_Host");
 
 using (var scope = app.Services.CreateScope())
 {
-    var notificationService = scope.ServiceProvider.GetService<INotificationService>();
-    if (notificationService is InMemoryNotificationService inMemoryService)
-    {
-        inMemoryService.Preload();
-    }
-
     var crawlerIdentifier = scope.ServiceProvider.GetRequiredService<ICrawlerIdentifier>();
     await crawlerIdentifier.Initialize();
 

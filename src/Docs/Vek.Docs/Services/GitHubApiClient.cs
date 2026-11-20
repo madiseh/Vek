@@ -43,20 +43,6 @@ namespace Vek.Docs.Services
             }
         }
 
-        public async Task<GitHubReleases[]> GetReleasesAsync()
-        {
-            try
-            {
-                var result = await _http.GetFromJsonAsync<GitHubReleases[]>("repos/Vek/Vek/releases?per_page=100", _jsonSerializerOptions);
-                return result ?? Array.Empty<GitHubReleases>();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                return Array.Empty<GitHubReleases>();
-            }
-        }
-
         public async Task<GitHubRepository?> GetRepositoryAsync(string owner, string repo)
         {
             try
@@ -68,6 +54,20 @@ namespace Vek.Docs.Services
             {
                 Console.WriteLine(e.Message);
                 return null;
+            }
+        }
+
+        public async Task<GitHubRelease[]> GetLatestReleasesAsync()
+        {
+            try
+            {
+                var result = await _http.GetFromJsonAsync<GitHubRelease[]>("repos/madiseh/Vek/releases?per_page=3", _jsonSerializerOptions);
+                return result ?? Array.Empty<GitHubRelease>();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return Array.Empty<GitHubRelease>();
             }
         }
 

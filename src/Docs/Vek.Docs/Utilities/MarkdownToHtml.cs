@@ -16,27 +16,22 @@ namespace Vek.Docs.Utilities;
 #nullable enable
 public partial class MarkdownToHtml
 {
-    private const string GitHubBlobDevBaseUrl = "https://github.com/madiseh/vek/blob/dev/";
-    private const string GitHubRawDevBaseUrl = "https://raw.githubusercontent.com/Vek/Vek/dev/";
+    private const string GitHubBlobMasterBaseUrl = "https://github.com/madiseh/vek/blob/master/";
+    private const string GitHubRawMasterBaseUrl = "https://raw.githubusercontent.com/madiseh/Vek/master/";
 
     private static readonly HeadingRenderOptions _defaultHeadingOptions = new(true, true, true, true);
-    private static readonly HeadingRenderOptions _releaseHeadingOptions = new(false, false, false, false);
-
     private static readonly ListRenderOptions _defaultListOptions = new(null);
-    private static readonly ListRenderOptions _releaseListOptions = new("mt-3 mb-6 px-6");
 
     private static readonly LinkRenderOptions _defaultLinkOptions = new(true, true, false);
     private static readonly LinkRenderOptions _contributionLinkOptions = new(true, true, true);
 
     private static readonly MarkdownPipeline _defaultPipeline = BuildDefaultPipeline();
-    private static readonly MarkdownPipeline _releasePipeline = BuildReleasePipeline();
     private static readonly MarkdownPipeline _contributionPipeline = BuildContributionPipeline();
 
     public enum RenderMode
     {
         Default = 0,
-        ReleasePageRender = 1,
-        ContributionPageRender = 2,
+        ContributionPageRender = 1,
     }
 
     public static string Parse(string markdownBody, Uri? baseUrl = null, RenderMode renderMode = RenderMode.Default)
@@ -45,7 +40,6 @@ public partial class MarkdownToHtml
 
         return renderMode switch
         {
-            RenderMode.ReleasePageRender => ParseReleaseMarkdown(markdownBody, baseUrl),
             RenderMode.ContributionPageRender => ParseContributionMarkdown(markdownBody, baseUrl),
             _ => ParseDefaultMarkdown(markdownBody, baseUrl),
         };
@@ -60,20 +54,6 @@ public partial class MarkdownToHtml
             _defaultHeadingOptions,
             _defaultListOptions,
             _defaultLinkOptions);
-    }
-
-    private static string ParseReleaseMarkdown(string markdownBody, Uri? baseUrl)
-    {
-        var preprocessedBody = PreprocessReleaseMarkdown(markdownBody);
-        var html = RenderMarkdown(
-            preprocessedBody,
-            baseUrl,
-            _releasePipeline,
-            _releaseHeadingOptions,
-            _releaseListOptions,
-            _defaultLinkOptions);
-
-        return PostProcessReleaseHtml(html);
     }
 
     private static string ParseContributionMarkdown(string markdownBody, Uri? baseUrl)
@@ -115,14 +95,6 @@ public partial class MarkdownToHtml
             .Build();
     }
 
-    private static MarkdownPipeline BuildReleasePipeline()
-    {
-        return new MarkdownPipelineBuilder()
-            .UseAutoIdentifiers()
-            .UseAlertBlocks()
-            .Build();
-    }
-
     private static MarkdownPipeline BuildContributionPipeline()
     {
         return new MarkdownPipelineBuilder()
@@ -130,27 +102,10 @@ public partial class MarkdownToHtml
             .Build();
     }
 
-    private static string PreprocessReleaseMarkdown(string markdownBody)
-    {
-        var body = LeadingReleaseCommentRegex().Replace(markdownBody, string.Empty);
-        body = PullRequestUrlRegex().Replace(body, "[#$1]($0)");
-        body = CompareUrlRegex().Replace(body, "[${range}]($0)");
-        body = GitHubMentionRegex().Replace(body, "[@$1](https://github.com/$1)");
-
-        return body;
-    }
-
-    private static string PostProcessReleaseHtml(string html)
-    {
-        return FullChangelogParagraphRegex().Replace(
-            html,
-            "<p class=\"release-full-changelog\"><strong>Full Changelog</strong>:");
-    }
-
     private static string PreprocessContributionMarkdown(string markdownBody)
     {
-        var body = ContributionImageSourceRegex().Replace(markdownBody, "$1=\"" + GitHubRawDevBaseUrl + "$2\"");
-        body = ContributionImageSourceSetRegex().Replace(body, "$1=\"" + GitHubRawDevBaseUrl + "$2\"");
+        var body = ContributionImageSourceRegex().Replace(markdownBody, "$1=\"" + GitHubRawMasterBaseUrl + "$2\"");
+        body = ContributionImageSourceSetRegex().Replace(body, "$1=\"" + GitHubRawMasterBaseUrl + "$2\"");
         body = ContributionTocBlockRegex().Replace(body, static match =>
         {
             var tocContent = match.Groups["toc"].Value.Trim();
@@ -338,7 +293,7 @@ public partial class MarkdownToHtml
 
             if (url.StartsWith('/'))
             {
-                return $"{GitHubBlobDevBaseUrl}{url.TrimStart('/')}";
+                return $"{GitHubBlobMasterBaseUrl}{url.TrimStart('/')}";
             }
 
             if (!IsMarkdownFileLink(url))
@@ -350,7 +305,7 @@ public partial class MarkdownToHtml
                 ? url[2..]
                 : url;
 
-            return $"{GitHubBlobDevBaseUrl}{relativePath}";
+            return $"{GitHubBlobMasterBaseUrl}{relativePath}";
         }
 
         private static string GetInlineText(LinkInline obj)
@@ -377,21 +332,6 @@ public partial class MarkdownToHtml
     private sealed record ListRenderOptions(string? AdditionalCssClass);
 
     private sealed record LinkRenderOptions(bool HighlightGitHubMentions, bool HighlightCompareLinks, bool RewriteContributionLinks);
-
-    [GeneratedRegex(@"^\s*<!--.*?-->\s*", RegexOptions.Singleline)]
-    private static partial Regex LeadingReleaseCommentRegex();
-
-    [GeneratedRegex(@"https://github\.com/Vek/Vek/pull/(?<id>\d{3,6})")]
-    private static partial Regex PullRequestUrlRegex();
-
-    [GeneratedRegex(@"https://github\.com/Vek/Vek/compare/(?<range>[^\s)]+)")]
-    private static partial Regex CompareUrlRegex();
-
-    [GeneratedRegex(@"(?<![\w/\[(`])@(?<user>[A-Za-z0-9](?:[A-Za-z0-9-]{0,38}))\b")]
-    private static partial Regex GitHubMentionRegex();
-
-    [GeneratedRegex(@"<p>\s*<strong>Full Changelog</strong>\s*:", RegexOptions.CultureInvariant)]
-    private static partial Regex FullChangelogParagraphRegex();
 
     [GeneratedRegex(@"^https://github\.com/[A-Za-z0-9-]+/?$", RegexOptions.CultureInvariant)]
     private static partial Regex GitHubUserUrlRegex();

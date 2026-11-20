@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Vek.Docs.Pages.Consent.Prompt;
 using Vek.Docs.Services;
-using Vek.Docs.Services.Notifications;
 using Vek.Docs.Services.UserPreferences;
 using Vek.Examples.Data;
 using Vek.Services;
@@ -44,7 +43,6 @@ namespace Vek.Docs.Extensions
             services.AddScoped<IDocsNavigationService, DocsNavigationService>();
             services.AddBlazoredLocalStorage();
             services.AddScoped<IUserPreferencesService, UserPreferencesService>();
-            services.AddScoped<INotificationService, InMemoryNotificationService>();
             services.AddSingleton<IPeriodicTableService, PeriodicTableService>();
             services.AddSingleton<IRenderQueueService, RenderQueueService>();
             services.AddScoped<LayoutService>();

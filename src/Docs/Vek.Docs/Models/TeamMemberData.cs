@@ -22,6 +22,15 @@ namespace Vek.Docs.Models
                 LinkedIn = null,
                 Bio = "Creator and Lead Developer of Vek.",
                 Team = Team.Core
+            },
+            new TeamMember
+            {
+                Name = "Max Behzadi",
+                GitHub = "maxbehzadi",
+                GitHubSponsor = false,
+                LinkedIn = null,
+                Bio = "Contributor to Vek.",
+                Team = Team.Contribution
             }
         ];
 

@@ -185,3 +185,21 @@ ol,
 ul {
   list-style: none;
 }
+
+.docs-release-popover {
+  width: min(34rem, calc(100vw - 2rem));
+}
+
+.docs-release-list {
+  padding: .5rem;
+}
+
+.docs-release-heading {
+  border-bottom: 1px solid var(--vek-palette-divider);
+  margin-bottom: .25rem;
+  opacity: 1 !important;
+}
+
+.docs-release-item {
+  min-height: 4.5rem;
+}

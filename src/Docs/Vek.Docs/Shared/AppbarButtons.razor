@@ -1,33 +1,34 @@
 ﻿@using Vek.Docs.Enums
 
-<VekTooltip Text="Notifications">
-    <VekBadge Color="Color.Secondary" Dot="true" Overlap="true" Visible="_newNotificationsAvailable">
-        <VekMenu Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter" PopoverClass="docs-layout-menu-shadow" ListClass="pa-2 docs-menu-list" LockScroll="true" AriaLabel="Notifications">
-            <div class="d-flex justify-space-between align-center px-2">
-                <VekText Typo="Typo.subtitle2">Notifications</VekText>
-                <VekButton Disabled="@(_newNotificationsAvailable == false)" OnClick="MarkNotificationAsReadAsync" StartIcon="@Icons.Material.Filled.DoneAll" Variant="Variant.Text" Color="Color.Primary" Class="ml-16 mr-n2">Mark as read</VekButton>
-            </div>
-            @if (_messages != null)
-            {
-                @foreach (var (message, read) in _messages.Take(5))
-                {
-                    <VekMenuItem Class="px-2 py-0 rounded" Href="@($"/vek/announcements/{message.Id}")">
-                        <VekText Typo="Typo.subtitle2">@message.Title</VekText>
-                        <VekText Typo="Typo.body2">@($"{message.Authors.FirstOrDefault()?.DisplayName} • {message.PublishDate.ToString("MM/dd/yyyy")}")</VekText>
-                    </VekMenuItem>
-                    <VekDivider Class="my-2" />
-                }
-            }
-            else
-            {
-                <div class="d-flex justify-center align-center px-2 py-8 relative">
-                    <VekText Class="vek-text-secondary my-12">Nothing new :(</VekText>
-                    <VekLogo Class="docs-logo-filter mx-16 absolute" />
+<VekMenu Icon="@Icons.Material.Outlined.NotificationsNone"
+         Color="Color.Inherit"
+         Variant="Variant.Text"
+         AriaLabel="Latest Vek releases"
+         PopoverClass="docs-layout-menu-shadow docs-release-popover"
+         ListClass="docs-release-list"
+         AnchorOrigin="Origin.BottomRight"
+         TransformOrigin="Origin.TopRight"
+         MaxHeight="420">
+    <VekMenuItem Disabled="true" Class="docs-release-heading">
+        <VekText Typo="Typo.subtitle1" Class="font-weight-bold">Latest Vek releases</VekText>
+    </VekMenuItem>
+    @if (_latestReleases.Length == 0)
+    {
+        <VekMenuItem Disabled="true" Label="No releases are available right now" />
+    }
+    else
+    {
+        @foreach (var release in _latestReleases)
+        {
+            <VekMenuItem Href="@release.HtmlUrl" Target="_blank" Class="docs-release-item" rel="noopener noreferrer">
+                <div class="d-flex flex-column">
+                    <VekText Typo="Typo.subtitle1" Class="font-weight-bold">@GetReleaseTitle(release)</VekText>
+                    <VekText Typo="Typo.body2" Color="Color.Secondary">Vek Team · @GetReleaseDate(release)</VekText>
                 </div>
-            }
-        </VekMenu>
-    </VekBadge>
-</VekTooltip>
+            </VekMenuItem>
+        }
+    }
+</VekMenu>
 
 <VekTooltip Text="@RtlButtonText">
     <VekIconButton OnClick="@LayoutService.ToggleRightToLeftAsync" Icon="@RtlButtonIcon" Color="Color.Inherit" aria-label="@RtlButtonText" />

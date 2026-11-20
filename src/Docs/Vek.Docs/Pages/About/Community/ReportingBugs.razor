@@ -3,32 +3,31 @@
 <DocsPage DisplayFooter="true">
     <DocsPageHeader Title="Reporting Bugs" SubTitle="" />
     <DocsPageContent>
-        
         <DocsPageSection>
-            <SectionHeader Title="Is it really a bug?">
+            <SectionHeader Title="Make sure an issue is the right place">
                 <Description>
-                    Consider if it's really a bug. Sometimes, the concept or use case has been misunderstood.<br/>
-                    If you're looking to get help with something, we'd love to help you - but the best way to do that is through <VekLink Href="/vek/community/getting-help">asking for help</VekLink> rather than reporting a bug.
-                </Description>
-            </SectionHeader>
-        </DocsPageSection>
-        
-        <DocsPageSection>
-            <SectionHeader Title="Search the issues">
-                <Description>
-                    Search through the <VekLink Href="https://github.com/madiseh/vek/issues" Target="_blank">issues</VekLink> and <VekLink Href="https://github.com/madiseh/vek/discussions" Target="_blank">discussions</VekLink> first. If you find anything that seems like the same thing, comment on that one instead of creating a duplicate.
+                    Use a bug report when Vek behaves differently from its documented or expected behavior. If you are unsure how to use a feature, need help with setup, or want advice about an approach, visit our <VekLink Href="/vek/community/getting-help">Getting Help</VekLink> page instead. The community can help you work out whether you have found a defect.
                 </Description>
             </SectionHeader>
         </DocsPageSection>
 
         <DocsPageSection>
-            <SectionHeader Title="Minimal reproduction">
+            <SectionHeader Title="Look for an existing report">
                 <Description>
-                    To ensure that we can help you,  we need to reproduce the bug reliably - in a minimal way and separately from the rest of your project. It makes it easier for us to narrow down what could be causing the problem, allow people to test potential solutions, and finally create a pull request to fix the issue. 
-                    Start with TryVek. If you can be reproduced the issue there, you can save the code snippet and attach it to the issue. If not, provide a link to a GitHub repository with minimal reproduction (No complete applications).
+                    Search the <VekLink Href="https://github.com/madiseh/vek/issues" Target="_blank">Vek issues</VekLink> before opening a new report. If someone has already reported the same behavior, add a comment with any details that can help investigate it, such as another reproduction or environment. This keeps related information together and avoids duplicate reports.
                 </Description>
             </SectionHeader>
-            <VekButton DropShadow="false" EndIcon="@Icons.Material.Rounded.OpenInNew" Variant="Variant.Filled" Color="Color.Primary" Class="docs-no-text-transform" Href="https://github.com/madiseh/vek/" Target="_blank">TryVek</VekButton>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Show how to reproduce it">
+                <Description>
+                    A small, self-contained example helps the team reproduce the behavior and identify its cause. Try it in <VekLink Href="https://try.vek.com" Target="_blank">TryVek</VekLink> first and include the snippet link in your report. If the issue depends on your host or project setup, share a minimal public repository that demonstrates it rather than a complete application.
+                    <br/><br/>
+                    In your report, describe what you expected and what happened, list the steps that trigger the problem, and include the Vek version and relevant environment details. Add any error messages that clarify the failure, and remove secrets or private data from examples.
+                </Description>
+            </SectionHeader>
+            <VekButton DropShadow="false" EndIcon="@Icons.Material.Rounded.OpenInNew" Variant="Variant.Filled" Color="Color.Primary" Class="docs-no-text-transform" Href="https://github.com/madiseh/vek/issues/new/choose" Target="_blank">Report a bug on GitHub</VekButton>
         </DocsPageSection>
 
     </DocsPageContent>
