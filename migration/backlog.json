@@ -960,9 +960,12 @@
       "title": "Card Collapsible Body with Animated Toggle Action in Header",
       "module": "Card",
       "priority": 85,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/085-card-expandable-collapsible-content.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:56:49Z",
+      "completed_at": "2026-11-19T21:09:23Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/52"
     },
     {
       "id": "086",

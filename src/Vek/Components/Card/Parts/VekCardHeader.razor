@@ -18,4 +18,12 @@
     {
         @ChildContent
     }
+    @if (ParentCard?.Collapsible == true)
+    {
+        <VekIconButton Class="vek-card-collapse-toggle"
+                       Icon="@Icons.Material.Filled.ExpandMore"
+                       aria-label="@(ParentCard.IsExpanded ? "Collapse card" : "Expand card")"
+                       aria-expanded="@ParentCard.IsExpanded.ToString().ToLowerInvariant()"
+                       OnClick="ParentCard.ToggleExpandedAsync" />
+    }
 </div>
