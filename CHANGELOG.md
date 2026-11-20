@@ -15,6 +15,14 @@ For GitHub Releases and downloadable packages, see the [Releases page](https://g
 - Refreshed documentation branding, rewritten getting started and support guides, and updated contributor guidelines. ([PR #63](https://github.com/madiseh/Vek/pull/63))
 - Removed Carbon Ads integration and ad-block detection. ([PR #65](https://github.com/madiseh/Vek/pull/65))
 
+### ✅ Test Results
+- Unit tests: 6,568 passed, 2 skipped, 0 failed (6,570 total).
+- Documentation tests: 1,493 passed, 0 skipped, 0 failed.
+- Analyzer tests: 391 passed, 0 skipped, 0 failed.
+- Format check: passed.
+- Build-only projects: 2 passed.
+- [Download the JUnit test reports](https://github.com/madiseh/Vek/releases/download/v1.3.1/test-results-v1.3.1.zip) from [candidate CI run 44721941602](https://github.com/madiseh/Vek/actions/runs/44721941602), for commit `45d7e7912c5795955faa6a1e6c9b2bdd4e382a32`.
+
 ## [v1.3.0] - 2026-11-20
 
 > Vek v1.3.0 introduces 17 new component features across input, selection, navigation, display, and layout, along with a modern Bento-style documentation overview redesign.
