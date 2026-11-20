@@ -547,10 +547,12 @@
       "title": "Tabs Render Modes: Active Tab Lazily with DOM Caching",
       "module": "Tabs",
       "priority": 46,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/046-tabs-lazy-render-and-caching-modes.md",
       "dependencies": [],
-      "started_at": "2026-11-20T11:25:54Z"
+      "started_at": "2026-11-20T11:25:54Z",
+      "completed_at": "2026-11-20T12:25:59Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/72"
     },
     {
       "id": "047",
