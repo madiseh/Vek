@@ -2230,5 +2230,256 @@ namespace Vek.UnitTests.Components
 
             comp.Instance.CloseCalls.Should().Be(1);
         }
+
+        private static RenderFragment CreateTabsContent(params (string Text, bool? Closeable, CloseButtonDisplayMode? Mode)[] tabs) => builder =>
+        {
+            var seq = 0;
+            foreach (var tab in tabs)
+            {
+                builder.OpenComponent<VekTabPanel>(seq++);
+                builder.AddComponentParameter(seq++, nameof(VekTabPanel.Text), tab.Text);
+                if (tab.Closeable.HasValue)
+                {
+                    builder.AddComponentParameter(seq++, nameof(VekTabPanel.Closeable), tab.Closeable.Value);
+                }
+                if (tab.Mode.HasValue)
+                {
+                    builder.AddComponentParameter(seq++, nameof(VekTabPanel.CloseButtonDisplayMode), tab.Mode.Value);
+                }
+                builder.CloseComponent();
+            }
+        };
+
+        [Test]
+        public void ClosableTabs_RendersCloseButton_WhenCloseableIsTrue()
+        {
+            var comp = Context.Render<VekTabs>(parameters => parameters
+                .Add(p => p.Closeable, true)
+                .Add(p => p.ChildContent, CreateTabsContent(("Tab 1", null, null), ("Tab 2", null, null), ("Tab 3", null, null)))
+            );
+
+            var closeButtons = comp.FindAll(".vek-tab-close-button");
+            closeButtons.Should().HaveCount(3);
+            comp.FindAll(".vek-tab-closable").Should().HaveCount(3);
+        }
+
+        [Test]
+        public void ClosableTabs_TabPanelCloseable_OverridesTabsCloseable()
+        {
+            var comp = Context.Render<VekTabs>(parameters => parameters
+                .Add(p => p.Closeable, true)
+                .Add(p => p.ChildContent, CreateTabsContent(("Tab 1", null, null), ("Tab 2", false, null), ("Tab 3", null, null)))
+            );
+
+            var closeButtons = comp.FindAll(".vek-tab-close-button");
+            closeButtons.Should().HaveCount(2);
+
+            var comp2 = Context.Render<VekTabs>(parameters => parameters
+                .Add(p => p.Closeable, false)
+                .Add(p => p.ChildContent, CreateTabsContent(("Tab 1", null, null), ("Tab 2", true, null), ("Tab 3", null, null)))
+            );
+
+            var closeButtons2 = comp2.FindAll(".vek-tab-close-button");
+            closeButtons2.Should().HaveCount(1);
+        }
+
+        [Test]
+        public async Task ClosableTabs_CloseButtonDisplayMode_ControlsVisibility()
+        {
+            var compNever = Context.Render<VekTabs>(parameters => parameters
+                .Add(p => p.Closeable, true)
+                .Add(p => p.CloseButtonDisplayMode, CloseButtonDisplayMode.Never)
+                .Add(p => p.ChildContent, CreateTabsContent(("Tab 1", null, null), ("Tab 2", null, null)))
+            );
+            compNever.FindAll(".vek-tab-close-button").Should().BeEmpty();
+
+            var compActiveOnly = Context.Render<VekTabs>(parameters => parameters
+                .Add(p => p.Closeable, true)
+                .Add(p => p.CloseButtonDisplayMode, CloseButtonDisplayMode.ActiveTabOnly)
+                .Add(p => p.ChildContent, CreateTabsContent(("Tab 1", null, null), ("Tab 2", null, null)))
+            );
+            compActiveOnly.FindAll(".vek-tab-close-button").Should().HaveCount(1);
+
+            await compActiveOnly.FindAll(".vek-tab")[1].ClickAsync();
+            compActiveOnly.FindAll(".vek-tab-close-button").Should().HaveCount(1);
+            compActiveOnly.FindAll(".vek-tab")[1].ClassList.Should().Contain("vek-tab-active");
+
+            var compHover = Context.Render<VekTabs>(parameters => parameters
+                .Add(p => p.Closeable, true)
+                .Add(p => p.CloseButtonDisplayMode, CloseButtonDisplayMode.OnHover)
+                .Add(p => p.ChildContent, CreateTabsContent(("Tab 1", null, null), ("Tab 2", null, null)))
+            );
+            compHover.Find(".vek-tabs-tabbar").ClassList.Should().Contain("vek-tabs-close-on-hover");
+            compHover.FindAll(".vek-tab-close-on-hover").Should().HaveCount(2);
+        }
+
+        [Test]
+        public async Task ClosableTabs_ClickCloseButton_ClosesTabAndInvokesOnTabClosed()
+        {
+            VekTabPanel closedPanel = null;
+            var comp = Context.Render<VekTabs>(parameters => parameters
+                .Add(p => p.Closeable, true)
+                .Add(p => p.OnTabClosed, EventCallback.Factory.Create<VekTabPanel>(this, panel => closedPanel = panel))
+                .Add(p => p.ChildContent, CreateTabsContent(("Tab 1", null, null), ("Tab 2", null, null), ("Tab 3", null, null)))
+            );
+
+            comp.Instance.Panels.Should().HaveCount(3);
+            var targetPanel = comp.Instance.Panels[0];
+
+            var closeButton = comp.FindAll(".vek-tab-close-button")[0];
+            await closeButton.ClickAsync();
+
+            comp.Instance.Panels.Should().HaveCount(2);
+            closedPanel.Should().Be(targetPanel);
+            comp.FindAll(".vek-tab").Should().HaveCount(2);
+        }
+
+        [Test]
+        public async Task ClosableTabs_OnTabClosing_Cancellation_PreventsClosing()
+        {
+            var closingInvocations = 0;
+            var comp = Context.Render<VekTabs>(parameters => parameters
+                .Add(p => p.Closeable, true)
+                .Add(p => p.OnTabClosing, EventCallback.Factory.Create<TabClosingEventArgs>(this, args =>
+                {
+                    closingInvocations++;
+                    args.Cancel = true;
+                }))
+                .Add(p => p.ChildContent, CreateTabsContent(("Tab 1", null, null), ("Tab 2", null, null)))
+            );
+
+            var closeButton = comp.FindAll(".vek-tab-close-button")[0];
+            await closeButton.ClickAsync();
+
+            closingInvocations.Should().Be(1);
+            comp.Instance.Panels.Should().HaveCount(2);
+            comp.FindAll(".vek-tab").Should().HaveCount(2);
+        }
+
+        [Test]
+        public async Task ClosableTabs_PanelOnClose_Cancellation_PreventsClosing()
+        {
+            var panelOnCloseFired = false;
+            var comp = Context.Render<VekTabs>(parameters => parameters
+                .Add(p => p.Closeable, true)
+                .Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<VekTabPanel>(0);
+                    builder.AddComponentParameter(1, nameof(VekTabPanel.Text), "Tab 1");
+                    builder.AddComponentParameter(2, nameof(VekTabPanel.OnClose), EventCallback.Factory.Create<TabClosingEventArgs>(this, args =>
+                    {
+                        panelOnCloseFired = true;
+                        args.Cancel = true;
+                    }));
+                    builder.CloseComponent();
+                    builder.OpenComponent<VekTabPanel>(3);
+                    builder.AddComponentParameter(4, nameof(VekTabPanel.Text), "Tab 2");
+                    builder.CloseComponent();
+                })
+            );
+
+            var closeButton = comp.FindAll(".vek-tab-close-button")[0];
+            await closeButton.ClickAsync();
+
+            panelOnCloseFired.Should().BeTrue();
+            comp.Instance.Panels.Should().HaveCount(2);
+        }
+
+        [Test]
+        public async Task ClosableTabs_ActiveTabClosed_SelectsAdjacentNextTab()
+        {
+            var activeIndex = 0;
+            var comp = Context.Render<VekTabs>(parameters => parameters
+                .Add(p => p.Closeable, true)
+                .Add(p => p.ActivePanelIndex, activeIndex)
+                .Add(p => p.ActivePanelIndexChanged, EventCallback.Factory.Create<int>(this, idx => activeIndex = idx))
+                .Add(p => p.ChildContent, CreateTabsContent(("Tab 1", null, null), ("Tab 2", null, null), ("Tab 3", null, null)))
+            );
+
+            await comp.FindAll(".vek-tab")[1].ClickAsync();
+            comp.Instance.ActivePanel!.Text.Should().Be("Tab 2");
+            activeIndex.Should().Be(1);
+
+            var closeButton = comp.FindAll(".vek-tab")[1].QuerySelector(".vek-tab-close-button");
+            closeButton.Should().NotBeNull();
+            await closeButton!.ClickAsync();
+
+            comp.Instance.Panels.Should().HaveCount(2);
+            comp.Instance.ActivePanel!.Text.Should().Be("Tab 3");
+            activeIndex.Should().Be(1);
+            comp.FindAll(".vek-tab")[1].ClassList.Should().Contain("vek-tab-active");
+        }
+
+        [Test]
+        public async Task ClosableTabs_LastActiveTabClosed_SelectsAdjacentPreviousTab()
+        {
+            var activeIndex = 0;
+            var comp = Context.Render<VekTabs>(parameters => parameters
+                .Add(p => p.Closeable, true)
+                .Add(p => p.ActivePanelIndex, activeIndex)
+                .Add(p => p.ActivePanelIndexChanged, EventCallback.Factory.Create<int>(this, idx => activeIndex = idx))
+                .Add(p => p.ChildContent, CreateTabsContent(("Tab 1", null, null), ("Tab 2", null, null), ("Tab 3", null, null)))
+            );
+
+            await comp.FindAll(".vek-tab")[2].ClickAsync();
+            comp.Instance.ActivePanel!.Text.Should().Be("Tab 3");
+            activeIndex.Should().Be(2);
+
+            var closeButton = comp.FindAll(".vek-tab")[2].QuerySelector(".vek-tab-close-button");
+            closeButton.Should().NotBeNull();
+            await closeButton!.ClickAsync();
+
+            comp.Instance.Panels.Should().HaveCount(2);
+            comp.Instance.ActivePanel!.Text.Should().Be("Tab 2");
+            activeIndex.Should().Be(1);
+            comp.FindAll(".vek-tab")[1].ClassList.Should().Contain("vek-tab-active");
+        }
+
+        [Test]
+        public async Task ClosableTabs_KeyboardNavigation_DeleteKeyClosesTab()
+        {
+            var comp = Context.Render<VekTabs>(parameters => parameters
+                .Add(p => p.Closeable, true)
+                .Add(p => p.ChildContent, CreateTabsContent(("Tab 1", null, null), ("Tab 2", null, null)))
+            );
+
+            var tabHeader = comp.FindAll(".vek-tab")[0];
+            await tabHeader.KeyDownAsync(new KeyboardEventArgs { Key = "Delete" });
+
+            comp.Instance.Panels.Should().HaveCount(1);
+            comp.Instance.ActivePanel!.Text.Should().Be("Tab 2");
+        }
+
+        [Test]
+        public void ClosableTabs_CustomCloseIconAndToolTip()
+        {
+            var comp = Context.Render<VekTabs>(parameters => parameters
+                .Add(p => p.Closeable, true)
+                .Add(p => p.CloseIcon, Icons.Material.Filled.Delete)
+                .Add(p => p.CloseIconToolTip, "Remove Tab")
+                .Add(p => p.CloseIconClass, "custom-close-class")
+                .Add(p => p.ChildContent, CreateTabsContent(("Tab 1", null, null)))
+            );
+
+            var closeButton = comp.Find(".vek-tab-close-button");
+            closeButton.ClassList.Should().Contain("custom-close-class");
+        }
+
+        [Test]
+        public async Task ClosableTabs_CloseTabAsyncByIndex()
+        {
+            var comp = Context.Render<VekTabs>(parameters => parameters
+                .Add(p => p.Closeable, true)
+                .Add(p => p.ChildContent, CreateTabsContent(("Tab 1", null, null), ("Tab 2", null, null)))
+            );
+
+            var result = await comp.Instance.CloseTabAsync(0);
+            result.Should().BeTrue();
+            comp.Instance.Panels.Should().HaveCount(1);
+            comp.Instance.ActivePanel!.Text.Should().Be("Tab 2");
+
+            var invalidResult = await comp.Instance.CloseTabAsync(99);
+            invalidResult.Should().BeFalse();
+        }
     }
 }

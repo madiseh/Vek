@@ -1,0 +1,127 @@
+@namespace Vek.Docs.Examples
+
+<VekStack Spacing="4">
+    <VekTabs @bind-ActivePanelIndex="_activeTab"
+             Closeable="true"
+             CloseButtonDisplayMode="_displayMode"
+             OnTabClosing="HandleTabClosing"
+             OnTabClosed="HandleTabClosed"
+             Elevation="2"
+             Rounded="true"
+             ApplyEffectsToContainer="true"
+             TabPanelsClass="pa-6">
+        @foreach (var tab in _tabs)
+        {
+            <VekTabPanel @key="tab.Id" ID="tab.Id" Text="@tab.Title" Icon="@tab.Icon" Closeable="@tab.Closeable">
+                <VekStack Spacing="2">
+                    <VekText Typo="Typo.h6">@tab.Title</VekText>
+                    <VekText Typo="Typo.body1">@tab.Content</VekText>
+                    @if (tab.HasUnsavedChanges)
+                    {
+                        <VekAlert Severity="Severity.Warning" Dense="true">
+                            This tab has unsaved changes. Closing will be prevented while protection is enabled.
+                        </VekAlert>
+                    }
+                </VekStack>
+            </VekTabPanel>
+        }
+    </VekTabs>
+
+    <VekStack Row="true" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Spacing="3">
+        <VekButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddTab" StartIcon="@Icons.Material.Filled.Add">
+            Add Tab
+        </VekButton>
+        <VekButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="ResetTabs" StartIcon="@Icons.Material.Filled.Refresh">
+            Reset Tabs
+        </VekButton>
+        <VekSelect T="CloseButtonDisplayMode" Label="Close Button Mode" @bind-Value="_displayMode" Dense="true" Style="min-width: 180px;">
+            <VekSelectItem Value="CloseButtonDisplayMode.Always">Always</VekSelectItem>
+            <VekSelectItem Value="CloseButtonDisplayMode.OnHover">On Hover</VekSelectItem>
+            <VekSelectItem Value="CloseButtonDisplayMode.ActiveTabOnly">Active Tab Only</VekSelectItem>
+        </VekSelect>
+        <VekSwitch T="bool" Color="Color.Warning" @bind-Value="_protectUnsavedChanges">
+            Protect Unsaved Changes
+        </VekSwitch>
+    </VekStack>
+
+    @if (!string.IsNullOrEmpty(_lastEventMessage))
+    {
+        <VekText Typo="Typo.caption" Color="Color.Secondary">
+            <b>Status:</b> @_lastEventMessage
+        </VekText>
+    }
+</VekStack>
+
+@code {
+    private int _activeTab;
+    private CloseButtonDisplayMode _displayMode = CloseButtonDisplayMode.Always;
+    private bool _protectUnsavedChanges = true;
+    private string _lastEventMessage = string.Empty;
+    private int _tabCounter = 3;
+    private List<TabItem> _tabs = [];
+
+    protected override void OnInitialized()
+    {
+        ResetTabs();
+    }
+
+    private void ResetTabs()
+    {
+        _tabs =
+        [
+            new TabItem { Id = 1, Title = "Dashboard", Content = "Main overview and analytics dashboard.", Icon = Icons.Material.Filled.Dashboard, Closeable = false },
+            new TabItem { Id = 2, Title = "Editor", Content = "Document editor with draft changes.", Icon = Icons.Material.Filled.Edit, HasUnsavedChanges = true },
+            new TabItem { Id = 3, Title = "Settings", Content = "Application and user preferences.", Icon = Icons.Material.Filled.Settings }
+        ];
+        _activeTab = 0;
+        _lastEventMessage = "Tabs reset to default configuration.";
+    }
+
+    private void AddTab()
+    {
+        _tabCounter++;
+        var newTab = new TabItem
+        {
+            Id = _tabCounter,
+            Title = $"Document {_tabCounter}",
+            Content = $"Dynamic content for document {_tabCounter}.",
+            Icon = Icons.Material.Filled.Description
+        };
+        _tabs.Add(newTab);
+        _activeTab = _tabs.Count - 1;
+        _lastEventMessage = $"Added new tab: {newTab.Title}";
+    }
+
+    private void HandleTabClosing(TabClosingEventArgs args)
+    {
+        var targetTab = _tabs.ElementAtOrDefault(args.PanelIndex);
+        if (targetTab is not null && targetTab.HasUnsavedChanges && _protectUnsavedChanges)
+        {
+            args.Cancel = true;
+            _lastEventMessage = $"Closing cancelled: '{targetTab.Title}' has unsaved changes.";
+            return;
+        }
+
+        _lastEventMessage = $"Closing tab at index {args.PanelIndex}...";
+    }
+
+    private void HandleTabClosed(VekTabPanel panel)
+    {
+        var tab = _tabs.FirstOrDefault(t => t.Title == panel.Text || (panel.ID is int id && t.Id == id));
+        if (tab is not null)
+        {
+            _tabs.Remove(tab);
+            _lastEventMessage = $"Tab '{tab.Title}' closed. Adjacent tab activated.";
+        }
+    }
+
+    private class TabItem
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+        public string Icon { get; set; } = string.Empty;
+        public bool? Closeable { get; set; }
+        public bool HasUnsavedChanges { get; set; }
+    }
+}
