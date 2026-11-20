@@ -57,6 +57,25 @@
     cursor: default !important;
     pointer-events: none !important;
   }
+
+  position: relative;
+
+  &.vek-treeview-item--dragging {
+    opacity: 0.5;
+  }
+
+  &.vek-treeview-item--drag-over-before > .vek-treeview-item-content {
+    box-shadow: 0 -2px 0 0 var(--vek-palette-primary);
+  }
+
+  &.vek-treeview-item--drag-over-after > .vek-treeview-item-content {
+    box-shadow: 0 2px 0 0 var(--vek-palette-primary);
+  }
+
+  &.vek-treeview-item--drag-over-into > .vek-treeview-item-content {
+    background-color: var(--vek-palette-primary-hover);
+    outline: 1px dashed var(--vek-palette-primary);
+  }
 }
 
 .vek-treeview-item-content {

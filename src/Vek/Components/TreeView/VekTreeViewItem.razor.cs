@@ -19,6 +19,8 @@ namespace Vek
     public partial class VekTreeViewItem<T> : VekComponentBase, IDisposable
     {
         private bool _isServerLoaded;
+        private bool _isDragging;
+        private TreeItemDropPosition? _currentDropPosition;
         private readonly ParameterState<bool> _selectedState;
         private readonly ParameterState<bool> _expandedState;
         private readonly ParameterState<IReadOnlyCollection<ITreeItemData<T>>?> _itemsState;
@@ -45,6 +47,10 @@ namespace Vek
             new CssBuilder("vek-treeview-item")
                 .AddClass("vek-treeview-select-none", GetExpandOnDoubleClick)
                 .AddClass("vek-treeview-item-disabled", GetDisabled())
+                .AddClass("vek-treeview-item--dragging", _isDragging)
+                .AddClass("vek-treeview-item--drag-over-before", _currentDropPosition == TreeItemDropPosition.Before)
+                .AddClass("vek-treeview-item--drag-over-into", _currentDropPosition == TreeItemDropPosition.Into)
+                .AddClass("vek-treeview-item--drag-over-after", _currentDropPosition == TreeItemDropPosition.After)
                 .AddClass(Class)
                 .Build();
 
@@ -812,6 +818,154 @@ namespace Vek
             // in non-tri-state mode we need to fake the checked status. the actual status of the checkbox is irrelevant,
             // only _selectedState.Value matters!
             return _selectedState ? CheckedIcon : UncheckedIcon;
+        }
+
+        /// <summary>
+        /// Enables drag-and-drop on this specific item.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c> (inherits from <see cref="VekTreeView{T}.AllowDragDrop"/>).
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.TreeView.Behavior)]
+        public bool? AllowDragDrop { get; set; }
+
+        /// <summary>
+        /// Determines whether this item can accept dropped items.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c> (inherits from <see cref="VekTreeView{T}.AllowDragDrop"/>).
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.TreeView.Behavior)]
+        public bool? AllowDrop { get; set; }
+
+        public bool GetAllowDragDrop() => AllowDragDrop ?? VekTreeRoot?.GetAllowDragDrop() ?? false;
+        public bool GetAllowDrop() => AllowDrop ?? VekTreeRoot?.GetAllowDragDrop() ?? false;
+
+        public Task HandleDragStartAsync(DragEventArgs e)
+        {
+            if (!GetAllowDragDrop() || GetDisabled() || VekTreeRoot == null)
+                return Task.CompletedTask;
+
+            _isDragging = true;
+            VekTreeRoot.DragManager.StartDrag(this);
+            StateHasChanged();
+            return Task.CompletedTask;
+        }
+
+        public Task HandleDragEndAsync(DragEventArgs e)
+        {
+            _isDragging = false;
+            _currentDropPosition = null;
+            VekTreeRoot?.DragManager.EndDrag();
+            StateHasChanged();
+            return Task.CompletedTask;
+        }
+
+        public void HandleDragOver(DragEventArgs e)
+        {
+            if (!GetAllowDrop() || GetDisabled() || VekTreeRoot == null || !VekTreeRoot.DragManager.IsDragging)
+                return;
+
+            var source = VekTreeRoot.DragManager.ActiveDragItem as VekTreeViewItem<T>;
+            if (source == null || source == this)
+                return;
+
+            if (IsDescendantOf(source))
+                return;
+
+            var position = TreeItemDropPosition.Into;
+            if (e.OffsetY < 8)
+            {
+                position = TreeItemDropPosition.Before;
+            }
+            else if (e.OffsetY > 24)
+            {
+                position = TreeItemDropPosition.After;
+            }
+            else if (!VekTreeRoot.GetAllowReparenting())
+            {
+                position = e.OffsetY < 16 ? TreeItemDropPosition.Before : TreeItemDropPosition.After;
+            }
+
+            var args = new TreeNodeDropEventArgs<T>
+            {
+                SourceItem = source,
+                TargetItem = this,
+                SourceValue = source.Value,
+                TargetValue = this.Value,
+                DropPosition = position
+            };
+
+            if (VekTreeRoot.CanDropFunc != null && !VekTreeRoot.CanDropFunc(args))
+            {
+                if (_currentDropPosition != null)
+                {
+                    _currentDropPosition = null;
+                    StateHasChanged();
+                }
+                return;
+            }
+
+            if (_currentDropPosition != position)
+            {
+                _currentDropPosition = position;
+                StateHasChanged();
+            }
+        }
+
+        public void HandleDragLeave(DragEventArgs e)
+        {
+            if (_currentDropPosition != null)
+            {
+                _currentDropPosition = null;
+                StateHasChanged();
+            }
+        }
+
+        public async Task HandleDropAsync(DragEventArgs e)
+        {
+            if (!GetAllowDrop() || GetDisabled() || VekTreeRoot == null || !VekTreeRoot.DragManager.IsDragging)
+                return;
+
+            var source = VekTreeRoot.DragManager.ActiveDragItem as VekTreeViewItem<T>;
+            var pos = _currentDropPosition;
+            _currentDropPosition = null;
+            VekTreeRoot.DragManager.EndDrag();
+            StateHasChanged();
+
+            if (source == null || source == this || pos == null)
+                return;
+
+            if (IsDescendantOf(source))
+                return;
+
+            var args = new TreeNodeDropEventArgs<T>
+            {
+                SourceItem = source,
+                TargetItem = this,
+                SourceValue = source.Value,
+                TargetValue = this.Value,
+                DropPosition = pos.Value
+            };
+
+            if (VekTreeRoot.CanDropFunc != null && !VekTreeRoot.CanDropFunc(args))
+                return;
+
+            await VekTreeRoot.OnNodeDrop.InvokeAsync(args);
+        }
+
+        internal bool IsDescendantOf(VekTreeViewItem<T> item)
+        {
+            var current = Parent;
+            while (current != null)
+            {
+                if (current == item)
+                    return true;
+                current = current.Parent;
+            }
+            return false;
         }
     }
 }
