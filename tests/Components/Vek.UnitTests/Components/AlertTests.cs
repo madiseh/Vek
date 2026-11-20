@@ -5,8 +5,8 @@
 using AwesomeAssertions;
 using Bunit;
 using Microsoft.AspNetCore.Components.Web;
-using Vek.UnitTests.TestComponents.Alert;
 using NUnit.Framework;
+using Vek.UnitTests.TestComponents.Alert;
 
 namespace Vek.UnitTests.Components
 {
