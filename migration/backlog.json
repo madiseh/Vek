@@ -665,9 +665,10 @@
       "title": "DatePicker Embedded Inline Calendar Display (Non-Popup Mode)",
       "module": "DatePicker",
       "priority": 55,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/055-datepicker-inline-calendar-mode.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-20T22:08:58Z"
     },
     {
       "id": "056",
