@@ -891,9 +891,12 @@
       "title": "Slider Dual-Thumb Range Selection with Lower and Upper Value Binding",
       "module": "Slider",
       "priority": 77,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/077-slider-dual-thumb-range-selection.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-20T11:26:11Z",
+      "completed_at": "2026-11-20T12:19:23Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/71"
     },
     {
       "id": "078",
