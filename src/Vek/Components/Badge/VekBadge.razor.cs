@@ -15,14 +15,14 @@ namespace Vek
             .Build();
 
         protected string WrapperClass => new CssBuilder("vek-badge-wrapper")
-            .AddClass($"vek-badge-{Origin.ToStringFast(true).Replace("-", " ")}")
+              .AddClass(BadgePositionClass)
             .Build();
 
         protected string BadgeClassname => new CssBuilder("vek-badge")
             .AddClass("vek-badge-dot", Dot)
             .AddClass("vek-badge-bordered", Bordered)
             .AddClass("vek-badge-icon", !string.IsNullOrEmpty(Icon) && !Dot)
-            .AddClass($"vek-badge-{Origin.ToStringFast(true).Replace("-", " ")}")
+              .AddClass(BadgePositionClass)
             .AddClass($"vek-elevation-{Elevation.ToString()}")
             .AddClass("vek-theme-" + Color.ToStringFast(true), Color != Color.Default)
             .AddClass("vek-badge-default", Color == Color.Default)
@@ -39,6 +39,16 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.Badge.Appearance)]
         public Origin Origin { get; set; } = Origin.TopRight;
+
+        /// <summary>
+        /// Positions the badge at a logical corner of its content.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>, which preserves the position set by <see cref="Origin"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Badge.Appearance)]
+        public BadgePosition? Position { get; set; }
 
         /// <summary>
         /// The size of the drop shadow.
@@ -118,6 +128,16 @@ namespace Vek
         public int Max { get; set; } = 99;
 
         /// <summary>
+        /// Caps numeric badge content at this value and appends a plus sign when exceeded.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>, which uses <see cref="Max"/> (default <c>99</c>).
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Badge.Behavior)]
+        public int? MaxNumber { get; set; }
+
+        /// <summary>
         /// The <c>string</c> or <c>int</c> value to display inside the badge.
         /// </summary>
         /// <remarks>
@@ -161,6 +181,27 @@ namespace Vek
 
         private string? _content;
 
+        /// <summary>
+        /// Indicates whether logical start and end positions should follow right-to-left layout.
+        /// </summary>
+        [CascadingParameter(Name = "RightToLeft")]
+        public bool RightToLeft { get; set; }
+
+        private string BadgePositionClass
+        {
+            get
+            {
+                if (Position is not { } position)
+                    return $"vek-badge-{Origin.ToStringFast(true).Replace("-", " ")}";
+
+                var vertical = position is BadgePosition.TopEnd or BadgePosition.TopStart ? "top" : "bottom";
+                var isEnd = position is BadgePosition.TopEnd or BadgePosition.BottomEnd;
+                var isRight = isEnd != RightToLeft;
+                var horizontal = isRight ? "right" : "left";
+                return $"vek-badge-{vertical} {horizontal}";
+            }
+        }
+
         // Without this gate the badge always registers a DOM click listener, even when nobody subscribed to OnClick.
         // A null delegate is not enough, because Razor still hands Blazor an EventCallback carrying this component as the receiver, which the render tree treats as a live handler.
         // Only a default EventCallback keeps the listener off the element.
@@ -185,9 +226,10 @@ namespace Vek
             }
             else if (Content is int numberContent)
             {
-                if (numberContent > Max)
+                var maxNumber = MaxNumber ?? Max;
+                if (numberContent > maxNumber)
                 {
-                    _content = Max + "+";
+                    _content = maxNumber + "+";
                 }
                 else
                 {

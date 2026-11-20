@@ -2,8 +2,8 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Vek.UnitTests.TestComponents.Badge;
 using NUnit.Framework;
+using Vek.UnitTests.TestComponents.Badge;
 
 namespace Vek.UnitTests.Components
 {
@@ -63,6 +63,70 @@ namespace Vek.UnitTests.Components
             var comp = Context.Render<VekBadge>();
             await comp.SetParametersAndRenderAsync(parameters => parameters.Add(x => x.Visible, false));
             comp.FindAll("span").Should().HaveCount(1, "Hidden badge renders 1 span");
+        }
+
+        /// <summary>
+        /// A numeric badge shows a plus sign after its configured maximum.
+        /// </summary>
+        [Test]
+        public void Badge_MaxNumber_CapsNumericContent()
+        {
+            var comp = Context.Render<VekBadge>(parameters => parameters
+                .Add(x => x.Content, 150)
+                .Add(x => x.MaxNumber, 99));
+
+            comp.Find(".vek-badge").TextContent.Should().Be("99+");
+        }
+
+        /// <summary>
+        /// The legacy maximum remains effective when the new maximum is not supplied.
+        /// </summary>
+        [Test]
+        public void Badge_MaxNumber_UsesLegacyMaxWhenUnset()
+        {
+            var comp = Context.Render<VekBadge>(parameters => parameters
+                .Add(x => x.Content, 42)
+                .Add(x => x.Max, 20));
+
+            comp.Find(".vek-badge").TextContent.Should().Be("20+");
+        }
+
+        /// <summary>
+        /// A badge's logical position maps to the corresponding physical corner in the current reading direction.
+        /// </summary>
+        [TestCase(BadgePosition.TopEnd, false, "vek-badge-top right")]
+        [TestCase(BadgePosition.TopStart, false, "vek-badge-top left")]
+        [TestCase(BadgePosition.BottomEnd, false, "vek-badge-bottom right")]
+        [TestCase(BadgePosition.BottomStart, false, "vek-badge-bottom left")]
+        [TestCase(BadgePosition.TopEnd, true, "vek-badge-top left")]
+        [TestCase(BadgePosition.TopStart, true, "vek-badge-top right")]
+        [TestCase(BadgePosition.BottomEnd, true, "vek-badge-bottom left")]
+        [TestCase(BadgePosition.BottomStart, true, "vek-badge-bottom right")]
+        public void Badge_Position_UsesLogicalCorners(BadgePosition position, bool rightToLeft, string expectedClasses)
+        {
+            var comp = Context.Render<VekBadge>(parameters =>
+            {
+                parameters.AddCascadingValue("RightToLeft", rightToLeft);
+                parameters.Add(x => x.Position, position);
+            });
+
+            comp.Find(".vek-badge-wrapper").ClassName.Should().Be("vek-badge-wrapper " + expectedClasses);
+            comp.Find(".vek-badge").ClassName.Should().Contain(expectedClasses);
+        }
+
+        /// <summary>
+        /// A status dot renders a compact indicator without numeric badge content.
+        /// </summary>
+        [Test]
+        public void Badge_Dot_RendersCompactIndicator()
+        {
+            var comp = Context.Render<VekBadge>(parameters => parameters
+                .Add(x => x.Dot, true)
+                .Add(x => x.Content, 4));
+
+            var badge = comp.Find(".vek-badge");
+            badge.ClassList.Should().Contain("vek-badge-dot");
+            badge.TextContent.Should().BeEmpty();
         }
 
         [Test]
