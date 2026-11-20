@@ -4,9 +4,11 @@
 - **Feature ID**: 039
 - **Feature Slug**: textbox-custom-buttons-and-adornments
 - **Module**: TextField
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 39
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/70
+- **Completed At**: 2026-11-20T11:50:31Z
 
 ---
 
