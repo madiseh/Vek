@@ -483,7 +483,8 @@
       "specification": "specifications/040-masked-input-regex-and-literals.md",
       "dependencies": [],
       "started_at": "2026-11-20T22:33:27Z",
-      "completed_at": "2026-11-20T23:28:00Z"
+      "completed_at": "2026-11-20T23:32:19Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/78"
     },
     {
       "id": "041",
