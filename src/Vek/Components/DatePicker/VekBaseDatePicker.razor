@@ -14,7 +14,14 @@
             <VekButton Variant="Variant.Text" Color="Color.Inherit" Class="vek-button-date" OnClick="OnFormattedDateClick">@GetTitleDateString()</VekButton>
         </VekPickerToolbar>
         <VekPickerContent>
-            <div id="@_vekPickerCalendarContentElementId" class="vek-picker-calendar-content @($"vek-picker-calendar-content-{MaxMonthColumns ?? DisplayMonths}")" @onmousedown:preventDefault="true">
+            <div class="@CalendarBodyClassname">
+                @if (PresetsContent != null)
+                {
+                    <div class="vek-picker-presets" role="group" aria-label="@PresetsAriaLabel">
+                        @PresetsContent
+                    </div>
+                }
+                <div id="@_vekPickerCalendarContentElementId" class="vek-picker-calendar-content @($"vek-picker-calendar-content-{MaxMonthColumns ?? DisplayMonths}")" @onmousedown:preventDefault="true">
                 @{
                     int dayId = 0; 
                     var culture = GetCulture();
@@ -159,6 +166,7 @@
                         }
                     </div>
                 }
+                </div>
             </div>
         </VekPickerContent></text>;
 }

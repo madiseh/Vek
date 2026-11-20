@@ -47,4 +47,30 @@
                </InputContent>
            </VekInputControl>;
 
+    protected override RenderFragment? PresetsContent
+    {
+        get
+        {
+            var presets = EffectivePresets;
+            if (presets is null || presets.Count == 0)
+            {
+                return null;
+            }
+
+            return @<text>
+                @foreach (var preset in presets)
+                {
+                    var isSelected = IsPresetActive(preset);
+                    <VekButton Variant="@(isSelected ? Variant.Filled : Variant.Text)"
+                               Color="@(isSelected ? Color : Color.Default)"
+                               Size="Size.Small"
+                               Class="@($"vek-picker-preset-button{(isSelected ? " vek-picker-preset-active" : "")}")"
+                               OnClick="@(async () => await SelectPresetAsync(preset))"
+                               aria-pressed="@(isSelected ? "true" : "false")">
+                        @preset.Label
+                    </VekButton>
+                }
+            </text>;
+        }
+    }
 }

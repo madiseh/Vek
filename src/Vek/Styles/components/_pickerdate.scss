@@ -169,6 +169,59 @@
   justify-content: center;
 }
 
+.vek-picker-calendar-layout {
+  display: contents;
+
+  &.has-presets {
+    display: flex;
+    flex-direction: row;
+
+    @media (max-width: $breakpoint-sm) {
+      flex-direction: column;
+    }
+  }
+}
+
+.vek-picker-presets {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 6px;
+  gap: 2px;
+  min-width: 130px;
+  max-width: 160px;
+  border-inline-end: 1px solid var(--vek-palette-divider);
+  overflow-y: auto;
+  max-height: 330px;
+
+  .vek-picker-preset-button {
+    justify-content: flex-start;
+    text-align: start;
+    font-size: 0.8125rem;
+    padding: 6px 10px;
+    border-radius: var(--vek-default-borderradius);
+    white-space: nowrap;
+    width: 100%;
+
+    &.vek-picker-preset-active {
+      font-weight: 600;
+    }
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-width: none;
+    min-width: 0;
+    max-height: none;
+    border-inline-end: none;
+    border-bottom: 1px solid var(--vek-palette-divider);
+
+    .vek-picker-preset-button {
+      width: auto;
+    }
+  }
+}
+
 .vek-picker-calendar-content {
   display: grid;
   --selected-day: 0;
