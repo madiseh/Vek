@@ -3,6 +3,18 @@
 All notable changes to Vek will be documented in this file.
 For GitHub Releases and downloadable packages, see the [Releases page](https://github.com/madiseh/Vek/releases).
 
+## [v1.3.1] - 2026-11-20
+
+> Vek v1.3.1 reorganizes the repository project structure, centralizes NuGet dependency management, refreshes documentation branding and contributor guidelines, and removes obsolete integrations.
+
+### 🏗️ Architecture & Project Structure
+- Reorganized repository layout into an architecture-aligned root solution, `src/`, and `tests/` structure. ([PR #66](https://github.com/madiseh/Vek/pull/66))
+- Centralized NuGet package version management via root `Directory.Packages.props`. ([PR #67](https://github.com/madiseh/Vek/pull/67))
+
+### 🌐 Documentation & Branding
+- Refreshed documentation branding, rewritten getting started and support guides, and updated contributor guidelines. ([PR #63](https://github.com/madiseh/Vek/pull/63))
+- Removed Carbon Ads integration and ad-block detection. ([PR #65](https://github.com/madiseh/Vek/pull/65))
+
 ## [v1.3.0] - 2026-11-20
 
 > Vek v1.3.0 introduces 17 new component features across input, selection, navigation, display, and layout, along with a modern Bento-style documentation overview redesign.
