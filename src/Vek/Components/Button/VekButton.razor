@@ -3,7 +3,7 @@
 @implements IDisposable
 
 @{
-    OpenRoot(__builder, Classname, IsLoading);
+    OpenRoot(__builder, Classname, IsLoading, ButtonGroup?.GetAriaPressed(this));
     RenderLabel(__builder);
     __builder.CloseElement();
 }

@@ -4,9 +4,12 @@
 - **Feature ID**: 032
 - **Feature Slug**: button-group-selection-modes
 - **Module**: ButtonGroup
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 32
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/68
+- **Started At**: 2026-11-20T10:46:14Z
+- **Completed At**: 2026-11-20T11:32:36Z
 
 ---
 

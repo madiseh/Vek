@@ -187,21 +187,22 @@ namespace Vek
         /// <see cref="HtmlTag"/> is a public parameter with no fixed set of values, so the element is opened by name rather than written as markup.
         /// class and style come before the splat so a class or style supplied through <see cref="VekComponentBase.UserAttributes"/> still wins, which is the precedence the VekElement boundary gave them.
         /// </remarks>
-        private protected void OpenRoot(RenderTreeBuilder builder, string classname, bool busy = false)
+        private protected void OpenRoot(RenderTreeBuilder builder, string classname, bool busy = false, bool? ariaPressed = null)
         {
             builder.OpenElement(0, HtmlTag);
             builder.AddAttribute(1, "class", classname);
             builder.AddAttribute(2, "style", Style);
             builder.AddAttribute(3, "aria-busy", busy ? "true" : null);
-            builder.AddMultipleAttributes(4, UserAttributes!);
-            builder.AddAttribute(5, "onclick", this.AsNonRenderingEventHandler<MouseEventArgs>(OnClickHandler));
-            builder.AddAttribute(6, "type", ButtonType.ToStringFast(true));
-            builder.AddAttribute(7, "href", Href);
-            builder.AddAttribute(8, "target", Target);
-            builder.AddAttribute(9, "rel", GetRel());
-            builder.AddAttribute(10, "disabled", GetDisabledState());
-            builder.AddEventStopPropagationAttribute(11, "onclick", !GetClickPropagation());
-            builder.AddElementReferenceCapture(12, _captureElementReference);
+            builder.AddAttribute(4, "aria-pressed", ariaPressed?.ToString().ToLowerInvariant());
+            builder.AddMultipleAttributes(5, UserAttributes!);
+            builder.AddAttribute(6, "onclick", this.AsNonRenderingEventHandler<MouseEventArgs>(OnClickHandler));
+            builder.AddAttribute(7, "type", ButtonType.ToStringFast(true));
+            builder.AddAttribute(8, "href", Href);
+            builder.AddAttribute(9, "target", Target);
+            builder.AddAttribute(10, "rel", GetRel());
+            builder.AddAttribute(11, "disabled", GetDisabledState());
+            builder.AddEventStopPropagationAttribute(12, "onclick", !GetClickPropagation());
+            builder.AddElementReferenceCapture(13, _captureElementReference);
         }
 
         /// <summary>

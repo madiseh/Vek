@@ -376,9 +376,12 @@
       "title": "ButtonGroup Single and Multiple Selection Toggle Modes",
       "module": "ButtonGroup",
       "priority": 32,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/032-button-group-selection-modes.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-20T10:46:14Z",
+      "completed_at": "2026-11-20T11:32:36Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/68"
     },
     {
       "id": "033",
