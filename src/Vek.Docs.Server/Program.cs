@@ -1,7 +1,6 @@
 ﻿using Vek.Docs.Extensions;
 using Vek.Docs.Models;
 using Vek.Docs.Services;
-using Vek.Docs.Services.Notifications;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseStaticWebAssets();
@@ -44,11 +43,6 @@ app.MapFallbackToPage("/_Host");
 
 using (var scope = app.Services.CreateScope())
 {
-    var notificationService = scope.ServiceProvider.GetService<INotificationService>();
-    if (notificationService is InMemoryNotificationService inMemoryService)
-    {
-        inMemoryService.Preload();
-    }
     // Warm up the documentation
     ApiDocumentation.GetType("VekAlert");
 }

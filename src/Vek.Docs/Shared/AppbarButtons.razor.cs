@@ -5,18 +5,11 @@
 using Microsoft.AspNetCore.Components;
 using Vek.Docs.Enums;
 using Vek.Docs.Services;
-using Vek.Docs.Services.Notifications;
 
 namespace Vek.Docs.Shared;
 
 public partial class AppbarButtons
 {
-    private IDictionary<NotificationMessage, bool> _messages = null;
-    private bool _newNotificationsAvailable;
-
-    [Inject]
-    private INotificationService NotificationService { get; set; } = null!;
-
     [Inject]
     private LayoutService LayoutService { get; set; } = null!;
 
@@ -50,21 +43,4 @@ public partial class AppbarButtons
         _ => Icons.Material.Filled.LightMode
     };
 
-    private async Task MarkNotificationAsReadAsync()
-    {
-        await NotificationService.MarkNotificationsAsRead();
-        _newNotificationsAvailable = false;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            _newNotificationsAvailable = await NotificationService.AreNewNotificationsAvailable();
-            _messages = await NotificationService.GetNotifications();
-            StateHasChanged();
-        }
-
-        await base.OnAfterRenderAsync(firstRender);
-    }
 }
