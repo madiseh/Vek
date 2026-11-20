@@ -665,10 +665,12 @@
       "title": "DatePicker Embedded Inline Calendar Display (Non-Popup Mode)",
       "module": "DatePicker",
       "priority": 55,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/055-datepicker-inline-calendar-mode.md",
       "dependencies": [],
-      "started_at": "2026-11-20T22:08:58Z"
+      "started_at": "2026-11-20T22:08:58Z",
+      "completed_at": "2026-11-20T23:39:01Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/80"
     },
     {
       "id": "056",
