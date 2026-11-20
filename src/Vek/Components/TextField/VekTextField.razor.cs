@@ -19,6 +19,9 @@ namespace Vek
         private readonly ParameterState<double> _inputDelayState;
         private readonly ParameterState<bool> _showPasswordToggleState;
         private readonly ParameterState<bool> _passwordVisibleState;
+        private readonly ParameterState<char?> _promptCharState;
+        private readonly ParameterState<ShowLiterals> _showLiteralsState;
+        private readonly ParameterState<bool> _saveLiteralRepresentationState;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VekTextField{T}"/> class.
@@ -37,6 +40,12 @@ namespace Vek
             _passwordVisibleState = registerScope.RegisterParameter<bool>(nameof(PasswordVisible))
                 .WithParameter(() => PasswordVisible)
                 .WithEventCallback(() => PasswordVisibleChanged);
+            _promptCharState = registerScope.RegisterParameter<char?>(nameof(PromptChar))
+                .WithParameter(() => PromptChar);
+            _showLiteralsState = registerScope.RegisterParameter<ShowLiterals>(nameof(ShowLiterals))
+                .WithParameter(() => ShowLiterals);
+            _saveLiteralRepresentationState = registerScope.RegisterParameter<bool>(nameof(SaveLiteralRepresentation))
+                .WithParameter(() => SaveLiteralRepresentation);
         }
 
         protected override double EffectiveDebounceInterval => _bindValueModeState.Value switch
@@ -230,6 +239,36 @@ namespace Vek
             get => _maskReference?.Mask ?? _mask; // this might look strange, but it is absolutely necessary due to how VekMask works.
             set => _mask = value;
         }
+
+        /// <summary>
+        /// The prompt character displayed for unfilled positions when a mask is applied.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c> (respecting the mask's own placeholder setting).
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public char? PromptChar { get; set; }
+
+        /// <summary>
+        /// Controls when formatting literals and prompt characters are displayed in a masked input.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="ShowLiterals.Always"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public ShowLiterals ShowLiterals { get; set; } = ShowLiterals.Always;
+
+        /// <summary>
+        /// Controls whether the bound <see cref="VekBaseInput{T}.Value"/> includes literal formatting characters or only raw data when a mask is applied.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>. When <c>false</c>, only clean input characters without literals are saved to the value.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool SaveLiteralRepresentation { get; set; } = true;
 
         /// <summary>
         /// Defines the resizing behavior of this input.

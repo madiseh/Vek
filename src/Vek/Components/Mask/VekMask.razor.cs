@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Vek.Services;
+using Vek.State;
 using Vek.Utilities;
 
 namespace Vek
@@ -27,6 +28,30 @@ namespace Vek
         private ElementReference _elementReference;
         private ElementReference _elementReference1;
         private IMask _mask = new PatternMask("** **-** **");
+        private readonly ParameterState<char?> _promptCharState;
+        private readonly ParameterState<ShowLiterals> _showLiteralsState;
+        private readonly ParameterState<bool> _saveLiteralRepresentationState;
+        private readonly ParameterState<string?> _maskPatternState;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VekMask"/> class.
+        /// </summary>
+        public VekMask()
+        {
+            using var registerScope = CreateRegisterScope();
+            _promptCharState = registerScope.RegisterParameter<char?>(nameof(PromptChar))
+                .WithParameter(() => PromptChar)
+                .WithChangeHandler(OnPromptCharChanged);
+            _showLiteralsState = registerScope.RegisterParameter<ShowLiterals>(nameof(ShowLiterals))
+                .WithParameter(() => ShowLiterals)
+                .WithChangeHandler(OnShowLiteralsChanged);
+            _saveLiteralRepresentationState = registerScope.RegisterParameter<bool>(nameof(SaveLiteralRepresentation))
+                .WithParameter(() => SaveLiteralRepresentation)
+                .WithChangeHandler(OnSaveLiteralRepresentationChanged);
+            _maskPatternState = registerScope.RegisterParameter<string?>(nameof(MaskPattern))
+                .WithParameter(() => MaskPattern)
+                .WithChangeHandler(OnMaskPatternChanged);
+        }
 
         internal string ElementId { get; } = Identifier.Create("mask");
 
@@ -148,10 +173,120 @@ namespace Vek
         [Category(CategoryTypes.FormComponent.Appearance)]
         public string ClearIcon { get; set; } = Icons.Material.Filled.Clear;
 
+        /// <summary>
+        /// The prompt character displayed for unfilled positions.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c> (or <c>'_'</c> when using <see cref="MaskPattern"/>).
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public char? PromptChar { get; set; }
+
+        /// <summary>
+        /// Controls when formatting literals and prompt characters are displayed.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="ShowLiterals.Always"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public ShowLiterals ShowLiterals { get; set; } = ShowLiterals.Always;
+
+        /// <summary>
+        /// Controls whether the bound <see cref="VekBaseInput{T}.Value"/> includes literal formatting characters or only raw data.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>. When <c>false</c>, only clean input characters without literals are saved to the value.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool SaveLiteralRepresentation { get; set; } = true;
+
+        /// <summary>
+        /// A string pattern defining the mask rules using standard mask tokens.
+        /// </summary>
+        /// <remarks>
+        /// When set, automatically creates a <see cref="PatternMask"/> configured with standard tokens and <see cref="PromptChar"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public string? MaskPattern { get; set; }
+
+        private void OnPromptCharChanged(ParameterChangedEventArgs<char?> args)
+        {
+            if (_mask is PatternMask patternMask && args.Value.HasValue)
+            {
+                patternMask.PromptChar = args.Value.Value;
+            }
+        }
+
+        private void OnShowLiteralsChanged(ParameterChangedEventArgs<ShowLiterals> args)
+        {
+            if (ReadText != GetDisplayText())
+            {
+                _ = SetTextAndUpdateValueAsync(GetDisplayText(), updateValue: false);
+            }
+        }
+
+        private void OnSaveLiteralRepresentationChanged(ParameterChangedEventArgs<bool> args)
+        {
+            if (!string.IsNullOrEmpty(Mask.Text))
+            {
+                var valueText = Mask.GetValueText(args.Value) ?? string.Empty;
+                _ = SetValueCoreAsync(ConvertGet(valueText));
+            }
+        }
+
+        private void OnMaskPatternChanged(ParameterChangedEventArgs<string?> args)
+        {
+            if (!string.IsNullOrEmpty(args.Value))
+            {
+                SetMask(CreatePatternMask(args.Value, _promptCharState.Value ?? '_'));
+            }
+        }
+
+        protected internal string GetDisplayText()
+        {
+            if (_showLiteralsState.Value == global::Vek.ShowLiterals.Never)
+            {
+                return Mask.GetValueText(saveLiterals: false) ?? Mask.GetCleanText() ?? string.Empty;
+            }
+
+            if (_showLiteralsState.Value == global::Vek.ShowLiterals.WhileEditing)
+            {
+                if (!_isFocused)
+                {
+                    var clean = Mask.GetValueText(saveLiterals: false);
+                    if (string.IsNullOrEmpty(clean))
+                        return string.Empty;
+
+                    return Mask.GetValueText(saveLiterals: true) ?? string.Empty;
+                }
+
+                if (string.IsNullOrEmpty(Mask.Text) && Mask is PatternMask pm && pm.PromptChar is not null)
+                {
+                    return pm.GetPromptMaskText();
+                }
+            }
+
+            return Mask.Text ?? string.Empty;
+        }
+
         protected override async Task OnInitializedAsync()
         {
-            if (ReadText != Mask.Text)
-                await SetTextAndUpdateValueAsync(Mask.Text, updateValue: false);
+            if (!string.IsNullOrEmpty(_maskPatternState.Value))
+            {
+                SetMask(CreatePatternMask(_maskPatternState.Value, _promptCharState.Value ?? '_'));
+            }
+            else if (_mask is PatternMask patternMask && _promptCharState.Value.HasValue)
+            {
+                patternMask.PromptChar = _promptCharState.Value.Value;
+            }
+
+            var displayText = GetDisplayText();
+            if (ReadText != displayText)
+                await SetTextAndUpdateValueAsync(displayText, updateValue: false);
             await base.OnInitializedAsync();
             UpdateClearable();
         }
@@ -159,6 +294,14 @@ namespace Vek
         protected override void OnParametersSet()
         {
             base.OnParametersSet();
+            if (!string.IsNullOrEmpty(_maskPatternState.Value) && (_mask is not PatternMask pm || pm.Mask != _maskPatternState.Value))
+            {
+                SetMask(CreatePatternMask(_maskPatternState.Value, _promptCharState.Value ?? '_'));
+            }
+            else if (_mask is PatternMask patternMask && _promptCharState.Value.HasValue && patternMask.PromptChar != _promptCharState.Value.Value)
+            {
+                patternMask.PromptChar = _promptCharState.Value.Value;
+            }
             UpdateClearable();
         }
 
@@ -301,10 +444,14 @@ namespace Vek
             _updating = true;
             try
             {
-                await base.SetTextAndUpdateValueAsync(text, updateValue: false);
+                var displayText = GetDisplayText();
+                await base.SetTextAndUpdateValueAsync(displayText, updateValue: false);
                 if (Clearable || ClearButtonDisplayMode is not null)
                     UpdateClearable();
-                var v = ConvertGet(cleanText);
+                var textToSave = _saveLiteralRepresentationState.Value
+                    ? cleanText
+                    : (Mask.GetValueText(false) ?? cleanText);
+                var v = ConvertGet(textToSave);
                 await SetValueCoreAsync(v);
                 await ValueChanged.InvokeAsync(v);
                 await SetCaretPositionAsync(caret, selection);
@@ -330,12 +477,14 @@ namespace Vek
                 return;
             var text = ConvertSet(ReadValue);
             var cleanText = Mask.GetCleanText();
-            if (!IsSameText(cleanText, text))
+            var valueText = Mask.GetValueText(false);
+            if (!IsSameText(cleanText, text) && !IsSameText(valueText, text))
                 Mask.SetText(text);
 
             // Refresh whenever the displayed text disagrees with the mask, not only when the mask itself just changed.
             // VekTextField shares this mask instance and applies the incoming value to it first, so a value cleared from code left the mask empty while our own text, and with it the rendered input, stayed on the old value (#12822).
-            if (!IsSameText(ReadText, Mask.Text))
+            var displayText = GetDisplayText();
+            if (!IsSameText(ReadText, displayText))
                 await UpdateAsync();
 
             static bool IsSameText(string? first, string? second)
@@ -432,15 +581,33 @@ namespace Vek
             Mask.Selection = _selection = (start, end);
         }
 
-        internal void OnFocused(FocusEventArgs obj)
+        internal async Task OnFocused(FocusEventArgs obj)
         {
             _isFocused = true;
+            if (_showLiteralsState.Value == ShowLiterals.WhileEditing)
+            {
+                var displayText = GetDisplayText();
+                if (ReadText != displayText)
+                {
+                    await base.SetTextAndUpdateValueAsync(displayText, updateValue: false);
+                    StateHasChanged();
+                }
+            }
         }
 
         protected internal override async Task OnBlurredAsync(FocusEventArgs obj)
         {
             await base.OnBlurredAsync(obj);
             _isFocused = false;
+            if (_showLiteralsState.Value == ShowLiterals.WhileEditing)
+            {
+                var displayText = GetDisplayText();
+                if (ReadText != displayText)
+                {
+                    await base.SetTextAndUpdateValueAsync(displayText, updateValue: false);
+                    StateHasChanged();
+                }
+            }
         }
 
         private async Task SetCaretPositionAsync(int caret, (int, int)? selection = null)
@@ -498,6 +665,10 @@ namespace Vek
             // swap masks while retaining text
             // note: this is required for `BaseMask` instances other than `PatternMask` to work as expected
             other.SetText(ReadText);
+            if (other is PatternMask patternMask && _promptCharState.Value.HasValue)
+            {
+                patternMask.PromptChar = _promptCharState.Value.Value;
+            }
             _mask = other;
         }
 

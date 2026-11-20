@@ -4,9 +4,11 @@
 - **Feature ID**: 040
 - **Feature Slug**: masked-input-regex-and-literals
 - **Module**: Mask
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 40
 - **Dependencies**: []
+- **Started At**: 2026-11-20T22:33:27Z
+- **Completed At**: 2026-11-20T23:28:00Z
 
 ---
 
