@@ -3,11 +3,11 @@ using Bunit;
 using Bunit.TestDoubles;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using Vek.Docs.Pages.Api;
 using Vek.Docs.Services;
 using Vek.Services;
 using Vek.UnitTests.Mocks;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Docs.Generated
 {
