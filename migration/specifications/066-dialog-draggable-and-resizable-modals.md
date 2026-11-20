@@ -4,9 +4,12 @@
 - **Feature ID**: 066
 - **Feature Slug**: dialog-draggable-and-resizable-modals
 - **Module**: Dialog
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 66
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/69
+- **Started At**: 2026-11-20T10:46:35Z
+- **Completed At**: 2026-11-20T11:35:01Z
 
 ---
 

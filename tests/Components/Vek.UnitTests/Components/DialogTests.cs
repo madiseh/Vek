@@ -1361,6 +1361,32 @@ namespace Vek.UnitTests.Components
             comp.Find("div.vek-dialog-content").GetAttribute("class").Should().Be(expectedClassname);
         }
 
+        /// <summary>
+        /// Enables the accessible movement and resize controls when requested.
+        /// </summary>
+        [Test]
+        public async Task DraggableAndResizableOptionsRenderAccessibleInteractionHandles()
+        {
+            var comp = Context.Render<VekDialogProvider>();
+            var service = Context.Services.GetRequiredService<IDialogService>();
+            var options = new DialogOptions { Draggable = true, Resizable = true };
+
+            await comp.InvokeAsync(() => service.ShowAsync<DialogOkCancel>("Adjustable dialog", options));
+
+            var dialog = comp.Find("[role='dialog']");
+            dialog.ClassList.Should().Contain("vek-dialog-draggable");
+            dialog.ClassList.Should().Contain("vek-dialog-resizable");
+
+            var header = comp.Find(".vek-dialog-title");
+            header.GetAttribute("role").Should().Be("group");
+            header.GetAttribute("tabindex").Should().Be("0");
+            header.GetAttribute("aria-label").Should().Be("Move dialog with arrow keys");
+
+            var handles = comp.FindAll(".vek-dialog-resize-handle");
+            handles.Count.Should().Be(8);
+            handles.Select(handle => handle.GetAttribute("aria-label")).Should().OnlyContain(label => !string.IsNullOrWhiteSpace(label));
+        }
+
         [TestCase("", "vek-dialog-actions")]
         [TestCase("my-class", "vek-dialog-actions my-class")]
         public async Task DialogWithActionsClassValueShouldRenderExpectedClassname(string actionsClass, string expectedClassname)

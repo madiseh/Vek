@@ -13,6 +13,8 @@ const expectedWindowGlobals: [name: string, type: "object" | "function"][] = [
     ["vekDragAndDrop", "object"],
     // vekDataGrid.ts
     ["vekDataGrid", "object"],
+    // vekDialogInteraction.ts
+    ["vekDialogInteraction", "object"],
     // vekElementReference.ts
     ["vekElementRef", "object"],
     // vekExitPrompt.ts

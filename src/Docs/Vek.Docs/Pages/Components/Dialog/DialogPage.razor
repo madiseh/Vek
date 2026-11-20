@@ -69,6 +69,17 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Move and Resize">
+                <Description>
+                    Enable <CodeInline>Draggable</CodeInline> to move a dialog by its header. Focus the header and use the arrow keys for precise movement. Enable <CodeInline>Resizable</CodeInline> to add eight edge and corner handles; the handles also work with the arrow keys. Movement and resizing stay within the viewport.
+                </Description>
+            </SectionHeader>
+            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogInteractionExample)), new CodeFile("Dialog.razor", nameof(DialogInteractionExample_Dialog))})">
+                <DialogInteractionExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Templating and Passing Simple Data">
                 <Description>Build a reusable dialog and pass simple data to it for different scenarios.</Description>
             </SectionHeader>

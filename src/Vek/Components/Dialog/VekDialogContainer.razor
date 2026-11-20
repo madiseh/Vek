@@ -8,10 +8,10 @@
 
 <div @attributes="UserAttributes" id="@ElementId" class="vek-dialog-container @GetPosition()">
     <VekOverlay Visible="true" OnClick="HandleBackgroundClickAsync" Class="@BackgroundClassname" DarkBackground="true" @onmouseup="OnMouseUpAsync" />
-    <div @ref="_dialogContainerReference" id="_@Id.ToString("N")" role="dialog" aria-modal="true" aria-labelledby="@GetAriaLabelledBy()" aria-label="@GetAriaLabel()" class="@Classname" style="@Style" tabindex="-1">
+    <div @ref="_dialogContainerReference" id="_@Id.ToString("N")" role="dialog" aria-modal="true" aria-labelledby="@GetAriaLabelledBy()" aria-label="@GetAriaLabel()" class="@Classname" style="@DialogStyle" tabindex="-1">
         @if (!GetHideHeader())
         {
-            <div id="@($"_{Id:N}_title")" class="@TitleClassname">
+            <div id="@($"_{Id:N}_title")" class="@TitleClassname" role="@(GetDraggable() ? "group" : null)" tabindex="@(GetDraggable() ? "0" : null)" aria-label="@(GetDraggable() ? "Move dialog with arrow keys" : null)" data-vek-dialog-drag-handle="@(GetDraggable() ? "true" : null)">
                 @if (TitleContent is null)
                 {
                     <VekText Typo="Typo.h6">@_titleState.Value</VekText>
@@ -29,5 +29,16 @@
         <CascadingValue Value="(IVekDialogInstanceInternal)this" IsFixed="true">
             @Content
         </CascadingValue>
+        @if (GetResizable())
+        {
+            <button type="button" class="vek-dialog-resize-handle vek-dialog-resize-n" aria-label="Resize dialog from top edge" data-vek-dialog-resize="n"></button>
+            <button type="button" class="vek-dialog-resize-handle vek-dialog-resize-ne" aria-label="Resize dialog from top right corner" data-vek-dialog-resize="ne"></button>
+            <button type="button" class="vek-dialog-resize-handle vek-dialog-resize-e" aria-label="Resize dialog from right edge" data-vek-dialog-resize="e"></button>
+            <button type="button" class="vek-dialog-resize-handle vek-dialog-resize-se" aria-label="Resize dialog from bottom right corner" data-vek-dialog-resize="se"></button>
+            <button type="button" class="vek-dialog-resize-handle vek-dialog-resize-s" aria-label="Resize dialog from bottom edge" data-vek-dialog-resize="s"></button>
+            <button type="button" class="vek-dialog-resize-handle vek-dialog-resize-sw" aria-label="Resize dialog from bottom left corner" data-vek-dialog-resize="sw"></button>
+            <button type="button" class="vek-dialog-resize-handle vek-dialog-resize-w" aria-label="Resize dialog from left edge" data-vek-dialog-resize="w"></button>
+            <button type="button" class="vek-dialog-resize-handle vek-dialog-resize-nw" aria-label="Resize dialog from top left corner" data-vek-dialog-resize="nw"></button>
+        }
     </div>
 </div>

@@ -2,6 +2,7 @@
 import "./vekAAAlicense";
 
 import VekDataGrid from "./vekDataGrid";
+import VekDialogInteraction from "./vekDialogInteraction";
 import VekDragAndDrop from "./vekDragAndDrop";
 import VekElementReference from "./vekElementReference";
 import VekExitPrompt from "./vekExitPrompt";
@@ -40,6 +41,7 @@ declare global {
         hasDefinedParentHeight: typeof hasDefinedParentHeight;
         vekDragAndDrop: VekDragAndDrop;
         vekDataGrid: typeof VekDataGrid;
+        vekDialogInteraction: VekDialogInteraction;
         vekElementRef: VekElementReference;
         vekExitPrompt: VekExitPrompt;
         vekFileUpload: VekFileUpload;
@@ -80,6 +82,7 @@ window.getTabbableElements = getTabbableElements;
 window.hasDefinedParentHeight = hasDefinedParentHeight;
 window.vekDragAndDrop = new VekDragAndDrop();
 window.vekDataGrid = VekDataGrid;
+window.vekDialogInteraction = new VekDialogInteraction();
 window.vekElementRef = new VekElementReference();
 // Guard against a second copy of the script replacing the instance that owns the registered prompts.
 if (!window.vekExitPrompt) {

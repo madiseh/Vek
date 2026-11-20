@@ -93,6 +93,22 @@ namespace Vek
         public bool? FullWidth { get; init; }
 
         /// <summary>
+        /// Allows the dialog to be moved by dragging its header.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        public bool? Draggable { get; init; }
+
+        /// <summary>
+        /// Adds resize handles to the dialog edges and corners.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        public bool? Resizable { get; init; }
+
+        /// <summary>
         /// The custom CSS classes to apply to the dialog background.
         /// </summary>
         /// <remarks>

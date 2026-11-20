@@ -3,6 +3,7 @@
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using Vek.Services;
 using Vek.State;
 using Vek.Utilities;
@@ -26,6 +27,10 @@ namespace Vek
         private bool _disposed;
         private VekDialog? _dialog;
         private ElementReference _dialogContainerReference;
+        private DotNetObjectReference<DialogInteractionCallbacks>? _dialogInteractionReference;
+        private DialogBounds? _dialogBounds;
+        private bool? _lastDraggable;
+        private bool? _lastResizable;
         private readonly ParameterState<DialogOptions> _dialogOptionsState;
         private readonly ParameterState<string?> _titleState;
 
@@ -42,6 +47,9 @@ namespace Vek
 
         [Inject]
         private IKeyInterceptorService KeyInterceptorService { get; set; } = null!;
+
+        [Inject]
+        private IJSRuntime JsRuntime { get; set; } = null!;
 
         /// <summary>
         /// Displays this dialog right-to-left.
@@ -118,8 +126,31 @@ namespace Vek
                 .AddClass("vek-dialog-width-full", GetFullWidth() && !GetFullScreen())
                 .AddClass("vek-dialog-fullscreen", GetFullScreen())
                 .AddClass("vek-dialog-rtl", RightToLeft)
+                .AddClass("vek-dialog-draggable", GetDraggable())
+                .AddClass("vek-dialog-resizable", GetResizable())
                 .AddClass(_dialog?.Class)
                 .Build();
+
+        protected string DialogStyle
+        {
+            get
+            {
+                var builder = StyleBuilder.Default(Style);
+                if (_dialogBounds is { } bounds)
+                {
+                    builder
+                        .AddStyle("position:absolute")
+                        .AddStyle(FormattableString.Invariant($"left:{bounds.Left}px"))
+                        .AddStyle(FormattableString.Invariant($"top:{bounds.Top}px"))
+                        .AddStyle(FormattableString.Invariant($"width:{bounds.Width}px"))
+                        .AddStyle(FormattableString.Invariant($"height:{bounds.Height}px"))
+                        .AddStyle("transform:none")
+                        .AddStyle("margin:0");
+                }
+
+                return builder.Build();
+            }
+        }
 
         protected string BackgroundClassname =>
             new CssBuilder("vek-overlay-dialog")
@@ -130,6 +161,24 @@ namespace Vek
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+            var draggable = GetDraggable();
+            var resizable = GetResizable();
+            if ((firstRender || draggable != _lastDraggable || resizable != _lastResizable) && IsJSRuntimeAvailable)
+            {
+                _lastDraggable = draggable;
+                _lastResizable = resizable;
+
+                if (draggable || resizable)
+                {
+                    _dialogInteractionReference ??= DotNetObjectReference.Create(new DialogInteractionCallbacks(this));
+                    await JsRuntime.InvokeVoidAsync("vekDialogInteraction.initialize", _dialogContainerReference, _dialogInteractionReference, draggable, resizable, _dialogBounds);
+                }
+                else if (!firstRender)
+                {
+                    await JsRuntime.InvokeVoidAsync("vekDialogInteraction.destroy", _dialogContainerReference);
+                }
+            }
+
             if (firstRender)
             {
                 var options = new KeyInterceptorOptions(
@@ -331,6 +380,10 @@ namespace Vek
 
         private bool GetFullScreen() => GetDialogOptionsOrDefault.FullScreen ?? GlobalDialogOptions.FullScreen ?? false;
 
+        private bool GetDraggable() => GetDialogOptionsOrDefault.Draggable ?? GlobalDialogOptions.Draggable ?? false;
+
+        private bool GetResizable() => GetDialogOptionsOrDefault.Resizable ?? GlobalDialogOptions.Resizable ?? false;
+
         private string? GetBackgroundClass() => GetDialogOptionsOrDefault.BackgroundClass ?? GlobalDialogOptions.BackgroundClass;
 
         private DialogOptions GetDialogOptionsOrDefault => _dialogOptionsState.Value ?? DialogOptions.Default;
@@ -346,6 +399,29 @@ namespace Vek
             if (IsJSRuntimeAvailable)
             {
                 await KeyInterceptorService.UnsubscribeAsync(ElementId);
+                if (_dialogInteractionReference is not null)
+                {
+                    await JsRuntime.InvokeVoidAsync("vekDialogInteraction.destroy", _dialogContainerReference);
+                }
+            }
+
+            _dialogInteractionReference?.Dispose();
+        }
+
+        private Task SetDialogBoundsAsync(double left, double top, double width, double height)
+        {
+            _dialogBounds = new DialogBounds(left, top, width, height);
+            return InvokeAsync(StateHasChanged);
+        }
+
+        private sealed record DialogBounds(double Left, double Top, double Width, double Height);
+
+        private sealed class DialogInteractionCallbacks(VekDialogContainer dialog)
+        {
+            [JSInvokable]
+            public Task SetDialogBoundsAsync(double left, double top, double width, double height)
+            {
+                return dialog.SetDialogBoundsAsync(left, top, width, height);
             }
         }
 
