@@ -172,6 +172,109 @@ namespace Vek.UnitTests.Components
         /// <summary>
         /// If Debounce Interval is null or 0, Value should change immediately
         /// </summary>
+        /// <summary>
+        /// An input binding mode commits each input event immediately.
+        /// </summary>
+        [Test]
+        public async Task OnInputMode_UpdatesBoundValueImmediately()
+        {
+            var comp = Context.Render<VekTextField<string>>(parameters => parameters
+                .Add(field => field.BindValueMode, BindValueMode.OnInput));
+
+            await comp.Find("input").InputAsync(new ChangeEventArgs { Value = "instant" });
+
+            comp.Instance.ReadText.Should().Be("instant");
+            comp.Instance.ReadValue.Should().Be("instant");
+        }
+
+        /// <summary>
+        /// An on-change binding mode commits pending text on Enter or blur.
+        /// </summary>
+        [Test]
+        public async Task OnChangeMode_CommitsOnEnterAndBlur()
+        {
+            var comp = Context.Render<VekTextField<string>>(parameters => parameters
+                .Add(field => field.BindValueMode, BindValueMode.OnChange));
+            var input = comp.Find("input");
+
+            await input.InputAsync(new ChangeEventArgs { Value = "saved with Enter" });
+            comp.Instance.ReadText.Should().Be("saved with Enter");
+            comp.Instance.ReadValue.Should().BeNull();
+
+            await input.KeyDownAsync(new KeyboardEventArgs { Key = "Enter" });
+            comp.Instance.ReadValue.Should().Be("saved with Enter");
+
+            await input.InputAsync(new ChangeEventArgs { Value = "saved with blur" });
+            comp.Instance.ReadValue.Should().Be("saved with Enter");
+            await input.BlurAsync();
+
+            await comp.WaitForAssertionAsync(() => comp.Instance.ReadValue.Should().Be("saved with blur"));
+        }
+
+        /// <summary>
+        /// A delayed input mode uses its default 300 millisecond commit delay.
+        /// </summary>
+        [Test, NonParallelizable]
+        public async Task OnDelayedInputMode_UsesDefaultDelay()
+        {
+            var timeProvider = Context.AddFakeTimeProvider();
+            var comp = Context.Render<VekTextField<string>>(parameters => parameters
+                .Add(field => field.BindValueMode, BindValueMode.OnDelayedInput));
+            var timers = timeProvider.TimersCreated;
+
+            await comp.Find("input").InputAsync(new ChangeEventArgs { Value = "delayed" });
+            await timeProvider.WaitForTimerAsync(timers);
+
+            comp.Instance.ReadText.Should().Be("delayed");
+            comp.Instance.ReadValue.Should().BeNull();
+            timeProvider.Advance(TimeSpan.FromMilliseconds(299));
+            comp.Instance.ReadValue.Should().BeNull();
+            timeProvider.Advance(TimeSpan.FromMilliseconds(1));
+
+            await comp.WaitForAssertionAsync(() => comp.Instance.ReadValue.Should().Be("delayed"));
+        }
+
+        /// <summary>
+        /// A delayed input mode uses the caller-provided commit delay.
+        /// </summary>
+        [Test, NonParallelizable]
+        public async Task OnDelayedInputMode_UsesConfiguredDelay()
+        {
+            var timeProvider = Context.AddFakeTimeProvider();
+            var comp = Context.Render<VekTextField<string>>(parameters => parameters
+                .Add(field => field.BindValueMode, BindValueMode.OnDelayedInput)
+                .Add(field => field.InputDelay, 80));
+            var timers = timeProvider.TimersCreated;
+
+            await comp.Find("input").InputAsync(new ChangeEventArgs { Value = "custom delay" });
+            await timeProvider.WaitForTimerAsync(timers);
+
+            timeProvider.Advance(TimeSpan.FromMilliseconds(79));
+            comp.Instance.ReadValue.Should().BeNull();
+            timeProvider.Advance(TimeSpan.FromMilliseconds(1));
+
+            await comp.WaitForAssertionAsync(() => comp.Instance.ReadValue.Should().Be("custom delay"));
+        }
+
+        /// <summary>
+        /// A delayed input mode commits pending text immediately when the field blurs.
+        /// </summary>
+        [Test, NonParallelizable]
+        public async Task OnDelayedInputMode_CommitsPendingTextOnBlur()
+        {
+            Context.AddFakeTimeProvider();
+            var comp = Context.Render<VekTextField<string>>(parameters => parameters
+                .Add(field => field.BindValueMode, BindValueMode.OnDelayedInput));
+            var input = comp.Find("input");
+
+            await input.InputAsync(new ChangeEventArgs { Value = "commit before delay" });
+            comp.Instance.ReadValue.Should().BeNull();
+
+            await input.BlurAsync();
+
+            await comp.WaitForAssertionAsync(() => comp.Instance.ReadValue.Should().Be("commit before delay"));
+        }
+
         [Test]
         public async Task WithNoDebounceIntervalValueShouldChangeImmediately()
         {

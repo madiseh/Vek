@@ -144,11 +144,13 @@
         <DocsPageSection>
             <SectionHeader Title="Update Timing">
                 <Description>
-                    By default, text fields update on Enter or <VekLink href="https://developer.mozilla.org/en-US/docs/Web/API/Element/blur_event">blur</VekLink> using the OnChange event. 
-                    To get input events instantly, set <VekLink href="https://www.vek.com/api/vektextfield#properties">Immediate</VekLink> to true and component will use OnInput events.
-                    To wait for a user to stop typing and then receive input events, set the <VekLink href="https://www.vek.com/api/vektextfield#properties">Debounce Interval</VekLink> to a non-zero value.
+                      Set <CodeInline>BindValueMode</CodeInline> to <CodeInline>OnInput</CodeInline> to update the bound value on each keystroke, <CodeInline>OnChange</CodeInline> to commit on Enter or blur, or <CodeInline>OnDelayedInput</CodeInline> to commit after typing pauses.
+                      Use <CodeInline>InputDelay</CodeInline> to configure the delayed mode; it defaults to 300 milliseconds. Existing <CodeInline>Immediate</CodeInline> and <CodeInline>DebounceInterval</CodeInline> settings remain supported when <CodeInline>BindValueMode</CodeInline> is omitted.
                 </Description>
             </SectionHeader>
+              <SectionContent Code="@nameof(TextFieldBindingModeExample)">
+                  <TextFieldBindingModeExample />
+              </SectionContent>
             <SectionContent Code="@nameof(DebouncedTextFieldExample)" ShowCode="false">
                 <DebouncedTextFieldExample/>
             </SectionContent>

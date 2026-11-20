@@ -15,6 +15,8 @@ namespace Vek
     {
         private IMask? _mask;
         private VekMask? _maskReference;
+        private readonly ParameterState<global::Vek.BindValueMode?> _bindValueModeState;
+        private readonly ParameterState<double> _inputDelayState;
         private readonly ParameterState<bool> _showPasswordToggleState;
         private readonly ParameterState<bool> _passwordVisibleState;
 
@@ -24,12 +26,33 @@ namespace Vek
         public VekTextField()
         {
             using var registerScope = CreateRegisterScope();
+            _bindValueModeState = registerScope.RegisterParameter<global::Vek.BindValueMode?>(nameof(BindValueMode))
+                .WithParameter(() => BindValueMode)
+                .WithChangeHandler(OnBindValueModeChangedAsync);
+            _inputDelayState = registerScope.RegisterParameter<double>(nameof(InputDelay))
+                .WithParameter(() => InputDelay)
+                .WithChangeHandler(OnInputDelayChangedAsync);
             _showPasswordToggleState = registerScope.RegisterParameter<bool>(nameof(ShowPasswordToggle))
                 .WithParameter(() => ShowPasswordToggle);
             _passwordVisibleState = registerScope.RegisterParameter<bool>(nameof(PasswordVisible))
                 .WithParameter(() => PasswordVisible)
                 .WithEventCallback(() => PasswordVisibleChanged);
         }
+
+        protected override double EffectiveDebounceInterval => _bindValueModeState.Value switch
+        {
+            null => base.EffectiveDebounceInterval,
+            global::Vek.BindValueMode.OnDelayedInput => Math.Max(0, _inputDelayState.Value),
+            _ => 0
+        };
+
+        protected internal override bool EffectiveImmediate => _bindValueModeState.Value is null
+            ? base.EffectiveImmediate
+            : _bindValueModeState.Value switch
+            {
+                global::Vek.BindValueMode.OnInput or global::Vek.BindValueMode.OnChange or global::Vek.BindValueMode.OnDelayedInput => true,
+                _ => false
+            };
 
         protected string Classname =>
             new CssBuilder("vek-input-input-control")
@@ -54,6 +77,26 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.FormComponent.Behavior)]
         public InputType InputType { get; set; } = InputType.Text;
+
+        /// <summary>
+        /// Controls when user-entered text updates the bound value.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>, which preserves the legacy <see cref="VekBaseInput{T}.Immediate"/> and <see cref="VekDebouncedInput{T}.DebounceInterval"/> behavior.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public global::Vek.BindValueMode? BindValueMode { get; set; }
+
+        /// <summary>
+        /// The delay before an <see cref="global::Vek.BindValueMode.OnDelayedInput"/> value is committed.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to 300 milliseconds. Non-positive values commit immediately.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public double InputDelay { get; set; } = 300;
 
         /// <summary>
         /// Shows a button to clear this input's value.
@@ -488,6 +531,12 @@ namespace Vek
 
         private async Task OnInnerValueChangedAsync(string? text)
         {
+            if (_bindValueModeState.Value == global::Vek.BindValueMode.OnChange)
+            {
+                await SetTextAndUpdateValueAsync(text, updateValue: false);
+                return;
+            }
+
             var valueBefore = ReadValue;
             await SetTextAndUpdateValueAsync(text);
 
@@ -497,8 +546,8 @@ namespace Vek
             // that value-unchanged case, resync the displayed text to the value's formatted representation.
             // Gated to committed changes (not live oninput typing, not while debouncing) so we never
             // reformat mid-keystroke and jump the caret, matching VekNumericField.
-            if (!Immediate && DebounceInterval <= 0 && !ConversionError && !HasMask
-                && EqualityComparer<T?>.Default.Equals(valueBefore, ReadValue))
+            if (_bindValueModeState.Value is null && !Immediate && DebounceInterval <= 0 && !ConversionError && !HasMask
+              && EqualityComparer<T?>.Default.Equals(valueBefore, ReadValue))
             {
                 var formatted = ConvertSet(ReadValue);
                 if (!string.Equals(ReadText, formatted, StringComparison.Ordinal))
@@ -512,6 +561,11 @@ namespace Vek
         /// <inheritdoc />
         protected internal override async Task OnBlurredAsync(FocusEventArgs obj)
         {
+            if (_bindValueModeState.Value is not null)
+            {
+                await CommitTextValueAsync();
+            }
+
             await base.OnBlurredAsync(obj);
 
             // Apply the format/converter to the displayed text on blur. While the user edits an Immediate
@@ -525,7 +579,42 @@ namespace Vek
             }
         }
 
-        private Task OnMaskedValueChangedAsync(string s) => SetTextAndUpdateValueAsync(s);
+        private Task OnMaskedValueChangedAsync(string s) =>
+            SetTextAndUpdateValueAsync(s, updateValue: _bindValueModeState.Value != global::Vek.BindValueMode.OnChange);
+
+        protected override async Task InvokeKeyDownAsync(KeyboardEventArgs obj)
+        {
+            if (obj.Key == "Enter" && _bindValueModeState.Value is not null)
+            {
+                await CommitTextValueAsync();
+            }
+
+            await base.InvokeKeyDownAsync(obj);
+        }
+
+        private async Task OnBindValueModeChangedAsync(ParameterChangedEventArgs<global::Vek.BindValueMode?> args)
+        {
+            if (args.LastValue == global::Vek.BindValueMode.OnDelayedInput)
+            {
+                await CommitTextValueAsync();
+            }
+
+            await UpdateDebouncerIntervalAsync(EffectiveDebounceInterval);
+            if (args.Value == global::Vek.BindValueMode.OnDelayedInput && args.LastValue == global::Vek.BindValueMode.OnChange)
+            {
+                await base.UpdateValuePropertyAsync(updateText: false);
+            }
+        }
+
+        private async Task OnInputDelayChangedAsync(ParameterChangedEventArgs<double> args)
+        {
+            if (_bindValueModeState.Value == global::Vek.BindValueMode.OnDelayedInput && args.Value <= 0)
+            {
+                await CommitTextValueAsync();
+            }
+
+            await UpdateDebouncerIntervalAsync(EffectiveDebounceInterval);
+        }
 
         private string GetCounterText() => Counter switch
         {
