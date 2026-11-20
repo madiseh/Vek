@@ -412,9 +412,10 @@
       "title": "Button Floating Badge, Status Dot, and Counter Adornment",
       "module": "Button",
       "priority": 35,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/035-button-badge-and-counter-adornment.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-20T11:25:25Z"
     },
     {
       "id": "036",

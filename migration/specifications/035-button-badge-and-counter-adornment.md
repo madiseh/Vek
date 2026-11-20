@@ -4,9 +4,10 @@
 - **Feature ID**: 035
 - **Feature Slug**: button-badge-and-counter-adornment
 - **Module**: Button
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 35
 - **Dependencies**: []
+- **Started At**: 2026-11-20T11:25:25Z
 
 ---
 

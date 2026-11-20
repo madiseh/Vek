@@ -5,10 +5,26 @@
 @{
     OpenRoot(__builder, Classname, IsLoading);
     RenderLabel(__builder);
+    RenderBadge(__builder);
     __builder.CloseElement();
 }
 
 @code {
+    private void RenderBadge(RenderTreeBuilder __builder)
+    {
+        @if (HasBadge)
+        {
+            <span class="@BadgeWrapperClassname">
+                <span role="status" aria-live="polite" aria-label="@GetBadgeAriaLabel" class="@BadgeClassname">
+                    @if (!IsBadgeDot)
+                    {
+                        @BadgeFormattedContent
+                    }
+                </span>
+            </span>
+        }
+    }
+
     private void RenderLabel(RenderTreeBuilder __builder)
     {
         <span class="vek-button-label">
