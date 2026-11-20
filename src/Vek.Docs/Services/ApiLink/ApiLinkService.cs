@@ -149,13 +149,6 @@ namespace Vek.Docs.Services
 
                 new ApiLinkServiceEntry
                 {
-                    Title = "Releases",
-                    Link = "about/project/releases",
-                    SubTitle = "Learn More"
-                },
-
-                new ApiLinkServiceEntry
-                {
                     Title = "Roadmap",
                     Link = "about/project/roadmap",
                     SubTitle = "Learn More"

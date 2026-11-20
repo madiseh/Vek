@@ -7,7 +7,6 @@ using System.Text.Json.Serialization;
 namespace Vek.Docs.Models.Context
 {
     [JsonSerializable(typeof(GithubContributors[]))]
-    [JsonSerializable(typeof(GitHubReleases[]))]
     [JsonSerializable(typeof(GitHubRepository))]
     public sealed partial class GithubApiJsonSerializerContext : JsonSerializerContext
     {
