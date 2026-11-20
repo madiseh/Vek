@@ -9,6 +9,10 @@ exports[`window API surface is unchanged 1`] = `
   "vekDataGrid": {
     "getColumnContentWidths": "function(1)",
   },
+  "vekDialogInteraction": {
+    "destroy": "function(1)",
+    "initialize": "function(5)",
+  },
   "vekDragAndDrop": {
     "getDropIndexOnPosition": "function(3)",
     "getDropZoneIdentifierOnPosition": "function(2)",

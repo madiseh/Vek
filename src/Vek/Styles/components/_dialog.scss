@@ -105,6 +105,108 @@
     }
   }
 
+  &.vek-dialog-draggable .vek-dialog-title {
+    cursor: move;
+    touch-action: none;
+  }
+
+  &.vek-dialog-draggable .vek-dialog-title .vek-button-close {
+    cursor: pointer;
+    touch-action: auto;
+  }
+
+  & .vek-dialog-resize-handle {
+    position: absolute;
+    z-index: 3;
+    display: block;
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+
+    &:hover {
+      background-color: var(--vek-palette-divider);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--vek-palette-primary-main);
+      outline-offset: 1px;
+    }
+  }
+
+  & .vek-dialog-resize-n,
+  & .vek-dialog-resize-s {
+    right: 12px;
+    left: 12px;
+    height: 8px;
+    cursor: ns-resize;
+  }
+
+  & .vek-dialog-resize-n {
+    top: 0;
+  }
+
+  & .vek-dialog-resize-s {
+    bottom: 0;
+  }
+
+  & .vek-dialog-resize-e,
+  & .vek-dialog-resize-w {
+    top: 12px;
+    bottom: 12px;
+    width: 8px;
+    cursor: ew-resize;
+  }
+
+  & .vek-dialog-resize-e {
+    right: 0;
+  }
+
+  & .vek-dialog-resize-w {
+    left: 0;
+  }
+
+  & .vek-dialog-resize-ne,
+  & .vek-dialog-resize-sw {
+    cursor: nesw-resize;
+  }
+
+  & .vek-dialog-resize-nw,
+  & .vek-dialog-resize-se {
+    cursor: nwse-resize;
+  }
+
+  & .vek-dialog-resize-ne,
+  & .vek-dialog-resize-nw,
+  & .vek-dialog-resize-se,
+  & .vek-dialog-resize-sw {
+    width: 16px;
+    height: 16px;
+  }
+
+  & .vek-dialog-resize-ne {
+    top: 0;
+    right: 0;
+  }
+
+  & .vek-dialog-resize-nw {
+    top: 0;
+    left: 0;
+  }
+
+  & .vek-dialog-resize-se {
+    right: 0;
+    bottom: 0;
+  }
+
+  & .vek-dialog-resize-sw {
+    bottom: 0;
+    left: 0;
+  }
+
   & .vek-dialog-content {
     position: relative;
     flex: 1 1 auto;

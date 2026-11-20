@@ -4,9 +4,10 @@
 - **Feature ID**: 066
 - **Feature Slug**: dialog-draggable-and-resizable-modals
 - **Module**: Dialog
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 66
 - **Dependencies**: []
+- **Started At**: 2026-11-20T10:46:35Z
 
 ---
 

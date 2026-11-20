@@ -1,0 +1,17 @@
+@namespace Vek.Docs.Examples
+
+@inject IDialogService Dialog
+
+<VekButton OnClick="OpenDialogAsync" Color="Color.Primary">Open movable and resizable dialog</VekButton>
+
+@code {
+    private async Task OpenDialogAsync()
+    {
+        await Dialog.ShowAsync<DialogInteractionExample_Dialog>("Adjustable dialog", new DialogOptions
+        {
+            Draggable = true,
+            Resizable = true,
+            MaxWidth = MaxWidth.Medium
+        });
+    }
+}
