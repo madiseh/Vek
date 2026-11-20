@@ -54,12 +54,12 @@ Follow Vek's scoped testing policy:
 1. **Targeted Tests First**:
    - Run filtered tests using Microsoft.Testing.Platform runner syntax and `-p:SkipBunCompile=true`:
      ```pwsh
-     dotnet test --project src/Vek.UnitTests/Vek.UnitTests.csproj --no-restore -p:SkipBunCompile=true -- --filter "FullyQualifiedName~<TargetComponentTests>" --output Normal --no-ansi --hangdump --hangdump-timeout 30s
+     dotnet test --project tests/Components/Vek.UnitTests/Vek.UnitTests.csproj --no-restore -p:SkipBunCompile=true -- --filter "FullyQualifiedName~<TargetComponentTests>" --output Normal --no-ansi --hangdump --hangdump-timeout 30s
      ```
 2. **Analyzer & Code-Fix Tests**:
    - If analyzers or code fixes were touched, run:
      ```pwsh
-     dotnet test --project src/Vek.UnitTests.Analyzers/Vek.UnitTests.Analyzers.csproj --no-restore -- --filter "FullyQualifiedName~<AnalyzerTests>" --output Normal --no-ansi --hangdump --hangdump-timeout 30s
+     dotnet test --project tests/Analyzers/Vek.UnitTests.Analyzers/Vek.UnitTests.Analyzers.csproj --no-restore -- --filter "FullyQualifiedName~<AnalyzerTests>" --output Normal --no-ansi --hangdump --hangdump-timeout 30s
      ```
 3. **No Default Full-Solution Runs**:
    - Do not execute full solution tests for localized changes.
@@ -101,11 +101,9 @@ Analyze the conversation transcript, user instructions, and chat corrections to 
 ## Phase 4: Formatting & Git Working Tree Safety
 
 1. **Pre-PR Whitespace Formatting**:
-   - Run `dotnet format whitespace` from the `src/` directory targeting modified files:
+   - Run `dotnet format whitespace` from the repository root targeting modified files:
      ```pwsh
-     cd src
-     dotnet format whitespace --folder --include <path/to/changed/files/relative/to/src>
-     cd ..
+     dotnet format whitespace --folder --include <path/to/changed/files/relative/to/repository-root>
      ```
    - This ensures correct line endings (LF) and applies UTF-8 with BOM (`charset = utf-8-bom`) required by CI.
 2. **Git Working Tree Safety**:

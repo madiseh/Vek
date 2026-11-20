@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>$(PrimaryTargetFramework)</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Vek.UnitTests</RootNamespace>
+  </PropertyGroup>
+
+  <!-- Razor sourcegenerator doesn't work well with this kind of nullable (null for generic) https://github.com/dotnet/razor/issues/8720 -->
+  <PropertyGroup>
+    <NoWarn>CS8669</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Vek.UnitTests.Viewer' " />
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Examples\Vek.Examples.Data\Vek.Examples.Data.csproj" />
+    <ProjectReference Include="..\..\..\src\Vek\Vek.csproj" />
+  </ItemGroup>
+
+</Project>

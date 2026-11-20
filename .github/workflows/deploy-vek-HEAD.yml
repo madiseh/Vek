@@ -12,7 +12,7 @@ jobs:
       web-app-name: vek
       web-app-slot-name:  'staging'
       swap-slots: true
-      project-directory: ./src/Vek.Docs.WasmHost
+      project-directory: ./src/Docs/Vek.Docs.WasmHost
     secrets:
       publish-profile: ${{ secrets.PUBLISH_VEK }}
       azure-cred: ${{ secrets.AZURE_CREDENTIALS_VEK_PROD }}

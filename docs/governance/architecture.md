@@ -10,29 +10,40 @@ The library multi-targets `.NET 8.0`, `.NET 9.0`, `.NET 10.0`, and `.NET 11.0`.
 
 ## 1. Repository Topology & Project Graph
 
-The repository is organized around a unified `src/` layout separating the core component suite, Roslyn analyzers, documentation generation, and testing infrastructure:
+The repository separates product projects from test infrastructure. Project families are grouped by responsibility, and solution folders in the root `Vek.slnx` mirror the directory layout:
 
 ```
-src/
-├── Vek/                               # Core Blazor component library
-│   ├── Components/                    # High-level Blazor components (DataGrid, Menu, Dialog, etc.)
-│   ├── Styles/                        # SCSS design tokens, themes, and CSS variables
-│   ├── TScripts/                      # TypeScript interop helpers, observers, and ripple logic
-│   └── Utilities/                     # CssBuilder, StyleBuilder, ParameterState, and helpers
-├── Vek.Analyzers/                     # Roslyn analyzers for component parameter validation
-├── Vek.Analyzers.CodeFixes/           # Roslyn code fixes for automated migrations
-├── Vek.Analyzers.TestComponents/      # Razor test components used by analyzer test suites
-├── Vek.Benchmarks/                    # BenchmarkDotNet performance measurement suite
-├── Vek.Docs/                          # Main documentation website application
-├── Vek.Docs.Compiler/                 # Source generator/compiler extracting code snippets & metadata
-├── Vek.Docs.Server/                   # ASP.NET Core Blazor Server host for documentation
-├── Vek.Docs.WasmHost/                 # Blazor WebAssembly host for documentation
-├── Vek.Examples.Data/                 # Mock datasets and domain entities for examples & tests
-├── Vek.UnitTests/                     # Core bUnit component tests (Microsoft.Testing.Platform)
-├── Vek.UnitTests.Shared/              # Shared bUnit infrastructure, fixtures, and assertions
-├── Vek.UnitTests.Viewer/              # Isolated interactive test viewer for APG accessibility & repros
-├── Vek.UnitTests.Analyzers/           # Roslyn analyzer and code-fix verification tests
-└── Vek.UnitTests.Docs/                # Generated tests verifying all documentation examples
+.
+|-- .editorconfig
+|-- Directory.Build.props / Directory.Build.targets
+|-- Vek.slnx
+|-- src/
+|   |-- Vek/                           # Core Blazor component library
+|   |-- Analyzers/
+|   |   |-- Vek.Analyzers/              # Roslyn analyzers
+|   |   `-- Vek.Analyzers.CodeFixes/    # Roslyn code fixes
+|   |-- Benchmarks/
+|   |   `-- Vek.Benchmarks/             # BenchmarkDotNet performance suite
+|   |-- Docs/
+|   |   |-- Vek.Docs/                   # Documentation website application
+|   |   |-- Vek.Docs.Compiler/          # Documentation source and metadata compiler
+|   |   |-- Vek.Docs.Server/            # ASP.NET Core Blazor Server host
+|   |   |-- Vek.Docs.Wasm/              # Blazor WebAssembly app
+|   |   `-- Vek.Docs.WasmHost/          # Blazor WebAssembly host
+|   `-- Examples/
+|       `-- Vek.Examples.Data/          # Shared example datasets and domain entities
+`-- tests/
+    |-- Analyzers/
+    |   |-- Vek.Analyzers.TestComponents/ # Razor inputs for analyzer tests
+    |   `-- Vek.UnitTests.Analyzers/     # Analyzer and code-fix tests
+    |-- Components/
+    |   |-- Vek.UnitTests/               # Core bUnit component tests
+    |   `-- Vek.UnitTests.Viewer/         # Interactive visual and APG repro host
+    |-- Docs/
+    |   |-- Vek.UnitTests.Docs/           # Generated documentation example tests
+    |   `-- Vek.UnitTests.Docs.Generator/ # Generates documentation tests
+    `-- Shared/
+        `-- Vek.UnitTests.Shared/         # Shared test infrastructure
 ```
 
 ### Project Interdependencies
@@ -40,13 +51,13 @@ src/
 ```mermaid
 graph TD
     Vek["src/Vek (Core Library)"]
-    VekAnalyzers["src/Vek.Analyzers (Roslyn)"]
-    VekCodeFixes["src/Vek.Analyzers.CodeFixes"]
-    VekDocs["src/Vek.Docs (Docs App)"]
-    VekCompiler["src/Vek.Docs.Compiler"]
-    VekUnitTests["src/Vek.UnitTests"]
-    VekViewer["src/Vek.UnitTests.Viewer"]
-    VekShared["src/Vek.UnitTests.Shared"]
+    VekAnalyzers["src/Analyzers/Vek.Analyzers (Roslyn)"]
+    VekCodeFixes["src/Analyzers/Vek.Analyzers.CodeFixes"]
+    VekDocs["src/Docs/Vek.Docs (Docs App)"]
+    VekCompiler["src/Docs/Vek.Docs.Compiler"]
+    VekUnitTests["tests/Components/Vek.UnitTests"]
+    VekViewer["tests/Components/Vek.UnitTests.Viewer"]
+    VekShared["tests/Shared/Vek.UnitTests.Shared"]
 
     VekAnalyzers --> VekCodeFixes
     Vek --> VekDocs
@@ -61,7 +72,7 @@ graph TD
 - **Client Assets**: Bun-compiled JavaScript bundles and CSS styles are embedded and packaged as Static Web Assets (`wwwroot/`).
 
 ### Release Version Flow
-- `src/Directory.Build.props` holds the current stable version in `VersionPrefix` for local builds.
+- `Directory.Build.props` holds the current stable version in `VersionPrefix` for local builds.
 - Release builds use `VersionPrefix` as the package and assembly version, and the publish workflow rejects a release tag that does not match it.
 - The public `Vek.Metadata.Version` property reads the generated assembly version. Documentation UI version labels use this property instead of hard-coded version text.
 
@@ -164,13 +175,13 @@ Vek's visual language is powered by a modern, CSS-variable-driven design system.
 Vek integrates targeted TypeScript helpers for interactions that require direct DOM manipulation, high-frequency events, or browser APIs.
 
 ### Toolchain & Architecture
-- **Bun via bundotnet.cli**: Frontend asset compilation is powered by Bun (pinned in `src/Directory.Build.props`), managed locally through `bundotnet.cli` in `.config/dotnet-tools.json`.
+- **Bun via bundotnet.cli**: Frontend asset compilation is powered by Bun (pinned in `Directory.Build.props`), managed locally through `bundotnet.cli` in `.config/dotnet-tools.json`.
 - **Fast C# Iteration (`-p:SkipBunCompile=true`)**: Normal C#, Razor, test, and doc builds pass `-p:SkipBunCompile=true` to bypass Bun asset bundling. The asset pipeline runs only when `TScripts`, styles, `package.json`, or asset configs are modified.
 - **Source Layout**:
   - `src/Vek/TScripts/`: Contains TypeScript sources (`vekHelpers.ts`, `vekRipple.ts`, observers, popover positioning).
   - `entrypoint.ts`: Central export file bundled into `vek.js`.
 - **Shipped Bundle Hygiene**: Unit test files (`*.test.ts`) are executed by `bun test` and must **never** be imported into `entrypoint.ts` to prevent test harnesses from leaking into shipped production bundles.
-- **Frontend Sources and Generated Minified Assets (Strict No-Commit Policy)**: Keep style changes in `src/Vek/Styles/**/*.scss` or `src/Vek.Docs/Styles/**/*.scss` and script changes in `src/Vek/TScripts/**/*.ts`. Do not edit, stage, or include generated `*.min.*` bundles or their source maps from any project (including `src/Vek/wwwroot/` and `src/Vek.Docs/wwwroot/`) in feature, fix, or documentation PRs. Because local builds automatically regenerate these outputs, always restore them before committing (`git checkout -- "**/wwwroot/*.min.*" "**/wwwroot/*.map"`). Include or update minified bundles and maps only when preparing release artifacts.
+- **Frontend Sources and Generated Minified Assets (Strict No-Commit Policy)**: Keep style changes in `src/Vek/Styles/**/*.scss` or `src/Docs/Vek.Docs/Styles/**/*.scss` and script changes in `src/Vek/TScripts/**/*.ts`. Do not edit, stage, or include generated `*.min.*` bundles or their source maps from any project (including `src/Vek/wwwroot/` and `src/Docs/Vek.Docs/wwwroot/`) in feature, fix, or documentation PRs. Because local builds automatically regenerate these outputs, always restore them before committing (`git checkout -- "**/wwwroot/*.min.*" "**/wwwroot/*.map"`). Include or update minified bundles and maps only when preparing release artifacts.
 
 ---
 
@@ -179,7 +190,7 @@ Vek integrates targeted TypeScript helpers for interactions that require direct 
 Vek treats accessibility (ARIA) as a first-class architectural requirement, matching the [W3C ARIA Authoring Practices Guide (APG)](https://www.w3.org/WAI/ARIA/apg/patterns/).
 
 ### Architecture
-- **Interactive Test Viewer (`src/Vek.UnitTests.Viewer`)**: A dedicated Blazor WASM/Server host that renders components in isolation using minimal chrome (`chrome=none`).
+- **Interactive Test Viewer (`tests/Components/Vek.UnitTests.Viewer`)**: A dedicated Blazor WASM/Server host that renders components in isolation using minimal chrome (`chrome=none`).
 - **Accessibility Tree Verification**:
   - Screen readers render the browser's accessibility tree. Rather than requiring subjective screen-reader runs, automated verification inspects the full AX tree (`Accessibility.getFullAXTree` or browser snapshots).
   - Dynamic states (`aria-expanded`, `aria-activedescendant`, `aria-selected`, `aria-checked`) must transition accurately during keyboard navigation.

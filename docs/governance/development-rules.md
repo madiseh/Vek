@@ -8,7 +8,7 @@ This document specifies the core engineering guidelines, C# XML documentation st
 
 ## 1. Compiler & Build Standards
 
-- **Treat Warnings as Errors**: `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>` is enforced repo-wide in `src/Directory.Build.props`. All compiler and analyzer warnings must be fixed directly; never suppress or ignore warnings.
+- **Treat Warnings as Errors**: `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>` is enforced repo-wide in `Directory.Build.props`. All compiler and analyzer warnings must be fixed directly; never suppress or ignore warnings.
 - **Incremental Build Hygiene**: Avoid running `dotnet clean` as part of normal local iteration. Use clean builds only when project assets or incremental compilation caches are genuinely corrupted.
 - **Namespace Import Verification**: Incremental local builds can occasionally resolve symbols that CI's clean build rejects with `CS0246`. When introducing or referencing types from secondary namespaces (e.g. `FormFieldChangedEventArgs` in `Vek.Utilities`, not `Vek`), explicitly verify that the required `using` directives are present.
 - **No Heavy Dependencies**: Do not introduce new NuGet packages or heavy external dependencies without explicit project approval.
@@ -76,27 +76,27 @@ Every public API surface in Vek must be thoroughly, concisely, and consistently 
 
 ## 4. Roslyn Analyzers & Code Fixes
 
-Vek ships first-party Roslyn analyzers (`src/Vek.Analyzers`) and code fixes (`src/Vek.Analyzers.CodeFixes`) to guide consumers toward best practices and handle API migrations automatically.
+Vek ships first-party Roslyn analyzers (`src/Analyzers/Vek.Analyzers`) and code fixes (`src/Analyzers/Vek.Analyzers.CodeFixes`) to guide consumers toward best practices and handle API migrations automatically.
 
 ### Migration Hints & Parameter Obsoletion
 - When renaming or removing a component parameter:
   1. Mark the old parameter `[Obsolete("...")]` with a clear migration message.
-  2. Add a `VEK0002` migration hint to `src/Vek.Analyzers/Internal/ParameterMigration.cs`.
-  3. Add a test case in `MigrationHintCases` within `src/Vek.UnitTests.Analyzers`.
-  4. Document the migration row in the analyzer documentation page (`src/Vek.Docs/Pages/Features/AnalyzersPage.razor`).
+  2. Add a `VEK0002` migration hint to `src/Analyzers/Vek.Analyzers/Internal/ParameterMigration.cs`.
+  3. Add a test case in `MigrationHintCases` within `tests/Analyzers/Vek.UnitTests.Analyzers`.
+  4. Document the migration row in the analyzer documentation page (`src/Docs/Vek.Docs/Pages/Features/AnalyzersPage.razor`).
 - **Binary Compatibility**: Note that changing an `EventCallback` to `EventCallback<T>` is a binary breaking change even though it remains source-compatible in Razor. Prefer additive overloads or deliberate major-version transitions.
 
 ---
 
 ## 5. Formatting & File Encodings
 
-- **UTF-8 with BOM for C# Files**: In accordance with `src/.editorconfig` (`charset = utf-8-bom`), all `.cs` files must be UTF-8 encoded with a Byte Order Mark. Agent file generation tools often omit BOMs; the final whitespace pass corrects this.
+- **UTF-8 with BOM for C# Files**: In accordance with `.editorconfig` (`charset = utf-8-bom`), all `.cs` files must be UTF-8 encoded with a Byte Order Mark. Agent file generation tools often omit BOMs; the final whitespace pass corrects this.
 - **Line Endings**: Standardize on LF line endings across all text files.
-- **Pre-PR Whitespace Formatting**:
-  - Run `dotnet format whitespace --folder --include <path/to/files>` once at the very end of a task from the `src/` directory.
-  - Paths passed to `--include` must be relative to `src/`:
+-- **Pre-PR Whitespace Formatting**:
+  - Run `dotnet format whitespace --folder --include <path/to/files>` once at the very end of a task from the repository root.
+  - Paths passed to `--include` must be relative to the repository root:
     ```bash
-    dotnet format whitespace --folder --include Vek/Components/Menu/VekMenu.razor.cs
+    dotnet format whitespace --folder --include src/Vek/Components/Menu/VekMenu.razor.cs
     ```
 
 ---
@@ -140,7 +140,7 @@ docs(governance): define commit and pull request title rules
 
 ## 8. Frontend Assets & Minified Bundles Policy
 
-- **No Minified Assets in PRs**: Never commit generated minified files (`*.min.css`, `*.min.js`, `*.min.*`) or their source maps (`*.map`) from any project (`src/Vek/wwwroot/`, `src/Vek.Docs/wwwroot/`, etc.) in feature, bug-fix, or documentation PRs.
+- **No Minified Assets in PRs**: Never commit generated minified files (`*.min.css`, `*.min.js`, `*.min.*`) or their source maps (`*.map`) from any project (`src/Vek/wwwroot/`, `src/Docs/Vek.Docs/wwwroot/`, etc.) in feature, bug-fix, or documentation PRs.
 - **Auto-Regeneration Guard**: Building the project or running frontend asset pipelines regenerates minified files locally. Before staging and committing changes, always inspect `git status` and restore any generated minified files:
   ```bash
   git checkout -- "**/wwwroot/*.min.*" "**/wwwroot/*.map"

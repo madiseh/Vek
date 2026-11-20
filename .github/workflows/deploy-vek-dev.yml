@@ -18,6 +18,6 @@ jobs:
     with:
       dotnet-version: 10.0.x
       web-app-name: vek-dev
-      project-directory: './src/Vek.Docs.WasmHost'
+      project-directory: './src/Docs/Vek.Docs.WasmHost'
     secrets:
       publish-profile: ${{ secrets.PUBLISH_VEK_DEV }}
