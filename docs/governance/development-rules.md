@@ -12,6 +12,7 @@ This document specifies the core engineering guidelines, C# XML documentation st
 - **Incremental Build Hygiene**: Avoid running `dotnet clean` as part of normal local iteration. Use clean builds only when project assets or incremental compilation caches are genuinely corrupted.
 - **Namespace Import Verification**: Incremental local builds can occasionally resolve symbols that CI's clean build rejects with `CS0246`. When introducing or referencing types from secondary namespaces (e.g. `FormFieldChangedEventArgs` in `Vek.Utilities`, not `Vek`), explicitly verify that the required `using` directives are present.
 - **No Heavy Dependencies**: Do not introduce new NuGet packages or heavy external dependencies without explicit project approval.
+- **Central Package Versions**: Keep NuGet package versions in the repository-root `Directory.Packages.props`. `PackageReference` entries in project files omit `Version`; use conditional `PackageVersion` entries there when a package needs different versions by project or target framework.
 
 ---
 

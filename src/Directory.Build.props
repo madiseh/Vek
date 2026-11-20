@@ -18,14 +18,6 @@
     <EnumGenerator_EnumMetadataSource>DescriptionAttribute</EnumGenerator_EnumMetadataSource>
   </PropertyGroup>
 
-  <!--
-    Roslyn version for the SHIPPED analyzer + code-fix assemblies (Vek.Analyzers and
-    Vek.Analyzers.CodeFixes). Both DLLs are packed side-by-side into analyzers/dotnet/cs of the
-    Vek NuGet package and are loaded by the CONSUMER's build compiler / IDE Roslyn host.
-  -->
-  <PropertyGroup>
-    <VekRoslynShippedVersion>4.7.0</VekRoslynShippedVersion>
-  </PropertyGroup>
 
   <PropertyGroup>
     <BunVersion>1.4.4</BunVersion>

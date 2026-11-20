@@ -57,7 +57,7 @@ graph TD
 ```
 
 ### NuGet Packaging Architecture
-- **Shipped Analyzers**: `Vek.Analyzers.dll` and `Vek.Analyzers.CodeFixes.dll` are packed side-by-side into `analyzers/dotnet/cs` of the primary `Vek` NuGet package. They target Roslyn 4.7.0 (via `<VekRoslynShippedVersion>`) ensuring full compatibility with consuming consumer IDEs and build compilers.
+- **Shipped Analyzers**: `Vek.Analyzers.dll` and `Vek.Analyzers.CodeFixes.dll` are packed side-by-side into `analyzers/dotnet/cs` of the primary `Vek` NuGet package. They target Roslyn 4.7.0 (via `<VekRoslynShippedVersion>` in the root `Directory.Packages.props`) ensuring full compatibility with consuming consumer IDEs and build compilers. NuGet package versions are centrally managed in this file.
 - **Client Assets**: Bun-compiled JavaScript bundles and CSS styles are embedded and packaged as Static Web Assets (`wwwroot/`).
 
 ### Release Version Flow

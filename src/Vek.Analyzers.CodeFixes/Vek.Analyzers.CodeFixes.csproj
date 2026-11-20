@@ -10,7 +10,7 @@
     <!-- Workspaces transitively pins Microsoft.CodeAnalysis.CSharp to the same band as the analyzer
          (VekRoslynShippedVersion in src/Directory.Build.props); both DLLs ship together in
          analyzers/dotnet/cs and must stay on the same Roslyn band. -->
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(VekRoslynShippedVersion)" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
   </ItemGroup>
 
   <ItemGroup>
