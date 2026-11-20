@@ -568,9 +568,10 @@
       "title": "Tabs Vertical Orientation and Position (Top, Bottom, Left, Right)",
       "module": "Tabs",
       "priority": 47,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/047-tabs-multi-orientation-and-positions.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-20T22:33:34Z"
     },
     {
       "id": "048",

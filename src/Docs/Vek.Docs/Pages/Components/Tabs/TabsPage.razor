@@ -23,15 +23,25 @@
         </DocsPageSection>
 
         <DocsPageSection>
-            <SectionHeader Title="Tabs Position">
+            <SectionHeader Title="Multi-Orientation and Position">
                 <Description>
-                    The position of the tab bar can be changed with the <CodeInline>Position</CodeInline> property.
+                    The tab strip can be positioned on any side of the container using the <CodeInline>TabPosition</CodeInline> property. Setting it to <CodeInline>TabPosition.Left</CodeInline> or <CodeInline>TabPosition.Right</CodeInline> switches the tab strip to a vertical orientation, displaying active indicator sliders along the inner boundary and enabling ArrowUp / ArrowDown keyboard navigation.
                 </Description>
             </SectionHeader>
-            <SectionContent Code="@nameof(TabsPositionExample)" ShowCode="false" Block="true" FullWidth="true">
-                <TabsPositionExample />
+            <SectionContent Code="@nameof(TabsMultiOrientationExample)" ShowCode="true" Block="true" FullWidth="true">
+                <TabsMultiOrientationExample />
             </SectionContent>
             <SectionSubGroups>
+                <DocsPageSection>
+                    <SectionHeader Title="Legacy Position Selector">
+                        <Description>
+                            The tab bar can also be configured with the legacy <CodeInline>Position</CodeInline> parameter.
+                        </Description>
+                    </SectionHeader>
+                    <SectionContent Code="@nameof(TabsPositionExample)" ShowCode="false" Block="true" FullWidth="true">
+                        <TabsPositionExample />
+                    </SectionContent>
+                </DocsPageSection>
                 <DocsPageSection>
                     <SectionHeader Title="Centered">
                         <Description>
