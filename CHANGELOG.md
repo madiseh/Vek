@@ -50,6 +50,14 @@ For GitHub Releases and downloadable packages, see the [Releases page](https://g
 16. TimePicker intervals & 12/24-hour formats — [PR #61](https://github.com/madiseh/Vek/pull/61)
 17. TreeView drag-and-drop node reordering — [PR #64](https://github.com/madiseh/Vek/pull/64)
 
+### ✅ Test Results
+- Unit tests: 6,568 passed, 2 skipped, 0 failed (6,570 total).
+- Documentation tests: 1,500 passed, 0 skipped, 0 failed.
+- Analyzer tests: 391 passed, 0 skipped, 0 failed.
+- Format check: passed.
+- Build-only projects: 2 passed.
+- [Download the JUnit test reports](https://github.com/madiseh/Vek/releases/download/v1.3.0/test-results-v1.3.0.zip) from [candidate CI run 44710092127](https://github.com/madiseh/Vek/actions/runs/44710092127), for commit `2be9e6b58d091977e112f8a590dc527a1beebc35`.
+
 ---
 
 ## [v1.2.1] - 2026-11-19
