@@ -556,3 +556,46 @@
 .vek-input-input-control {
   user-select: none;
 }
+
+.vek-input > .vek-input-adornment-start {
+  order: 0;
+}
+
+.vek-input > .vek-input-editor-button-start {
+  order: 1;
+}
+
+.vek-input > .vek-input-input-control {
+  order: 2;
+  flex: 1 1 auto;
+}
+
+.vek-input > .vek-input-clear-button,
+.vek-input > .vek-input-password-toggle-button {
+  order: 3;
+}
+
+.vek-input > .vek-input-editor-button-end {
+  order: 4;
+}
+
+.vek-input > .vek-input-adornment-end {
+  order: 5;
+}
+
+.vek-input-editor-button {
+  align-self: stretch;
+  min-width: 40px;
+  margin: 0;
+  padding-inline: 8px;
+  border-radius: 0;
+  color: var(--vek-palette-text-secondary);
+}
+
+.vek-input-editor-button-start {
+  border-inline-end: 1px solid var(--vek-palette-lines-inputs);
+}
+
+.vek-input-editor-button-end {
+  border-inline-start: 1px solid var(--vek-palette-lines-inputs);
+}

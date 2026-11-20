@@ -90,6 +90,12 @@
         </div>
     }
 
+    @if (Buttons is not null)
+    {
+        <CascadingValue Name="EditorButtonDisabled" Value="@GetDisabledState()">
+            @Buttons
+        </CascadingValue>
+    }
 
     @if (ShowClearButton())
     {

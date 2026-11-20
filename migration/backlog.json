@@ -464,9 +464,11 @@
       "title": "TextBox Embedded Custom Action Buttons and Adornment Slots",
       "module": "TextField",
       "priority": 39,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/039-textbox-custom-buttons-and-adornments.md",
-      "dependencies": []
+      "dependencies": [],
+      "completed_at": "2026-11-20T11:50:31Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/70"
     },
     {
       "id": "040",

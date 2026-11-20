@@ -2274,6 +2274,61 @@ namespace Vek.UnitTests.Components
         }
 
         /// <summary>
+        /// Custom editor buttons render inside the input frame and invoke their action.
+        /// </summary>
+        [Test]
+        public async Task EditorButtons_RenderAndInvokeActions()
+        {
+            var clickCount = 0;
+            var comp = Context.Render<VekTextField<string>>(parameters => parameters
+                .Add(field => field.Buttons, builder =>
+                {
+                    builder.OpenComponent<VekEditorButton>(0);
+                    builder.AddAttribute(1, nameof(VekEditorButton.Placement), Adornment.Start);
+                    builder.AddAttribute(2, nameof(VekEditorButton.Icon), Icons.Material.Filled.Search);
+                    builder.AddAttribute(3, nameof(VekEditorButton.AriaLabel), "Search inventory");
+                    builder.AddAttribute(4, nameof(VekEditorButton.OnClick), EventCallback.Factory.Create<MouseEventArgs>(this, () => clickCount++));
+                    builder.CloseComponent();
+                    builder.OpenComponent<VekEditorButton>(5);
+                    builder.AddAttribute(6, nameof(VekEditorButton.Placement), Adornment.End);
+                    builder.AddAttribute(7, nameof(VekEditorButton.ChildContent), (RenderFragment)(childBuilder => childBuilder.AddContent(0, "Clear")));
+                    builder.AddAttribute(8, nameof(VekEditorButton.OnClick), EventCallback.Factory.Create<MouseEventArgs>(this, () => clickCount++));
+                    builder.CloseComponent();
+                }));
+
+            comp.Find(".vek-input").QuerySelector(".vek-input-editor-button-start").Should().NotBeNull();
+            comp.Find(".vek-input").QuerySelector(".vek-input-editor-button-end").Should().NotBeNull();
+            comp.Find(".vek-input-editor-button-start").GetAttribute("aria-label").Should().Be("Search inventory");
+
+            await comp.Find(".vek-input-editor-button-start").ClickAsync();
+
+            clickCount.Should().Be(1);
+        }
+
+        /// <summary>
+        /// Custom editor buttons follow their containing field's disabled state.
+        /// </summary>
+        [Test]
+        public async Task EditorButtons_TrackDisabledStateChanges()
+        {
+            var comp = Context.Render<VekTextField<string>>(parameters => parameters
+                .Add(field => field.Disabled, false)
+                .Add(field => field.Buttons, builder =>
+                {
+                    builder.OpenComponent<VekEditorButton>(0);
+                    builder.AddAttribute(1, nameof(VekEditorButton.AriaLabel), "Search inventory");
+                    builder.CloseComponent();
+                }));
+
+            comp.Find(".vek-input-editor-button-end").HasAttribute("disabled").Should().BeFalse();
+
+            await comp.SetParametersAndRenderAsync(parameters => parameters
+                .Add(field => field.Disabled, true));
+
+            comp.Find(".vek-input-editor-button-end").HasAttribute("disabled").Should().BeTrue();
+        }
+
+        /// <summary>
         /// Verifies that a text field with various configurations renders the expected <c>aria-describedby</c> attribute.
         /// </summary>
         // no helpers, validates error id is present when error is present

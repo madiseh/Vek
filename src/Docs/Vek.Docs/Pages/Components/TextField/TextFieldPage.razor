@@ -86,6 +86,17 @@
 </DocsPageSection>
 
 <DocsPageSection>
+    <SectionHeader Title="Embedded Action Buttons">
+        <Description>
+            Use the <CodeInline>Buttons</CodeInline> slot to place custom actions inside the input frame. Set each <CodeInline>VekEditorButton</CodeInline> to <CodeInline>Adornment.Start</CodeInline> or <CodeInline>Adornment.End</CodeInline> and give icon-only buttons an accessible name. Clicking an action keeps focus in the text field.
+        </Description>
+    </SectionHeader>
+    <SectionContent Code="@nameof(TextFieldEditorButtonsExample)">
+        <TextFieldEditorButtonsExample />
+    </SectionContent>
+</DocsPageSection>
+
+<DocsPageSection>
     <SectionHeader Title="Password Visibility Toggle">
         <Description>
             Enable <CodeInline>ShowPasswordToggle</CodeInline> on password inputs (<CodeInline>InputType="InputType.Password"</CodeInline>) to display an interactive visibility toggle button switching between masked password and plain text. The toggle button features dynamic ARIA announcements (<CodeInline>Show password</CodeInline> / <CodeInline>Hide password</CodeInline>), supports custom visibility icons, preserves cursor focus, and cleanly integrates with <CodeInline>Clearable</CodeInline> and adornments.
