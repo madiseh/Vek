@@ -1031,9 +1031,12 @@
       "title": "Skeleton Pre-Configured Shape Cards, Avatars, and Synchronized Shimmer",
       "module": "Skeleton",
       "priority": 91,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/091-skeleton-bone-shapes-and-shimmer-animation.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:56:59Z",
+      "completed_at": "2026-11-19T22:06:21Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/58"
     },
     {
       "id": "092",

@@ -16,6 +16,12 @@ public enum Animation
     False,
 
     /// <summary>
+    /// No animation occurs.
+    /// </summary>
+    [Description("none")]
+    None,
+
+    /// <summary>
     /// The animation fades in and out in a pulsing loop.
     /// </summary>
     [Description("pulse")]
@@ -25,5 +31,11 @@ public enum Animation
     /// A left-to-right wave effect occurs.
     /// </summary>
     [Description("wave")]
-    Wave
+    Wave,
+
+    /// <summary>
+    /// A synchronized shimmer moves across the skeleton.
+    /// </summary>
+    [Description("shimmer")]
+    Shimmer
 }

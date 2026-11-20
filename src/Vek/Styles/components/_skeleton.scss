@@ -22,6 +22,10 @@
   border-radius: 50%;
 }
 
+.vek-skeleton-card {
+  border-radius: var(--vek-default-borderradius);
+}
+
 .vek-skeleton-pulse {
   animation: vek-skeleton-keyframes-pulse 1.5s ease-in-out 0.5s infinite;
 }
@@ -41,4 +45,35 @@
   animation: vek-skeleton-keyframes-wave 1.6s linear 0.5s infinite;
   transform: translateX(-100%);
   background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.04), transparent);
+}
+
+.vek-skeleton-shimmer {
+  overflow: hidden;
+  position: relative;
+}
+
+.vek-skeleton-shimmer::after {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  animation: vek-skeleton-keyframes-wave 1.6s linear infinite;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--vek-palette-background) 80%, var(--vek-palette-skeleton)),
+    transparent
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vek-skeleton-pulse,
+  .vek-skeleton-wave::after,
+  .vek-skeleton-shimmer::after {
+    animation: none;
+  }
 }

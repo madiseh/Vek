@@ -4,9 +4,12 @@
 - **Feature ID**: 091
 - **Feature Slug**: skeleton-bone-shapes-and-shimmer-animation
 - **Module**: Skeleton
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 91
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/58
+- **Started At**: 2026-11-19T19:56:59Z
+- **Completed At**: 2026-11-19T22:06:21Z
 
 ---
 

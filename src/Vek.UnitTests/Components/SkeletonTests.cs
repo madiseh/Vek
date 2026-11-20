@@ -68,16 +68,39 @@ namespace Vek.UnitTests.Components
         }
 
         /// <summary>
-        /// A skeleton is hidden from assistive technology unless the user overrides it.
+        /// Skeletons expose a loading name and busy state that user attributes can override.
         /// </summary>
         [Test]
-        public void SkeletonShouldBeHiddenFromAssistiveTechnologies()
+        public void SkeletonShouldExposeAccessibleLoadingState()
         {
             var comp = Context.Render<VekSkeleton>();
-            comp.Find("span.vek-skeleton").GetAttribute("aria-hidden").Should().Be("true");
+            var skeleton = comp.Find("span.vek-skeleton");
+            skeleton.GetAttribute("aria-busy").Should().Be("true");
+            skeleton.GetAttribute("aria-label").Should().Be("Loading");
 
-            var overridden = Context.Render<VekSkeleton>(parameters => parameters.AddUnmatched("aria-hidden", "false"));
-            overridden.Find("span.vek-skeleton").GetAttribute("aria-hidden").Should().Be("false");
+            var overridden = Context.Render<VekSkeleton>(parameters => parameters
+                .AddUnmatched("aria-busy", "false")
+                .AddUnmatched("aria-label", "Loading profile card"));
+            var overriddenSkeleton = overridden.Find("span.vek-skeleton");
+            overriddenSkeleton.GetAttribute("aria-busy").Should().Be("false");
+            overriddenSkeleton.GetAttribute("aria-label").Should().Be("Loading profile card");
+        }
+
+        /// <summary>
+        /// Card skeletons support the shimmer animation and a caller-defined corner radius.
+        /// </summary>
+        [Test]
+        public void SkeletonCardShapeSupportsShimmerAndBorderRadius()
+        {
+            var comp = Context.Render<VekSkeleton>(parameters => parameters
+                .Add(x => x.SkeletonType, SkeletonType.Card)
+                .Add(x => x.Animation, Animation.Shimmer)
+                .Add(x => x.BorderRadius, "12px"));
+
+            var skeleton = comp.Find("span.vek-skeleton");
+            skeleton.ClassList.Should().Contain("vek-skeleton-card");
+            skeleton.ClassList.Should().Contain("vek-skeleton-shimmer");
+            skeleton.GetAttribute("style").Should().Be("border-radius:12px;");
         }
     }
 }

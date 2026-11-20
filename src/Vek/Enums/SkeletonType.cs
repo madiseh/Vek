@@ -34,5 +34,11 @@ public enum SkeletonType
     /// Use the <see cref="VekSkeleton.Width"/> and <see cref="VekSkeleton.Height"/> parameters to control its size.
     /// </remarks>
     [Description("rectangle")]
-    Rectangle
+    Rectangle,
+
+    /// <summary>
+    /// The skeleton displays a rounded card shape.
+    /// </summary>
+    [Description("card")]
+    Card
 }
