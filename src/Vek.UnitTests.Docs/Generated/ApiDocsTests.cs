@@ -32,7 +32,6 @@ namespace Vek.UnitTests.Docs.Generated
             _ctx.Services.AddTransient<IScrollListenerFactory, MockScrollListenerFactory>();
             _ctx.Services.AddTransient<IJsApiService, MockJsApiService>();
             _ctx.Services.AddTransient<IDocsJsApiService, MockDocsJsApiService>();
-            _ctx.Services.AddTransient<IAdBlockDetectionService, MockAdBlockDetectionService>();
             _ctx.Services.AddTransient<IResizeObserverFactory, MockResizeObserverFactory>();
             _ctx.Services.AddTransient<IScrollSpyFactory, MockScrollSpyFactory>();
             _ctx.Services.AddSingleton<IDocsNavigationService, DocsNavigationService>();
