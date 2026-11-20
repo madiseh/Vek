@@ -4,9 +4,10 @@
 - **Feature ID**: 012
 - **Feature Slug**: datagrid-filter-builder-dialog
 - **Module**: DataGrid
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 12
 - **Dependencies**: ["004"]
+- **Started At**: 2026-11-20T22:33:17Z
 
 ---
 

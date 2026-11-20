@@ -432,12 +432,31 @@
     </div>
 }
 
+@if (_isFilterBuilderVisible)
+{
+    <VekOverlay @bind-Visible="_isFilterBuilderVisible" AutoClose="true" OnClick="HideFilterBuilderAsync" />
+    <div class="vek-datagrid-filter-builder-dialog" role="dialog" aria-modal="true" aria-label="Filter Builder">
+        @if (FilterBuilderTemplate != null)
+        {
+            @FilterBuilderTemplate(this)
+        }
+        else
+        {
+            <VekFilterBuilder T="T" DataGrid="this" OnClose="HideFilterBuilderAsync" />
+        }
+    </div>
+}
+
 @code {
 
     internal RenderFragment ToolbarMenu(VekDataGrid<T> dataGrid) =>
     @<text>
         <VekMenu Icon="@Icons.Material.Outlined.Settings" Size="Size.Small" Dense="true" AriaLabel="@Localizer[LanguageResource.VekDataGrid_Columns]">
             <VekMenuItem OnClick="@dataGrid.ShowColumnsPanel">@Localizer[LanguageResource.VekDataGrid_Columns]</VekMenuItem>
+                @if (dataGrid.Filterable)
+                {
+                    <VekMenuItem OnClick="@dataGrid.ShowFilterBuilderAsync">Filter Builder</VekMenuItem>
+                }
                 @if (dataGrid.IsGrouped)
                 {
                     <VekMenuItem OnClick="@dataGrid.ExpandAllGroupsAsync">@Localizer[LanguageResource.VekDataGrid_ExpandAllGroups]</VekMenuItem>

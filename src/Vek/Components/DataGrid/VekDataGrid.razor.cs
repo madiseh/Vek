@@ -677,6 +677,16 @@ namespace Vek
         public RenderFragment<DataGridColumnChooserContext<T>>? ColumnChooserTemplate { get; set; }
 
         /// <summary>
+        /// Gets or sets the custom template used to render the visual filter builder dialog.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>. When set, this overrides the default <see cref="VekFilterBuilder{T}"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Filtering)]
+        public RenderFragment<VekDataGrid<T>>? FilterBuilderTemplate { get; set; }
+
+        /// <summary>
         /// Whether matching search terms are highlighted in searchable cells.
         /// </summary>
         /// <remarks>
@@ -4304,6 +4314,33 @@ namespace Vek
         {
             _isColumnChooserVisible = false;
             _columnChooserAnchorId = null;
+            StateHasChanged();
+            return Task.CompletedTask;
+        }
+
+        private bool _isFilterBuilderVisible;
+
+        /// <summary>
+        /// Specifies whether the visual filter builder dialog is currently visible.
+        /// </summary>
+        public bool IsFilterBuilderVisible => _isFilterBuilderVisible;
+
+        /// <summary>
+        /// Shows the visual filter builder dialog.
+        /// </summary>
+        public Task ShowFilterBuilderAsync()
+        {
+            _isFilterBuilderVisible = true;
+            StateHasChanged();
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Hides the visual filter builder dialog.
+        /// </summary>
+        public Task HideFilterBuilderAsync()
+        {
+            _isFilterBuilderVisible = false;
             StateHasChanged();
             return Task.CompletedTask;
         }
