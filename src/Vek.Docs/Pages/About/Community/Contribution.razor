@@ -6,9 +6,14 @@
 <DocsPage DisplayFooter="true">
     <DocsPageHeader Title="Contribution" />
     <DocsPageContent>
-        @if (string.IsNullOrEmpty(_contribution))
+        @if (string.IsNullOrEmpty(_contribution) && !_contributionUnavailable)
         {
             <VekProgressCircular Color="Color.Primary" Indeterminate="true" />
+        }
+        else if (_contributionUnavailable)
+        {
+            <p>The contribution guide could not be loaded right now. You can read it directly on GitHub.</p>
+            <VekLink Href="https://github.com/madiseh/vek/blob/master/CONTRIBUTING.md" Target="_blank">Open the Vek contribution guide</VekLink>
         }
         else
         {
@@ -21,6 +26,7 @@
 
 @code {
     private string _contribution;
+    private bool _contributionUnavailable;
 
     [Inject]
     private HttpClient HttpClient { get; set; }
@@ -30,8 +36,21 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var response = await HttpClient.GetAsync("https://raw.githubusercontent.com/Vek/Vek/dev/CONTRIBUTING.md");
-        _contribution = await response.Content.ReadAsStringAsync();
+        try
+        {
+            using var response = await HttpClient.GetAsync("https://raw.githubusercontent.com/madiseh/Vek/master/CONTRIBUTING.md");
+            if (!response.IsSuccessStatusCode)
+            {
+                _contributionUnavailable = true;
+                return;
+            }
+
+            _contribution = await response.Content.ReadAsStringAsync();
+        }
+        catch (HttpRequestException)
+        {
+            _contributionUnavailable = true;
+        }
     }
 
     private string GetBody(string value)

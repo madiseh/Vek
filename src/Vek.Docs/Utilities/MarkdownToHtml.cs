@@ -16,8 +16,8 @@ namespace Vek.Docs.Utilities;
 #nullable enable
 public partial class MarkdownToHtml
 {
-    private const string GitHubBlobDevBaseUrl = "https://github.com/madiseh/vek/blob/dev/";
-    private const string GitHubRawDevBaseUrl = "https://raw.githubusercontent.com/Vek/Vek/dev/";
+    private const string GitHubBlobMasterBaseUrl = "https://github.com/madiseh/vek/blob/master/";
+    private const string GitHubRawMasterBaseUrl = "https://raw.githubusercontent.com/madiseh/Vek/master/";
 
     private static readonly HeadingRenderOptions _defaultHeadingOptions = new(true, true, true, true);
     private static readonly HeadingRenderOptions _releaseHeadingOptions = new(false, false, false, false);
@@ -149,8 +149,8 @@ public partial class MarkdownToHtml
 
     private static string PreprocessContributionMarkdown(string markdownBody)
     {
-        var body = ContributionImageSourceRegex().Replace(markdownBody, "$1=\"" + GitHubRawDevBaseUrl + "$2\"");
-        body = ContributionImageSourceSetRegex().Replace(body, "$1=\"" + GitHubRawDevBaseUrl + "$2\"");
+        var body = ContributionImageSourceRegex().Replace(markdownBody, "$1=\"" + GitHubRawMasterBaseUrl + "$2\"");
+        body = ContributionImageSourceSetRegex().Replace(body, "$1=\"" + GitHubRawMasterBaseUrl + "$2\"");
         body = ContributionTocBlockRegex().Replace(body, static match =>
         {
             var tocContent = match.Groups["toc"].Value.Trim();
@@ -338,7 +338,7 @@ public partial class MarkdownToHtml
 
             if (url.StartsWith('/'))
             {
-                return $"{GitHubBlobDevBaseUrl}{url.TrimStart('/')}";
+                return $"{GitHubBlobMasterBaseUrl}{url.TrimStart('/')}";
             }
 
             if (!IsMarkdownFileLink(url))
@@ -350,7 +350,7 @@ public partial class MarkdownToHtml
                 ? url[2..]
                 : url;
 
-            return $"{GitHubBlobDevBaseUrl}{relativePath}";
+            return $"{GitHubBlobMasterBaseUrl}{relativePath}";
         }
 
         private static string GetInlineText(LinkInline obj)
