@@ -41,16 +41,18 @@ namespace Vek
         private Size IconSize => Snackbar?.State.Options.IconSize ?? Size.Medium;
 
         // behavior
-        private void ActionClicked() => Snackbar?.Clicked(false);
-        private void CloseIconClicked() => Snackbar?.Clicked(true);
+        private Task ActionClickedAsync() => Snackbar?.ClickedAsync(false) ?? Task.CompletedTask;
+        private Task CloseIconClickedAsync() => Snackbar?.ClickedAsync(true) ?? Task.CompletedTask;
         private SnackbarMessage? Message => Snackbar?.SnackbarMessage;
 
-        private void SnackbarClicked()
+        private Task SnackbarClickedAsync()
         {
             if (!ShowActionButton)
             {
-                Snackbar?.Clicked(false);
+                return ActionClickedAsync();
             }
+
+            return Task.CompletedTask;
         }
 
         private void SnackbarUpdated()
