@@ -26,6 +26,17 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Single and Multiple Selection">
+                <Description>
+                    Set <CodeInline>SelectionMode</CodeInline> to <CodeInline>ButtonGroupSelectionMode.Single</CodeInline> to keep one button selected, or <CodeInline>ButtonGroupSelectionMode.Multiple</CodeInline> to toggle several choices. Give each selectable <CodeInline>VekButton</CodeInline> a distinct, non-null <CodeInline>Value</CodeInline>. The group uses native buttons, so Tab moves between actions and Space or Enter activates the focused button.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(ButtonGroupSelectionModesExample)">
+                <ButtonGroupSelectionModesExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Sizes and Colors">
             </SectionHeader>
             <SectionContent Code="@nameof(ButtonGroupSizesColorsExample)" ShowCode="false">

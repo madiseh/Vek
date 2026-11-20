@@ -1,14 +1,116 @@
 ﻿using AwesomeAssertions;
 using Bunit;
 using Microsoft.AspNetCore.Components;
-using Vek.UnitTests.TestComponents.ButtonGroup;
+using Microsoft.AspNetCore.Components.Web;
 using NUnit.Framework;
+using Vek.UnitTests.TestComponents.ButtonGroup;
 
 namespace Vek.UnitTests.Components;
 
 [TestFixture]
 public class ButtonGroupTests : BunitTest
 {
+    /// <summary>
+    /// Buttons keep their action behavior without exposing selection state when the group uses the default mode.
+    /// </summary>
+    [Test]
+    public async Task NoneModeKeepsButtonsAsActions()
+    {
+        var clickCount = 0;
+        var comp = Context.Render<VekButtonGroup>(parameters => parameters
+            .Add(p => p.ChildContent, CreateSelectionButtons(() => clickCount++)));
+
+        var buttons = comp.FindAll("button");
+        buttons[0].HasAttribute("aria-pressed").Should().BeFalse();
+        await buttons[0].ClickAsync();
+
+        clickCount.Should().Be(1);
+    }
+
+    /// <summary>
+    /// Single mode keeps one selected key and exposes its state on the corresponding button.
+    /// </summary>
+    [Test]
+    public async Task SingleModeBindsAndKeepsOneButtonPressed()
+    {
+        object selectedValue = "left";
+        IReadOnlyCollection<object> changedValues = null;
+        var comp = Context.Render<VekButtonGroup>(parameters => parameters
+            .Add(p => p.SelectionMode, ButtonGroupSelectionMode.Single)
+            .Add(p => p.SelectedValue, selectedValue)
+            .Add(p => p.SelectedValueChanged, EventCallback.Factory.Create<object>(this, value => selectedValue = value))
+            .Add(p => p.OnSelectionChanged, EventCallback.Factory.Create<IReadOnlyCollection<object>>(this, values => changedValues = values))
+            .Add(p => p.ChildContent, CreateSelectionButtons()));
+
+        var buttons = comp.FindAll("button");
+        buttons[0].GetAttribute("aria-pressed").Should().Be("true");
+        buttons[1].GetAttribute("aria-pressed").Should().Be("false");
+
+        await buttons[1].ClickAsync();
+
+        selectedValue.Should().Be("right");
+        changedValues.Should().ContainSingle().Which.Should().Be("right");
+        comp.FindAll("button").Select(button => button.GetAttribute("aria-pressed")).Should().Equal("false", "true");
+    }
+
+    /// <summary>
+    /// Single mode moves the pressed state when selection is managed by the group.
+    /// </summary>
+    [Test]
+    public async Task SingleModeUpdatesPressedStateWhenUnbound()
+    {
+        var comp = Context.Render<VekButtonGroup>(parameters => parameters
+            .Add(p => p.SelectionMode, ButtonGroupSelectionMode.Single)
+            .Add(p => p.SelectedValue, "left")
+            .Add(p => p.ChildContent, CreateSelectionButtons()));
+
+        await comp.FindAll("button")[1].ClickAsync();
+
+        comp.FindAll("button").Select(button => button.GetAttribute("aria-pressed")).Should().Equal("false", "true");
+    }
+
+    /// <summary>
+    /// Multiple mode toggles only the activated key and reports the remaining selection.
+    /// </summary>
+    [Test]
+    public async Task MultipleModeBindsAndReportsSelectedKeys()
+    {
+        IReadOnlyCollection<object> selectedValues = new object[] { "left" };
+        IReadOnlyCollection<object> changedValues = null;
+        var comp = Context.Render<VekButtonGroup>(parameters => parameters
+            .Add(p => p.SelectionMode, ButtonGroupSelectionMode.Multiple)
+            .Add(p => p.SelectedValues, selectedValues)
+            .Add(p => p.SelectedValuesChanged, EventCallback.Factory.Create<IReadOnlyCollection<object>>(this, values => selectedValues = values))
+            .Add(p => p.OnSelectionChanged, EventCallback.Factory.Create<IReadOnlyCollection<object>>(this, values => changedValues = values))
+            .Add(p => p.ChildContent, CreateSelectionButtons()));
+
+        var buttons = comp.FindAll("button");
+        buttons[0].GetAttribute("aria-pressed").Should().Be("true");
+        buttons[1].GetAttribute("aria-pressed").Should().Be("false");
+
+        await buttons[1].ClickAsync();
+
+        selectedValues.Should().HaveCount(2).And.Contain("left").And.Contain("right");
+        changedValues.Should().HaveCount(2).And.Contain("left").And.Contain("right");
+        comp.FindAll("button").Select(button => button.GetAttribute("aria-pressed")).Should().Equal("true", "true");
+    }
+
+    /// <summary>
+    /// Multiple mode toggles a pressed button off while preserving other selections.
+    /// </summary>
+    [Test]
+    public async Task MultipleModeTogglesPressedStateWhenUnbound()
+    {
+        var comp = Context.Render<VekButtonGroup>(parameters => parameters
+            .Add(p => p.SelectionMode, ButtonGroupSelectionMode.Multiple)
+            .Add(p => p.SelectedValues, new object[] { "left", "right" })
+            .Add(p => p.ChildContent, CreateSelectionButtons()));
+
+        await comp.FindAll("button")[0].ClickAsync();
+
+        comp.FindAll("button").Select(button => button.GetAttribute("aria-pressed")).Should().Equal("false", "true");
+    }
+
     /// <summary>
     /// A group with no parameters renders a horizontal element with the group role, text variant classes, and overridden button styles.
     /// </summary>
@@ -150,4 +252,20 @@ public class ButtonGroupTests : BunitTest
     {
         return comp.FindAll(".vek-button-root").Select(button => button.ClassList.Contains("vek-width-full")).ToList();
     }
+
+    /// <summary>
+    /// Creates keyed buttons for selection behavior tests.
+    /// </summary>
+    private static RenderFragment CreateSelectionButtons(Action onClick = null) => builder =>
+    {
+        builder.OpenComponent<VekButton>(0);
+        builder.AddAttribute(1, nameof(VekButton.Value), "left");
+        builder.AddAttribute(2, nameof(VekButton.OnClick), EventCallback.Factory.Create<MouseEventArgs>(builder, onClick ?? (() => { })));
+        builder.AddAttribute(3, nameof(VekButton.ChildContent), (RenderFragment)(contentBuilder => contentBuilder.AddContent(0, "Left")));
+        builder.CloseComponent();
+        builder.OpenComponent<VekButton>(4);
+        builder.AddAttribute(5, nameof(VekButton.Value), "right");
+        builder.AddAttribute(6, nameof(VekButton.ChildContent), (RenderFragment)(contentBuilder => contentBuilder.AddContent(0, "Right")));
+        builder.CloseComponent();
+    };
 }

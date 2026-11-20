@@ -1,0 +1,47 @@
+@namespace Vek.Docs.Examples
+
+<div class="d-flex flex-column gap-6">
+    <div>
+        <VekText Typo="Typo.subtitle2">Alignment</VekText>
+        <VekButtonGroup SelectionMode="ButtonGroupSelectionMode.Single"
+                        SelectedValue="_selectedAlignment"
+                        SelectedValueChanged="OnAlignmentChanged"
+                        aria-label="Text alignment">
+            <VekButton Value="@("left")">Left</VekButton>
+            <VekButton Value="@("center")">Center</VekButton>
+            <VekButton Value="@("right")">Right</VekButton>
+        </VekButtonGroup>
+        <VekText Typo="Typo.body2">Selected alignment: @_selectedAlignment</VekText>
+    </div>
+
+    <div>
+        <VekText Typo="Typo.subtitle2">Text styles</VekText>
+        <VekButtonGroup SelectionMode="ButtonGroupSelectionMode.Multiple"
+                        SelectedValues="_selectedStyles"
+                        SelectedValuesChanged="OnStylesChanged"
+                        OnSelectionChanged="OnStylesChanged"
+                        aria-label="Text styles">
+            <VekButton Value="@("bold")">Bold</VekButton>
+            <VekButton Value="@("italic")">Italic</VekButton>
+            <VekButton Value="@("underline")">Underline</VekButton>
+        </VekButtonGroup>
+        <VekText Typo="Typo.body2">Selected styles: @string.Join(", ", _selectedStyles.OrderBy(value => value))</VekText>
+    </div>
+</div>
+
+@code {
+    private object _selectedAlignment = "left";
+    private IReadOnlyCollection<object> _selectedStyles = new object[] { "bold" };
+
+    private Task OnAlignmentChanged(object value)
+    {
+        _selectedAlignment = value;
+        return Task.CompletedTask;
+    }
+
+    private Task OnStylesChanged(IReadOnlyCollection<object> values)
+    {
+        _selectedStyles = values;
+        return Task.CompletedTask;
+    }
+}

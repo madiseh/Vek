@@ -4,9 +4,10 @@
 - **Feature ID**: 032
 - **Feature Slug**: button-group-selection-modes
 - **Module**: ButtonGroup
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 32
 - **Dependencies**: []
+- **Started At**: 2026-11-20T10:46:14Z
 
 ---
 

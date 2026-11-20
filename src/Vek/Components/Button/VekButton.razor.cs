@@ -144,6 +144,16 @@ namespace Vek
         public bool FullWidth { get; set; }
 
         /// <summary>
+        /// The key used by a containing button group to track this button's selection.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>. Assign a non-null value when the button participates in a selectable group.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Button.Behavior)]
+        public object? Value { get; set; }
+
+        /// <summary>
         /// The content within this component.
         /// </summary>
         [Parameter]
@@ -249,8 +259,14 @@ namespace Vek
             }
 
             _lastAcceptedClickTimestamp = timestamp;
+            if (ButtonGroup is not null)
+            {
+                await ButtonGroup.HandleButtonClickAsync(this);
+            }
             await base.OnClickHandler(ev);
         }
+
+        internal void RefreshSelection() => StateHasChanged();
 
         protected override bool GetDisabledState() => IsLoading || base.GetDisabledState();
 

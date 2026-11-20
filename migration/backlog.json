@@ -376,9 +376,10 @@
       "title": "ButtonGroup Single and Multiple Selection Toggle Modes",
       "module": "ButtonGroup",
       "priority": 32,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/032-button-group-selection-modes.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-20T10:46:14Z"
     },
     {
       "id": "033",
