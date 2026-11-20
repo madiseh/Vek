@@ -156,7 +156,7 @@ namespace Vek.Docs.Services
 
                 new ApiLinkServiceEntry
                 {
-                    Title = "Sponsors & Backers",
+                    Title = "Support Vek",
                     Link = "about/project/sponsor",
                     SubTitle = "Learn More"
                 },
