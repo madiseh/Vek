@@ -4,10 +4,12 @@
 - **Feature ID**: 035
 - **Feature Slug**: button-badge-and-counter-adornment
 - **Module**: Button
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 35
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/73
 - **Started At**: 2026-11-20T11:25:25Z
+- **Completed At**: 2026-11-20T12:28:32Z
 
 ---
 

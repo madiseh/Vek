@@ -412,10 +412,12 @@
       "title": "Button Floating Badge, Status Dot, and Counter Adornment",
       "module": "Button",
       "priority": 35,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/035-button-badge-and-counter-adornment.md",
       "dependencies": [],
-      "started_at": "2026-11-20T11:25:25Z"
+      "started_at": "2026-11-20T11:25:25Z",
+      "completed_at": "2026-11-20T12:28:32Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/73"
     },
     {
       "id": "036",
