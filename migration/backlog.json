@@ -520,9 +520,11 @@
       "title": "Tabs Dynamic Close Button and Tab Removal Lifecycle",
       "module": "Tabs",
       "priority": 45,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/045-tabs-closable-tabs-and-lifecycle-events.md",
-      "dependencies": []
+      "dependencies": [],
+      "completed_at": "2026-11-20T08:12:36Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/60"
     },
     {
       "id": "046",

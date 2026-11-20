@@ -4,9 +4,11 @@
 - **Feature ID**: 045
 - **Feature Slug**: tabs-closable-tabs-and-lifecycle-events
 - **Module**: Tabs
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 45
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/60
+- **Completed At**: 2026-11-20T08:12:36Z
 
 ---
 
