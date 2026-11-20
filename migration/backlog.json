@@ -773,10 +773,12 @@
       "title": "Dialog Draggable Header, Viewport Clamping, and Resizable Edges",
       "module": "Dialog",
       "priority": 66,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/066-dialog-draggable-and-resizable-modals.md",
       "dependencies": [],
-      "started_at": "2026-11-20T10:46:35Z"
+      "started_at": "2026-11-20T10:46:35Z",
+      "completed_at": "2026-11-20T11:35:01Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/69"
     },
     {
       "id": "067",
