@@ -3,6 +3,55 @@
 All notable changes to Vek will be documented in this file.
 For GitHub Releases and downloadable packages, see the [Releases page](https://github.com/madiseh/Vek/releases).
 
+## [v1.3.0] - 2026-11-20
+
+> Vek v1.3.0 introduces 17 new component features across input, selection, navigation, display, and layout, along with a modern Bento-style documentation overview redesign.
+
+### ✨ Component Features
+- Added split button and dropdown button components with action menus. ([PR #45](https://github.com/madiseh/Vek/pull/45))
+- Added multi-selection with removable chip tags in Select. ([PR #46](https://github.com/madiseh/Vek/pull/46))
+- Added click debounce and double-click protection to Button. ([PR #47](https://github.com/madiseh/Vek/pull/47))
+- Added scale tick marks and step snapping to Slider. ([PR #48](https://github.com/madiseh/Vek/pull/48))
+- Added configurable text value binding modes (OnInput, OnBlur, OnEnter, Delayed) to TextField. ([PR #49](https://github.com/madiseh/Vek/pull/49))
+- Added password masking with visibility toggle button in TextField. ([PR #51](https://github.com/madiseh/Vek/pull/51))
+- Added collapsible card body toggle to Card. ([PR #52](https://github.com/madiseh/Vek/pull/52))
+- Added dual calendar date range selection and preset ranges to DatePicker. ([PR #53](https://github.com/madiseh/Vek/pull/53))
+- Added half-star precision and hover preview to Rating. ([PR #54](https://github.com/madiseh/Vek/pull/54))
+- Added bounded resizable panes and one-click collapse toggles to SplitPanel. ([PR #55](https://github.com/madiseh/Vek/pull/55))
+- Added async action button execution and undo callbacks to Snackbar. ([PR #56](https://github.com/madiseh/Vek/pull/56))
+- Added logical status dot indicators and capped counter positions (99+) to Badge. ([PR #57](https://github.com/madiseh/Vek/pull/57))
+- Added card placeholders and synchronized shimmer animations to Skeleton. ([PR #58](https://github.com/madiseh/Vek/pull/58))
+- Added page size selector and quick jump controls to Pagination. ([PR #59](https://github.com/madiseh/Vek/pull/59))
+- Added closable tabs and closing lifecycle events to Tabs. ([PR #60](https://github.com/madiseh/Vek/pull/60))
+- Added configurable minute/second intervals and 12/24-hour formats to TimePicker. ([PR #61](https://github.com/madiseh/Vek/pull/61))
+- Added drag-and-drop node reordering and hierarchical reparenting to TreeView. ([PR #64](https://github.com/madiseh/Vek/pull/64))
+
+### 🌐 Documentation & Showcase
+- Redesigned the Overview component directory with a modern Bento showcase, categorized cards, and live search. ([PR #50](https://github.com/madiseh/Vek/pull/50))
+
+### 🖼️ Feature Screenshots
+![Vek v1.3.0 component feature screenshots](https://github.com/madiseh/Vek/releases/download/v1.3.0/release-slideshow.gif)
+
+1. SplitButton & DropDownButton action menus — [PR #45](https://github.com/madiseh/Vek/pull/45)
+2. Select multi-selection chip tags — [PR #46](https://github.com/madiseh/Vek/pull/46)
+3. Button click debounce & double-click protection — [PR #47](https://github.com/madiseh/Vek/pull/47)
+4. Slider scale ticks & step snapping — [PR #48](https://github.com/madiseh/Vek/pull/48)
+5. TextField value binding modes — [PR #49](https://github.com/madiseh/Vek/pull/49)
+6. TextField password visibility toggle — [PR #51](https://github.com/madiseh/Vek/pull/51)
+7. Card collapsible body — [PR #52](https://github.com/madiseh/Vek/pull/52)
+8. DatePicker dual range selection & presets — [PR #53](https://github.com/madiseh/Vek/pull/53)
+9. Rating half-star precision & hover preview — [PR #54](https://github.com/madiseh/Vek/pull/54)
+10. SplitPanel resizable panes & collapse — [PR #55](https://github.com/madiseh/Vek/pull/55)
+11. Snackbar async action button & undo callback — [PR #56](https://github.com/madiseh/Vek/pull/56)
+12. Badge status dots & capped counter positions — [PR #57](https://github.com/madiseh/Vek/pull/57)
+13. Skeleton card placeholders & shimmer animation — [PR #58](https://github.com/madiseh/Vek/pull/58)
+14. Pagination page size selector & quick jump — [PR #59](https://github.com/madiseh/Vek/pull/59)
+15. Tabs closable tabs & closing lifecycle events — [PR #60](https://github.com/madiseh/Vek/pull/60)
+16. TimePicker intervals & 12/24-hour formats — [PR #61](https://github.com/madiseh/Vek/pull/61)
+17. TreeView drag-and-drop node reordering — [PR #64](https://github.com/madiseh/Vek/pull/64)
+
+---
+
 ## [v1.2.1] - 2026-11-19
 
 > Vek v1.2.1 centralizes release version resolution from build configuration and updates documentation version labels. The Vek component API is unchanged.
