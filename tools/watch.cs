@@ -1,4 +1,4 @@
-#!/usr/bin/env dotnet
+﻿#!/usr/bin/env dotnet
 
 // This script extends the 'dotnet watch' functionality to also watch and rebuild
 // Vek JS/CSS assets using Bun whenever relevant source files change.
@@ -18,9 +18,9 @@ static async Task Run()
     var toolsDirectory = Path.Combine(repositoryRoot, "tools");
     var srcDirectory = Path.Combine(repositoryRoot, "src");
     var vekProjectDirectory = Path.Combine(srcDirectory, "Vek");
-    var vekDocsProjectDirectory = Path.Combine(srcDirectory, "Vek.Docs.Server");
+    var vekDocsProjectDirectory = Path.Combine(srcDirectory, "Docs", "Vek.Docs.Server");
     var assetBuildScript = Path.Combine(vekProjectDirectory, "build.mts");
-    var buildPropsFile = Path.Combine(srcDirectory, "Directory.Build.props");
+    var buildPropsFile = Path.Combine(repositoryRoot, "Directory.Build.props");
     var versions = GetVersions(buildPropsFile);
     await RestoreTools(repositoryRoot);
 

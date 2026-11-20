@@ -55,7 +55,7 @@
         },
         {
             "matchFileNames": [
-                "src/Vek.Analyzers.CodeFixes/Vek.Analyzers.CodeFixes.csproj"
+                "src/Analyzers/Vek.Analyzers.CodeFixes/Vek.Analyzers.CodeFixes.csproj"
             ],
             "matchPackageNames": [
                 "Microsoft.CodeAnalysis.CSharp.Workspaces"
@@ -65,7 +65,7 @@
         {
             "description": "Shipped analyzer targets Roslyn 4.x; keep the build-time authoring-rules package on the matching 3.x line.",
             "matchFileNames": [
-                "src/Vek.Analyzers/Vek.Analyzers.csproj"
+                "src/Analyzers/Vek.Analyzers/Vek.Analyzers.csproj"
             ],
             "matchPackageNames": [
                 "Microsoft.CodeAnalysis.Analyzers"
@@ -103,7 +103,7 @@
             "description": "One branch for everything that feeds the Bun build, so two open PRs can never rewrite bun.lock at once. The Saturday window closes before the 06:00 AutoTriage sweep, and groupSingleUpdates keeps the group title on weeks when only one package moves.",
             "matchFileNames": [
                 "src/package.json",
-                "src/Directory.Build.props",
+                "Directory.Build.props",
                 ".config/dotnet-tools.json",
                 ".github/renovate.json"
             ],
@@ -126,7 +126,7 @@
                 "@types/bun"
             ],
             "matchFileNames": [
-                "src/Directory.Build.props",
+                "Directory.Build.props",
                 ".config/dotnet-tools.json",
                 ".github/renovate.json",
                 "src/package.json"
