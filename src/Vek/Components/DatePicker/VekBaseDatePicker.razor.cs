@@ -249,6 +249,23 @@ namespace Vek
         public RenderFragment<DatePickerDayContext>? DayCellTemplate { get; set; }
 
         /// <summary>
+        /// Optional content to display as a presets panel alongside the calendar.
+        /// </summary>
+        protected virtual RenderFragment? PresetsContent => null;
+
+        /// <summary>
+        /// The aria-label for the presets panel.
+        /// </summary>
+        protected virtual string PresetsAriaLabel => "Date range presets";
+
+        /// <summary>
+        /// CSS class for the calendar body layout.
+        /// </summary>
+        protected virtual string CalendarBodyClassname => PresetsContent is not null
+            ? "vek-picker-calendar-layout has-presets"
+            : "vek-picker-calendar-layout";
+
+        /// <summary>
         /// The function which returns CSS classes for a date.
         /// </summary>
         /// <remarks>

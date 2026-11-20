@@ -1,0 +1,133 @@
+@page "/"
+@using Vek.Docs
+@using Microsoft.AspNetCore.Components.Web
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model Vek.Docs.WasmHost.Pages.HostModel
+@{
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html data-prerender="@Model.PreRender">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width">
+    <title>Vek - Blazor Component Library</title>
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="description" content="Blazor Component Library based on Material Design. Vek is easy to use and extend, especially for .NET devs because it uses almost no Javascript.">
+    <meta name="keywords" content="vek, blazor, blazor components, blazor material, material design, material design components, matblazor alternative, blazor table, blazor data grid, blazor material design components, .net,.net core, components, webassembly">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Vek - Blazor Component Library">
+    <meta property="og:url" content="https://github.com/madiseh/vek">
+    <meta property="og:site_name" content="Vek" />
+    <meta property="og:description" content="Blazor Component Library based on Material Design. Vek is easy to use and extend, especially for .NET devs because it uses almost no Javascript.">
+    <meta property="og:image" content="https://github.com/madiseh/vek_content/Vek.Docs/images/logo.png">
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Vek - Blazor Component Library">
+    <meta name="twitter:description" content="Blazor Component Library based on Material Design. Vek is easy to use and extend, especially for .NET devs because it uses almost no Javascript.">
+    <meta name="twitter:image" content="https://github.com/madiseh/vek_content/Vek.Docs/images/logo.png">
+    <meta name="docsearch:language" content="en">
+    <meta name="docsearch:version" content="master">
+    <meta http-equiv="Content-Security-Policy"
+          content="base-uri 'self';
+                   default-src 'self';
+                   img-src data: https:;
+                   object-src 'none';
+                   script-src 'self'
+                              'sha256-v8v3RKRPmN4odZ1CWM5gw80QKPCCWMcpNeOmimNL2AA='
+                              https://www.googletagmanager.com
+                              https://use.fontawesome.com
+                              https://kit.fontawesome.com
+                              'unsafe-eval';
+                   style-src 'self'
+                              https://fonts.googleapis.com
+                              https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css
+                              *.fontawesome.com
+                              'unsafe-inline';
+                   font-src 'self'
+                             *.fontawesome.com
+                             https://fonts.gstatic.com;
+                   connect-src 'self'
+                               https://api.github.com
+                               https://azuresearch-usnc.nuget.org
+                               https://discord.com
+                               https://raw.githubusercontent.com/Vek/Vek/master/LICENSE
+                               https://raw.githubusercontent.com/Vek/Vek/dev/ROADMAP.md
+                               https://raw.githubusercontent.com/Vek/Vek/dev/CONTRIBUTING.md
+                               https://*.google-analytics.com
+                               http://localhost:*
+                               wss://localhost:*
+                               ws://localhost:*;
+                   upgrade-insecure-requests;">
+    <base href="/" />
+    <link rel="apple-touch-icon" sizes="180x180" href="_content/Vek.Docs/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="_content/Vek.Docs/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="_content/Vek.Docs/favicon-16x16.png">
+    <link rel="mask-icon" href="_content/Vek.Docs/safari-pinned-tab.svg" color="#2563EB">
+    <meta name="msapplication-TileColor" content="#0B0F17">
+    <meta name="theme-color" content="#2563EB">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
+    <link href="_content/Vek/Vek.min.css?v=#{CACHE_TOKEN}#" rel="stylesheet" />
+    <link href="_content/Vek.Docs/VekDocs.min.css?v=#{CACHE_TOKEN}#" rel="stylesheet" />
+     @if(Model.PreRender)
+    {
+        <component type="typeof(HeadOutlet)" render-mode="WebAssemblyPrerendered" />
+    }
+</head>
+
+<body>
+    @if(Model.PreRender)
+    {
+        <component type="typeof(Vek.Docs.Wasm.App)" render-mode="WebAssemblyPrerendered" />
+    }
+    else
+    {
+        <div id="app">
+            <div id="loading-screen" style="height:100%;width:100%;margin:0;position:fixed;background-color:#0B0F17;">
+                <div style="display: flex;flex-direction:column;justify-content: center;align-items:center;height:100%;width:100%;gap:1.5rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" height="120px" width="120px">
+                        <defs>
+                            <linearGradient id="vekHostGradLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#38BDF8"/>
+                                <stop offset="50%" stop-color="#2563EB"/>
+                                <stop offset="100%" stop-color="#1D4ED8"/>
+                            </linearGradient>
+                            <linearGradient id="vekHostGradRight" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#60A5FA"/>
+                                <stop offset="50%" stop-color="#3B82F6"/>
+                                <stop offset="100%" stop-color="#1E40AF"/>
+                            </linearGradient>
+                            <linearGradient id="vekHostGradApex" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#1D4ED8"/>
+                                <stop offset="100%" stop-color="#3B82F6"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M 17 21 C 17 19.3 18.3 18 20 18 L 33 18 C 34.7 18 36 19.3 36 21 L 50 57 L 50 80 L 47 81.5 L 17 23 Z" fill="url(#vekHostGradLeft)"/>
+                        <path d="M 64 21 C 64 19.3 65.3 18 67 18 L 80 18 C 81.7 18 83 19.3 83 21 L 83 23 L 53 81.5 L 50 80 L 50 57 Z" fill="url(#vekHostGradRight)"/>
+                        <path d="M 47 81.5 Q 50 83 53 81.5 L 50 79 Z" fill="url(#vekHostGradApex)"/>
+                        <line x1="50" y1="57" x2="50" y2="80" stroke="#FFFFFF" stroke-width="0.8" opacity="0.4"/>
+                    </svg>
+                    <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:1.1rem;letter-spacing:0.1em;color:#94A3B8;">LOADING VEK</div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_content/Vek/Vek.min.js?v=#{CACHE_TOKEN}#"></script>
+    <script src="_content/Vek.Docs/JS/docs.js?v=#{CACHE_TOKEN}#"></script>
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_content/Blazor-Analytics/blazor-analytics.js"></script>
+</body>
+
+</html>

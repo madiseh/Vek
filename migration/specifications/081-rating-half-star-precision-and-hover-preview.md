@@ -4,9 +4,12 @@
 - **Feature ID**: 081
 - **Feature Slug**: rating-half-star-precision-and-hover-preview
 - **Module**: Rating
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 81
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/54
+- **Started At**: 2026-11-19T19:56:46Z
+- **Completed At**: 2026-11-19T21:21:49Z
 
 ---
 

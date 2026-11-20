@@ -1,4 +1,5 @@
 ﻿@namespace Vek
+@using Vek.Resources
 @inherits VekComponentBase
 @inject InternalVekLocalizer Localizer
 
@@ -141,5 +142,33 @@
                     @TabPanelHeader(panel)
                 </div>
             }
+            @if (this is not VekDynamicTabs && IsTabCloseable(panel) && ShouldRenderCloseButton(panel))
+            {
+                @RenderCloseButton(panel)
+            }
         </div>;
+
+    private RenderFragment RenderCloseButton(VekTabPanel panel) =>
+        @<span class="vek-tab-close-wrapper" @onclick:stopPropagation="true" @onkeydown:stopPropagation="true">
+            @if (!string.IsNullOrEmpty(GetCloseIconToolTip(panel)))
+            {
+                <VekTooltip Text="@GetCloseIconToolTip(panel)">
+                    <VekIconButton Icon="@GetCloseIcon(panel)"
+                                   Class="@GetCloseIconClass(panel)"
+                                   Size="Size.Small"
+                                   Disabled="@IsPanelDisabled(panel)"
+                                   OnClick="@(() => CloseTabAsync(panel))"
+                                   aria-label="@Localizer[LanguageResource.VekTabs_CloseTab]" />
+                </VekTooltip>
+            }
+            else
+            {
+                <VekIconButton Icon="@GetCloseIcon(panel)"
+                               Class="@GetCloseIconClass(panel)"
+                               Size="Size.Small"
+                               Disabled="@IsPanelDisabled(panel)"
+                               OnClick="@(() => CloseTabAsync(panel))"
+                               aria-label="@Localizer[LanguageResource.VekTabs_CloseTab]" />
+            }
+        </span>;
 }

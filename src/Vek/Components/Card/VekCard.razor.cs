@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Vek.State;
 using Vek.Utilities;
 
 namespace Vek
@@ -12,6 +13,8 @@ namespace Vek
     /// <seealso cref="VekCardMedia" />
     public partial class VekCard : VekComponentBase
     {
+        private readonly ParameterState<bool> _expandedState;
+
         protected string Classname => new CssBuilder("vek-card")
             .AddClass(Class)
             .Build();
@@ -62,5 +65,47 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.Card.Behavior)]
         public RenderFragment? ChildContent { get; set; }
+
+        /// <summary>
+        /// Allows the card body to be collapsed from its header.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Card.Behavior)]
+        public bool Collapsible { get; set; }
+
+        /// <summary>
+        /// Displays or hides the card body when <see cref="Collapsible"/> is enabled.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.Card.Behavior)]
+        public bool Expanded { get; set; } = true;
+
+        /// <summary>
+        /// Occurs when the expanded state changes.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.Card.Behavior)]
+        public EventCallback<bool> ExpandedChanged { get; set; }
+
+        internal bool IsExpanded => _expandedState.Value;
+
+        public VekCard()
+        {
+            using var registerScope = CreateRegisterScope();
+            _expandedState = registerScope.RegisterParameter<bool>(nameof(Expanded))
+                .WithParameter(() => Expanded)
+                .WithEventCallback(() => ExpandedChanged);
+        }
+
+        internal Task ToggleExpandedAsync()
+        {
+            return Collapsible ? _expandedState.SetValueAsync(!_expandedState.Value) : Task.CompletedTask;
+        }
     }
 }

@@ -399,9 +399,12 @@
       "title": "Button Click Debounce and Double-Click Protection",
       "module": "Button",
       "priority": 34,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/034-button-double-click-and-debounce-guard.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:54:50Z",
+      "completed_at": "2026-11-19T20:29:24Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/47"
     },
     {
       "id": "035",
@@ -445,9 +448,12 @@
       "title": "TextBox Configurable Value Binding Modes and Debounce Delay",
       "module": "TextField",
       "priority": 38,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/038-textbox-debounced-bind-value-modes.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:54:51Z",
+      "completed_at": "2026-11-19T20:31:59Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/49"
     },
     {
       "id": "039",
@@ -529,9 +535,11 @@
       "title": "Tabs Dynamic Close Button and Tab Removal Lifecycle",
       "module": "Tabs",
       "priority": 45,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/045-tabs-closable-tabs-and-lifecycle-events.md",
-      "dependencies": []
+      "dependencies": [],
+      "completed_at": "2026-11-20T08:12:36Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/60"
     },
     {
       "id": "046",
@@ -633,9 +641,12 @@
       "title": "DatePicker Dual Calendar Range Selection with Preset Ranges",
       "module": "DatePicker",
       "priority": 54,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/054-datepicker-range-picker-mode.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:31:16Z",
+      "completed_at": "2026-11-19T21:11:58Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/53"
     },
     {
       "id": "055",
@@ -653,9 +664,12 @@
       "title": "TimePicker Configurable Minute Intervals, Seconds, and 12/24-Hour Formats",
       "module": "TimePicker",
       "priority": 56,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/056-timepicker-time-intervals-and-12-24-format.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:31:19Z",
+      "completed_at": "2026-11-20T08:15:12Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/61"
     },
     {
       "id": "057",
@@ -696,9 +710,12 @@
       "title": "TreeView Interactive Node Drag-and-Drop Reordering and Reparenting",
       "module": "TreeView",
       "priority": 60,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/060-treeview-node-drag-and-drop-reorder.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:31:22Z",
+      "completed_at": "2026-11-20T08:54:00Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/64"
     },
     {
       "id": "061",
@@ -909,9 +926,12 @@
       "title": "Rating Fractional/Half-Star Precision and Live Hover Score Preview",
       "module": "Rating",
       "priority": 81,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/081-rating-half-star-precision-and-hover-preview.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:56:46Z",
+      "completed_at": "2026-11-19T21:21:49Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/54"
     },
     {
       "id": "082",
@@ -929,9 +949,12 @@
       "title": "SplitPanel Resizable Splitter Bar with Double-Click Pane Collapse",
       "module": "SplitPanel",
       "priority": 83,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/083-splitpanel-resizable-panes-and-collapse.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:56:48Z",
+      "completed_at": "2026-11-19T21:24:21Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/55"
     },
     {
       "id": "084",
@@ -951,9 +974,12 @@
       "title": "Card Collapsible Body with Animated Toggle Action in Header",
       "module": "Card",
       "priority": 85,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/085-card-expandable-collapsible-content.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:56:49Z",
+      "completed_at": "2026-11-19T21:09:23Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/52"
     },
     {
       "id": "086",
@@ -991,9 +1017,12 @@
       "title": "Snackbar Interactive Action Buttons with Async Undo Callback",
       "module": "Snackbar",
       "priority": 89,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/089-snackbar-action-button-and-undo-callback.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:56:58Z",
+      "completed_at": "2026-11-19T21:44:36Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/56"
     },
     {
       "id": "090",
@@ -1013,9 +1042,12 @@
       "title": "Skeleton Pre-Configured Shape Cards, Avatars, and Synchronized Shimmer",
       "module": "Skeleton",
       "priority": 91,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/091-skeleton-bone-shapes-and-shimmer-animation.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T19:56:59Z",
+      "completed_at": "2026-11-19T22:06:21Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/58"
     },
     {
       "id": "092",
@@ -1033,9 +1065,11 @@
       "title": "Badge Status Indicator Dots, Max Value Truncation (99+), and Placement Anchors",
       "module": "Badge",
       "priority": 93,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/093-badge-status-dots-and-overlap-positions.md",
-      "dependencies": []
+      "dependencies": [],
+      "completed_at": "2026-11-19T22:03:47Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/57"
     },
     {
       "id": "094",
@@ -1087,9 +1121,12 @@
       "title": "Pagination Integrated Page Size Selector Dropdown and Direct Page Jump Input",
       "module": "Pagination",
       "priority": 98,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/098-pagination-page-size-selector-and-quick-jump.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-19T21:49:00Z",
+      "completed_at": "2026-11-19T22:37:29Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/59"
     },
     {
       "id": "099",

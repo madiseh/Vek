@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Vek.State;
 using Vek.Utilities;
 
@@ -19,6 +20,10 @@ namespace Vek
     public partial class VekButton : VekBaseButton, IDisposable
     {
         private readonly ParameterState<bool> _loadingState;
+        private readonly ParameterState<int> _clickDebounceIntervalState;
+        private readonly ParameterState<int> _doubleClickThresholdState;
+        private long? _lastAcceptedClickTimestamp;
+        private long? _pendingClickTimestamp;
 
         protected string Classname => new CssBuilder("vek-button-root vek-button")
             .AddClass($"vek-button-{Variant.ToStringFast(true)}")
@@ -163,6 +168,33 @@ namespace Vek
         public EventCallback<bool> LoadingChanged { get; set; }
 
         /// <summary>
+        /// The minimum time in milliseconds between click event invocations.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>300</c>. Set to <c>0</c> to allow every click through.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.Button.Behavior)]
+        public int ClickDebounceInterval { get; set; } = 300;
+
+        /// <summary>
+        /// The time in milliseconds within which a second click raises <see cref="OnDoubleClick"/>.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>300</c>. Set to <c>0</c> to disable double-click detection.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.Button.Behavior)]
+        public int DoubleClickThreshold { get; set; } = 300;
+
+        /// <summary>
+        /// Occurs when a second click arrives within <see cref="DoubleClickThreshold"/> milliseconds.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.Button.Behavior)]
+        public EventCallback<MouseEventArgs> OnDoubleClick { get; set; }
+
+        /// <summary>
         /// Supplies custom content for the loading indicator.
         /// </summary>
         /// <remarks>
@@ -178,9 +210,47 @@ namespace Vek
             _loadingState = registerScope.RegisterParameter<bool>(nameof(Loading))
                 .WithParameter(() => Loading)
                 .WithEventCallback(() => LoadingChanged);
+            _clickDebounceIntervalState = registerScope.RegisterParameter<int>(nameof(ClickDebounceInterval))
+                .WithParameter(() => ClickDebounceInterval);
+            _doubleClickThresholdState = registerScope.RegisterParameter<int>(nameof(DoubleClickThreshold))
+                .WithParameter(() => DoubleClickThreshold);
         }
 
         protected bool IsLoading => _loadingState.Value;
+
+        [Inject]
+        private TimeProvider TimeProvider { get; set; } = null!;
+
+        protected override async Task OnClickHandler(MouseEventArgs ev)
+        {
+            if (GetDisabledState())
+            {
+                return;
+            }
+
+            var timestamp = TimeProvider.GetTimestamp();
+            var doubleClickThreshold = _doubleClickThresholdState.Value;
+            var isDoubleClick = doubleClickThreshold > 0
+                                && _pendingClickTimestamp is { } previousClickTimestamp
+                                && TimeProvider.GetElapsedTime(previousClickTimestamp, timestamp) <= TimeSpan.FromMilliseconds(doubleClickThreshold);
+
+            _pendingClickTimestamp = isDoubleClick ? null : timestamp;
+            if (isDoubleClick)
+            {
+                await OnDoubleClick.InvokeAsync(ev);
+            }
+
+            var clickDebounceInterval = _clickDebounceIntervalState.Value;
+            if (clickDebounceInterval > 0
+                && _lastAcceptedClickTimestamp is { } lastAcceptedClickTimestamp
+                && TimeProvider.GetElapsedTime(lastAcceptedClickTimestamp, timestamp) < TimeSpan.FromMilliseconds(clickDebounceInterval))
+            {
+                return;
+            }
+
+            _lastAcceptedClickTimestamp = timestamp;
+            await base.OnClickHandler(ev);
+        }
 
         protected override bool GetDisabledState() => IsLoading || base.GetDisabledState();
 

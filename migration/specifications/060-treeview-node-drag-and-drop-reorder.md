@@ -4,9 +4,12 @@
 - **Feature ID**: 060
 - **Feature Slug**: treeview-node-drag-and-drop-reorder
 - **Module**: TreeView
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 60
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/64
+- **Started At**: 2026-11-19T19:31:22Z
+- **Completed At**: 2026-11-20T08:54:00Z
 
 ---
 

@@ -24,6 +24,14 @@
     cursor: ew-resize;
     position: relative;
     outline: none;
+    flex: 0 0 auto;
+    background: var(--vek-palette-divider);
+    transition: background-color 120ms ease;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--vek-palette-action-default-hover);
+    }
 
     &.horizontal {
       cursor: n-resize;

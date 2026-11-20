@@ -64,16 +64,6 @@ namespace Vek
         public string AddIconStyle { get; set; } = string.Empty;
 
         /// <summary>
-        /// The CSS classes applied to the "Close" button.
-        /// </summary>
-        /// <remarks>
-        /// Defaults to <c>""</c>. Multiple classes must be separated by spaces.
-        /// </remarks>
-        [Parameter]
-        [Category(CategoryTypes.Tabs.Appearance)]
-        public string CloseIconClass { get; set; } = string.Empty;
-
-        /// <summary>
         /// The CSS styles applied to the "Close" button.
         /// </summary>
         /// <remarks>
@@ -93,16 +83,6 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.Tabs.Behavior)]
         public string AddIconToolTip { get; set; } = string.Empty;
-
-        /// <summary>
-        /// The text shown when the user hovers over the "Close" button.
-        /// </summary>
-        /// <remarks>
-        /// Defaults to <c>""</c>. When <c>null</c> or empty, no tooltip will be shown.
-        /// </remarks>
-        [Parameter]
-        [Category(CategoryTypes.Tabs.Behavior)]
-        public string CloseIconToolTip { get; set; } = string.Empty;
 
         protected override string InternalClassName { get; } = "vek-dynamic-tabs";
 

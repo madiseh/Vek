@@ -1,0 +1,27 @@
+@namespace Vek.Docs.Examples
+
+<VekStack Spacing="3">
+    <VekTextField @bind-Value="_instantValue"
+                  BindValueMode="BindValueMode.OnInput"
+                  Label="Update on input"
+                  Variant="Variant.Outlined" />
+    <VekTextField @bind-Value="_committedValue"
+                  BindValueMode="BindValueMode.OnChange"
+                  Label="Update on Enter or blur"
+                  Variant="Variant.Outlined" />
+    <VekTextField @bind-Value="_delayedValue"
+                  BindValueMode="BindValueMode.OnDelayedInput"
+                  InputDelay="500"
+                  Label="Update after 500 ms"
+                  Variant="Variant.Outlined" />
+
+    <VekText Typo="Typo.body2">On input: @_instantValue</VekText>
+    <VekText Typo="Typo.body2">On Enter or blur: @_committedValue</VekText>
+    <VekText Typo="Typo.body2">After the delay: @_delayedValue</VekText>
+</VekStack>
+
+@code {
+    private string _instantValue = "Type to update immediately";
+    private string _committedValue = "Press Enter or leave this field";
+    private string _delayedValue = "Wait until typing pauses";
+}

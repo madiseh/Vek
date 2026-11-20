@@ -21,6 +21,7 @@ namespace Vek
         /// </summary>
         protected string ClassName =>
             new CssBuilder("vek-rating-item")
+                .AddClass($"vek-rating-item-half-{HalfPosition}", HalfPosition is not null)
                 .AddClass("vek-ripple", Ripple && !ReadOnly)
                 .AddClass($"vek-{Color.ToStringFast(true)}-text", Color != Color.Default)
                 .AddClass("vek-rating-item-active", Active)
@@ -39,11 +40,23 @@ namespace Vek
         /// The value for this item.
         /// </summary>
         /// <remarks>
-        /// Defaults to the index of this item in the parent <see cref="VekRating"/>.  (e.g. The 3rd item has a value of <c>3</c>.)
+        /// Defaults to the item's whole or fractional position in the parent <see cref="VekRating"/>.
         /// </remarks>
         [Parameter]
         [Category(CategoryTypes.Rating.Data)]
         public int ItemValue { get; set; }
+
+        /// <summary>
+        /// Supplies a fractional position when this item represents part of a rating increment.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.Rating.Data)]
+        public double? PreciseItemValue { get; set; }
+
+        /// <summary>Identifies the visible half when this item is part of a half-step rating.</summary>
+        [Parameter]
+        [Category(CategoryTypes.Rating.Appearance)]
+        public string? HalfPosition { get; set; }
 
         /// <summary>
         /// The size of this item.
@@ -104,6 +117,11 @@ namespace Vek
         [Parameter]
         public EventCallback<int> ItemClicked { get; set; }
 
+        /// <summary>Occurs when a fractional rating position is clicked.</summary>
+        [Parameter]
+        [Category(CategoryTypes.Rating.Data)]
+        public EventCallback<double> PreciseItemClicked { get; set; }
+
         /// <summary>
         /// Occurs when the user hovers over this item.
         /// </summary>
@@ -113,13 +131,20 @@ namespace Vek
         [Parameter]
         public EventCallback<int?> ItemHovered { get; set; }
 
+        /// <summary>Occurs when the pointer enters or leaves a fractional rating position.</summary>
+        [Parameter]
+        [Category(CategoryTypes.Rating.Data)]
+        public EventCallback<double?> PreciseItemHovered { get; set; }
+
         internal Color ItemColor { get; set; }
 
         internal string? ItemIcon { get; set; }
 
         internal bool Active { get; set; }
 
-        private bool Checked => ItemValue == Rating?.GetState<int>(nameof(Rating.SelectedValue));
+        private double CurrentItemValue => PreciseItemValue ?? ItemValue;
+
+        private bool Checked => CurrentItemValue == Rating?.CurrentValue;
 
         protected override void OnParametersSet()
         {
@@ -135,16 +160,16 @@ namespace Vek
                 return null;
             }
 
-            if (Rating.HoveredValue.HasValue && Rating.HoveredValue.Value >= ItemValue)
+            if (Rating.HoveredValue.HasValue && Rating.HoveredValue.Value >= CurrentItemValue)
             {
                 // full icon when RatingItem hovered
                 return Rating.FullIcon;
             }
 
-            var ratingSelectedValue = Rating.GetState<int>(nameof(Rating.SelectedValue));
-            if (ratingSelectedValue >= ItemValue)
+            var ratingSelectedValue = Rating.CurrentValue;
+            if (ratingSelectedValue >= CurrentItemValue)
             {
-                if (Rating.HoveredValue.HasValue && Rating.HoveredValue.Value < ItemValue)
+                if (Rating.HoveredValue.HasValue && Rating.HoveredValue.Value < CurrentItemValue)
                 {
                     // empty icon when equal or higher RatingItem value clicked, but less value hovered
                     return Rating.EmptyIcon;
@@ -170,16 +195,16 @@ namespace Vek
                 return Color.Inherit;
             }
 
-            if (Rating.HoveredValue.HasValue && Rating.HoveredValue.Value >= ItemValue)
+            if (Rating.HoveredValue.HasValue && Rating.HoveredValue.Value >= CurrentItemValue)
             {
                 // full icon color when RatingItem hovered
                 return Rating.FullIconColor.Value;
             }
 
-            var ratingSelectedValue = Rating.GetState<int>(nameof(Rating.SelectedValue));
-            if (ratingSelectedValue >= ItemValue)
+            var ratingSelectedValue = Rating.CurrentValue;
+            if (ratingSelectedValue >= CurrentItemValue)
             {
-                if (Rating.HoveredValue.HasValue && Rating.HoveredValue.Value < ItemValue)
+                if (Rating.HoveredValue.HasValue && Rating.HoveredValue.Value < CurrentItemValue)
                 {
                     // empty icon color when equal or higher RatingItem value clicked, but less value hovered
                     return Rating.EmptyIconColor.Value;
@@ -203,7 +228,9 @@ namespace Vek
 
             Active = false;
 
-            return ItemHovered.InvokeAsync(null);
+            return PreciseItemHovered.HasDelegate
+                ? PreciseItemHovered.InvokeAsync(null)
+                : ItemHovered.InvokeAsync(null);
         }
 
         internal Task HandlePointerOverAsync(PointerEventArgs e)
@@ -215,7 +242,9 @@ namespace Vek
 
             Active = true;
 
-            return ItemHovered.InvokeAsync(ItemValue);
+            return PreciseItemHovered.HasDelegate
+                ? PreciseItemHovered.InvokeAsync(CurrentItemValue)
+                : ItemHovered.InvokeAsync(ItemValue);
         }
 
         private Task HandleClickAsync()
@@ -226,7 +255,12 @@ namespace Vek
             }
 
             Active = false;
-            var ratingSelectedValue = Rating?.GetState<int>(nameof(Rating.SelectedValue));
+            var ratingSelectedValue = Rating?.CurrentValue;
+
+            if (PreciseItemClicked.HasDelegate)
+            {
+                return PreciseItemClicked.InvokeAsync(ratingSelectedValue == CurrentItemValue ? 0 : CurrentItemValue);
+            }
 
             return ItemClicked.InvokeAsync(ratingSelectedValue == ItemValue ? 0 : ItemValue);
         }

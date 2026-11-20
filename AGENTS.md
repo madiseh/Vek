@@ -12,11 +12,11 @@ Vek maintains centralized architecture and governance documentation under `docs/
 
 | Change type | Common locations | Verification | Notes |
 | --- | --- | --- | --- |
-| Component C#/Razor behavior | `src/Vek`, `src/Vek.UnitTests*` | Filtered `dotnet test` on `Vek.UnitTests.csproj` | Use `-p:SkipBunCompile=true` unless assets are affected. |
+| Component C#/Razor behavior | `src/Vek`, `tests/Components/Vek.UnitTests` | Filtered `dotnet test` on `Vek.UnitTests.csproj` | Use `-p:SkipBunCompile=true` unless assets are affected. |
 | Component public API | Component, tests, docs | Unit tests plus relevant docs validation | XML docs and `[Category(...)]` are required. |
-| Docs page/example | `src/Vek.Docs*` | Relevant docs build or generated docs tests | Do not edit generated docs tests. |
+| Docs page/example | `src/Docs/Vek.Docs*` | Relevant docs build or generated docs tests | Do not edit generated docs tests. |
 | TS/style/assets | `TScripts`, styles, `wwwroot`, asset inputs | Normal scoped build | Do not use `-p:SkipBunCompile=true`. |
-| Analyzer/code fix | `src/Vek.Analyzers*` | Filtered analyzer tests | Keep diagnostics, fixes, and tests aligned. |
+| Analyzer/code fix | `src/Analyzers/Vek.Analyzers*` | Filtered analyzer tests | Keep diagnostics, fixes, and tests aligned. |
 | Metadata/prose only | Root markdown, `.github` text | No `dotnet` verification | Do not run build/test/format for prose-only changes. |
 
 ## Scope and Workflow
@@ -30,12 +30,12 @@ Vek maintains centralized architecture and governance documentation under `docs/
 - Do not make speculative large changes when the intent is unclear. Ask a clarifying question or propose a short plan instead.
 
 ### Default working rules
-- Follow `src/.editorconfig`.
+- Follow `.editorconfig`.
 - Treat warnings as errors. Do not ignore analyzer warnings.
 - Do not make `dotnet clean` part of the normal local loop. Use it only when incremental build state is clearly stale or corrupted.
 - Incremental builds can miss a missing `using` directive that CI's clean build rejects with `CS0246`. When a change references a type from a namespace not already imported in that file, verify the namespace (many types such as `FormFieldChangedEventArgs` live in `Vek.Utilities`, not `Vek`) before finishing.
 - Prefer a single scoped `dotnet build` or `dotnet test` command as the first verification step. Split build and test only when you will reuse the build outputs for multiple test runs.
-- Do not build `src/Vek/Vek.csproj` immediately before testing `src/Vek.UnitTests/Vek.UnitTests.csproj`; the test project already builds `Vek`, `Vek.UnitTests.Shared`, and `Vek.UnitTests.Viewer`.
+- Do not build `src/Vek/Vek.csproj` immediately before testing `tests/Components/Vek.UnitTests/Vek.UnitTests.csproj`; the test project already builds `Vek`, `Vek.UnitTests.Shared`, and `Vek.UnitTests.Viewer`.
 
 ## Before Editing
 
@@ -43,12 +43,13 @@ Vek maintains centralized architecture and governance documentation under `docs/
 
 ## Repository Layout
 
-- `src/` contains the product code and nearly all project work. Expect the main library, docs app, tests, analyzers, benchmarks, and related support projects to live here.
+- `src/` contains product and supporting projects. `tests/` contains test projects grouped by component, analyzer, docs, and shared infrastructure.
 - `src/Vek/` is the core component library. Most component, utility, styling, `TScripts`, and `wwwroot` changes land here.
-- `src/Vek.UnitTests*` contains test projects and test support code. Look here for component tests, shared test infrastructure, viewer-only helpers, and docs-related tests.
-- `src/Vek.Docs*` contains the documentation site, examples, and docs build support. Update docs here when component behavior or public API changes.
-- `src/Vek.Analyzers*` contains analyzer, code-fix, and analyzer-test projects.
-- Repo-wide build configuration is centered in `src/`, especially `src/Directory.Build.*` and `src/.editorconfig`.
+- `src/Docs/` contains the documentation site and docs build projects; `src/Examples/` contains data shared by documentation examples and the test viewer.
+- `src/Analyzers/` contains analyzer and code-fix product projects. Analyzer tests and test components live in `tests/Analyzers/`.
+- `src/Benchmarks/` contains performance benchmarks.
+- `tests/Components/`, `tests/Analyzers/`, `tests/Docs/`, and `tests/Shared/` separate test projects by responsibility.
+- Repo-wide build and formatting configuration lives at the repository root in `Directory.Build.*` and `.editorconfig`.
 - Tooling and automation live primarily in `tools/`, `.config/`, and `.github/`.
 - Treat `bin/`, `obj/`, `TestResults/`, generated files, and similar outputs as build artifacts unless the task explicitly targets them.
 
@@ -60,29 +61,29 @@ Vek maintains centralized architecture and governance documentation under `docs/
 ## Scoped Commands and Verification
 
 ### Project targets
-- Components: `src/Vek/Vek.csproj` and `src/Vek.UnitTests/Vek.UnitTests.csproj`
-- Docs: `src/Vek.Docs.Compiler/Vek.Docs.Compiler.csproj`, `src/Vek.Docs/Vek.Docs.csproj`, `src/Vek.Docs.Server/Vek.Docs.Server.csproj`, and `src/Vek.Docs.WasmHost/Vek.Docs.WasmHost.csproj`
-- Docs tests: `src/Vek.UnitTests.Docs/Vek.UnitTests.Docs.csproj`
-- Analyzers and code fixes: `src/Vek.Analyzers/Vek.Analyzers.csproj`, `src/Vek.Analyzers.CodeFixes/Vek.Analyzers.CodeFixes.csproj`, and `src/Vek.UnitTests.Analyzers/Vek.UnitTests.Analyzers.csproj`
+- Components: `src/Vek/Vek.csproj` and `tests/Components/Vek.UnitTests/Vek.UnitTests.csproj`
+- Docs: projects under `src/Docs/`, including `Vek.Docs`, `Vek.Docs.Compiler`, `Vek.Docs.Server`, `Vek.Docs.Wasm`, and `Vek.Docs.WasmHost`
+- Docs tests: `tests/Docs/Vek.UnitTests.Docs/Vek.UnitTests.Docs.csproj`
+- Analyzers and code fixes: `src/Analyzers/Vek.Analyzers/Vek.Analyzers.csproj`, `src/Analyzers/Vek.Analyzers.CodeFixes/Vek.Analyzers.CodeFixes.csproj`, and `tests/Analyzers/Vek.UnitTests.Analyzers/Vek.UnitTests.Analyzers.csproj`
 
 ### Choose the smallest valid verification loop
 - For repository metadata or prose-only changes outside the build inputs, such as `README.md`, `CHANGELOG.md`, or `.github/` text-only edits: do not run `dotnet`.
-- For component `.cs` or `.razor` changes with behavior coverage: use the default local loop below, a single filtered `dotnet test` against `src/Vek.UnitTests/Vek.UnitTests.csproj` with `-p:SkipBunCompile=true`.
+- For component `.cs` or `.razor` changes with behavior coverage: use the default local loop below, a single filtered `dotnet test` against `tests/Components/Vek.UnitTests/Vek.UnitTests.csproj` with `-p:SkipBunCompile=true`.
 - For component `.cs` or `.razor` changes that only need compile validation: build one framework with `dotnet build src/Vek/Vek.csproj -f net10.0 -p:SkipBunCompile=true`. The library multi-targets net8.0/net9.0/net10.0/net11.0; `-f` compiles just one for a faster check, and PR CI also compiles only net10.0.
 - For `TScripts` or `Styles`: run a normal scoped project build.
 - For docs changes: build the relevant docs project. Avoid docs host run loops during agent verification.
 - To check whether current `dev` already contains a fix, use https://github.com/madiseh/vek, which is continuously deployed from `dev`, before building anything locally. vek.com tracks the latest release.
-- For docs example or API-page changes that need parity with CI, run `dotnet test --project src/Vek.UnitTests.Docs/Vek.UnitTests.Docs.csproj -p:GenerateDocsTests=true`.
-- For analyzer or code-fix changes: run a single filtered `dotnet test --project ... -- --filter ...` against `src/Vek.UnitTests.Analyzers/Vek.UnitTests.Analyzers.csproj`.
+- For docs example or API-page changes that need parity with CI, run `dotnet test --project tests/Docs/Vek.UnitTests.Docs/Vek.UnitTests.Docs.csproj -p:GenerateDocsTests=true`.
+- For analyzer or code-fix changes: run a single filtered `dotnet test --project ... -- --filter ...` against `tests/Analyzers/Vek.UnitTests.Analyzers/Vek.UnitTests.Analyzers.csproj`.
 
 ### Restore
 Do not run restore automatically at the start of every session. Reuse existing assets in the working tree.
 
-Run restore only when restore inputs changed (`*.csproj`, `src/Directory.Build.*`, or NuGet configuration files), when the target project's `obj/project.assets.json` is missing, or when a `--no-restore` build or test fails because restore data is stale. Restore only the project graph you are about to validate, for example `dotnet restore src/Vek.UnitTests/Vek.UnitTests.csproj`.
+Run restore only when restore inputs changed (`*.csproj`, root `Directory.Build.*`, or NuGet configuration files), when the target project's `obj/project.assets.json` is missing, or when a `--no-restore` build or test fails because restore data is stale. Restore only the project graph you are about to validate, for example `dotnet restore tests/Components/Vek.UnitTests/Vek.UnitTests.csproj`.
 
 If `.config/dotnet-tools.json` changes, run `dotnet tool restore --tool-manifest .config/dotnet-tools.json`.
 
-If `src/package.json`, `src/bun.lock`, `src/.oxlintrc.json`, `src/Directory.Build.props`, any `tsconfig.json`, `src/Vek/bunfig.toml`, `src/Vek/test-setup.ts`, or a project's build script (`build.mjs` or `build.mts`) changes, run a normal scoped build without `SkipBunCompile` for the affected project so the frontend asset pipeline runs.
+If `src/package.json`, `src/bun.lock`, `src/.oxlintrc.json`, `Directory.Build.props`, any `tsconfig.json`, `src/Vek/bunfig.toml`, `src/Vek/test-setup.ts`, or a project's build script (`build.mjs` or `build.mts`) changes, run a normal scoped build without `SkipBunCompile` for the affected project so the frontend asset pipeline runs.
 
 ### Default local loop for C# or Razor component changes
 
@@ -91,34 +92,34 @@ If `src/package.json`, `src/bun.lock`, `src/.oxlintrc.json`, `src/Directory.Buil
 - This repository uses Microsoft.Testing.Platform via `global.json`, so pass runner-specific options after `--` and use `--hangdump`/`--hangdump-timeout`; the test app rejects VSTest `--blame-hang` flags as unknown options.
 - "Zero tests ran" means the filter or a runner flag was wrong; treat it as a failed run, not a passing one.
 - Do not pipe `dotnet` output through filters such as `tail`; that masks the exit code. Read the log for `Build succeeded`, `error CS`, or the test summary instead.
-- On Windows, leftover `Vek.UnitTests.exe` test hosts lock output assemblies and fail the build with `MSB3027`. Before rebuilding, stop only this checkout's hosts by running this PowerShell from the repository root: `Get-Process Vek.UnitTests -ErrorAction SilentlyContinue | Where-Object { $_.Path -like "$PWD\src\*" } | Stop-Process -Force`. Killing by name alone ends test runs in other worktrees; the `src\` segment keeps a main checkout from matching worktrees nested inside it.
+- On Windows, leftover `Vek.UnitTests.exe` test hosts lock output assemblies and fail the build with `MSB3027`. Before rebuilding, stop only this checkout's hosts by running this PowerShell from the repository root: `Get-Process Vek.UnitTests -ErrorAction SilentlyContinue | Where-Object { $_.Path -like "$PWD\tests\*" } | Stop-Process -Force`. Killing by name alone ends test runs in other worktrees; the `tests\` segment keeps a main checkout from matching worktrees nested inside it.
 
 ```bash
-dotnet test --project src/Vek.UnitTests/Vek.UnitTests.csproj --no-restore -p:SkipBunCompile=true -- --filter "FullyQualifiedName~MenuTests" --output Normal --no-ansi --hangdump --hangdump-timeout 30s
+dotnet test --project tests/Components/Vek.UnitTests/Vek.UnitTests.csproj --no-restore -p:SkipBunCompile=true -- --filter "FullyQualifiedName~MenuTests" --output Normal --no-ansi --hangdump --hangdump-timeout 30s
 ```
 
 - If you expect to run multiple filtered test commands against the same edits, build once and then reuse the outputs with `--no-build`:
 
 ```bash
-dotnet build src/Vek.UnitTests/Vek.UnitTests.csproj --no-restore -p:SkipBunCompile=true --nologo
-dotnet test --project src/Vek.UnitTests/Vek.UnitTests.csproj --no-build --no-restore -- --filter "FullyQualifiedName~MenuTests" --output Normal --no-ansi --hangdump --hangdump-timeout 30s
-dotnet test --project src/Vek.UnitTests/Vek.UnitTests.csproj --no-build --no-restore -- --filter "FullyQualifiedName~PopoverTests" --output Normal --no-ansi --hangdump --hangdump-timeout 30s
+dotnet build tests/Components/Vek.UnitTests/Vek.UnitTests.csproj --no-restore -p:SkipBunCompile=true --nologo
+dotnet test --project tests/Components/Vek.UnitTests/Vek.UnitTests.csproj --no-build --no-restore -- --filter "FullyQualifiedName~MenuTests" --output Normal --no-ansi --hangdump --hangdump-timeout 30s
+dotnet test --project tests/Components/Vek.UnitTests/Vek.UnitTests.csproj --no-build --no-restore -- --filter "FullyQualifiedName~PopoverTests" --output Normal --no-ansi --hangdump --hangdump-timeout 30s
 ```
 
 ### Bun & Minified Assets Policy
 - Frontend asset builds use the local `bundotnet.cli` tool from `.config/dotnet-tools.json`, not a separately installed global Bun. If Bun-related commands fail after tool or config changes, re-run the tool restore.
 - `-p:SkipBunCompile=true` skips the Bun-driven frontend asset compilation that normally runs during build. Use it for C#, Razor, test, and documentation changes that do not depend on regenerated frontend assets.
 - Do not use it when changes touch `TScripts`, styles, CSS, SCSS, asset-pipeline inputs such as `src/package.json` or `src/bun.lock`, or when verification depends on rebuilt JavaScript, CSS, or other static assets. When unsure, run the normal scoped build without it.
-- **NEVER commit minified files**: Never edit, stage, or commit generated `*.min.css`, `*.min.js`, or any `*.min.*` bundle files or their source maps (`*.map`) from ANY project (e.g. `src/Vek/wwwroot/`, `src/Vek.Docs/wwwroot/`) in feature or docs PRs. Local builds regenerate them; always restore them before committing: `git checkout -- "**/wwwroot/*.min.*" "**/wwwroot/*.map"`. Minified bundles are updated ONLY during release publication (`publish-release`).
+- **NEVER commit minified files**: Never edit, stage, or commit generated `*.min.css`, `*.min.js`, or any `*.min.*` bundle files or their source maps (`*.map`) from ANY project (e.g. `src/Vek/wwwroot/`, `src/Docs/Vek.Docs/wwwroot/`) in feature or docs PRs. Local builds regenerate them; always restore them before committing: `git checkout -- "**/wwwroot/*.min.*" "**/wwwroot/*.map"`. Minified bundles are updated ONLY during release publication (`publish-release`).
 
 ### Formatting
 Run `dotnet format whitespace --folder --include <path/to/changed/files>` once at the very end of the task as a final pre-PR pass to catch whitespace/newline/charset/etc mistakes. It does not fix `using` order or other code style, which CI's format check also enforces. Do not run it repeatedly during the normal edit-build-test loop.
 
-Run this command from the `src` directory. When using `--include`, pass file paths relative to `src`, for example: `--include Vek/Components/List/VekListItem.razor.cs`.
+Run this command from the repository root. When using `--include`, pass file paths relative to the root, for example: `--include src/Vek/Components/List/VekListItem.razor.cs` or `--include tests/Components/Vek.UnitTests/Components/MenuTests.cs`.
 
-New `.cs` files must be UTF-8 with a BOM (`charset = utf-8-bom` in `src/.editorconfig`). Most agent file-writing tools create files without a BOM, which builds and tests cleanly but fails CI's format check with `error CHARSET`. The final whitespace format pass fixes the encoding in place, so never skip it when new files were added. Keep line endings LF.
+New `.cs` files must be UTF-8 with a BOM (`charset = utf-8-bom` in `.editorconfig`). Most agent file-writing tools create files without a BOM, which builds and tests cleanly but fails CI's format check with `error CHARSET`. The final whitespace format pass fixes the encoding in place, so never skip it when new files were added. Keep line endings LF.
 
-If `src/.editorconfig` changed, format the whole `src` tree:
+If `.editorconfig` changed, format the whole `src` tree:
 
 ```bash
 dotnet format --no-restore
@@ -219,16 +220,16 @@ private Task ToggleAsync()
 - Ensure keyboard navigation works for interactive components.
 - Provide accessible names for interactive controls through a label, `aria-label`, or `aria-labelledby`.
 - To diagnose or verify screen-reader behavior, follow Diagnosing accessibility issues under Testing Rules; a screen reader is not required.
-- Components with logic require bUnit tests and a docs page at `src/Vek.Docs/Pages/Components/<ComponentName>/<ComponentName>Page.razor`.
+- Components with logic require bUnit tests and a docs page at `src/Docs/Vek.Docs/Pages/Components/<ComponentName>/<ComponentName>Page.razor`.
 
 ## Docs Pages and Examples
 
 - Keep docs in sync with component behavior, public APIs, and parameter changes.
-- Use `src/Vek.Docs/Pages/Components/Button/ButtonPage.razor` or `src/Vek.Docs/Pages/Components/Menu/MenuPage.razor` as a reference for component docs structure.
+- Use `src/Docs/Vek.Docs/Pages/Components/Button/ButtonPage.razor` or `src/Docs/Vek.Docs/Pages/Components/Menu/MenuPage.razor` as a reference for component docs structure.
 - Start with basic usage, introduce common variants next, group related scenarios with `SectionSubGroups`, and leave advanced or edge-case behavior for the end.
 - Write each component page as a guided progression rather than a catalog dump. Use clear section titles and short descriptions that explain when and why a feature is useful.
 - Order examples from simple to complex. Start with a small canonical example, then add focused examples for common variants, composition patterns, binding, edge cases, and advanced behavior.
-- Keep examples in `src/Vek.Docs/Pages/Components/<ComponentName>/Examples/` and name them after the component and scenario, such as `<ComponentName>SimpleExample`, `<ComponentName>DenseExample`, or `<ComponentName>TwoWayBindingExample`.
+- Keep examples in `src/Docs/Vek.Docs/Pages/Components/<ComponentName>/Examples/` and name them after the component and scenario, such as `<ComponentName>SimpleExample`, `<ComponentName>DenseExample`, or `<ComponentName>TwoWayBindingExample`.
 - Do not leave orphaned example components under `Examples/`. Every example should be referenced by the docs page or removed.
 - Prefer minimal examples that demonstrate one concept at a time. Make them realistic enough to teach the workflow, but avoid extra state, styling, or unrelated component features that distract from the documented behavior.
 - Use meaningful labels and sample content in examples. Avoid `Item 1`, `Item 2`, or placeholder text unless the content is irrelevant to the behavior being demonstrated.
@@ -248,7 +249,7 @@ private Task ToggleAsync()
 - Prefer additive APIs, safe defaults, or obsoleting old behavior while keeping the current PR scoped to the requested fix or feature.
 - If a breaking change is required, call it out explicitly in the PR description and update docs and tests accordingly.
 - For parameter renames or removals, consider `[Obsolete]` with a clear message and migration path.
-- When a parameter is removed, including by renaming it, add a VEK0002 migration hint to `src/Vek.Analyzers/Internal/ParameterMigration.cs`, with a case in `MigrationHintCases` and a row on the analyzer docs page. Verify the conversion against the component source, not the migration guide.
+- When a parameter is removed, including by renaming it, add a VEK0002 migration hint to `src/Analyzers/Vek.Analyzers/Internal/ParameterMigration.cs`, with a case in `MigrationHintCases` and a row on the analyzer docs page. Verify the conversion against the component source, not the migration guide.
 - A binary break is still a breaking change even when source-compatible. For example, changing a parameter from `EventCallback` to `EventCallback<T>` keeps existing Razor markup compiling but breaks precompiled consumers until they rebuild.
 - When current behavior is wrong compared to common web standards, prefer fixing the default over adding a parameter or `VekGlobal` setting to opt out of the fix. If the corrected default is breaking, hold it for the next major version as a single change.
 
@@ -285,11 +286,11 @@ private Task ToggleAsync()
 - For JS interop behavior, prefer bUnit JSInterop or narrow recording fakes. Assert user-visible behavior first; if call counts matter, snapshot calls after initial render and assert only the delta caused by the action.
 
 ### Test locations and naming
-- Test components belong in `src/Vek.UnitTests.Viewer/TestComponents/<ComponentName>/`.
+- Test components belong in `tests/Components/Vek.UnitTests.Viewer/TestComponents/<ComponentName>/`.
 - Viewer components are discovered by location: any component under `TestComponents/` (a `TestComponents.*` namespace) is loaded and addressable at `/viewer/<path>`, where `<path>` is its folder path relative to `TestComponents` plus the type name (e.g. `Menu/MenuTest1`). `Test`-suffixed scenario names are the convention but not required.
 - Add `@attribute [ViewerHidden]` to a helper or sub-component (e.g. dialog content shown via the dialog service) to keep it routable but out of the sidebar listing.
 - Keep viewer test component file names at 40 characters or fewer. Prefer concise scenario names over long descriptive file names.
-- Unit tests belong in `src/Vek.UnitTests/Components/<ComponentName>Tests.cs`.
+- Unit tests belong in `tests/Components/Vek.UnitTests/Components/<ComponentName>Tests.cs`.
 - Commit a viewer test component only when the scenario is too cumbersome to express directly in bUnit C# syntax. In those cases, add the viewer component first, then the unit test.
 - Viewer test components should expose explicit parameters, callbacks, or `TaskCompletionSource` gates for pending, loading, cancellation, or ordering flows instead of simulating latency with sleeps.
 - Give each test method a brief one-sentence XML `<summary>` describing the behavior under test.
@@ -299,12 +300,12 @@ private Task ToggleAsync()
 
 ### Reproducing visual issues with the Viewer
 
-Use `src/Vek.UnitTests.Viewer` to reproduce and verify visual, layout, focus, overlay, popover, drag/drop, responsive, RTL, dark-mode, or browser-interaction behavior that bUnit alone cannot confidently verify. Prefer a focused viewer component over the docs app unless the issue depends on docs-only composition.
+Use `tests/Components/Vek.UnitTests.Viewer` to reproduce and verify visual, layout, focus, overlay, popover, drag/drop, responsive, RTL, dark-mode, or browser-interaction behavior that bUnit alone cannot confidently verify. Prefer a focused viewer component over the docs app unless the issue depends on docs-only composition.
 
 Reproduction loop:
 1. Add a focused component under `TestComponents/<Component>/`, or under `TestComponents/Scratch/` for a throwaway repro (that folder is gitignored, so scratch components are never committed).
-2. Build the viewer with `dotnet build src/Vek.UnitTests.Viewer/Vek.UnitTests.Viewer.csproj`, without `SkipBunCompile`: the Viewer loads `Vek.min.js` and `Vek.min.css`, which are gitignored outputs of the Bun step. Components are discovered by reflection at startup, so a newly added file is not visible until the app is rebuilt and reloaded; `dotnet watch` does not reliably pick up added files or routes.
-3. Run it with `dotnet run --project src/Vek.UnitTests.Viewer/Vek.UnitTests.Viewer.csproj` and open the component's `/viewer/<path>` route described under Test locations and naming.
+2. Build the viewer with `dotnet build tests/Components/Vek.UnitTests.Viewer/Vek.UnitTests.Viewer.csproj`, without `SkipBunCompile`: the Viewer loads `Vek.min.js` and `Vek.min.css`, which are gitignored outputs of the Bun step. Components are discovered by reflection at startup, so a newly added file is not visible until the app is rebuilt and reloaded; `dotnet watch` does not reliably pick up added files or routes.
+3. Run it with `dotnet run --project tests/Components/Vek.UnitTests.Viewer/Vek.UnitTests.Viewer.csproj` and open the component's `/viewer/<path>` route described under Test locations and naming.
 4. Set visual state through the query string: `theme=light|dark`, `dir=ltr|rtl`, `chrome=full|none`. `chrome=none` hides the viewer UI (drawer and header) while keeping theme, RTL, and the popover/dialog/snackbar providers intact, which is useful for clean screenshots.
 5. Wait for an element with `data-viewer-state="ready"` inside `.test-viewer-surface` before reading it (`error`/`not-found` mean the component threw or the route was unmatched; the landing page has no marker). On first load the WASM runtime boots for a few seconds before any state appears, so poll with a timeout. The surface itself carries `data-viewer-theme`/`-dir`/`-chrome` reflecting the query state.
 6. Capture the route, query parameters, viewport, and steps as before/after evidence.
@@ -343,7 +344,7 @@ Verify with bUnit assertions on roles and `aria-*` attributes before and after i
 Execute the **`/review-finalize`** skill (`.agents/skills/review-finalize/SKILL.md`) upon completing tasks to run the standard 5-phase verification, test execution, in-place documentation sync to `docs/governance/`, and commit readiness check.
 
 A task is finished when:
-- Formatting was run for relevant changed files (`dotnet format whitespace --folder --include <files>` from `src/`).
+- Formatting was run for relevant changed files (`dotnet format whitespace --folder --include <files>` from the repository root).
 - The relevant target project builds cleanly with no new warnings when code, docs app, analyzer, or asset inputs changed.
 - Tests were updated and run when behavior changed.
 - Docs were updated when component behavior or public API changed.

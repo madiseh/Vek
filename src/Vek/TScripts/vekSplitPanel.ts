@@ -32,15 +32,24 @@ export default class VekSplitPanel {
     declare minPanelSize: number;
     declare panelGap: number;
     declare resetOnDoubleClick: boolean;
+    declare paneSize: number | null;
+    declare initialPaneSize: number | null;
+    declare paneSizeUnit: number;
+    declare minSize: number | null;
+    declare maxSize: number | null;
+    declare collapsible: boolean;
+    declare collapsed: boolean;
+    declare expandedSize: number;
+    declare dotNetReference: { invokeMethodAsync(method: string, size: number): Promise<unknown> } | null;
 
     /**
      * Creates and stores a split panel runtime instance for a container ID.
      */
-    static build(containerId: string, horizontal: boolean, resetOnDoubleClick: boolean, minPanelSize: number, firstPanelInitialSize: number | null, panelGap: number) {
-        window.splitPanels[containerId] = new VekSplitPanel(containerId, horizontal, resetOnDoubleClick, minPanelSize, firstPanelInitialSize, panelGap);
+    static build(containerId: string, horizontal: boolean, resetOnDoubleClick: boolean, minPanelSize: number, firstPanelInitialSize: number | null, panelGap: number, paneSize: number | null = null, paneSizeUnit = 0, minSize: number | null = null, maxSize: number | null = null, collapsible = false, dotNetReference: VekSplitPanel["dotNetReference"] = null) {
+        window.splitPanels[containerId] = new VekSplitPanel(containerId, horizontal, resetOnDoubleClick, minPanelSize, firstPanelInitialSize, panelGap, paneSize, paneSizeUnit, minSize, maxSize, collapsible, dotNetReference);
     }
 
-    constructor(containerId: string, horizontal: boolean, resetOnDoubleClick: boolean, minPanelSize: number, firstPanelInitialSize: number | null, panelGap: number) {
+    constructor(containerId: string, horizontal: boolean, resetOnDoubleClick: boolean, minPanelSize: number, firstPanelInitialSize: number | null, panelGap: number, paneSize: number | null = null, paneSizeUnit = 0, minSize: number | null = null, maxSize: number | null = null, collapsible = false, dotNetReference: VekSplitPanel["dotNetReference"] = null) {
         this.container = document.getElementById(containerId);
         if (!this.container) {
             console.warn(`VekSplitPanel: Container with id '${containerId}' not found.`);
@@ -65,6 +74,15 @@ export default class VekSplitPanel {
         this.lastDragEndDate = 0;
         this.firstPanelInitialSize = firstPanelInitialSize;
         this.keyboardStep = 10;
+        this.paneSize = paneSize;
+        this.initialPaneSize = paneSize;
+        this.paneSizeUnit = paneSizeUnit;
+        this.minSize = minSize;
+        this.maxSize = maxSize;
+        this.collapsible = collapsible;
+        this.collapsed = false;
+        this.expandedSize = 0;
+        this.dotNetReference = dotNetReference;
 
         this._onMouseDown = this._onMouseDown.bind(this);
         this._onMouseMove = this._onMouseMove.bind(this);
@@ -79,7 +97,7 @@ export default class VekSplitPanel {
         this.divider.addEventListener("touchend", this._onTouchEnd);
         this.divider.addEventListener("keydown", this._onKeyDown);
 
-        this.update(horizontal, resetOnDoubleClick, minPanelSize, panelGap, true);
+        this.update(horizontal, resetOnDoubleClick, minPanelSize, panelGap, true, paneSize, paneSizeUnit, minSize, maxSize, collapsible);
     }
 
     /**
@@ -100,22 +118,30 @@ export default class VekSplitPanel {
     /**
      * Updates runtime options and recalculates panel sizes when needed.
      */
-    update(horizontal: boolean, resetOnDoubleClick: boolean, minPanelSize: number, panelGap: number, forceRecalculateSize = false) {
+    update(horizontal: boolean, resetOnDoubleClick: boolean, minPanelSize: number, panelGap: number, forceRecalculateSize = false, paneSize: number | null = this.paneSize, paneSizeUnit = this.paneSizeUnit, minSize: number | null = this.minSize, maxSize: number | null = this.maxSize, collapsible = this.collapsible) {
         const shouldRecalculateSize = horizontal !== this.horizontal || forceRecalculateSize;
         this.horizontal = horizontal;
         this.minPanelSize = minPanelSize;
         this.panelGap = panelGap;
         this.resetOnDoubleClick = resetOnDoubleClick;
+        const controlledSizeChanged = paneSize !== this.paneSize;
+        this.paneSize = paneSize;
+        this.paneSizeUnit = paneSizeUnit;
+        this.minSize = minSize;
+        this.maxSize = maxSize;
+        this.collapsible = collapsible;
 
         // Browsers treat the null the script used to assign as an empty string, which clears the property.
         this.divider.style.minWidth = this.horizontal ? '' : `${panelGap}px`;
         this.divider.style.minHeight = this.horizontal ? `${panelGap}px` : '';
 
         const containerSize = this._getContainerSize();
-        this.divider.ariaValueMin = (this.minPanelSize / containerSize * 100).toFixed(2).toString();
-        this.divider.ariaValueMax = ((containerSize - panelGap - this.minPanelSize) / containerSize * 100).toFixed(2).toString();
+        const [min, max] = this.#getLimits(containerSize);
+        const asPercent = (size: number) => size / containerSize * 100;
+        this.divider.ariaValueMin = asPercent(min).toFixed(2);
+        this.divider.ariaValueMax = asPercent(max).toFixed(2);
 
-        if (shouldRecalculateSize) {
+        if (shouldRecalculateSize || controlledSizeChanged) {
             this.resetSizes();
         }
     }
@@ -129,11 +155,15 @@ export default class VekSplitPanel {
         this.firstPanel.style.height = "100%";
         this.secondPanel.style.height = "100%";
 
-        const firstPanelSizeNew = firstPanelSize !== null ? firstPanelSize : this.firstPanelInitialSize;
+        const firstPanelSizeNew = firstPanelSize !== null ? firstPanelSize : (this.paneSize ?? this.firstPanelInitialSize);
+        this.collapsed = false;
         if (firstPanelSizeNew === null) {
             this.divider.ariaValueNow = "50";
         } else {
-            this._setPanelSizes(firstPanelSizeNew, this._getContainerSize());
+            const pixelSize = this.paneSizeUnit === 0 && this.paneSize !== null && firstPanelSize === null
+                ? firstPanelSizeNew / 100 * this._getContainerSize()
+                : firstPanelSizeNew;
+            this._setPanelSizes(pixelSize, this._getContainerSize(), false);
         }
     }
 
@@ -149,6 +179,18 @@ export default class VekSplitPanel {
      */
     setDividerPosition(offset: number) {
         this.resetSizes(offset);
+    }
+
+    #getLimits(containerSize: number): [number, number] {
+        const min = Math.max(this.minPanelSize, this.paneSizeUnit === 0 ? (this.minSize ?? 0) / 100 * containerSize : (this.minSize ?? 0));
+        const max = Math.min(containerSize - this.panelGap - this.minPanelSize, this.paneSizeUnit === 0 ? (this.maxSize ?? 100) / 100 * containerSize : (this.maxSize ?? containerSize));
+        return [min, Math.max(min, max)];
+    }
+
+    #reportSize(size: number) {
+        const value = this.paneSizeUnit === 0 ? size / this._getContainerSize() * 100 : size;
+        this.paneSize = value;
+        void this.dotNetReference?.invokeMethodAsync("OnPaneSizeChangedAsync", value);
     }
 
     _getContainerSize() {
@@ -187,8 +229,7 @@ export default class VekSplitPanel {
         const newFirstSize = this.startFirstSize + delta;
 
         const containerSize = this._getContainerSize();
-        const min = this.minPanelSize;
-        const max = containerSize - this.panelGap - min;
+        const [min, max] = this.#getLimits(containerSize);
 
         if (newFirstSize >= min && newFirstSize <= max) {
             this.dividerHasMoved = true;
@@ -196,7 +237,7 @@ export default class VekSplitPanel {
         }
     }
 
-    _setPanelSizes(newFirstSize: number, containerSize: number) {
+    _setPanelSizes(newFirstSize: number, containerSize: number, report = true) {
         const newSecondSize = containerSize - newFirstSize - this.panelGap;
 
         this.firstPanel.style.height = this.horizontal ? `${newFirstSize}px` : "100%";
@@ -205,6 +246,8 @@ export default class VekSplitPanel {
         this.secondPanel.style.width = this.horizontal ? "100%" : `${newSecondSize}px`;
 
         this.divider.ariaValueNow = (newFirstSize / containerSize * 100).toFixed(2).toString();
+        if (report) this.#reportSize(newFirstSize);
+        if (newFirstSize > 0) this.expandedSize = newFirstSize;
     }
 
     _onMouseUp() {
@@ -224,6 +267,17 @@ export default class VekSplitPanel {
     }
 
     _onDoubleClick() {
+        if (this.collapsible) {
+            if (this.collapsed) {
+                this.collapsed = false;
+                this._setPanelSizes(this.expandedSize || this._getContainerSize() / 2, this._getContainerSize());
+            } else {
+                this.expandedSize = (this.horizontal ? this.firstPanel.offsetHeight : this.firstPanel.offsetWidth) || this._getContainerSize() / 2;
+                this.collapsed = true;
+                this._setPanelSizes(0, this._getContainerSize());
+            }
+            return;
+        }
         if (!this.resetOnDoubleClick) return;
 
         // Fixes the edge case where the user first clicks and then clicks again and holds to drag
@@ -233,7 +287,7 @@ export default class VekSplitPanel {
             ? this.container!.offsetHeight
             : this.container!.offsetWidth;
 
-        let firstPanelSize = this.firstPanelInitialSize;
+        let firstPanelSize = this.initialPaneSize !== null ? (this.paneSizeUnit === 0 ? this.initialPaneSize / 100 * containerSize : this.initialPaneSize) : this.firstPanelInitialSize;
         if (!firstPanelSize) {
             firstPanelSize = containerSize / 2 - this.panelGap / 2;
         }
@@ -264,18 +318,18 @@ export default class VekSplitPanel {
             } else if (key === "ArrowDown") {
                 delta = this.keyboardStep;
             } else if (key === "Home") {
-                this._setPanelSizes(this.minPanelSize, containerSize);
+                this._setPanelSizes(this.#getLimits(containerSize)[0], containerSize);
             } else if (key === "End") {
-                this._setPanelSizes(containerSize - this.panelGap - this.minPanelSize, containerSize);
+                this._setPanelSizes(this.#getLimits(containerSize)[1], containerSize);
             }
         } else if (key === "ArrowLeft") {
             delta = -this.keyboardStep;
         } else if (key === "ArrowRight") {
             delta = this.keyboardStep;
         } else if (key === "Home") {
-            this._setPanelSizes(this.minPanelSize, containerSize);
+            this._setPanelSizes(this.#getLimits(containerSize)[0], containerSize);
         } else if (key === "End") {
-            this._setPanelSizes(containerSize - this.panelGap - this.minPanelSize, containerSize);
+            this._setPanelSizes(this.#getLimits(containerSize)[1], containerSize);
         }
 
         if (delta !== 0) {
@@ -283,8 +337,7 @@ export default class VekSplitPanel {
                 ? this.firstPanel.offsetHeight
                 : this.firstPanel.offsetWidth;
             const newFirstPanelSize = firstPanelSize + delta;
-            const min = this.minPanelSize;
-            const max = containerSize - this.panelGap - min;
+            const [min, max] = this.#getLimits(containerSize);
 
             if (newFirstPanelSize >= min && newFirstPanelSize <= max) {
                 this._setPanelSizes(newFirstPanelSize, containerSize);
@@ -296,8 +349,8 @@ export default class VekSplitPanel {
 /**
  * Updates split panel options for an existing container ID.
  */
-export const vekSplitPanel_update = function (id: string, horizontal: boolean, resetOnDoubleClick: boolean, minPanelSize: number, panelGap: number) {
-    window.splitPanels[id]!.update(horizontal, resetOnDoubleClick, minPanelSize, panelGap);
+export const vekSplitPanel_update = function (id: string, horizontal: boolean, resetOnDoubleClick: boolean, minPanelSize: number, panelGap: number, paneSize: number | null = null, paneSizeUnit = 0, minSize: number | null = null, maxSize: number | null = null, collapsible = false) {
+    window.splitPanels[id]!.update(horizontal, resetOnDoubleClick, minPanelSize, panelGap, false, paneSize, paneSizeUnit, minSize, maxSize, collapsible);
 };
 
 /**

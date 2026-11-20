@@ -1,0 +1,470 @@
+﻿using System.Collections.Generic;
+using AngleSharp.Dom;
+using AwesomeAssertions;
+using Bunit;
+using Microsoft.AspNetCore.Components;
+using NUnit.Framework;
+using Vek.Extensions;
+using Vek.UnitTests.TestComponents.Pagination;
+
+namespace Vek.UnitTests.Components
+{
+    [TestFixture]
+    public class Pagination : BunitTest
+    {
+        /// <summary>
+        /// Tests the clicking on control buttons
+        /// </summary>
+        /// <param name="controlButton">The type of the control button. Page.First for the navigate-to-first-page button.</param>
+        /// <param name="numberOfClicks">The number of times the control button is clicked.</param>
+        /// <param name="initiallySelectedPage">The index of initially selected page.</param>
+        /// <param name="expectedSelectedPage">The expected selected page after clicking numberOfClicks times on the button.</param>
+        /// <param name="expectedDisabled">The expected disabled state after clicking numberOfClicks times on the button.</param>
+        [TestCase(Page.First, 1, 6, 1, true)]
+        [TestCase(Page.Previous, 3, 5, 2, false)]
+        [TestCase(Page.Previous, 7, 6, 1, true)]
+        [TestCase(Page.Next, 3, 5, 8, false)]
+        [TestCase(Page.Next, 7, 6, 11, true)]
+        [TestCase(Page.Last, 1, 6, 11, true)]
+        [Test]
+        public async Task PaginationControlButtonClick(Page controlButton, int numberOfClicks, int initiallySelectedPage, int expectedSelectedPage, bool expectedDisabled)
+        {
+            var comp = Context.Render<PaginationButtonTest>();
+
+            var pagination = comp.FindComponent<VekPagination>().Instance;
+            //navigate to the specified page
+            await comp.InvokeAsync(async () => { await pagination.NavigateToAsync(initiallySelectedPage - 1); });
+
+            //Click numberOfClicks times on the control button
+            for (var i = 0; i < numberOfClicks; i++)
+            {
+                var button = FindControlButton(comp, controlButton);
+                await button.ClickAsync();
+            }
+
+            //Expected values
+            pagination.GetState(x => x.Selected).Should().Be(expectedSelectedPage);
+            FindControlButton(comp, controlButton).IsDisabled().Should().Be(expectedDisabled);
+            comp.Find("#vek-pagination-test-selected").TextContent.Should()
+                .Be("Selected: " + expectedSelectedPage);
+        }
+
+        /// <summary>
+        /// Tests the aria-labels for the control buttons
+        /// </summary>
+        /// <param name="controlButton">The type of the control button. Page.First for the navigate-to-first-page button.</param>
+        /// <param name="expectedButtonAriaLabel">The expected value in the aria-label.</param>
+        [TestCase(Page.First, "First page")]
+        [TestCase(Page.Previous, "Previous page")]
+        [TestCase(Page.Next, "Next page")]
+        [TestCase(Page.Last, "Last page")]
+        [Test]
+        public void PaginationControlButtonAriaLabel(Page controlButton, string expectedButtonAriaLabel)
+        {
+            var comp = Context.Render<PaginationButtonTest>();
+
+            //get control button
+            var button = FindControlButton(comp, controlButton);
+
+            //Expected values
+            button.Attributes.GetNamedItem("aria-label")?.Value.Should().Be(expectedButtonAriaLabel);
+        }
+
+        /// <summary>
+        /// Tests the aria-labels for the page buttons. . . note the index's aren't sequential because there are elements of "..."
+        /// </summary>
+        /// <param name="index">The index of the control button. first page button has index 2.</param>
+        /// <param name="label">The expected value in the aria-label.</param>
+        [TestCase(2, "Page 1")]
+        [TestCase(3, "Page 2")]
+        [TestCase(5, "Current page 6")]
+        [TestCase(7, "Page 10")]
+        [TestCase(8, "Page 11")]
+        [Test]
+        public void PaginationPageButtonAriaLabel(int index, string label)
+        {
+            var comp = Context.Render<PaginationButtonTest>();
+            var buttons = comp.FindAll(".vek-pagination-item button");
+            var button = buttons[index];
+            button.Attributes.GetNamedItem("aria-label")?.Value.Should().Be(label);
+            if (index == 5)
+            {
+                button.Attributes.GetNamedItem("aria-current")?.Value.Should().Be("page");
+            }
+        }
+
+        /// <summary>
+        /// Tests the event callbacks of control button click events
+        /// </summary>
+        /// <param name="controlButton">The type of the control button. Page.First for the navigate-to-first-page button.</param>
+        /// <param name="expectedButtonClickedValue">The expected value in the dom after clicking on the button.</param>
+        [TestCase(Page.First, 0)]
+        [TestCase(Page.Previous, 1)]
+        [TestCase(Page.Next, 2)]
+        [TestCase(Page.Last, 3)]
+        [Test]
+        public async Task PaginationControlButtonEventCallback(Page controlButton, int expectedButtonClickedValue)
+        {
+            var comp = Context.Render<PaginationButtonTest>();
+
+            //Click control button
+            await FindControlButton(comp, controlButton).ClickAsync();
+
+            //Expected values
+            comp.Find("#vek-pagination-test-button-clicked").TextContent.Should()
+                .Be("Button clicked: " + expectedButtonClickedValue);
+        }
+
+        /// <summary>
+        /// Tests if the page buttons are hidden
+        /// </summary>
+        [Test]
+        public void HidePageButton()
+        {
+            var comp = Context.Render<PaginationHidePageButtonsTest>();
+
+            comp.FindAll(".vek-pagination-item button").Count.Should().Be(2);
+        }
+
+        /// <summary>
+        /// Tests the clicking on page buttons
+        /// </summary>
+        /// <param name="clickIndexPage">The index of the clicked page button.</param>
+        /// <param name="initiallySelectedPage">The initially selected page.</param>
+        /// <param name="expectedSelectedPage">The expected selected page.</param>
+        [TestCase(0, 6, 1)]
+        [TestCase(6, 6, 11)]
+        [TestCase(5, 5, 6)]
+        [TestCase(2, 5, 3)]
+        [Test]
+        public async Task PaginationPageButtonClick(int clickIndexPage, int initiallySelectedPage,
+            int expectedSelectedPage)
+        {
+            var comp = Context.Render<PaginationButtonTest>();
+
+            var pagination = comp.FindComponent<VekPagination>().Instance;
+            //navigate to the specified page
+            await comp.InvokeAsync(async () => { await pagination.NavigateToAsync(initiallySelectedPage - 1); });
+
+            //Click on the page button, +2 because of the first two control buttons
+            await comp.FindAll(".vek-pagination-item button")[clickIndexPage + 2].ClickAsync();
+
+            //Expected values
+            pagination.GetState(x => x.Selected).Should().Be(expectedSelectedPage);
+            comp.Find("#vek-pagination-test-selected").TextContent.Should()
+                .Be("Selected: " + expectedSelectedPage);
+        }
+
+        //returns the specified control button
+        private static IElement FindControlButton(IRenderedComponent<IComponent> comp, Page controlButton)
+        {
+            var buttons = comp.FindAll(".vek-pagination-item button");
+            var button = controlButton switch
+            {
+                Page.First => buttons[0],
+                Page.Previous => buttons[1],
+                Page.Next => buttons[^2],
+                Page.Last => buttons[^1],
+                _ => throw new ArgumentOutOfRangeException(nameof(controlButton), controlButton,
+                    @"This control button type is not supported!")
+            };
+            return button;
+        }
+
+        /// <summary>
+        /// Tests the NavigateTo(Page) method
+        /// </summary>
+        /// <param name="page">The page to navigate to.</param>
+        /// <param name="expectedSelectedPage">The expected selected page.</param>
+        [TestCase(Page.First, 1)]
+        [TestCase(Page.Previous, 5)]
+        [TestCase(Page.Next, 7)]
+        [TestCase(Page.Last, 11)]
+        [TestCase((Page)50, 6)]
+        [Test]
+        public async Task PaginationNavigateToPage(Page page, int expectedSelectedPage)
+        {
+            var comp = Context.Render<PaginationButtonTest>();
+
+            var pagination = comp.FindComponent<VekPagination>().Instance;
+
+            //navigate to the specified page
+            await comp.InvokeAsync(async () => { await pagination.NavigateToAsync(page); });
+
+            //Expected values
+            pagination.GetState(x => x.Selected).Should().Be(expectedSelectedPage);
+            comp.Find("#vek-pagination-test-selected").TextContent.Should()
+                .Be("Selected: " + expectedSelectedPage);
+        }
+
+        /// <summary>
+        /// Tests the NavigateTo(int) method
+        /// </summary>
+        /// <param name="page">The page to navigate to.</param>
+        /// <param name="expectedSelectedPage">The expected selected page.</param>
+        [TestCase(1, 1)]
+        [TestCase(11, 11)]
+        [TestCase(-1, 1)]
+        [TestCase(12, 11)]
+        [Test]
+        public async Task PaginationNavigateToPage(int page, int expectedSelectedPage)
+        {
+            var comp = Context.Render<PaginationButtonTest>();
+
+            var pagination = comp.FindComponent<VekPagination>().Instance;
+
+            //navigate to the specified page
+            await comp.InvokeAsync(async () => { await pagination.NavigateToAsync(page - 1); });
+
+            //Expected values
+            pagination.GetState(x => x.Selected).Should().Be(expectedSelectedPage);
+            comp.Find("#vek-pagination-test-selected").TextContent.Should()
+                .Be("Selected: " + expectedSelectedPage);
+        }
+
+        /// <summary>
+        /// Tests if no ellipsis appear
+        /// </summary>
+        /// <param name="count">The number of total items.</param>
+        /// <param name="middleCount">The number of items displayed in the middle.</param>
+        /// <param name="boundaryCount">The number of items displayed on the start and end.</param>
+        [TestCase(21, 5, 7)]
+        [TestCase(9, 3, 2)]
+        [TestCase(5, 1, 1)]
+        [TestCase(5, -1, 1)]
+        [TestCase(4, 1, -1)]
+        [TestCase(4, 1, 0)]
+        [Test]
+        public async Task PaginationCountWithoutEllipsis(int count, int middleCount, int boundaryCount)
+        {
+            var comp = Context.Render<PaginationCountTest>();
+
+            var pagination = comp.FindComponent<VekPagination>().Instance;
+            await comp.Find(".vek-pagination-test-middle-count input").ChangeAsync(middleCount.ToString());
+            await comp.Find(".vek-pagination-test-boundary-count input").ChangeAsync(boundaryCount.ToString());
+
+            //Expected values
+            pagination.GetState(x => x.MiddleCount).Should().Be(Math.Max(1, middleCount));
+            pagination.GetState(x => x.BoundaryCount).Should().Be(Math.Max(0, boundaryCount));
+
+            for (var i = 1; i <= count; i++)
+            {
+                await comp.Find(".vek-pagination-test-count input").ChangeAsync(i.ToString());
+                var buttons = comp.FindAll(".vek-pagination-item");
+                //Expected values
+                buttons.Count.Should().Be(i);
+                for (var j = 0; j < buttons.Count; j++)
+                {
+                    buttons[j].TextContent.Should().Be((j + 1).ToString());
+                }
+            }
+        }
+        /// <summary>
+        /// Tests if the items are displayed correctly
+        /// </summary>
+        /// <param name="selectedPage">The initially selected page.</param>
+        /// <param name="count">The number of items.</param>
+        /// <param name="middleCount">The number of items between the ellipsis.</param>
+        /// <param name="boundaryCount">The number of items at the start and end of the pagination.</param>
+        /// <param name="expectedValues">The expected content of the items.</param>
+        [TestCase(6, 11, 3, 2, new[] { "1", "2", "…", "5", "6", "7", "…", "10", "11" })]
+        [TestCase(7, 11, 3, 2, new[] { "1", "2", "…", "6", "7", "8", "9", "10", "11" })]
+        [TestCase(11, 11, 3, 2, new[] { "1", "2", "…", "6", "7", "8", "9", "10", "11" })]
+        [TestCase(5, 11, 3, 2, new[] { "1", "2", "3", "4", "5", "6", "…", "10", "11" })]
+        [TestCase(3, 11, 3, 2, new[] { "1", "2", "3", "4", "5", "6", "…", "10", "11" })]
+        [TestCase(11, 22, 1, 1, new[] { "1", "…", "11", "…", "22" })]
+        [TestCase(1, 22, 1, 1, new[] { "1", "2", "3", "…", "22" })]
+        [TestCase(8, 22, 5, 3, new[] { "1", "2", "3", "…", "6", "7", "8", "9", "10", "…", "20", "21", "22" })]
+        [TestCase(7, 22, 5, 3, new[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "…", "20", "21", "22" })]
+        [TestCase(16, 22, 5, 3, new[] { "1", "2", "3", "…", "14", "15", "16", "17", "18", "19", "20", "21", "22" })]
+        [TestCase(22, 22, 5, 3, new[] { "1", "2", "3", "…", "14", "15", "16", "17", "18", "19", "20", "21", "22" })]
+        [TestCase(8, 30, 11, 0, new[] { "…", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "…" })]
+        [TestCase(1, 30, 11, 0, new[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "…" })]
+        [TestCase(30, 30, 11, 0, new[] { "…", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30" })]
+        [TestCase(6, 30, 11, 0, new[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "…" })]
+        [TestCase(7, 30, 11, 0, new[] { "…", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "…" })]
+        [Test]
+        public async Task PaginationCountWithEllipsis(int selectedPage, int count, int middleCount,
+            int boundaryCount, string[] expectedValues)
+        {
+            var comp = Context.Render<PaginationCountTest>();
+
+            var pagination = comp.FindComponent<VekPagination>().Instance;
+            //set count variables
+            await comp.Find(".vek-pagination-test-count input").ChangeAsync(count.ToString());
+            await comp.Find(".vek-pagination-test-middle-count input").ChangeAsync(middleCount.ToString());
+            await comp.Find(".vek-pagination-test-boundary-count input").ChangeAsync(boundaryCount.ToString());
+
+            //navigate to the specified page
+            await comp.InvokeAsync(async () => { await pagination.NavigateToAsync(selectedPage - 1); });
+
+            //Expected values
+            var items = comp.FindAll(".vek-pagination-item");
+            items.Count.Should().Be(expectedValues.Length);
+            if (boundaryCount >= 1)
+            {
+                //Boundary pages keep the item count constant so the control doesn't change width while navigating.
+                items.Count.Should().Be(middleCount + (2 * boundaryCount) + 2);
+            }
+
+            for (var j = 0; j < items.Count; j++)
+            {
+                items[j].TextContent.Should().Be(expectedValues[j]);
+            }
+        }
+
+        /// <summary>
+        /// #13181: a <see cref="VekPagination.BoundaryCount"/> of zero set via the initial parameters hides the boundary pages instead of being clamped to one.
+        /// </summary>
+        [Test]
+        public void PaginationBoundaryCountZeroInitialParameter()
+        {
+            var comp = Context.Render<VekPagination>(parameters => parameters
+                .Add(x => x.Count, 30)
+                .Add(x => x.MiddleCount, 11)
+                .Add(x => x.BoundaryCount, 0)
+                .Add(x => x.Selected, 8)
+                .Add(x => x.ShowPreviousButton, false)
+                .Add(x => x.ShowNextButton, false));
+
+            var items = comp.FindAll(".vek-pagination-item");
+            items.Select(x => x.TextContent).Should()
+                .Equal("…", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "…");
+        }
+
+        /// <summary>
+        /// Tests if styles/visual parameters are applied correctly
+        /// </summary>
+        [Test]
+        public void PaginationStyles()
+        {
+            var comp = Context.Render<PaginationStylesTest>();
+
+            var buttons = comp.FindAll(".vek-pagination-item button");
+            var pagination = comp.Find("ul.vek-pagination");
+            var paginationItems = comp.FindAll("vek-pagination-item");
+
+            //test if previous and next buttons are hidden
+            buttons.Count.Should().Be(8);
+
+            //test if variant is filled
+            pagination.ClassName.Should().Contain("vek-pagination-filled");
+
+            //test if color is secondary
+            buttons[0].ClassName.Should().Contain("vek-button-filled-secondary");
+
+            //test if items are rectangular
+            foreach (var item in paginationItems)
+            {
+                item.ClassName.Should().Contain("vek-pagination-item-rectangular");
+            }
+
+            //test if size is large
+            pagination.ClassName.Should().Contain("vek-pagination-large");
+
+            //test if elevation is disabled
+            pagination.ClassName.Should().Contain("vek-pagination-disable-elevation");
+
+            //test if all buttons are disabled
+            foreach (var button in buttons)
+            {
+                button.IsDisabled().Should().BeTrue();
+            }
+
+            //test if rtl is used
+            pagination.ClassName.Should().Contain("vek-pagination-rtl");
+        }
+
+        /// <summary>
+        /// Pagination ellipses are hidden from assistive technology.
+        /// </summary>
+        [Test]
+        public void Pagination_EllipsisShouldBeHiddenFromAssistiveTechnologies()
+        {
+            var comp = Context.Render<VekPagination>(parameters => parameters
+                .Add(p => p.Count, 20)
+                .Add(p => p.Selected, 10));
+
+            var ellipses = comp.FindAll("li").Where(li => li.TextContent.Trim() == "…").ToList();
+            ellipses.Should().NotBeEmpty();
+            ellipses.Should().OnlyContain(li => li.FirstElementChild!.GetAttribute("aria-hidden") == "true");
+        }
+
+        /// <summary>
+        /// Changing page size updates the page range, page count, and callback value.
+        /// </summary>
+        [Test]
+        public async Task PageSizeSelector_UpdatesPageCountAndItemRange()
+        {
+            int? changedPageSize = null;
+            var comp = Context.Render<VekPagination>(parameters => parameters
+                .Add(p => p.Count, 10)
+                .Add(p => p.TotalItems, 46)
+                .Add(p => p.ShowPageSizeSelector, true)
+                .Add(p => p.ShowFirstButton, true)
+                .Add(p => p.ShowLastButton, true)
+                .Add(p => p.PageSizeChanged, EventCallback.Factory.Create<int>(this, pageSize => changedPageSize = pageSize)));
+
+            await comp.Find("select[aria-label='Items per page']").ChangeAsync("25");
+
+            comp.Instance.GetState(p => p.PageSize).Should().Be(25);
+            changedPageSize.Should().Be(25);
+            comp.Find(".vek-pagination-item-range").TextContent.Should().Be("1-25 of 46 items");
+            comp.FindAll(".vek-pagination-item button").Count.Should().Be(6);
+        }
+
+        /// <summary>
+        /// Direct page entry clamps an out-of-range value to the final page.
+        /// </summary>
+        [Test]
+        public async Task DirectPageJump_ClampsToAvailablePages()
+        {
+            var comp = Context.Render<VekPagination>(parameters => parameters
+                .Add(p => p.TotalItems, 80)
+                .Add(p => p.ShowDirectPageJump, true));
+            var input = comp.Find("input[aria-label='Go to page']");
+
+            await input.InputAsync("99");
+            await comp.Find("form.vek-pagination-page-jump-form").TriggerEventAsync("onsubmit", new EventArgs());
+
+            comp.Instance.GetState(p => p.Selected).Should().Be(8);
+            comp.Find(".vek-pagination-item-range").TextContent.Should().Be("71-80 of 80 items");
+            input.GetAttribute("value").Should().Be("8");
+        }
+
+        /// <summary>
+        /// Optional page size and page jump controls stay hidden by default.
+        /// </summary>
+        [Test]
+        public void Pagination_OptionalControlsAreHiddenByDefault()
+        {
+            var comp = Context.Render<VekPagination>();
+
+            comp.FindAll("select[aria-label='Items per page']").Should().BeEmpty();
+            comp.FindAll("input[aria-label='Go to page']").Should().BeEmpty();
+        }
+
+        /// <summary>
+        /// UserAttributes are forwarded to the list element, and the computed class and style keep winning over a class or style supplied there, as they did through the VekElement boundary.
+        /// </summary>
+        [Test]
+        public void Pagination_UserAttributes_ForwardedWithComputedClassAndStyleWinning()
+        {
+            var comp = Context.Render<VekPagination>(parameters => parameters
+                .Add(x => x.Count, 5)
+                .Add(x => x.Class, "own-class")
+                .Add(x => x.Style, "color:blue")
+                .Add(x => x.UserAttributes, new Dictionary<string, object>
+                {
+                    ["class"] = "user-class",
+                    ["style"] = "color:red",
+                    ["data-test"] = "pager",
+                }));
+
+            var root = comp.Find("ul");
+            root.GetAttribute("data-test").Should().Be("pager");
+            root.ClassList.Should().Contain("vek-pagination").And.Contain("own-class").And.NotContain("user-class");
+            root.GetAttribute("style").Should().Be("color:blue");
+        }
+    }
+}
