@@ -87,6 +87,10 @@
         background-color: var(--vek-palette-#{$color});
       }
 
+      .vek-slider-track-background {
+        background-color: rgba(var(--vek-palette-#{$color}-rgb), 0.30);
+      }
+
 
       .vek-slider-input {
         @include slider-track {
@@ -124,6 +128,10 @@
   @each $size, $value in $slider-sizes {
     &.vek-slider-#{$size} {
       .vek-slider-filled {
+        height: #{$value}px;
+      }
+
+      .vek-slider-track-background {
         height: #{$value}px;
       }
 
@@ -225,5 +233,65 @@
       top: 100%;
     left: 50%;
       white-space: nowrap;
+  }
+
+  &.vek-slider-range {
+    .vek-slider-container {
+      height: 24px;
+      align-items: center;
+    }
+
+    .vek-slider-inner-container {
+      pointer-events: none;
+    }
+
+    .vek-slider-track-background {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      border-radius: var(--vek-default-borderradius);
+      background-color: rgba(var(--vek-palette-primary-rgb), 0.30);
+    }
+
+    .vek-slider-filled {
+      position: absolute;
+      border-radius: var(--vek-default-borderradius);
+    }
+
+    .vek-slider-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      margin: 0;
+      background: transparent;
+
+      @include slider-track {
+        background: transparent !important;
+        border-color: transparent !important;
+      }
+
+      @include slider-thumb {
+        pointer-events: auto;
+      }
+    }
+
+    &:hover .vek-slider-value-label,
+    .vek-slider-input:focus ~ .vek-slider-value-label,
+    .vek-slider-input:active ~ .vek-slider-value-label {
+      opacity: 1;
+    }
+  }
+
+  &.vek-slider-disabled {
+    opacity: 0.38;
+    cursor: default;
+
+    .vek-slider-track-background,
+    .vek-slider-filled {
+      background-color: var(--vek-palette-text-disabled);
+    }
   }
 }
