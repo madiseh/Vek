@@ -687,10 +687,12 @@
       "title": "TreeView Interactive Node Drag-and-Drop Reordering and Reparenting",
       "module": "TreeView",
       "priority": 60,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/060-treeview-node-drag-and-drop-reorder.md",
       "dependencies": [],
-      "started_at": "2026-11-19T19:31:22Z"
+      "started_at": "2026-11-19T19:31:22Z",
+      "completed_at": "2026-11-20T08:54:00Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/64"
     },
     {
       "id": "061",
