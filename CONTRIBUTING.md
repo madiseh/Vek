@@ -99,19 +99,19 @@ in your component and apply styles at component level.
 ## Project structure and where to find the most important files
 Vek is divided into different projects. The most important ones are:
 - [Vek](https://github.com/madiseh/vek/tree/dev/src/Vek): contains all components
-- [Vek.Docs](https://github.com/madiseh/vek/tree/dev/src/Vek.Docs): contains the [docs](https://github.com/madiseh/vek)
-- [Vek.Docs.WasmHost](https://github.com/madiseh/vek/tree/dev/src/Vek.Docs.WasmHost): local copy of the docs that can be set as the startup project and run locally to review changes before submission.
-- [Vek.UnitTests](https://github.com/madiseh/vek/tree/dev/src/Vek.UnitTests): contains bUnit tests for all components
-- [Vek.UnitTests.Viewer](https://github.com/madiseh/vek/tree/dev/src/Vek.UnitTests.Viewer): a visual representation of the unit tests. When you launch the project, you can test whether the components look and behave correctly
+- [Vek.Docs](https://github.com/madiseh/vek/tree/dev/src/Docs/Vek.Docs): contains the [docs](https://github.com/madiseh/vek)
+- [Vek.Docs.WasmHost](https://github.com/madiseh/vek/tree/dev/src/Docs/Vek.Docs.WasmHost): local copy of the docs that can be set as the startup project and run locally to review changes before submission.
+- [Vek.UnitTests](https://github.com/madiseh/vek/tree/dev/tests/Components/Vek.UnitTests): contains bUnit tests for all components
+- [Vek.UnitTests.Viewer](https://github.com/madiseh/vek/tree/dev/tests/Components/Vek.UnitTests.Viewer): a visual representation of the unit tests. When you launch the project, you can test whether the components look and behave correctly
 
 Most important files:
 
 -   Component `.razor` and `.razor.cs` classes ([Link](https://github.com/madiseh/vek/tree/dev/src/Vek/Components))
 -   Component `.scss` style classes ([Link](https://github.com/madiseh/vek/tree/dev/src/Vek/Styles/components))
 -   Enums ([Link](https://github.com/madiseh/vek/tree/dev/src/Vek/Enums))
--   Component doc pages ([Link](https://github.com/madiseh/vek/tree/dev/src/Vek.Docs/Pages/Components))
--   Component tests ([Link](https://github.com/madiseh/vek/tree/dev/src/Vek.UnitTests/Components))
--   Test components ([Link](https://github.com/madiseh/vek/tree/dev/src/Vek.UnitTests.Viewer/TestComponents))
+-   Component doc pages ([Link](https://github.com/madiseh/vek/tree/dev/src/Docs/Vek.Docs/Pages/Components))
+-   Component tests ([Link](https://github.com/madiseh/vek/tree/dev/tests/Components/Vek.UnitTests/Components))
+-   Test components ([Link](https://github.com/madiseh/vek/tree/dev/tests/Components/Vek.UnitTests.Viewer/TestComponents))
 
 ## Coding Dos and Don'ts
 

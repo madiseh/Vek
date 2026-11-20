@@ -10,11 +10,12 @@ This document defines the testing architecture, runner invocation syntax, concur
 
 | Test Project | Scope & Technologies | Verification Target |
 | :--- | :--- | :--- |
-| `src/Vek.UnitTests/` | bUnit, NUnit, Microsoft.Testing.Platform | Component behavior, reactive state transitions, DOM markup, event handling |
-| `src/Vek.UnitTests.Analyzers/` | Roslyn Microsoft.CodeAnalysis.Testing | Compile-time analyzer diagnostics, code fixes, and parameter migration hints |
-| `src/Vek.UnitTests.Docs/` | Generated bUnit documentation tests | Parity and zero-exception rendering of all documentation examples |
-| `src/Vek.UnitTests.Viewer/` | Blazor WASM/Server interactive host | Isolated visual reproduction and APG accessibility tree verification |
-| `src/Vek.UnitTests.Shared/` | Shared testing infrastructure | Common fixtures, bUnit test contexts, mock services, and assertion helpers |
+| `tests/Components/Vek.UnitTests/` | bUnit, NUnit, Microsoft.Testing.Platform | Component behavior, reactive state transitions, DOM markup, event handling |
+| `tests/Analyzers/Vek.UnitTests.Analyzers/` | Roslyn Microsoft.CodeAnalysis.Testing | Compile-time analyzer diagnostics, code fixes, and parameter migration hints |
+| `tests/Docs/Vek.UnitTests.Docs/` | Generated bUnit documentation tests | Parity and zero-exception rendering of all documentation examples |
+| `tests/Components/Vek.UnitTests.Viewer/` | Blazor WASM/Server interactive host | Isolated visual reproduction and APG accessibility tree verification |
+| `tests/Shared/Vek.UnitTests.Shared/` | Shared testing infrastructure | Common fixtures, bUnit test contexts, mock services, and assertion helpers |
+| `tests/Analyzers/Vek.Analyzers.TestComponents/` | Razor test inputs | Analyzer and code-fix test scenarios |
 
 ---
 
@@ -26,7 +27,7 @@ Vek uses **Microsoft.Testing.Platform** (pinned via `global.json`), not legacy V
 Execute scoped tests without recompiling Bun frontend assets using `-p:SkipBunCompile=true`:
 
 ```bash
-dotnet test --project src/Vek.UnitTests/Vek.UnitTests.csproj --no-restore -p:SkipBunCompile=true -- --filter "FullyQualifiedName~<FixtureOrTestName>" --output Normal --no-ansi --hangdump --hangdump-timeout 30s
+dotnet test --project tests/Components/Vek.UnitTests/Vek.UnitTests.csproj --no-restore -p:SkipBunCompile=true -- --filter "FullyQualifiedName~<FixtureOrTestName>" --output Normal --no-ansi --hangdump --hangdump-timeout 30s
 ```
 
 ### Multi-Test Iteration with Cached Build
@@ -34,11 +35,11 @@ When executing multiple test runs against the same compilation, build once and p
 
 ```bash
 # 1. Build test graph once
-dotnet build src/Vek.UnitTests/Vek.UnitTests.csproj --no-restore -p:SkipBunCompile=true --nologo
+dotnet build tests/Components/Vek.UnitTests/Vek.UnitTests.csproj --no-restore -p:SkipBunCompile=true --nologo
 
 # 2. Run targeted test suites rapidly
-dotnet test --project src/Vek.UnitTests/Vek.UnitTests.csproj --no-build --no-restore -- --filter "FullyQualifiedName~MenuTests" --output Normal --no-ansi --hangdump --hangdump-timeout 30s
-dotnet test --project src/Vek.UnitTests/Vek.UnitTests.csproj --no-build --no-restore -- --filter "FullyQualifiedName~PopoverTests" --output Normal --no-ansi --hangdump --hangdump-timeout 30s
+dotnet test --project tests/Components/Vek.UnitTests/Vek.UnitTests.csproj --no-build --no-restore -- --filter "FullyQualifiedName~MenuTests" --output Normal --no-ansi --hangdump --hangdump-timeout 30s
+dotnet test --project tests/Components/Vek.UnitTests/Vek.UnitTests.csproj --no-build --no-restore -- --filter "FullyQualifiedName~PopoverTests" --output Normal --no-ansi --hangdump --hangdump-timeout 30s
 ```
 
 ### Critical CLI Rules
@@ -78,7 +79,7 @@ dotnet test --project src/Vek.UnitTests/Vek.UnitTests.csproj --no-build --no-res
 Vek components must strictly conform to W3C ARIA Authoring Practices Guide (APG) specifications.
 
 ### Verification Workflow
-1. **Isolated Viewer Hosting**: Host the component in `src/Vek.UnitTests.Viewer/` using `chrome=none`.
+1. **Isolated Viewer Hosting**: Host the component in `tests/Components/Vek.UnitTests.Viewer/` using `chrome=none`.
 2. **Snapshot Accessibility Tree**:
    - Inspect the live accessibility tree via browser developer tooling or CDP (`Accessibility.getFullAXTree`).
    - Validate roles, accessible names, and initial attributes (`aria-expanded="false"`, `aria-haspopup="menu"`).
