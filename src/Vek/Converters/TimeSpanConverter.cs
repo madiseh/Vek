@@ -14,6 +14,8 @@ internal sealed partial class TimeSpanConverter : IReversibleConverter<TimeSpan?
 {
     public const string Format24Hours = "HH:mm";
     public const string Format12Hours = "hh:mm tt";
+    public const string Format24HoursWithSeconds = "HH:mm:ss";
+    public const string Format12HoursWithSeconds = "hh:mm:ss tt";
 
     public Func<string?> Format { get; set; } = () => null;
 
@@ -55,6 +57,11 @@ internal sealed partial class TimeSpanConverter : IReversibleConverter<TimeSpan?
             return time.TimeOfDay;
         }
 
+        if (DateTime.TryParseExact(input, Format24HoursWithSeconds, Culture(), DateTimeStyles.None, out time))
+        {
+            return time.TimeOfDay;
+        }
+
         var m = AmPmRegularExpression().Match(input);
         if (m.Success)
         {
@@ -62,10 +69,20 @@ internal sealed partial class TimeSpanConverter : IReversibleConverter<TimeSpan?
             {
                 return time.TimeOfDay;
             }
+
+            if (DateTime.TryParseExact(input, Format12HoursWithSeconds, CultureInfo.InvariantCulture, DateTimeStyles.None, out time))
+            {
+                return time.TimeOfDay;
+            }
         }
         else
         {
             if (DateTime.TryParseExact(input, Format24Hours, CultureInfo.InvariantCulture, DateTimeStyles.None, out time))
+            {
+                return time.TimeOfDay;
+            }
+
+            if (DateTime.TryParseExact(input, Format24HoursWithSeconds, CultureInfo.InvariantCulture, DateTimeStyles.None, out time))
             {
                 return time.TimeOfDay;
             }

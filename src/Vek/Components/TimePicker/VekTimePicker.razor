@@ -7,23 +7,28 @@
 @code {
     protected override RenderFragment PickerContent => 
     @<text><VekPickerToolbar Class="@ToolbarClassname" Style="@Style" ShowToolbar="@ShowToolbar" Orientation="@Orientation" PickerVariant="@PickerVariant" Color="@Color">
-            <div class="vek-timepicker-hourminute vek-ltr">
+            <div class="@HourMinuteContainerClassname">
                 @if (TimeEditMode == TimeEditMode.Normal)
                 {
-                    <VekButton Variant="@Variant.Text" Color="@Color.Inherit" Class="@HoursButtonClassname" OnClick="@OnHourClickAsync">@GetHourString()</VekButton>
+                    <VekButton Variant="@Variant.Text" Color="@Color.Inherit" Class="@HoursButtonClassname" OnClick="@OnHourClickAsync" aria-label="@HoursButtonAriaLabel">@GetHourString()</VekButton>
                     <VekText Typo="@Typo.h2" Class="vek-timepicker-separator">:</VekText>
-                    <VekButton Variant="@Variant.Text" Color="@Color.Inherit" Class="@MinuteButtonClassname" OnClick="@OnMinutesClick">@GetMinuteString()</VekButton>
+                    <VekButton Variant="@Variant.Text" Color="@Color.Inherit" Class="@MinuteButtonClassname" OnClick="@OnMinutesClick" aria-label="@MinutesButtonAriaLabel">@GetMinuteString()</VekButton>
+                    @if (_showSecondsState.Value)
+                    {
+                        <VekText Typo="@Typo.h2" Class="vek-timepicker-separator">:</VekText>
+                        <VekButton Variant="@Variant.Text" Color="@Color.Inherit" Class="@SecondButtonClassname" OnClick="@OnSecondsClickAsync" aria-label="@SecondsButtonAriaLabel">@GetSecondString()</VekButton>
+                    }
                 }
                 else
                 {
-                    <VekText Typo="Typo.h2" Class="vek-timepicker-separator">@GetHourString():@GetMinuteString()</VekText>
+                    <VekText Typo="Typo.h2" Class="vek-timepicker-separator">@GetHourString():@GetMinuteString()@(_showSecondsState.Value ? $":{GetSecondString()}" : "")</VekText>
                 }
             </div>
-            @if (AmPm)
+            @if (IsAmPm)
             {
                 <div class="vek-timepicker-ampm">
-                    <VekButton Variant="@Variant.Text" Color="@Color.Inherit" Class="@AmButtonClassname" OnClick="OnAmClickedAsync">AM</VekButton>
-                    <VekButton Variant="@Variant.Text" Color="@Color.Inherit" Class="@PmButtonClassname" OnClick="OnPmClickedAsync">PM</VekButton>
+                    <VekButton Variant="@Variant.Text" Color="@Color.Inherit" Class="@AmButtonClassname" OnClick="OnAmClickedAsync" aria-label="AM">AM</VekButton>
+                    <VekButton Variant="@Variant.Text" Color="@Color.Inherit" Class="@PmButtonClassname" OnClick="OnPmClickedAsync" aria-label="PM">PM</VekButton>
                 </div>
             }
         </VekPickerToolbar>
@@ -36,7 +41,7 @@
                             <div class="@GetClockPointerThumbColor()"></div>
                         </div>
                         <div class="@HourDialClassname">
-                            @if (AmPm)
+                            @if (IsAmPm)
                             {
                                 @*Hours from 1 to 12*@
                                 for (int i = 1; i <= 12; ++i)
@@ -91,6 +96,23 @@
                                 <div class="vek-picker-stick vek-minute" style="@($"transform: rotateZ({_i * 6}deg);")" data-stick-value="@_i"></div>
                             }
                         </div>
+                        @if (_showSecondsState.Value)
+                        {
+                            <div class="@SecondDialClassname">   
+                                @*Seconds from 05 to 60 (00) - step 5*@                     
+                                @for (int i = 0; i < 12; ++i)
+                                {
+                                    var _i = i;
+                                    var angle = (6 - _i) * 30;
+                                    <VekText Class="@GetNumberColor(_i * 5)" Style="@GetTransform(angle, 109, 0, 5)">@((_i * 5).ToString("D2"))</VekText>
+                                }
+                                @for (int i = 0; i < 60; ++i)
+                                {
+                                    var _i = i;
+                                    <div class="vek-picker-stick vek-minute vek-second" style="@($"transform: rotateZ({_i * 6}deg);")" data-stick-value="@_i"></div>
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
             </div>

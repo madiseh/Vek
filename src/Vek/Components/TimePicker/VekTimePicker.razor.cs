@@ -25,6 +25,12 @@ namespace Vek
         private readonly SetTime _timeSet = new();
         private readonly Lazy<DotNetObjectReference<VekTimePicker>> _dotNetReferenceLazy;
 
+        private readonly ParameterState<TimeEditFormat?> _timeEditFormatState;
+        private readonly ParameterState<bool> _showSecondsState;
+        private readonly ParameterState<int> _minuteIntervalState;
+        private readonly ParameterState<int> _secondIntervalState;
+        private readonly ParameterState<int> _secondSelectionStepState;
+
         [Inject]
         private IJSRuntime JsRuntime { get; set; } = null!;
 
@@ -44,6 +50,18 @@ namespace Vek
             registerScope.RegisterParameter<string?>(nameof(TimeFormat))
                 .WithParameter(() => TimeFormat)
                 .WithChangeHandler(FormatChangedAsync);
+            _timeEditFormatState = registerScope.RegisterParameter<TimeEditFormat?>(nameof(TimeEditFormat))
+                .WithParameter(() => TimeEditFormat)
+                .WithChangeHandler(FormatChangedAsync);
+            _showSecondsState = registerScope.RegisterParameter<bool>(nameof(ShowSeconds))
+                .WithParameter(() => ShowSeconds)
+                .WithChangeHandler(FormatChangedAsync);
+            _minuteIntervalState = registerScope.RegisterParameter<int>(nameof(MinuteInterval))
+                .WithParameter(() => MinuteInterval);
+            _secondIntervalState = registerScope.RegisterParameter<int>(nameof(SecondInterval))
+                .WithParameter(() => SecondInterval);
+            _secondSelectionStepState = registerScope.RegisterParameter<int>(nameof(SecondSelectionStep))
+                .WithParameter(() => SecondSelectionStep);
         }
 
         internal TimeSpan? TimeIntermediate { get; private set; }
@@ -100,6 +118,91 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.FormComponent.PickerBehavior)]
         public int MinuteSelectionStep { get; set; } = 1;
+
+        /// <summary>
+        /// The interval in minutes between selectable values.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>1</c>. Common intervals are <c>1</c>, <c>5</c>, <c>10</c>, <c>15</c>, and <c>30</c> minutes.
+        /// When set, minutes are snapped to the nearest step during selection and keyboard navigation.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.PickerBehavior)]
+        public int MinuteInterval { get; set; } = 1;
+
+        /// <summary>
+        /// The interval in seconds between selectable values.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>1</c>. For example, a value of <c>5</c> allows seconds <c>0</c>, <c>5</c>, <c>10</c>, etc.
+        /// Snaps seconds during selection and keyboard navigation.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.PickerBehavior)]
+        public int SecondInterval { get; set; } = 1;
+
+        /// <summary>
+        /// The step interval when selecting seconds.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>1</c>. Alias for <see cref="SecondInterval"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.PickerBehavior)]
+        public int SecondSelectionStep { get; set; } = 1;
+
+        /// <summary>
+        /// Enables selection and display of seconds.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. When <c>true</c>, a seconds column is displayed in the toolbar,
+        /// and seconds can be selected via a seconds clock dial or keyboard navigation.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool ShowSeconds { get; set; }
+
+        /// <summary>
+        /// Specifies whether the picker operates in 12-hour (with AM/PM) or 24-hour mode.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>, falling back to <see cref="AmPm"/>.
+        /// When set to <see cref="TimeEditFormat.TwelveHour"/>, 12-hour AM/PM mode is used.
+        /// When set to <see cref="TimeEditFormat.TwentyFourHour"/>, 24-hour mode is used.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public TimeEditFormat? TimeEditFormat { get; set; }
+
+        /// <summary>
+        /// The accessible name for the hours toolbar button.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>"Select hours"</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string HoursButtonAriaLabel { get; set; } = "Select hours";
+
+        /// <summary>
+        /// The accessible name for the minutes toolbar button.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>"Select minutes"</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string MinutesButtonAriaLabel { get; set; } = "Select minutes";
+
+        /// <summary>
+        /// The accessible name for the seconds toolbar button.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>"Select seconds"</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string SecondsButtonAriaLabel { get; set; } = "Select seconds";
 
         /// <summary>
         /// Shows a 12-hour selection clock.
@@ -204,6 +307,7 @@ namespace Vek
                 TimeEditMode.Normal => OpenTo,
                 TimeEditMode.OnlyHours => OpenTo.Hours,
                 TimeEditMode.OnlyMinutes => OpenTo.Minutes,
+                TimeEditMode.OnlySeconds => OpenTo.Seconds,
                 _ => _currentView
             };
         }
@@ -233,6 +337,17 @@ namespace Vek
             }
         }
 
+        private int EffectiveMinuteInterval => _minuteIntervalState.Value > 1 ? _minuteIntervalState.Value : MinuteSelectionStep;
+
+        private int EffectiveSecondInterval => _secondIntervalState.Value > 1 ? _secondIntervalState.Value : (_secondSelectionStepState.Value > 1 ? _secondSelectionStepState.Value : 1);
+
+        private bool IsAmPm => _timeEditFormatState.Value switch
+        {
+            Vek.TimeEditFormat.TwelveHour => true,
+            Vek.TimeEditFormat.TwentyFourHour => false,
+            _ => AmPm
+        };
+
         /// <summary>
         /// Gets the hour portion of the selected time.
         /// </summary>
@@ -244,7 +359,7 @@ namespace Vek
                 return "--";
             }
 
-            var h = AmPm ? TimeIntermediate.Value.ToAmPmHour() : TimeIntermediate.Value.Hours;
+            var h = IsAmPm ? TimeIntermediate.Value.ToAmPmHour() : TimeIntermediate.Value.Hours;
             return $"{Math.Min(23, Math.Max(0, h)):D2}";
         }
 
@@ -262,11 +377,25 @@ namespace Vek
             return $"{Math.Min(59, Math.Max(0, TimeIntermediate.Value.Minutes)):D2}";
         }
 
+        /// <summary>
+        /// Gets the second portion of the selected time.
+        /// </summary>
+        /// <returns>A two-digit string for seconds, or <c>--</c> if no value is set.</returns>
+        private string GetSecondString()
+        {
+            if (TimeIntermediate == null)
+            {
+                return "--";
+            }
+
+            return $"{Math.Min(59, Math.Max(0, TimeIntermediate.Value.Seconds)):D2}";
+        }
+
         private Task UpdateTimeAsync()
         {
             if (GetReadOnlyState())
                 return Task.CompletedTask;
-            TimeIntermediate = new TimeSpan(_timeSet.Hour, _timeSet.Minute, 0);
+            TimeIntermediate = new TimeSpan(_timeSet.Hour, _timeSet.Minute, _showSecondsState.Value ? _timeSet.Second : 0);
             if ((PickerVariant == PickerVariant.Static && PickerActions == null) || (PickerActions != null && AutoClose))
             {
                 return SubmitAsync();
@@ -284,6 +413,12 @@ namespace Vek
         private async Task OnMinutesClick()
         {
             _currentView = OpenTo.Minutes;
+            await FocusAsync();
+        }
+
+        private async Task OnSecondsClickAsync()
+        {
+            _currentView = OpenTo.Seconds;
             await FocusAsync();
         }
 
@@ -306,6 +441,11 @@ namespace Vek
             await FocusAsync();
         }
 
+        private string HourMinuteContainerClassname =>
+            new CssBuilder("vek-timepicker-hourminute vek-ltr")
+                .AddClass("vek-timepicker-with-seconds", _showSecondsState.Value)
+                .Build();
+
         protected string ToolbarClassname =>
             new CssBuilder("vek-picker-timepicker-toolbar")
                 .AddClass("vek-picker-timepicker-toolbar-landscape", Orientation == Orientation.Landscape && PickerVariant == PickerVariant.Static)
@@ -314,12 +454,17 @@ namespace Vek
 
         protected string HoursButtonClassname =>
             new CssBuilder("vek-timepicker-button")
-                .AddClass("vek-timepicker-toolbar-text", _currentView == OpenTo.Minutes)
+                .AddClass("vek-timepicker-toolbar-text", _currentView != OpenTo.Hours)
                 .Build();
 
         protected string MinuteButtonClassname =>
             new CssBuilder("vek-timepicker-button")
-                .AddClass("vek-timepicker-toolbar-text", _currentView == OpenTo.Hours)
+                .AddClass("vek-timepicker-toolbar-text", _currentView != OpenTo.Minutes)
+                .Build();
+
+        protected string SecondButtonClassname =>
+            new CssBuilder("vek-timepicker-button")
+                .AddClass("vek-timepicker-toolbar-text", _currentView != OpenTo.Seconds)
                 .Build();
 
         protected string AmButtonClassname =>
@@ -344,6 +489,13 @@ namespace Vek
                 .AddClass("vek-time-picker-dial")
                 .AddClass("vek-time-picker-dial-out", _currentView != OpenTo.Minutes)
                 .AddClass("vek-time-picker-dial-hidden", _currentView != OpenTo.Minutes)
+                .Build();
+
+        private string SecondDialClassname =>
+            new CssBuilder("vek-time-picker-second")
+                .AddClass("vek-time-picker-dial")
+                .AddClass("vek-time-picker-dial-out", _currentView != OpenTo.Seconds)
+                .AddClass("vek-time-picker-dial-hidden", _currentView != OpenTo.Seconds)
                 .Build();
 
         private bool IsAm => _timeSet.Hour is >= 00 and < 12; // AM is 00:00 to 11:59.
@@ -375,7 +527,7 @@ namespace Vek
             {
                 var h = _timeSet.Hour;
 
-                if (AmPm)
+                if (IsAmPm)
                 {
                     h = _timeSet.Hour % 12;
                     if (_timeSet.Hour % 12 == 0)
@@ -393,6 +545,10 @@ namespace Vek
             {
                 return $"vek-clock-number vek-theme-{Color.ToStringFast(true)}";
             }
+            else if (_currentView == OpenTo.Seconds && _timeSet.Second == value)
+            {
+                return $"vek-clock-number vek-theme-{Color.ToStringFast(true)}";
+            }
 
             return "vek-clock-number";
         }
@@ -405,10 +561,13 @@ namespace Vek
             {
                 deg = _timeSet.Hour * 30 % 360;
             }
-
-            if (_currentView == OpenTo.Minutes)
+            else if (_currentView == OpenTo.Minutes)
             {
                 deg = _timeSet.Minute * 6 % 360;
+            }
+            else if (_currentView == OpenTo.Seconds)
+            {
+                deg = _timeSet.Second * 6 % 360;
             }
 
             return deg;
@@ -424,18 +583,7 @@ namespace Vek
 
         private string GetPointerRotation()
         {
-            double deg = 0;
-
-            if (_currentView == OpenTo.Hours)
-            {
-                deg = _timeSet.Hour * 30 % 360;
-            }
-
-            if (_currentView == OpenTo.Minutes)
-            {
-                deg = _timeSet.Minute * 6 % 360;
-            }
-
+            var deg = GetDeg();
             return $"rotateZ({deg}deg);";
         }
 
@@ -443,14 +591,9 @@ namespace Vek
         {
             var height = 40;
 
-            if (_currentView == OpenTo.Minutes)
-            {
-                height = 40;
-            }
-
             if (_currentView == OpenTo.Hours)
             {
-                if (!AmPm && _timeSet.Hour > 0 && _timeSet.Hour < 13)
+                if (!IsAmPm && _timeSet.Hour > 0 && _timeSet.Hour < 13)
                 {
                     height = 26;
                 }
@@ -458,6 +601,10 @@ namespace Vek
                 {
                     height = 40;
                 }
+            }
+            else
+            {
+                height = 40;
             }
 
             return $"{height}%;";
@@ -523,8 +670,13 @@ namespace Vek
             // Update the .NET properties from the JavaScript events.
             if (_currentView == OpenTo.Minutes)
             {
-                var minute = RoundToStepInterval(value);
+                var minute = RoundToMinuteStepInterval(value);
                 _timeSet.Minute = minute;
+            }
+            else if (_currentView == OpenTo.Seconds)
+            {
+                var second = RoundToSecondStepInterval(value);
+                _timeSet.Second = second;
             }
             else if (_currentView == OpenTo.Hours)
             {
@@ -553,6 +705,17 @@ namespace Vek
             // Clicking a stick will submit the time.
             if (_currentView == OpenTo.Minutes)
             {
+                if (TimeEditMode == TimeEditMode.Normal && _showSecondsState.Value)
+                {
+                    _currentView = OpenTo.Seconds;
+                }
+                else
+                {
+                    await SubmitAndCloseAsync();
+                }
+            }
+            else if (_currentView == OpenTo.Seconds)
+            {
                 await SubmitAndCloseAsync();
             }
             else if (_currentView == OpenTo.Hours)
@@ -577,16 +740,18 @@ namespace Vek
             {
                 _timeSet.Hour = 0;
                 _timeSet.Minute = 0;
+                _timeSet.Second = 0;
                 return;
             }
 
             _timeSet.Hour = TimeIntermediate.Value.Hours;
             _timeSet.Minute = TimeIntermediate.Value.Minutes;
+            _timeSet.Second = TimeIntermediate.Value.Seconds;
         }
 
         private int HourAmPm(int hour)
         {
-            if (AmPm)
+            if (IsAmPm)
             {
                 if (IsAm && hour == 12)
                 {
@@ -602,13 +767,14 @@ namespace Vek
             return hour;
         }
 
-        private int RoundToStepInterval(int value)
+        private int RoundToMinuteStepInterval(int value)
         {
-            if (MinuteSelectionStep > 1) // Ignore if step is less than or equal to 1.
+            var step = EffectiveMinuteInterval;
+            if (step > 1)
             {
-                var interval = MinuteSelectionStep % 60;
+                var interval = step % 60;
                 value = (value + (interval / 2)) / interval * interval;
-                if (value == 60) // For when it rounds up to 60.
+                if (value >= 60)
                 {
                     value = 0;
                 }
@@ -616,6 +782,24 @@ namespace Vek
 
             return value;
         }
+
+        private int RoundToSecondStepInterval(int value)
+        {
+            var step = EffectiveSecondInterval;
+            if (step > 1)
+            {
+                var interval = step % 60;
+                value = (value + (interval / 2)) / interval * interval;
+                if (value >= 60)
+                {
+                    value = 0;
+                }
+            }
+
+            return value;
+        }
+
+        private int RoundToStepInterval(int value) => RoundToMinuteStepInterval(value);
 
         private DotNetObjectReference<VekTimePicker> CreateDotNetObjectReference() => DotNetObjectReference.Create(this);
 
@@ -653,21 +837,47 @@ namespace Vek
                         }
                         else if (args.ShiftKey)
                         {
-                            if (_timeSet.Minute > 55)
+                            if (_currentView == OpenTo.Seconds)
                             {
-                                await ChangeHourAsync(1);
-                            }
+                                if (_timeSet.Second > 55)
+                                {
+                                    await ChangeMinuteAsync(1);
+                                }
 
-                            await ChangeMinuteAsync(5);
+                                await ChangeSecondAsync(5);
+                            }
+                            else
+                            {
+                                if (_timeSet.Minute > 55)
+                                {
+                                    await ChangeHourAsync(1);
+                                }
+
+                                await ChangeMinuteAsync(5);
+                            }
                         }
                         else
                         {
-                            if (_timeSet.Minute == 59)
+                            if (_currentView == OpenTo.Seconds)
                             {
-                                await ChangeHourAsync(1);
-                            }
+                                var step = EffectiveSecondInterval;
+                                if (_timeSet.Second + step >= 60)
+                                {
+                                    await ChangeMinuteAsync(1);
+                                }
 
-                            await ChangeMinuteAsync(1);
+                                await ChangeSecondAsync(step);
+                            }
+                            else
+                            {
+                                var step = EffectiveMinuteInterval;
+                                if (_timeSet.Minute + step >= 60)
+                                {
+                                    await ChangeHourAsync(1);
+                                }
+
+                                await ChangeMinuteAsync(step);
+                            }
                         }
                     }
 
@@ -681,21 +891,47 @@ namespace Vek
                         }
                         else if (args.ShiftKey)
                         {
-                            if (_timeSet.Minute < 5)
+                            if (_currentView == OpenTo.Seconds)
                             {
-                                await ChangeHourAsync(-1);
-                            }
+                                if (_timeSet.Second < 5)
+                                {
+                                    await ChangeMinuteAsync(-1);
+                                }
 
-                            await ChangeMinuteAsync(-5);
+                                await ChangeSecondAsync(-5);
+                            }
+                            else
+                            {
+                                if (_timeSet.Minute < 5)
+                                {
+                                    await ChangeHourAsync(-1);
+                                }
+
+                                await ChangeMinuteAsync(-5);
+                            }
                         }
                         else
                         {
-                            if (_timeSet.Minute == 0)
+                            if (_currentView == OpenTo.Seconds)
                             {
-                                await ChangeHourAsync(-1);
-                            }
+                                var step = EffectiveSecondInterval;
+                                if (_timeSet.Second == 0)
+                                {
+                                    await ChangeMinuteAsync(-1);
+                                }
 
-                            await ChangeMinuteAsync(-1);
+                                await ChangeSecondAsync(-step);
+                            }
+                            else
+                            {
+                                var step = EffectiveMinuteInterval;
+                                if (_timeSet.Minute == 0)
+                                {
+                                    await ChangeHourAsync(-1);
+                                }
+
+                                await ChangeMinuteAsync(-step);
+                            }
                         }
                     }
 
@@ -779,7 +1015,12 @@ namespace Vek
                 return TimeFormat;
             }
 
-            return AmPm ? TimeSpanConverter.Format12Hours : TimeSpanConverter.Format24Hours;
+            if (_showSecondsState.Value)
+            {
+                return IsAmPm ? TimeSpanConverter.Format12HoursWithSeconds : TimeSpanConverter.Format24HoursWithSeconds;
+            }
+
+            return IsAmPm ? TimeSpanConverter.Format12Hours : TimeSpanConverter.Format24Hours;
         }
 
         /// <inheritdoc />
@@ -790,6 +1031,14 @@ namespace Vek
                 Culture = GetCulture,
                 Format = GetFormat
             };
+        }
+
+        protected Task ChangeSecondAsync(int second)
+        {
+            _currentView = OpenTo.Seconds;
+            _timeSet.Second = (_timeSet.Second + second + 60) % 60;
+
+            return UpdateTimeAsync();
         }
 
         protected Task ChangeMinuteAsync(int minute)
@@ -818,6 +1067,7 @@ namespace Vek
             {
                 _timeSet.Hour = Time.Value.Hours;
                 _timeSet.Minute = Time.Value.Minutes;
+                _timeSet.Second = Time.Value.Seconds;
 
                 await UpdateTimeAsync();
             }
@@ -825,6 +1075,11 @@ namespace Vek
 
         private Task FormatChangedAsync()
         {
+            if (_timeEditFormatState.Value.HasValue)
+            {
+                AmPm = _timeEditFormatState.Value.Value == Vek.TimeEditFormat.TwelveHour;
+            }
+
             Touched = true;
             return SetTextAsync(ConvertSet(_value), false);
         }
@@ -850,6 +1105,8 @@ namespace Vek
             public int Hour { get; set; }
 
             public int Minute { get; set; }
+
+            public int Second { get; set; }
         }
     }
 }

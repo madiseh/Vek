@@ -6,6 +6,10 @@
                AmPm="AmPm"
                TimeEditMode="TimeEditMode"
                MinuteSelectionStep="MinuteSelectionStep"
+               MinuteInterval="MinuteInterval"
+               ShowSeconds="ShowSeconds"
+               SecondInterval="SecondInterval"
+               TimeEditFormat="TimeEditFormat"
                ClosingDelay="ClosingDelay"
                InputId="@InputId" />
 
@@ -26,6 +30,18 @@
 
     [Parameter]
     public int MinuteSelectionStep { get; set; } = 1;
+
+    [Parameter]
+    public int MinuteInterval { get; set; } = 1;
+
+    [Parameter]
+    public bool ShowSeconds { get; set; }
+
+    [Parameter]
+    public int SecondInterval { get; set; } = 1;
+
+    [Parameter]
+    public TimeEditFormat? TimeEditFormat { get; set; }
 
     // Mirrors VekTimePicker.ClosingDelay; tests set 0 to remove the post-commit close timer.
     [Parameter]
