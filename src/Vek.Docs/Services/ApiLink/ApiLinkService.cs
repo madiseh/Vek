@@ -128,13 +128,6 @@ namespace Vek.Docs.Services
 
                 new ApiLinkServiceEntry
                 {
-                    Title = "Announcements",
-                    Link = "about/announcements",
-                    SubTitle = "Learn More"
-                },
-
-                new ApiLinkServiceEntry
-                {
                     Title = "Getting Help",
                     Link = "about/community/getting-help",
                     SubTitle = "Learn More"
@@ -151,13 +144,6 @@ namespace Vek.Docs.Services
                 {
                     Title = "Contribution",
                     Link = "about/community/contribution",
-                    SubTitle = "Learn More"
-                },
-
-                new ApiLinkServiceEntry
-                {
-                    Title = "Community Extensions",
-                    Link = "about/community/extensions",
                     SubTitle = "Learn More"
                 },
 
