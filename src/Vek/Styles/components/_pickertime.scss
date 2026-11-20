@@ -27,6 +27,16 @@
       line-height: 1;
       letter-spacing: -0.00833em;
     }
+
+    &.vek-timepicker-with-seconds {
+      .vek-timepicker-button {
+        font-size: 2.75rem;
+      }
+
+      .vek-timepicker-separator {
+        font-size: 2.75rem;
+      }
+    }
   }
 
   .vek-timepicker-ampm {
@@ -63,6 +73,16 @@
         font-weight: 400;
         line-height: 1.04;
         letter-spacing: 0em;
+      }
+
+      &.vek-timepicker-with-seconds {
+        .vek-timepicker-button {
+          font-size: 2.25rem;
+        }
+
+        .vek-timepicker-separator {
+          font-size: 2.25rem;
+        }
       }
     }
 
@@ -193,7 +213,8 @@
         }
       }
 
-      &.vek-minute {
+      &.vek-minute,
+      &.vek-second {
         &:after {
           content: "";
           position: absolute;
@@ -277,7 +298,8 @@
   transform-origin: center;
 }
 
-.vek-time-picker-minute.vek-time-picker-dial-out {
+.vek-time-picker-minute.vek-time-picker-dial-out,
+.vek-time-picker-second.vek-time-picker-dial-out {
   transform: scale(.8,.8);
   transform-origin: center;
 }

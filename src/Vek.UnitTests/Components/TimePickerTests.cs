@@ -3,8 +3,8 @@ using AwesomeAssertions;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Vek.UnitTests.TestComponents.TimePicker;
 using NUnit.Framework;
+using Vek.UnitTests.TestComponents.TimePicker;
 
 namespace Vek.UnitTests.Components
 {
@@ -752,6 +752,198 @@ namespace Vek.UnitTests.Components
 
             picker.Time.Should().BeNull();
             await comp.WaitForAssertionAsync(() => comp.FindAll("div.vek-picker-open").Count.Should().Be(0));
+        }
+
+        [Test]
+        public void TimePicker_TimeEditFormat_TwelveHour_FormatsAndShowsAmPm()
+        {
+            var comp = Context.Render<VekTimePicker>(parameters => parameters
+                .Add(x => x.TimeEditFormat, TimeEditFormat.TwelveHour)
+                .Add(x => x.Time, new TimeSpan(14, 30, 0)));
+
+            comp.Find("input").GetAttribute("value").Should().Be("02:30 PM");
+            comp.Instance.AmPm.Should().BeTrue();
+        }
+
+        [Test]
+        public void TimePicker_TimeEditFormat_TwentyFourHour_FormatsAndHidesAmPm()
+        {
+            var comp = Context.Render<VekTimePicker>(parameters => parameters
+                .Add(x => x.TimeEditFormat, TimeEditFormat.TwentyFourHour)
+                .Add(x => x.Time, new TimeSpan(14, 30, 0)));
+
+            comp.Find("input").GetAttribute("value").Should().Be("14:30");
+            comp.Instance.AmPm.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task TimePicker_TimeEditFormat_DynamicSwitching()
+        {
+            var comp = Context.Render<VekTimePicker>(parameters => parameters
+                .Add(x => x.TimeEditFormat, TimeEditFormat.TwelveHour)
+                .Add(x => x.Time, new TimeSpan(15, 45, 0)));
+
+            comp.Find("input").GetAttribute("value").Should().Be("03:45 PM");
+
+            await comp.SetParametersAndRenderAsync(parameters => parameters
+                .Add(x => x.TimeEditFormat, TimeEditFormat.TwentyFourHour));
+
+            comp.Find("input").GetAttribute("value").Should().Be("15:45");
+        }
+
+        [Test]
+        public async Task TimePicker_MinuteInterval_SnapsSelection()
+        {
+            var comp = Context.Render<VekTimePicker>(parameters => parameters
+                .Add(x => x.MinuteInterval, 15)
+                .Add(x => x.OpenTo, OpenTo.Minutes));
+
+            var picker = comp.Instance;
+
+            await comp.InvokeAsync(() => picker.SelectTimeFromStick(13, false));
+            picker.TimeIntermediate?.Minutes.Should().Be(15);
+
+            await comp.InvokeAsync(() => picker.SelectTimeFromStick(24, false));
+            picker.TimeIntermediate?.Minutes.Should().Be(30);
+
+            await comp.InvokeAsync(() => picker.SelectTimeFromStick(58, false));
+            picker.TimeIntermediate?.Minutes.Should().Be(0);
+        }
+
+        [Test]
+        public async Task TimePicker_MinuteInterval_KeyboardNavigation()
+        {
+            var keyInterceptorService = Context.AddKeyInterceptorService();
+            var comp = Context.Render<SimpleTimePickerTest>(parameters => parameters
+                .Add(x => x.MinuteInterval, 15)
+                .Add(x => x.OpenTo, OpenTo.Minutes)
+                .Add(x => x.Time, new TimeSpan(10, 0, 0)));
+
+            var picker = comp.FindComponent<VekTimePicker>().Instance;
+
+            // Open the picker
+            await comp.InvokeAsync(() => keyInterceptorService.OnKeyDown(picker.ElementId, new KeyboardEventArgs { Key = " ", Type = "keydown" }));
+            await comp.WaitForAssertionAsync(() => comp.FindAll("div.vek-picker-open").Count.Should().Be(1));
+
+            // ArrowRight should advance by MinuteInterval (15 mins)
+            await comp.InvokeAsync(() => keyInterceptorService.OnKeyDown(picker.ElementId, new KeyboardEventArgs { Key = "ArrowRight", Type = "keydown" }));
+            await comp.WaitForAssertionAsync(() => picker.TimeIntermediate.Should().Be(new TimeSpan(10, 15, 0)));
+
+            await comp.InvokeAsync(() => keyInterceptorService.OnKeyDown(picker.ElementId, new KeyboardEventArgs { Key = "ArrowRight", Type = "keydown" }));
+            await comp.WaitForAssertionAsync(() => picker.TimeIntermediate.Should().Be(new TimeSpan(10, 30, 0)));
+        }
+
+        [Test]
+        public void TimePicker_ShowSeconds_ToolbarAndFormatting()
+        {
+            var comp = Context.Render<VekTimePicker>(parameters => parameters
+                .Add(x => x.ShowSeconds, true)
+                .Add(x => x.Time, new TimeSpan(14, 30, 45)));
+
+            comp.Find("input").GetAttribute("value").Should().Be("14:30:45");
+
+            // Check that toolbar has hours, minutes, and seconds buttons in static/open mode
+            var staticComp = Context.Render<VekTimePicker>(parameters => parameters
+                .Add(x => x.PickerVariant, PickerVariant.Static)
+                .Add(x => x.ShowSeconds, true));
+
+            var buttons = staticComp.FindAll("button.vek-timepicker-button");
+            buttons.Count.Should().Be(3);
+        }
+
+        [Test]
+        public void TimePicker_ShowSeconds_TwelveHour_Formatting()
+        {
+            var comp = Context.Render<VekTimePicker>(parameters => parameters
+                .Add(x => x.ShowSeconds, true)
+                .Add(x => x.TimeEditFormat, TimeEditFormat.TwelveHour)
+                .Add(x => x.Time, new TimeSpan(14, 30, 45)));
+
+            comp.Find("input").GetAttribute("value").Should().Be("02:30:45 PM");
+        }
+
+        [Test]
+        public async Task TimePicker_ShowSeconds_StepThroughViews()
+        {
+            var comp = await OpenPicker(parameters => parameters.Add(x => x.ShowSeconds, true));
+            var picker = comp.FindComponent<VekTimePicker>().Instance;
+
+            // Initial view is Hours
+            comp.FindAll("div.vek-time-picker-hour.vek-time-picker-dial-hidden").Count.Should().Be(0);
+
+            // Click hour stick -> should advance to Minutes
+            await comp.InvokeAsync(() => picker.OnStickClick(10));
+            comp.FindAll("div.vek-time-picker-minute.vek-time-picker-dial-hidden").Count.Should().Be(0);
+            comp.FindAll("div.vek-time-picker-hour.vek-time-picker-dial-hidden").Count.Should().Be(1);
+
+            // Click minute stick -> should advance to Seconds
+            await comp.InvokeAsync(() => picker.OnStickClick(25));
+            comp.FindAll("div.vek-time-picker-second.vek-time-picker-dial-hidden").Count.Should().Be(0);
+
+            // Select second stick -> commits and submits
+            await comp.InvokeAsync(() => picker.SelectTimeFromStick(40, false));
+            await comp.InvokeAsync(() => picker.OnStickClick(40));
+
+            await comp.WaitForAssertionAsync(() => picker.TimeIntermediate?.Seconds.Should().Be(40));
+        }
+
+        [Test]
+        public async Task TimePicker_SecondInterval_SnapsSelection()
+        {
+            var comp = Context.Render<VekTimePicker>(parameters => parameters
+                .Add(x => x.ShowSeconds, true)
+                .Add(x => x.SecondInterval, 10)
+                .Add(x => x.OpenTo, OpenTo.Seconds));
+
+            var picker = comp.Instance;
+
+            await comp.InvokeAsync(() => picker.SelectTimeFromStick(13, false));
+            picker.TimeIntermediate?.Seconds.Should().Be(10);
+
+            await comp.InvokeAsync(() => picker.SelectTimeFromStick(27, false));
+            picker.TimeIntermediate?.Seconds.Should().Be(30);
+        }
+
+        [Test]
+        public async Task TimePicker_Seconds_InputStringParsing()
+        {
+            var comp = Context.Render<VekTimePicker>(parameters => parameters.Add(x => x.ShowSeconds, true));
+            var picker = comp.Instance;
+
+            await comp.Find("input").ChangeAsync("16:20:30");
+            picker.TimeIntermediate.Should().Be(new TimeSpan(16, 20, 30));
+            picker.ConversionError.Should().BeFalse();
+
+            await comp.Find("input").ChangeAsync("04:20:30 PM");
+            picker.TimeIntermediate.Should().Be(new TimeSpan(16, 20, 30));
+            picker.ConversionError.Should().BeFalse();
+        }
+
+        [Test]
+        public void TimePicker_Toolbar_AriaLabels()
+        {
+            var comp = Context.Render<VekTimePicker>(parameters => parameters
+                .Add(x => x.PickerVariant, PickerVariant.Static)
+                .Add(x => x.ShowSeconds, true)
+                .Add(x => x.HoursButtonAriaLabel, "Choose hour")
+                .Add(x => x.MinutesButtonAriaLabel, "Choose minute")
+                .Add(x => x.SecondsButtonAriaLabel, "Choose second"));
+
+            comp.Find("button[aria-label='Choose hour']").Should().NotBeNull();
+            comp.Find("button[aria-label='Choose minute']").Should().NotBeNull();
+            comp.Find("button[aria-label='Choose second']").Should().NotBeNull();
+        }
+
+        [Test]
+        public async Task TimePicker_TimeEditMode_OnlySeconds()
+        {
+            var comp = await OpenPicker(parameters => parameters
+                .Add(x => x.ShowSeconds, true)
+                .Add(x => x.TimeEditMode, TimeEditMode.OnlySeconds));
+
+            comp.FindAll("div.vek-time-picker-second.vek-time-picker-dial-hidden").Count.Should().Be(0);
+            comp.FindAll("div.vek-time-picker-hour.vek-time-picker-dial-hidden").Count.Should().Be(1);
+            comp.FindAll("div.vek-time-picker-minute.vek-time-picker-dial-hidden").Count.Should().Be(1);
         }
     }
 }

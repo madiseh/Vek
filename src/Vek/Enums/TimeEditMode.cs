@@ -22,5 +22,10 @@ public enum TimeEditMode
     /// <summary>
     /// Only hours can be edited.
     /// </summary>
-    OnlyHours
+    OnlyHours,
+
+    /// <summary>
+    /// Only seconds can be edited.
+    /// </summary>
+    OnlySeconds
 }
