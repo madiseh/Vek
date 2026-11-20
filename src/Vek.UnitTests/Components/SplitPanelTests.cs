@@ -1,7 +1,8 @@
 ﻿using AwesomeAssertions;
 using Bunit;
-using Vek.UnitTests.TestComponents.SplitPanel;
+using Microsoft.AspNetCore.Components;
 using NUnit.Framework;
+using Vek.UnitTests.TestComponents.SplitPanel;
 
 namespace Vek.UnitTests.Components;
 
@@ -51,7 +52,7 @@ public class SplitPanelTests : BunitTest
     {
         Context.Render<SplitPanelTest>();
         var invocation = Context.JSInterop.VerifyInvoke("vekSplitPanel.build");
-        invocation.Arguments.Count.Should().Be(6);
+        invocation.Arguments.Count.Should().Be(12);
 
         await Context.DisposeComponentsAsync();
         invocation = Context.JSInterop.VerifyInvoke("vekSplitPanel_destroy");
@@ -65,7 +66,7 @@ public class SplitPanelTests : BunitTest
         await comp.SetParametersAndRenderAsync(parameters => parameters.Add(c => c.Horizontal, true));
 
         var invocation = Context.JSInterop.VerifyInvoke("vekSplitPanel_update");
-        invocation.Arguments.Count.Should().Be(5);
+        invocation.Arguments.Count.Should().Be(10);
     }
 
     [Test]
@@ -133,6 +134,47 @@ public class SplitPanelTests : BunitTest
 
         await Context.DisposeComponentsAsync();
         Context.JSInterop.VerifyInvoke("vekSplitPanel_destroy").Arguments[0].Should().Be("custom-split");
+    }
+
+    /// <summary>
+    /// Pane sizing options are forwarded to the interactive splitter.
+    /// </summary>
+    [Test]
+    public void PaneSizingOptions_ArePassedToJavaScript()
+    {
+        Context.Render<VekSplitPanel>(parameters => parameters
+            .Add(p => p.PaneSize, 35)
+            .Add(p => p.PaneSizeUnit, SplitPanelSizeUnit.Percentage)
+            .Add(p => p.MinSize, 20)
+            .Add(p => p.MaxSize, 75)
+            .Add(p => p.Collapsible, true));
+
+        var build = Context.JSInterop.VerifyInvoke("vekSplitPanel.build");
+        build.Arguments[6].Should().Be(35d);
+        build.Arguments[7].Should().Be(SplitPanelSizeUnit.Percentage);
+        build.Arguments[8].Should().Be(20d);
+        build.Arguments[9].Should().Be(75d);
+        build.Arguments[10].Should().Be(true);
+        build.Arguments[11].Should().NotBeNull();
+    }
+
+    /// <summary>
+    /// Interactive resizing updates the bound pane size.
+    /// </summary>
+    [Test]
+    public async Task PaneSizeChanged_UpdatesTheBoundValue()
+    {
+        var values = new List<double?>();
+        var comp = Context.Render<VekSplitPanel>(parameters => parameters
+            .Add(p => p.PaneSize, 35)
+            .Add(p => p.PaneSizeChanged, EventCallback.Factory.Create<double?>(this, value => values.Add(value))));
+
+        var reference = (Microsoft.JSInterop.DotNetObjectReference<VekSplitPanel>)Context.JSInterop
+            .VerifyInvoke("vekSplitPanel.build").Arguments[11]!;
+
+        await comp.InvokeAsync(() => reference.Value.OnPaneSizeChangedAsync(42));
+
+        values.Should().ContainSingle().Which.Should().Be(42d);
     }
 
     /// <summary>
