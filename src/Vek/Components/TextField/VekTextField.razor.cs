@@ -138,6 +138,13 @@ namespace Vek
         public EventCallback<MouseEventArgs> OnClearButtonClick { get; set; }
 
         /// <summary>
+        /// Renders custom action buttons inside the input frame.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public RenderFragment? Buttons { get; set; }
+
+        /// <summary>
         /// Shows an interactive button to toggle password visibility between masked and plain text.
         /// </summary>
         /// <remarks>

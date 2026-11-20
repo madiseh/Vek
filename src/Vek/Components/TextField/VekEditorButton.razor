@@ -1,0 +1,18 @@
+@namespace Vek
+
+<VekButton Class="@Classname"
+           Style="@Style"
+           StartIcon="@Icon"
+           IconSize="Size.Small"
+           Variant="Variant.Text"
+           Color="Color.Default"
+           Size="Size.Small"
+           Disabled="@EffectiveDisabled"
+           OnClick="@OnClick"
+           ClickDebounceInterval="0"
+           aria-label="@AriaLabel"
+           @attributes="UserAttributes"
+           ButtonType="ButtonType.Button"
+           @onmousedown:preventDefault>
+    @ChildContent
+</VekButton>

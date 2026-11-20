@@ -89,6 +89,13 @@ namespace Vek
         public RenderFragment? ChildContent { get; set; }
 
         /// <summary>
+        /// Renders custom action buttons alongside the input.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public RenderFragment? Buttons { get; set; }
+
+        /// <summary>
         /// The mask to apply to text values.
         /// </summary>
         /// <remarks>

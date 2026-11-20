@@ -1,0 +1,18 @@
+@namespace Vek.Docs.Examples
+
+<VekTextField @bind-Value="SearchTerm" Label="Search inventory" HelperText="Search by product name or SKU" Variant="Variant.Outlined" FullWidth="true">
+    <Buttons>
+        <VekEditorButton Placement="Adornment.Start" Icon="@Icons.Material.Filled.Search" AriaLabel="Run inventory search" OnClick="RunSearch" />
+        <VekEditorButton Placement="Adornment.End" Icon="@Icons.Material.Filled.Clear" AriaLabel="Clear search text" OnClick="ClearSearch" />
+    </Buttons>
+</VekTextField>
+<VekText Typo="Typo.body2" Class="mt-2" Color="Color.Secondary">@SearchMessage</VekText>
+
+@code {
+    private string SearchTerm { get; set; } = "wireless headphones";
+    private string SearchMessage { get; set; } = "Ready to search the inventory.";
+
+    private void RunSearch() => SearchMessage = $"Searching inventory for {SearchTerm}.";
+
+    private void ClearSearch() => SearchTerm = string.Empty;
+}
