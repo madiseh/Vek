@@ -209,5 +209,22 @@
             </SectionContent>
         </DocsPageSection>
 
+        <DocsPageSection>
+            <SectionHeader Title="Drag and Drop Reordering">
+                <Description>
+                    <p>
+                        Enable node drag-and-drop reordering with <CodeInline>AllowDragDrop</CodeInline>. When enabled, users can drag nodes to reorder siblings or reparent items into other nodes.
+                    </p>
+                    <br/>
+                    <p>
+                        Configure reparenting using <CodeInline>AllowReparenting</CodeInline>, or validate drop operations dynamically using <CodeInline>CanDropFunc</CodeInline>. Handle completed drops with <CodeInline>OnNodeDrop</CodeInline>, which provides details about the source, target, and drop position (<c>Before</c>, <c>Into</c>, or <c>After</c>).
+                    </p>
+                </Description>
+            </SectionHeader>
+            <SectionContent Outlined="true" Code="@nameof(TreeViewDragDropExample)">
+                <TreeViewDragDropExample />
+            </SectionContent>
+        </DocsPageSection>
+
     </DocsPageContent>
 </DocsPage>

@@ -61,11 +61,22 @@ namespace Vek
             registerScope.RegisterParameter<string>(nameof(IndeterminateIcon))
                 .WithParameter(() => IndeterminateIcon)
                 .WithChangeHandler(OnParameterChangedAsync);
+            _allowDragDropState = registerScope.RegisterParameter<bool>(nameof(AllowDragDrop))
+                .WithParameter(() => AllowDragDrop)
+                .WithChangeHandler(OnParameterChangedAsync);
+            _allowReparentingState = registerScope.RegisterParameter<bool>(nameof(AllowReparenting))
+                .WithParameter(() => AllowReparenting)
+                .WithChangeHandler(OnParameterChangedAsync);
             _selection = new();
         }
 
         private readonly ParameterState<T?> _selectedValueState;
         private readonly ParameterState<IReadOnlyCollection<T>?> _selectedValuesState;
+        private readonly ParameterState<bool> _allowDragDropState;
+        private readonly ParameterState<bool> _allowReparentingState;
+
+        internal bool GetAllowDragDrop() => _allowDragDropState.Value;
+        internal bool GetAllowReparenting() => _allowReparentingState.Value;
 
         private HashSet<T> _selection;
         private readonly HashSet<VekTreeViewItem<T>> _childItems = new();
@@ -237,6 +248,72 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.TreeView.Behavior)]
         public bool Disabled { get; set; }
+
+        /// <summary>
+        /// Enables drag-and-drop node reordering and reparenting.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.TreeView.Behavior)]
+        public bool AllowDragDrop { get; set; }
+
+        /// <summary>
+        /// Determines whether dragging a node into another node as a child (reparenting) is permitted.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>. When set to <c>false</c>, only reordering before and after sibling nodes is allowed.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.TreeView.Behavior)]
+        public bool AllowReparenting { get; set; } = true;
+
+        /// <summary>
+        /// An event callback that occurs when a node is dropped onto a target node.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.TreeView.Behavior)]
+        public EventCallback<TreeNodeDropEventArgs<T>> OnNodeDrop { get; set; }
+
+        /// <summary>
+        /// A predicate function to determine whether a drop operation is valid.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.TreeView.Behavior)]
+        public Func<TreeNodeDropEventArgs<T>, bool>? CanDropFunc { get; set; }
+
+        /// <summary>
+        /// Coordinates drag-and-drop state across tree view nodes.
+        /// </summary>
+        internal TreeNodeDragManager DragManager { get; } = new();
+
+        /// <summary>
+        /// Programmatically drops a source item onto a target item with a specified drop position.
+        /// </summary>
+        public async Task<bool> DropNodeAsync(VekTreeViewItem<T> sourceItem, VekTreeViewItem<T> targetItem, TreeItemDropPosition dropPosition)
+        {
+            if (sourceItem == null || targetItem == null || sourceItem == targetItem)
+                return false;
+
+            if (targetItem.IsDescendantOf(sourceItem))
+                return false;
+
+            var args = new TreeNodeDropEventArgs<T>
+            {
+                SourceItem = sourceItem,
+                TargetItem = targetItem,
+                SourceValue = sourceItem.Value,
+                TargetValue = targetItem.Value,
+                DropPosition = dropPosition
+            };
+
+            if (CanDropFunc != null && !CanDropFunc(args))
+                return false;
+
+            await OnNodeDrop.InvokeAsync(args);
+            return !args.Cancel;
+        }
 
         /// <summary>
         /// Determines whether items are displayed.

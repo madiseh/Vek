@@ -4,9 +4,10 @@
 - **Feature ID**: 060
 - **Feature Slug**: treeview-node-drag-and-drop-reorder
 - **Module**: TreeView
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 60
 - **Dependencies**: []
+- **Started At**: 2026-11-19T19:31:22Z
 
 ---
 

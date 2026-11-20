@@ -4,7 +4,15 @@
 
 @if (Visible)
 {
-    <li @attributes="UserAttributes" class="@Classname" style="@Style">
+    <li @attributes="UserAttributes" class="@Classname" style="@Style"
+        draggable="@(GetAllowDragDrop() && !GetDisabled() ? "true" : null)"
+        @ondragstart="HandleDragStartAsync"
+        @ondragend="HandleDragEndAsync"
+        @ondragover="HandleDragOver"
+        @ondragover:preventDefault="GetAllowDrop()"
+        @ondragleave="HandleDragLeave"
+        @ondrop="HandleDropAsync"
+        @ondrop:preventDefault="GetAllowDrop()">
         <div class="@ContentClassname" @onclick="OnItemClickedAsync" @onclick:stopPropagation="true" @ondblclick="OnItemDoubleClickedAsync" @ondblclick:stopPropagation="true">
             @if (Content != null)
             {
