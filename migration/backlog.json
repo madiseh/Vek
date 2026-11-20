@@ -644,10 +644,12 @@
       "title": "TimePicker Configurable Minute Intervals, Seconds, and 12/24-Hour Formats",
       "module": "TimePicker",
       "priority": 56,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/056-timepicker-time-intervals-and-12-24-format.md",
       "dependencies": [],
-      "started_at": "2026-11-19T19:31:19Z"
+      "started_at": "2026-11-19T19:31:19Z",
+      "completed_at": "2026-11-20T08:15:12Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/61"
     },
     {
       "id": "057",
