@@ -1,0 +1,27 @@
+<VekTabs @ref="Tabs" RenderMode="@RenderMode">
+    <VekTabPanel Text="Item One">
+        <TabsKeepAlivePanel ComponentName="Panel 1" FirstRender="@(x => _firstRenders.Add(x))" />
+    </VekTabPanel>
+    <VekTabPanel Text="Item Two">
+        <TabsKeepAlivePanel ComponentName="Panel 2" FirstRender="@(x => _firstRenders.Add(x))" />
+    </VekTabPanel>
+    <VekTabPanel Text="Item Three">
+        <TabsKeepAlivePanel ComponentName="Panel 3" FirstRender="@(x => _firstRenders.Add(x))" />
+    </VekTabPanel>
+</VekTabs>
+
+<p>
+    @foreach (var firstRender in _firstRenders)
+    {
+        @firstRender<br />
+    }
+</p>
+
+@code {
+    private readonly List<string> _firstRenders = [];
+
+    public VekTabs Tabs { get; set; } = null!;
+
+    [Parameter]
+    public TabsRenderMode RenderMode { get; set; } = TabsRenderMode.ActiveTab;
+}

@@ -17,6 +17,33 @@ public partial class VekTabPanel : VekComponentBase
     private bool _disposed;
     private bool _alreadyRendered;
 
+    /// <summary>
+    /// Indicates whether this panel has been rendered at least once.
+    /// </summary>
+    internal bool AlreadyRendered => _alreadyRendered;
+
+    private bool ShouldRenderPanel()
+    {
+        if (Parent is null)
+        {
+            return false;
+        }
+
+        var mode = Parent.EffectiveRenderMode;
+        if (mode == TabsRenderMode.ActiveTab)
+        {
+            _alreadyRendered = false;
+            return Parent.ActivePanel == this;
+        }
+
+        if (mode == TabsRenderMode.AllTabs)
+        {
+            return true;
+        }
+
+        return Parent.ActivePanel == this || _alreadyRendered;
+    }
+
     internal string Classname =>
         new CssBuilder("vek-tab-panel")
             .AddClass("vek-tab-panel-hidden", !Visible)
