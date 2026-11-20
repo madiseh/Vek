@@ -8,6 +8,7 @@ namespace Vek.Docs.Models.Context
 {
     [JsonSerializable(typeof(GithubContributors[]))]
     [JsonSerializable(typeof(GitHubRepository))]
+    [JsonSerializable(typeof(GitHubRelease[]))]
     public sealed partial class GithubApiJsonSerializerContext : JsonSerializerContext
     {
     }

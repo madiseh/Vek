@@ -57,6 +57,20 @@ namespace Vek.Docs.Services
             }
         }
 
+        public async Task<GitHubRelease[]> GetLatestReleasesAsync()
+        {
+            try
+            {
+                var result = await _http.GetFromJsonAsync<GitHubRelease[]>("repos/madiseh/Vek/releases?per_page=3", _jsonSerializerOptions);
+                return result ?? Array.Empty<GitHubRelease>();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return Array.Empty<GitHubRelease>();
+            }
+        }
+
         public async Task<int> GetContributorsCountAsync(string owner, string repo)
         {
             try
