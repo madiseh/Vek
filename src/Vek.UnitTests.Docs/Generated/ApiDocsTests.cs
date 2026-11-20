@@ -3,11 +3,11 @@ using Bunit;
 using Bunit.TestDoubles;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using Vek.Docs.Pages.Api;
 using Vek.Docs.Services;
 using Vek.Services;
 using Vek.UnitTests.Mocks;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Docs.Generated
 {
@@ -32,7 +32,6 @@ namespace Vek.UnitTests.Docs.Generated
             _ctx.Services.AddTransient<IScrollListenerFactory, MockScrollListenerFactory>();
             _ctx.Services.AddTransient<IJsApiService, MockJsApiService>();
             _ctx.Services.AddTransient<IDocsJsApiService, MockDocsJsApiService>();
-            _ctx.Services.AddTransient<IAdBlockDetectionService, MockAdBlockDetectionService>();
             _ctx.Services.AddTransient<IResizeObserverFactory, MockResizeObserverFactory>();
             _ctx.Services.AddTransient<IScrollSpyFactory, MockScrollSpyFactory>();
             _ctx.Services.AddSingleton<IDocsNavigationService, DocsNavigationService>();

@@ -36,7 +36,6 @@ namespace Vek.Docs.Extensions
             });
 
             services.AddScoped<IDocsJsApiService, DocsJsApiService>();
-            services.AddScoped<IAdBlockDetectionService, AdBlockDetectionService>();
             services.AddSingleton<DiscordApiClient>();
             services.AddSingleton<NugetApiClient>();
             services.AddSingleton<GitHubApiClient>();

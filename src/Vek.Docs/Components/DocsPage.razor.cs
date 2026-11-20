@@ -27,13 +27,10 @@ namespace Vek.Docs.Components
         private string _anchor = null;
         private bool _displayView;
         private string _componentName;
-        private bool _renderAds;
-        private bool _adBlockerDetected;
         [Inject] NavigationManager NavigationManager { get; set; }
 
         [Inject] private IDocsNavigationService DocsService { get; set; }
         [Inject] private IRenderQueueService RenderQueue { get; set; }
-        [Inject] private IAdBlockDetectionService AdBlockDetection { get; set; }
         [Parameter] public RenderFragment ChildContent { get; set; }
 
         private bool _contentDrawerOpen = true;
@@ -89,7 +86,7 @@ namespace Vek.Docs.Components
             }*/
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        protected override Task OnAfterRenderAsync(bool firstRender)
         {
             if (_stopwatch.IsRunning)
             {
@@ -97,21 +94,7 @@ namespace Vek.Docs.Components
                 Rendered?.Invoke(_stopwatch);
             }
 
-            if (firstRender)
-            {
-                _renderAds = true;
-                StateHasChanged();
-
-                // Carbon Ads injects '#carbonads' only after carbon.js fetches and runs.
-                // Probe after a short wait so we can show a fallback message when
-                // the script is being blocked by an ad blocker or network filter.
-                var blocked = await AdBlockDetection.IsAdBlockedAsync();
-                if (blocked && !_adBlockerDetected)
-                {
-                    _adBlockerDetected = true;
-                    StateHasChanged();
-                }
-            }
+            return Task.CompletedTask;
         }
 
         public string GetParentTitle(DocsPageSection section)
