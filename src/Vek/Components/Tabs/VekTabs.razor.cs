@@ -44,6 +44,7 @@ namespace Vek
         private readonly ParameterState<int> _activePanelIndexState;
         private readonly ParameterState<bool> _closeableState;
         private readonly ParameterState<CloseButtonDisplayMode> _closeButtonDisplayModeState;
+        private readonly ParameterState<TabsRenderMode> _renderModeState;
         private readonly Dictionary<ElementReference, BoundingClientRect> _tabSizes = [];
         /// <summary>
         /// Unique identifier for this VekTabs component instance.
@@ -88,10 +89,44 @@ namespace Vek
         public EventCallback<VekItemDropInfo<VekTabPanel>> OnItemDropped { get; set; }
 
         /// <summary>
+        /// Specifies the rendering and DOM caching mode for tab panels.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="TabsRenderMode.ActiveTab"/>.<br />
+        /// When <see cref="TabsRenderMode.ActiveTab"/>, only the currently active tab panel is rendered in the DOM.<br />
+        /// When <see cref="TabsRenderMode.AllTabs"/>, all tab panels are rendered immediately and preserved in the DOM.<br />
+        /// When <see cref="TabsRenderMode.ActiveTabLazily"/>, tab panels are rendered on demand upon first activation and preserved in the DOM.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.Tabs.Behavior)]
+        public TabsRenderMode RenderMode { get; set; } = TabsRenderMode.ActiveTab;
+
+        /// <summary>
+        /// Resolves the effective render mode, taking into account <see cref="RenderMode"/>, <see cref="KeepPanelsAlive"/>, and <see cref="LazyLoadPanels"/>.
+        /// </summary>
+        public TabsRenderMode EffectiveRenderMode
+        {
+            get
+            {
+                if (_renderModeState.Value != TabsRenderMode.ActiveTab)
+                {
+                    return _renderModeState.Value;
+                }
+
+                if (KeepPanelsAlive)
+                {
+                    return LazyLoadPanels ? TabsRenderMode.ActiveTabLazily : TabsRenderMode.AllTabs;
+                }
+
+                return _renderModeState.Value;
+            }
+        }
+
+        /// <summary>
         /// Persists the content of tabs when they are not visible.
         /// </summary>
         /// <remarks>
-        /// Defaults to <c>false</c>.<br />
+        /// Defaults to <c>false</c>. Prefer using <see cref="RenderMode" /> instead.<br />
         /// When <c>false</c>, selecting a tab will initialize its content each time the tab is visited.<br />
         /// When <c>true</c>, a tab's content is initialized only once and is hidden via <c>display:none</c>.
         /// </remarks>
@@ -103,7 +138,7 @@ namespace Vek
         /// Initializes tab panels only once visited. Only has an effect when <see cref="KeepPanelsAlive"/> is <c>true</c>.
         /// </summary>
         /// <remarks>
-        /// Defaults to <c>false</c>.<br />
+        /// Defaults to <c>false</c>. Prefer using <see cref="RenderMode" /> with <see cref="TabsRenderMode.ActiveTabLazily" /> instead.<br />
         /// When <c>false</c>, all tabs' contents are initialized immediately.<br />
         /// When <c>true</c>, a tab's content is initialized only once it is visited.
         /// </remarks>
@@ -576,6 +611,8 @@ namespace Vek
                 .WithParameter(() => Closeable);
             _closeButtonDisplayModeState = registerScope.RegisterParameter<CloseButtonDisplayMode>(nameof(CloseButtonDisplayMode))
                 .WithParameter(() => CloseButtonDisplayMode);
+            _renderModeState = registerScope.RegisterParameter<TabsRenderMode>(nameof(RenderMode))
+                .WithParameter(() => RenderMode);
         }
 
         /// <inheritdoc />

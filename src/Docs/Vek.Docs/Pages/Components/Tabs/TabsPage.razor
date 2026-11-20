@@ -242,6 +242,22 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Render Modes">
+                <Description>
+                    Configure how tab panels are rendered and preserved in the DOM using the <CodeInline>RenderMode</CodeInline> property:
+                    <ul>
+                        <li><CodeInline>TabsRenderMode.ActiveTab</CodeInline> (default): Only the active tab panel is rendered in the DOM. Inactive tab panels are removed and recreated upon activation.</li>
+                        <li><CodeInline>TabsRenderMode.ActiveTabLazily</CodeInline>: Tab panels are created on demand upon first activation and cached in the DOM, preserving form state, text input, and scroll positions across tab switches.</li>
+                        <li><CodeInline>TabsRenderMode.AllTabs</CodeInline>: All tab panels are rendered immediately upon initialization and kept in the DOM, with inactive panels hidden using CSS.</li>
+                    </ul>
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TabsRenderModesExample)" ShowCode="true" Block="true">
+                <TabsRenderModesExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Keep Panels Alive">
                 <Description>
                     By default, tab panels are removed when switching to another tab and rerendered once the tab is selected again.

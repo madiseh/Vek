@@ -2,19 +2,10 @@
 @inherits VekComponentBase
 @implements IAsyncDisposable
 
-@if (Parent?.KeepPanelsAlive == true && (!Parent.LazyLoadPanels || Parent.ActivePanel == this || _alreadyRendered))
+@if (ShouldRenderPanel())
 {
     _alreadyRendered = true;
-    <div @attributes="UserAttributes" class="@PanelClassname" style="@Style" role="tabpanel" id="@Parent.GetTabPanelId(this)" aria-labelledby="@Parent.GetTabId(this)">
+    <div @attributes="UserAttributes" class="@PanelClassname" style="@Style" role="tabpanel" id="@Parent?.GetTabPanelId(this)" aria-labelledby="@Parent?.GetTabId(this)">
         @ChildContent
     </div>
-}
-else
-{
-    @if (Parent?.ActivePanel == this)
-    {
-        <div @attributes="UserAttributes" class="@PanelClassname" style="@Style" role="tabpanel" id="@Parent.GetTabPanelId(this)" aria-labelledby="@Parent.GetTabId(this)">
-            @ChildContent
-        </div>
-    }
 }

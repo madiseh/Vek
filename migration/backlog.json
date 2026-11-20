@@ -547,9 +547,10 @@
       "title": "Tabs Render Modes: Active Tab Lazily with DOM Caching",
       "module": "Tabs",
       "priority": 46,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/046-tabs-lazy-render-and-caching-modes.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-20T11:25:54Z"
     },
     {
       "id": "047",
