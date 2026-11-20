@@ -4,6 +4,36 @@
 @inject InternalVekLocalizer Localizer
 
 <ul @attributes="UserAttributes" class="@Classname" style="@Style">
+    @if (ShowPageSizeSelector)
+    {
+        <li class="vek-pagination-utility vek-pagination-page-size">
+            <label>
+                <span>@Localizer[LanguageResource.VekPagination_ItemsPerPage]</span>
+                <select class="vek-pagination-native-control" aria-label="@Localizer[LanguageResource.VekPagination_ItemsPerPage]" value="@_pageSizeState.Value" disabled="@Disabled" @onchange="OnPageSizeSelectionChangedAsync">
+                    @foreach (var pageSize in EffectivePageSizeOptions)
+                    {
+                        <option value="@pageSize">@pageSize</option>
+                    }
+                </select>
+            </label>
+        </li>
+    }
+    @if (ShowPageSizeSelector || _totalItemsState.Value > 0)
+    {
+        <li class="vek-pagination-utility vek-pagination-item-range" aria-live="polite">@ItemRangeText</li>
+    }
+    @if (ShowDirectPageJump)
+    {
+        <li class="vek-pagination-utility vek-pagination-page-jump">
+            <form class="vek-pagination-page-jump-form" @onsubmit="JumpToPageAsync" @onsubmit:preventDefault="true">
+                <label>
+                    <span>@Localizer[LanguageResource.VekPagination_GoToPage]</span>
+                    <input class="vek-pagination-native-control" type="number" min="1" max="@PageCount" aria-label="@Localizer[LanguageResource.VekPagination_GoToPage]" @bind="_pageJumpValue" @bind:event="oninput" disabled="@Disabled" />
+                </label>
+                <button class="vek-pagination-jump-button" type="submit" disabled="@Disabled">@Localizer[LanguageResource.VekPagination_Go]</button>
+            </form>
+        </li>
+    }
     @if (ShowFirstButton)
     {
         <li class="@ItemClassname">
@@ -44,13 +74,13 @@
     @if (ShowNextButton)
     {
         <li class="@ItemClassname">
-            <VekIconButton Icon="@NextIcon" Variant="@Variant" Size="@Size" Disabled="@(_selectedState.Value == _countState.Value || Disabled)" OnClick="@(() => OnClickControlButtonAsync(Page.Next))" aria-label="@Localizer[LanguageResource.VekPagination_NextPage]"></VekIconButton>
+            <VekIconButton Icon="@NextIcon" Variant="@Variant" Size="@Size" Disabled="@(_selectedState.Value == PageCount || Disabled)" OnClick="@(() => OnClickControlButtonAsync(Page.Next))" aria-label="@Localizer[LanguageResource.VekPagination_NextPage]"></VekIconButton>
         </li>
     }
     @if (ShowLastButton)
     {
         <li class="@ItemClassname">
-            <VekIconButton Icon="@LastIcon" Variant="@Variant" Size="@Size" Disabled="@(_selectedState.Value == _countState.Value || Disabled)" OnClick="@(() => OnClickControlButtonAsync(Page.Last))" aria-label="@Localizer[LanguageResource.VekPagination_LastPage]"></VekIconButton>
+            <VekIconButton Icon="@LastIcon" Variant="@Variant" Size="@Size" Disabled="@(_selectedState.Value == PageCount || Disabled)" OnClick="@(() => OnClickControlButtonAsync(Page.Last))" aria-label="@Localizer[LanguageResource.VekPagination_LastPage]"></VekIconButton>
         </li>
     }
 </ul>

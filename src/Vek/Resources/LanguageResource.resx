@@ -321,8 +321,20 @@
   <data name="VekPagination_CurrentPage" xml:space="preserve">
     <value>Current page {0}</value>
   </data>
+  <data name="VekPagination_Go" xml:space="preserve">
+    <value>Go</value>
+  </data>
+  <data name="VekPagination_GoToPage" xml:space="preserve">
+    <value>Go to page</value>
+  </data>
+  <data name="VekPagination_ItemRangeText" xml:space="preserve">
+    <value>{0:N0}-{1:N0} of {2:N0} items</value>
+  </data>
   <data name="VekPagination_FirstPage" xml:space="preserve">
     <value>First page</value>
+  </data>
+  <data name="VekPagination_ItemsPerPage" xml:space="preserve">
+    <value>Items per page</value>
   </data>
   <data name="VekPagination_LastPage" xml:space="preserve">
     <value>Last page</value>
