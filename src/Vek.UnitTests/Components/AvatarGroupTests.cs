@@ -1,7 +1,7 @@
 ﻿using AwesomeAssertions;
 using Bunit;
-using Vek.UnitTests.TestComponents.AvatarGroup;
 using NUnit.Framework;
+using Vek.UnitTests.TestComponents.AvatarGroup;
 
 namespace Vek.UnitTests.Components
 {
@@ -63,6 +63,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task AvatarGroupChangeMax()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var comp = Context.Render<AvatarGroupChangeMaxTest>();
             // select elements needed for the test
             var group = comp.FindComponent<VekAvatarGroup>();
@@ -96,8 +97,11 @@ namespace Vek.UnitTests.Components
             avatars[4].ClassList.Should().Contain("vek-avatar-group-max-avatar");
 
             // click button to change max avatars to 7
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.Find("#change-max-button").ClickAsync();
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.Find("#change-max-button").ClickAsync();
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.Find("#change-max-button").ClickAsync();
 
             // find all avatars again after click
@@ -115,6 +119,7 @@ namespace Vek.UnitTests.Components
             avatars[6].ClassList.Should().NotContain("vek-avatar-group-max-avatar");
 
             // click button one more time to set it to 0
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.Find("#change-max-button").ClickAsync();
 
             // find all avatars again after click
@@ -126,6 +131,7 @@ namespace Vek.UnitTests.Components
             avatars[0].ClassList.Should().Contain("vek-avatar-group-max-avatar");
 
             // click button one more time to set it to 1
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.Find("#change-max-button").ClickAsync();
 
             // find all avatars again after click

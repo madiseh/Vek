@@ -6,8 +6,8 @@ using AngleSharp.Dom;
 using AwesomeAssertions;
 using Bunit;
 using Microsoft.AspNetCore.Components.Web;
-using Vek.UnitTests.TestComponents.DataGrid;
 using NUnit.Framework;
+using Vek.UnitTests.TestComponents.DataGrid;
 
 #nullable enable
 namespace Vek.UnitTests.Components
@@ -463,6 +463,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task DataGridGroupingTestBoundAndUnboundScenarios()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var comp = Context.Render<DataGridColumnGroupingTest>();
             var dataGrid = comp.FindComponent<VekDataGrid<DataGridColumnGroupingTest.Model>>();
             var popoverProvider = comp.FindComponent<VekPopoverProvider>();
@@ -518,8 +519,7 @@ namespace Vek.UnitTests.Components
             professionCells[1].TextContent.Should().Be("Profession: (None)");
             Rows().Count.Should().Be(4, because: "1 header row + 2 data rows + 1 footer row");
 
-            var ungroup = comp.Find(".UnGroupAll");
-            await ungroup.ClickAsync();
+            await comp.Find(".UnGroupAll").ClickAsync();
             comp.Instance.IsAgeGrouped.Should().Be(false);
             comp.Instance.IsGenderGrouped.Should().Be(false);
             comp.Instance.IsProfessionGrouped.Should().Be(false);
@@ -551,7 +551,8 @@ namespace Vek.UnitTests.Components
             var rowCount = Rows().Count;
             rowCount.Should().Be(5, because: "1 header row + 3 data rows + 1 footer row");
 
-            await ungroup.ClickAsync();
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
+            await comp.Find(".UnGroupAll").ClickAsync();
             comp.Instance.IsAgeGrouped.Should().Be(false);
             comp.Instance.IsGenderGrouped.Should().Be(false);
             comp.Instance.IsProfessionGrouped.Should().Be(false);
@@ -567,7 +568,8 @@ namespace Vek.UnitTests.Components
             comp.Instance.IsGenderGrouped.Should().Be(true);
             Rows().Count.Should().Be(4, because: "1 header row + 2 data rows + 1 footer row");
 
-            await ungroup.ClickAsync();
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
+            await comp.Find(".UnGroupAll").ClickAsync();
             comp.Instance.IsAgeGrouped.Should().Be(false);
             comp.Instance.IsGenderGrouped.Should().Be(false);
             comp.Instance.IsProfessionGrouped.Should().Be(false);
@@ -583,7 +585,8 @@ namespace Vek.UnitTests.Components
             comp.Instance.IsNameGrouped.Should().Be(true);
             Rows().Count.Should().Be(6, because: "1 header row + 4 data rows + 1 footer row");
 
-            await ungroup.ClickAsync();
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
+            await comp.Find(".UnGroupAll").ClickAsync();
             comp.Instance.IsAgeGrouped.Should().Be(false);
             comp.Instance.IsGenderGrouped.Should().Be(false);
             comp.Instance.IsProfessionGrouped.Should().Be(false);

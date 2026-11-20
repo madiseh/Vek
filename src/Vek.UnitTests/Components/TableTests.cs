@@ -7,8 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using Microsoft.JSInterop.Infrastructure;
 using Moq;
-using Vek.UnitTests.TestComponents.Table;
 using NUnit.Framework;
+using Vek.UnitTests.TestComponents.Table;
 
 namespace Vek.UnitTests.Components
 {
@@ -3199,6 +3199,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task RowsPerPageChangeValueFromCode()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var testComponent = Context.Render<TablePagerChangeRowsPerPageTest>();
             var table = testComponent.FindComponent<VekTable<string>>().Instance;
             var buttonComponent = testComponent.FindComponent<VekButton>();
@@ -3207,6 +3208,7 @@ namespace Vek.UnitTests.Components
             await buttonComponent.Find("button").ClickAsync();
             await testComponent.WaitForAssertionAsync(() => table.RowsPerPage.Should().Be(10));
             //Toggle the rows per page value from 10 back to  to 35
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await buttonComponent.Find("button").ClickAsync();
             await testComponent.WaitForAssertionAsync(() => table.RowsPerPage.Should().Be(35));
         }

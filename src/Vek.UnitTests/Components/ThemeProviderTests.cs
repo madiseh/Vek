@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
+using NUnit.Framework;
 using Vek.Extensions;
 using Vek.UnitTests.TestComponents.ThemeProvider;
 using Vek.Utilities;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {
@@ -662,6 +662,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task CurrentPalette_Binding_ShouldWorkInTestComponent()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             // Arrange
             var comp = Context.Render<ThemeProviderCurrentPaletteTest>();
 
@@ -675,6 +676,7 @@ namespace Vek.UnitTests.Components
             comp.Instance.GetCurrentPalette().Should().BeOfType<PaletteDark>();
 
             // Act - toggle back to light mode
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.InvokeAsync(() => comp.Find("button").Click());
 
             // Assert - should be light palette again

@@ -10,9 +10,9 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
+using NUnit.Framework;
 using Vek.Extensions;
 using Vek.UnitTests.TestComponents.Menu;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {
@@ -68,6 +68,7 @@ namespace Vek.UnitTests.Components
         public async Task OpenMenu_ClickFirstItem_CheckClosed()
         {
             // https://github.com/madiseh/vek/issues/4063
+            var timeProvider = Context.AddFakeTimeProvider();
 
             var comp = Context.Render<MenuTest1>();
             var menu = comp.FindComponent<VekMenu>();
@@ -78,18 +79,21 @@ namespace Vek.UnitTests.Components
             await comp.FindAll("div.vek-menu-item")[0].ClickAsync();
             await comp.WaitForAssertionAsync(() => { comp.FindAll("div.vek-popover-open").Count.Should().Be(0); });
 
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.FindAll("button.vek-button-root")[0].ClickAsync();
             comp.FindAll("div.vek-menu-item").Count.Should().Be(2);
             comp.FindAll("a.vek-menu-item").Count.Should().Be(2);
             await comp.FindAll("div.vek-menu-item")[0].ClickAsync();
             await comp.WaitForAssertionAsync(() => comp.FindAll("div.vek-popover-open").Count.Should().Be(0));
 
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.FindAll("button.vek-button-root")[0].ClickAsync();
             comp.FindAll("div.vek-menu-item").Count.Should().Be(2);
             await comp.FindAll("div.vek-menu-item")[0].ClickAsync();
             await comp.WaitForAssertionAsync(() => comp.FindAll("div.vek-popover-open").Count.Should().Be(0));
 
             //Disabled item's click ot touch should not close popover
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.FindAll("button.vek-button-root")[0].ClickAsync();
 
             var menuItems = comp.FindComponents<VekMenuItem>();
@@ -273,6 +277,7 @@ namespace Vek.UnitTests.Components
             await comp.WaitForAssertionAsync(() => menu.GetState(x => x.Open).Should().BeFalse());
 
             // Clicking the button again should open the menu indefinitely.
+            await comp.InvokeAsync(() => timeProvider.Advance(TimeSpan.FromMilliseconds(301)));
             await comp.Find("button.vek-button-root").ClickAsync();
             await comp.WaitForAssertionAsync(() => menu.GetState(x => x.Open).Should().BeTrue());
 
@@ -626,6 +631,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task Open_TwoWayBinding()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             var comp = Context.Render<MenuTwoWayTest>();
             var menu = comp.FindComponent<VekMenu>();
             IElement SwitchElement() => comp.Find("#switch");
@@ -650,6 +656,7 @@ namespace Vek.UnitTests.Components
                 comp.FindAll("div.vek-popover-open").Count.Should().Be(0, "Popover should disappear after closing.");
             });
 
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.Find("button.vek-button-root").ClickAsync();
             await comp.WaitForAssertionAsync(() =>
             {
@@ -666,6 +673,7 @@ namespace Vek.UnitTests.Components
                 comp.FindAll("div.vek-popover-open").Count.Should().Be(1, "Popover count should remain the same.");
             });
 
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.Find("button.vek-button-root").ClickAsync();
             await comp.WaitForAssertionAsync(() =>
             {
@@ -674,6 +682,7 @@ namespace Vek.UnitTests.Components
                 comp.FindAll("div.vek-popover-open").Count.Should().Be(0, "Popover should no longer be visible.");
             });
 
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await comp.Find("button.vek-button-root").ClickAsync();
             await comp.WaitForAssertionAsync(() =>
             {
@@ -783,6 +792,7 @@ namespace Vek.UnitTests.Components
         [Test]
         public async Task Menu_ButtonActivator_WithContext()
         {
+            var timeProvider = Context.AddFakeTimeProvider();
             // Test that the activator content renders and clicking it opens the menu
             // Use a test component that properly uses the context
             var comp = Context.Render<MenuActivatorsTest>();
@@ -795,6 +805,7 @@ namespace Vek.UnitTests.Components
             await button.ClickAsync(new MouseEventArgs());
             await comp.WaitForAssertionAsync(() => comp.FindAll("div.vek-popover-open").Count.Should().Be(1));
 
+            timeProvider.Advance(TimeSpan.FromMilliseconds(301));
             await button.ClickAsync(new MouseEventArgs());
             await comp.WaitForAssertionAsync(() => comp.FindAll("div.vek-popover-open").Count.Should().Be(0));
         }
@@ -1437,7 +1448,7 @@ namespace Vek.UnitTests.Components
             menu.GetState(x => x.Open).Should().BeTrue();
 
             // Past the 50ms window, a real click is honored and closes it.
-            await comp.InvokeAsync(() => timeProvider.Advance(TimeSpan.FromMilliseconds(100)));
+            await comp.InvokeAsync(() => timeProvider.Advance(TimeSpan.FromMilliseconds(301)));
             await comp.Find("button.vek-button-root").ClickAsync(new MouseEventArgs { Button = 0 });
             await comp.WaitForAssertionAsync(() => menu.GetState(x => x.Open).Should().BeFalse());
         }
