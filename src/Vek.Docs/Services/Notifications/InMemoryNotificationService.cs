@@ -107,7 +107,7 @@ public class InMemoryNotificationService(ILocalStorageService localStorageServic
             "We are paving the way for the future of Blazor",
             "Announcement",
             new DateTime(2022, 01, 13),
-            "_content/Vek.Docs/images/announcements/vek_heretostay.png",
+                    "_content/Vek.Docs/images/announcements/vek_heretostay.svg",
             [
                 new NotificationAuthor("Jonny Larsson",
                     "https://avatars.githubusercontent.com/u/10367109?v=4")
