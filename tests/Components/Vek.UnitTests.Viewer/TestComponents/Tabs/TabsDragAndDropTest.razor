@@ -4,7 +4,7 @@
 </VekRadioGroup>
 
 <VekTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" TabPanelsClass="pa-6"
-         EnableDragAndDrop="true" OnItemDropped="@ItemDroppedFired" Position="@_selectedPosition">
+         EnableDragAndDrop="true" OnItemDropped="@ItemDroppedFired" OnTabReordered="@TabReordered" Position="@_selectedPosition">
     <VekTabPanel Text="Tab One">
         <VekText>Content One</VekText>
     </VekTabPanel>
@@ -28,6 +28,9 @@
 
     [Parameter]
     public EventCallback<VekItemDropInfo<VekTabPanel>> ItemDroppedFired { get; set; }
+
+    [Parameter]
+    public EventCallback<TabReorderedEventArgs> TabReordered { get; set; }
 
     protected override void OnInitialized()
     {

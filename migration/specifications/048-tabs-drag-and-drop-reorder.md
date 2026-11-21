@@ -4,9 +4,12 @@
 - **Feature ID**: 048
 - **Feature Slug**: tabs-drag-and-drop-reorder
 - **Module**: Tabs
-- **Status**: Backlog
+- **Status**: Completed
 - **Priority**: 48
 - **Dependencies**: ["044"]
+- **Pull Request**: https://github.com/madiseh/Vek/pull/91
+- **Started At**: 2026-11-21T12:46:21Z
+- **Completed At**: 2026-11-21T13:45:39Z
 
 ---
 
