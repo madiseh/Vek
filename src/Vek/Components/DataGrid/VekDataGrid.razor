@@ -447,7 +447,124 @@
     </div>
 }
 
+@if (HasContextMenu)
+{
+    <VekMenu @ref="_contextMenu"
+             PositionAtCursor="true"
+             Dense="true"
+             Class="vek-datagrid-context-menu"
+             Open="@_contextMenuOpen"
+             OpenChanged="@OnContextMenuOpenChangedAsync">
+        @if (_currentContextMenuArgs is not null)
+        {
+            var template = GetContextMenuTemplate(_currentContextMenuArgs.Target);
+            if (template is not null)
+            {
+                @template(_currentContextMenuArgs)
+            }
+            else
+            {
+                @RenderDefaultContextMenu(_currentContextMenuArgs)
+            }
+        }
+    </VekMenu>
+}
+
 @code {
+
+    internal RenderFragment RenderDefaultContextMenu(DataGridContextMenuArgs<T> context) =>
+        @<text>
+            @if (context.Target == DataGridContextMenuTarget.Cell && (context.FormattedValue is not null || context.Value is not null))
+            {
+                <VekMenuItem Icon="@Icons.Material.Filled.ContentCopy" OnClick="@context.CopyCellAsync">
+                    Copy Cell
+                </VekMenuItem>
+            }
+
+            @if (context.Target == DataGridContextMenuTarget.Cell && context.Value is not null && (context.Column?.filterable ?? false))
+            {
+                <VekMenuItem Icon="@Icons.Material.Filled.FilterAlt" OnClick="@context.FilterByCellValueAsync">
+                    Filter By Value
+                </VekMenuItem>
+            }
+
+            @if (context.Column is not null && context.Column.sortable)
+            {
+                <VekMenuItem Icon="@Icons.Material.Filled.ArrowUpward" OnClick="@context.SortAscendingAsync">
+                    Sort Ascending
+                </VekMenuItem>
+                <VekMenuItem Icon="@Icons.Material.Filled.ArrowDownward" OnClick="@context.SortDescendingAsync">
+                    Sort Descending
+                </VekMenuItem>
+                @if (context.SortDirection != SortDirection.None)
+                {
+                    <VekMenuItem Icon="@Icons.Material.Filled.Clear" OnClick="@context.ClearSortAsync">
+                        Clear Sort
+                    </VekMenuItem>
+                }
+            }
+
+            @if (context.Column is not null && context.Column.groupable && Groupable)
+            {
+                @if (context.Column.GroupingState.Value)
+                {
+                    <VekMenuItem Icon="@Icons.Material.Filled.AccountTree" OnClick="@context.UngroupAsync">
+                        Ungroup
+                    </VekMenuItem>
+                }
+                else
+                {
+                    <VekMenuItem Icon="@Icons.Material.Filled.TableRows" OnClick="@context.GroupByAsync">
+                        Group By This Column
+                    </VekMenuItem>
+                }
+            }
+
+            @if (context.Column is not null && context.Column.filterable)
+            {
+                <VekMenuItem Icon="@Icons.Material.Filled.FilterList" OnClick="@context.OpenFilterAsync">
+                    Filter...
+                </VekMenuItem>
+                @if (context.HasFilter)
+                {
+                    <VekMenuItem Icon="@Icons.Material.Filled.FilterAltOff" OnClick="@context.ClearFilterAsync">
+                        Clear Filter
+                    </VekMenuItem>
+                }
+            }
+
+            @if (context.Column is not null)
+            {
+                <VekMenuItem Icon="@Icons.Material.Filled.FormatLineSpacing" OnClick="@context.AutoFitAsync">
+                    AutoFit Column
+                </VekMenuItem>
+            }
+            <VekMenuItem Icon="@Icons.Material.Filled.ViewColumn" OnClick="@context.AutoFitAllAsync">
+                AutoFit All Columns
+            </VekMenuItem>
+
+            @if (context.CanPin && context.Column is not null)
+            {
+                @if (context.Column.EffectiveFixedStyle != DataGridFixedStyle.Left)
+                {
+                    <VekMenuItem Icon="@Icons.Material.Filled.PushPin" OnClick="@context.PinLeftAsync">
+                        Pin Left
+                    </VekMenuItem>
+                }
+                @if (context.Column.EffectiveFixedStyle != DataGridFixedStyle.Right)
+                {
+                    <VekMenuItem Icon="@Icons.Material.Filled.PushPin" OnClick="@context.PinRightAsync">
+                        Pin Right
+                    </VekMenuItem>
+                }
+                @if (context.Column.EffectiveFixedStyle != DataGridFixedStyle.None)
+                {
+                    <VekMenuItem Icon="@Icons.Material.Outlined.PushPin" OnClick="@context.UnpinAsync">
+                        Unpin
+                    </VekMenuItem>
+                }
+            }
+        </text>;
 
     internal RenderFragment ToolbarMenu(VekDataGrid<T> dataGrid) =>
     @<text>
@@ -535,8 +652,8 @@
                  @onmouseover="GetCellMouseEnterCallback(rowIndex, colIndex)"
                  @onmouseup="GetCellMouseUpCallback()"
                  @oncontextmenu="cellContextMenuClickCallback"
-                 @oncontextmenu:stopPropagation="@CellContextMenuClick.HasDelegate"
-                 @oncontextmenu:preventDefault="@CellContextMenuClick.HasDelegate">
+                 @oncontextmenu:stopPropagation="@(CellContextMenuClick.HasDelegate || HasCellContextMenu)"
+                 @oncontextmenu:preventDefault="@(CellContextMenuClick.HasDelegate || HasCellContextMenu)">
 
                  @if (showEditMode)
                  {

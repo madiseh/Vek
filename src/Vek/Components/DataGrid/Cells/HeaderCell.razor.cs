@@ -834,6 +834,23 @@ namespace Vek
             Column.SortIndex = -1;
         }
 
+        private bool HasHeaderContextMenu => DataGrid?.HasHeaderContextMenu ?? false;
+
+        private EventCallback<MouseEventArgs> GetContextMenuCallback()
+            => HasHeaderContextMenu
+                ? EventCallback.Factory.Create<MouseEventArgs>(this, OnContextMenuAsync)
+                : default;
+
+        private Task OnContextMenuAsync(MouseEventArgs args)
+        {
+            if (Column is not null && DataGrid is not null)
+            {
+                return DataGrid.OnHeaderContextMenuClickedAsync(args, Column);
+            }
+
+            return Task.CompletedTask;
+        }
+
         #endregion
 
         /// <summary>

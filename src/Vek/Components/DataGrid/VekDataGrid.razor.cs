@@ -85,6 +85,10 @@ namespace Vek
         private readonly ParameterState<int> _focusedColumnIndexState;
         private readonly ParameterState<DataGridSelectionMode> _selectionModeState;
         private readonly ParameterState<DataGridCellRange?> _selectedCellRangeState;
+        private readonly ParameterState<bool> _contextMenuEnabledState;
+        private VekMenu? _contextMenu;
+        private bool _contextMenuOpen;
+        private DataGridContextMenuArgs<T>? _currentContextMenuArgs;
         private readonly DataGridCellSelectionModel _cellSelectionModel = new();
         private bool _isDraggingCellRange;
         private bool _cellRangePointerGesture;
@@ -223,6 +227,9 @@ namespace Vek
                 .WithParameter(() => SelectedCellRange)
                 .WithEventCallback(() => SelectedCellRangeChanged)
                 .WithChangeHandler(OnSelectedCellRangeChangedAsync);
+
+            _contextMenuEnabledState = registerScope.RegisterParameter<bool>(nameof(ContextMenuEnabled))
+                .WithParameter(() => ContextMenuEnabled);
         }
 
         protected string Classname =>
@@ -529,6 +536,13 @@ namespace Vek
         public EventCallback<DataGridCellClickEventArgs<T>> CellContextMenuClick { get; set; }
 
         /// <summary>
+        /// Occurs when a context menu is requested via right-click on a header, row, cell, or footer.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public EventCallback<DataGridContextMenuArgs<T>> OnContextMenu { get; set; }
+
+        /// <summary>
         /// Occurs when edit mode begins for an item.
         /// </summary>
         /// <remarks>
@@ -685,6 +699,66 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.DataGrid.Filtering)]
         public RenderFragment<VekDataGrid<T>>? FilterBuilderTemplate { get; set; }
+
+        /// <summary>
+        /// Enables contextual right-click menus on headers, data rows, cells, and footers with standard data operations.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. When set to <c>true</c> without custom templates, built-in standard data actions are displayed.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public bool ContextMenuEnabled { get; set; }
+
+        /// <summary>
+        /// Custom template used to render the context menu for column headers.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>. When set, this overrides the default context menu when a header cell is right-clicked.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Appearance)]
+        public RenderFragment<DataGridContextMenuArgs<T>>? HeaderContextMenuTemplate { get; set; }
+
+        /// <summary>
+        /// Custom template used to render the context menu for data rows.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>. When set, this overrides the default context menu when a data row is right-clicked.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Appearance)]
+        public RenderFragment<DataGridContextMenuArgs<T>>? RowContextMenuTemplate { get; set; }
+
+        /// <summary>
+        /// Custom template used to render the context menu for data cells.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>. When set, this overrides the default context menu when a cell is right-clicked.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Appearance)]
+        public RenderFragment<DataGridContextMenuArgs<T>>? CellContextMenuTemplate { get; set; }
+
+        /// <summary>
+        /// Custom template used to render the context menu for footer cells.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>. When set, this overrides the default context menu when a footer cell is right-clicked.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Appearance)]
+        public RenderFragment<DataGridContextMenuArgs<T>>? FooterContextMenuTemplate { get; set; }
+
+        /// <summary>
+        /// Default custom template used when a more specific template is not set.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Appearance)]
+        public RenderFragment<DataGridContextMenuArgs<T>>? ContextMenuTemplate { get; set; }
 
         /// <summary>
         /// Whether matching search terms are highlighted in searchable cells.
@@ -3842,9 +3916,28 @@ namespace Vek
             await ActivateRowBehaviorsAsync(item, selectRow: _selectionModeState.Value != DataGridSelectionMode.CellRange);
         }
 
-        internal Task OnContextMenuClickedAsync(MouseEventArgs args, T item, int rowIndex)
+        internal async Task OnContextMenuClickedAsync(MouseEventArgs args, T item, int rowIndex)
         {
-            return RowContextMenuClick.InvokeAsync(new DataGridRowClickEventArgs<T>(args, item, rowIndex));
+            if (RowContextMenuClick.HasDelegate)
+            {
+                await RowContextMenuClick.InvokeAsync(new DataGridRowClickEventArgs<T>(args, item, rowIndex));
+            }
+
+            if (HasRowContextMenu)
+            {
+                var contextArgs = new DataGridContextMenuArgs<T>(
+                    args,
+                    DataGridContextMenuTarget.Row,
+                    item,
+                    rowIndex,
+                    null,
+                    null,
+                    this,
+                    null,
+                    null);
+
+                await OpenContextMenuAsync(contextArgs);
+            }
         }
 
         internal async Task OnCellClickedAsync(MouseEventArgs args, T item, int rowIndex, int columnIndex, Column<T> column)
@@ -3901,9 +3994,44 @@ namespace Vek
             }
         }
 
-        internal Task OnCellContextMenuClickedAsync(MouseEventArgs args, T item, int rowIndex, int columnIndex, Column<T> column)
+        internal async Task OnCellContextMenuClickedAsync(MouseEventArgs args, T item, int rowIndex, int columnIndex, Column<T> column)
         {
-            return CellContextMenuClick.InvokeAsync(new DataGridCellClickEventArgs<T>(args, item, rowIndex, columnIndex, column));
+            if (CellContextMenuClick.HasDelegate)
+            {
+                await CellContextMenuClick.InvokeAsync(new DataGridCellClickEventArgs<T>(args, item, rowIndex, columnIndex, column));
+            }
+
+            if (HasCellContextMenu)
+            {
+                var cell = new Cell<T>(this, column, GetEditingItemOrSource(item), item);
+                var value = cell.ComputedValue;
+                string? formattedText;
+                if (column.Culture is not null && column.isNumber)
+                {
+                    formattedText = column.ContentFormat is not null
+                        ? ((IFormattable?)cell._valueNumber)?.ToString(column.ContentFormat, column.Culture)
+                        : cell._valueNumber?.ToString(column.Culture);
+                }
+                else
+                {
+                    formattedText = column.ContentFormat is not null
+                        ? ((IFormattable?)cell.ComputedValue)?.ToString(column.ContentFormat, column.Culture)
+                        : cell.ComputedValue?.ToString();
+                }
+
+                var contextArgs = new DataGridContextMenuArgs<T>(
+                    args,
+                    DataGridContextMenuTarget.Cell,
+                    item,
+                    rowIndex,
+                    columnIndex,
+                    column,
+                    this,
+                    value,
+                    formattedText);
+
+                await OpenContextMenuAsync(contextArgs);
+            }
         }
 
         // The lambdas live in their own methods because the compiler allocates a closure on entry to whichever method
@@ -3917,12 +4045,171 @@ namespace Vek
             => EventCallback.Factory.Create<MouseEventArgs>(this, args => OnCellClickedAsync(args, item, rowIndex, colIndex, column));
 
         private EventCallback<MouseEventArgs> GetCellContextMenuClickCallback(T item, int rowIndex, int colIndex, Column<T> column)
-            => CellContextMenuClick.HasDelegate
+            => CellContextMenuClick.HasDelegate || HasCellContextMenu
                 ? CreateCellContextMenuClickCallback(item, rowIndex, colIndex, column)
                 : default;
 
         private EventCallback<MouseEventArgs> CreateCellContextMenuClickCallback(T item, int rowIndex, int colIndex, Column<T> column)
             => EventCallback.Factory.Create<MouseEventArgs>(this, args => OnCellContextMenuClickedAsync(args, item, rowIndex, colIndex, column));
+
+        internal bool HasContextMenu =>
+            _contextMenuEnabledState.Value ||
+            HeaderContextMenuTemplate is not null ||
+            RowContextMenuTemplate is not null ||
+            CellContextMenuTemplate is not null ||
+            FooterContextMenuTemplate is not null ||
+            ContextMenuTemplate is not null ||
+            OnContextMenu.HasDelegate ||
+            RowContextMenuClick.HasDelegate ||
+            CellContextMenuClick.HasDelegate;
+
+        internal bool HasHeaderContextMenu =>
+            _contextMenuEnabledState.Value ||
+            HeaderContextMenuTemplate is not null ||
+            ContextMenuTemplate is not null ||
+            OnContextMenu.HasDelegate;
+
+        internal bool HasCellContextMenu =>
+            _contextMenuEnabledState.Value ||
+            CellContextMenuTemplate is not null ||
+            RowContextMenuTemplate is not null ||
+            ContextMenuTemplate is not null ||
+            CellContextMenuClick.HasDelegate ||
+            OnContextMenu.HasDelegate;
+
+        internal bool HasRowContextMenu =>
+            _contextMenuEnabledState.Value ||
+            RowContextMenuTemplate is not null ||
+            ContextMenuTemplate is not null ||
+            RowContextMenuClick.HasDelegate ||
+            OnContextMenu.HasDelegate;
+
+        internal bool HasFooterContextMenu =>
+            _contextMenuEnabledState.Value ||
+            FooterContextMenuTemplate is not null ||
+            ContextMenuTemplate is not null ||
+            OnContextMenu.HasDelegate;
+
+        internal RenderFragment<DataGridContextMenuArgs<T>>? GetContextMenuTemplate(DataGridContextMenuTarget target)
+        {
+            return target switch
+            {
+                DataGridContextMenuTarget.Header => HeaderContextMenuTemplate ?? ContextMenuTemplate,
+                DataGridContextMenuTarget.Cell => CellContextMenuTemplate ?? RowContextMenuTemplate ?? ContextMenuTemplate,
+                DataGridContextMenuTarget.Row => RowContextMenuTemplate ?? ContextMenuTemplate,
+                DataGridContextMenuTarget.Footer => FooterContextMenuTemplate ?? ContextMenuTemplate,
+                _ => ContextMenuTemplate
+            };
+        }
+
+        internal async Task OpenContextMenuAsync(DataGridContextMenuArgs<T> args)
+        {
+            if (OnContextMenu.HasDelegate)
+            {
+                await OnContextMenu.InvokeAsync(args);
+            }
+
+            if (args.Handled)
+            {
+                return;
+            }
+
+            var template = GetContextMenuTemplate(args.Target);
+            if (!_contextMenuEnabledState.Value && template is null)
+            {
+                return;
+            }
+
+            _currentContextMenuArgs = args;
+            _contextMenuOpen = true;
+            StateHasChanged();
+            await Task.Yield();
+
+            if (_contextMenu is not null)
+            {
+                await _contextMenu.OpenMenuAsync(args.MouseEventArgs);
+            }
+        }
+
+        /// <summary>
+        /// Closes the currently active context menu.
+        /// </summary>
+        public Task CloseContextMenuAsync()
+        {
+            _contextMenuOpen = false;
+            _currentContextMenuArgs = null;
+            StateHasChanged();
+            return Task.CompletedTask;
+        }
+
+        private Task OnContextMenuOpenChangedAsync(bool open)
+        {
+            _contextMenuOpen = open;
+            if (!open)
+            {
+                _currentContextMenuArgs = null;
+            }
+            return Task.CompletedTask;
+        }
+
+        internal async Task CopyTextToClipboardAsync(string text)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
+            }
+            catch
+            {
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("vekWindow.copyToClipboard", text);
+                }
+                catch
+                {
+                    // Graceful fallback when clipboard permissions or runtime methods are unavailable
+                }
+            }
+        }
+
+        internal async Task OnHeaderContextMenuClickedAsync(MouseEventArgs args, Column<T> column)
+        {
+            if (HasHeaderContextMenu)
+            {
+                var colIndex = RenderedColumns.IndexOf(column);
+                var contextArgs = new DataGridContextMenuArgs<T>(
+                    args,
+                    DataGridContextMenuTarget.Header,
+                    default,
+                    null,
+                    colIndex >= 0 ? colIndex : null,
+                    column,
+                    this,
+                    null,
+                    column.Title);
+
+                await OpenContextMenuAsync(contextArgs);
+            }
+        }
+
+        internal async Task OnFooterContextMenuClickedAsync(MouseEventArgs args, Column<T> column)
+        {
+            if (HasFooterContextMenu)
+            {
+                var colIndex = RenderedColumns.IndexOf(column);
+                var contextArgs = new DataGridContextMenuArgs<T>(
+                    args,
+                    DataGridContextMenuTarget.Footer,
+                    default,
+                    null,
+                    colIndex >= 0 ? colIndex : null,
+                    column,
+                    this,
+                    null,
+                    null);
+
+                await OpenContextMenuAsync(contextArgs);
+            }
+        }
 
         /// <summary>
         /// Gets the total count of filtered items in the data grid.
