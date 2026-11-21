@@ -589,11 +589,12 @@
       "title": "Tabs Interactive Drag-and-Drop Tab Reordering",
       "module": "Tabs",
       "priority": 48,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/048-tabs-drag-and-drop-reorder.md",
       "dependencies": [
         "044"
-      ]
+      ],
+      "started_at": "2026-11-21T12:46:21Z"
     },
     {
       "id": "049",

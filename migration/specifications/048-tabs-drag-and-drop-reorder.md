@@ -4,9 +4,10 @@
 - **Feature ID**: 048
 - **Feature Slug**: tabs-drag-and-drop-reorder
 - **Module**: Tabs
-- **Status**: Backlog
+- **Status**: In Progress
 - **Priority**: 48
 - **Dependencies**: ["044"]
+- **Started At**: 2026-11-21T12:46:21Z
 
 ---
 

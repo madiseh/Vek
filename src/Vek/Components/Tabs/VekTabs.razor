@@ -23,7 +23,7 @@
                     </CascadingValue>
                 }
                 <div @ref="@_tabsContentSize" class="vek-tabs-tabbar-content" @onwheel="HandleWheel" @onwheel:preventDefault="ScrollMode != TabsScrollMode.None && !_isVerticalTabs && _allTabsSize > _tabBarContentSize">
-                    @if (EnableDragAndDrop)
+                    @if (EnableDragAndDrop || AllowTabReorder)
                     {
                         <VekDropContainer @ref="_dropContainer" T="VekTabPanel" Class="@WrapperClassnames" Style="@WrapperScrollStyle" Items="_panels"
                                           ItemsSelector="@((item,dropzone) => true)" ItemDropped="@ItemUpdated"

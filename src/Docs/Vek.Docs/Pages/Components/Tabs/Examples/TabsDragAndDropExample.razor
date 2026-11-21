@@ -1,35 +1,43 @@
-﻿@namespace Vek.Docs.Examples
+@namespace Vek.Docs.Examples
 
-<VekTabs Outlined="true" Elevation="4" Rounded="true" Border="true" 
+<VekTabs Outlined="true" Elevation="4" Rounded="true" Border="true"
          ApplyEffectsToContainer="true" Class="mt-8" TabPanelsClass="pa-6"
-         EnableDragAndDrop="true" Position="@Position">
-    <VekTabPanel Text="One">
-        <VekText Typo="Typo.h6">Tab One</VekText>
-    </VekTabPanel>
-    <VekTabPanel Text="Two">
-        <VekText Typo="Typo.h6">Tab Two</VekText>
-    </VekTabPanel>
-    <VekTabPanel Text="Three">
-        <VekText Typo="Typo.h6">Tab Three</VekText>
-    </VekTabPanel>
-    <VekTabPanel Text="Four">
-        <VekText Typo="Typo.h6">Tab Four</VekText>
-    </VekTabPanel>
-    <VekTabPanel Text="Five">
-        <VekText Typo="Typo.h6">Tab Five</VekText>
-    </VekTabPanel>
-    <VekTabPanel Text="Six">
-        <VekText Typo="Typo.h6">Tab Six</VekText>
-    </VekTabPanel>
-    <VekTabPanel Text="Seven">
-        <VekText Typo="Typo.h6">Tab Seven</VekText>
-    </VekTabPanel>
-    <VekTabPanel Text="Eight">
-        <VekText Typo="Typo.h6">Tab Eight</VekText>
-    </VekTabPanel>
-    <VekTabPanel Text="Nine">
-        <VekText Typo="Typo.h6">Tab Nine</VekText>
-    </VekTabPanel>
+         AllowTabReorder="true" OnTabReordered="HandleTabReordered" Position="@Position">
+    <Header>
+        @if (_lastReorder != null)
+        {
+            <span class="pa-2">Moved @_lastReorder.Panel.Text from @(_lastReorder.SourceIndex + 1) to @(_lastReorder.TargetIndex + 1)</span>
+        }
+    </Header>
+    <ChildContent>
+        <VekTabPanel Text="One">
+            <VekText Typo="Typo.h6">Tab One</VekText>
+        </VekTabPanel>
+        <VekTabPanel Text="Two">
+            <VekText Typo="Typo.h6">Tab Two</VekText>
+        </VekTabPanel>
+        <VekTabPanel Text="Three">
+            <VekText Typo="Typo.h6">Tab Three</VekText>
+        </VekTabPanel>
+        <VekTabPanel Text="Four">
+            <VekText Typo="Typo.h6">Tab Four</VekText>
+        </VekTabPanel>
+        <VekTabPanel Text="Five">
+            <VekText Typo="Typo.h6">Tab Five</VekText>
+        </VekTabPanel>
+        <VekTabPanel Text="Six">
+            <VekText Typo="Typo.h6">Tab Six</VekText>
+        </VekTabPanel>
+        <VekTabPanel Text="Seven">
+            <VekText Typo="Typo.h6">Tab Seven</VekText>
+        </VekTabPanel>
+        <VekTabPanel Text="Eight">
+            <VekText Typo="Typo.h6">Tab Eight</VekText>
+        </VekTabPanel>
+        <VekTabPanel Text="Nine">
+            <VekText Typo="Typo.h6">Tab Nine</VekText>
+        </VekTabPanel>
+    </ChildContent>
 </VekTabs>
 
 <VekSelect Label="Tabs Position" @bind-Value="Position" Variant="Variant.Outlined">
@@ -42,7 +50,10 @@
 </VekSelect>
    
 @code {
+    private TabReorderedEventArgs _lastReorder = null!;
     public Position Position { get; set; } = Position.Left;
+
+    private void HandleTabReordered(TabReorderedEventArgs args) => _lastReorder = args;
     public int TabCount { get; set; } = 6;
 
     private void OnSelectedValue(Position value)

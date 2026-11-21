@@ -77,12 +77,27 @@ namespace Vek
         private TimeProvider TimeProvider { get; set; } = null!;
 
         /// <summary>
-        /// Enables drag-and-drop re-ordering of tabs.
+        /// Enables drag-and-drop reordering of tabs.
         /// </summary>
         /// <remarks>Defaults to <c>false</c>.</remarks>
         [Parameter]
         [Category(CategoryTypes.Tabs.Behavior)]
         public bool EnableDragAndDrop { get; set; }
+
+        /// <summary>
+        /// Allows users to reorder tabs by dragging their headers.
+        /// </summary>
+        /// <remarks>Defaults to <c>false</c>.</remarks>
+        [Parameter]
+        [Category(CategoryTypes.Tabs.Behavior)]
+        public bool AllowTabReorder { get; set; }
+
+        /// <summary>
+        /// Occurs after a tab panel has been moved to a new position.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.Tabs.Behavior)]
+        public EventCallback<TabReorderedEventArgs> OnTabReordered { get; set; }
 
         /// <summary>
         /// When <see cref="EnableDragAndDrop" /> is set to true, this event will be raised when an item is dropped.
@@ -705,7 +720,8 @@ namespace Vek
                 _tabPositionExplicitlySet = true;
             }
 
-            var dragAndDropChanged = parameters.TryGetValue<bool>(nameof(EnableDragAndDrop), out var _);
+            var dragAndDropChanged = parameters.TryGetValue<bool>(nameof(EnableDragAndDrop), out var _)
+                || parameters.TryGetValue<bool>(nameof(AllowTabReorder), out var _);
             var positionChanged = parameters.TryGetValue<Position>(nameof(Position), out var _)
                 || parameters.TryGetValue<TabPosition>(nameof(TabPosition), out var _);
             var scrollModeChanged = parameters.TryGetValue<TabsScrollMode>(nameof(ScrollMode), out var scrollMode) && scrollMode != ScrollMode;
@@ -1651,30 +1667,30 @@ namespace Vek
                 return;
             }
 
-            // get the old index where this item was at
             var oldIndex = _panels.IndexOf(dropItem.Item);
-            // get the new index in _panels using IndexInZone
-            var newIndex = dropItem.IndexInZone;
+            if (oldIndex < 0)
+            {
+                return;
+            }
 
-            // remove the item from the old index
+            var newIndex = Math.Clamp(dropItem.IndexInZone, 0, _panels.Count - 1);
+            if (newIndex == oldIndex)
+            {
+                return;
+            }
+
             _panels.RemoveAt(oldIndex);
-
-            // insert the item at the new index
-            if (newIndex < _panels.Count)
-            {
-                _panels.Insert(newIndex, dropItem.Item);
-            }
-            else
-            {
-                _panels.Add(dropItem.Item);
-            }
-
-            // Set the dragged tab as active
+            _panels.Insert(newIndex, dropItem.Item);
             await ActivatePanelAsync(dropItem.Item);
 
             if (OnItemDropped.HasDelegate)
             {
                 await OnItemDropped.InvokeAsync(dropItem);
+            }
+
+            if (OnTabReordered.HasDelegate)
+            {
+                await OnTabReordered.InvokeAsync(new TabReorderedEventArgs(oldIndex, newIndex, dropItem.Item));
             }
         }
 

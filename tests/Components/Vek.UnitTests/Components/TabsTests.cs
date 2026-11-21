@@ -1666,6 +1666,39 @@ namespace Vek.UnitTests.Components
         }
 #nullable disable
 
+#nullable enable
+        [Test]
+        public async Task TabsDragAndDrop_ReorderRaisesCallbackWithIndexesAndPanel()
+        {
+            TabReorderedEventArgs? reordered = null;
+            var comp = Context.Render<TabsDragAndDropTest>(parameters => parameters
+                .Add(p => p.TabReordered, args => reordered = args));
+            var tabs = comp.FindComponent<VekTabs>().Instance;
+            var panel = tabs._panels[0];
+
+            await tabs.ItemUpdated(new VekItemDropInfo<VekTabPanel>(panel, "vek-drop-zone", 2));
+
+            tabs._panels[2].Should().BeSameAs(panel);
+            reordered.Should().NotBeNull();
+            reordered!.SourceIndex.Should().Be(0);
+            reordered.TargetIndex.Should().Be(2);
+            reordered.Panel.Should().BeSameAs(panel);
+        }
+
+        [Test]
+        public async Task TabsDragAndDrop_InvalidReorderDoesNotRaiseCallback()
+        {
+            TabReorderedEventArgs? reordered = null;
+            var comp = Context.Render<TabsDragAndDropTest>(parameters => parameters
+                .Add(p => p.TabReordered, args => reordered = args));
+            var tabs = comp.FindComponent<VekTabs>().Instance;
+
+            await tabs.ItemUpdated(new VekItemDropInfo<VekTabPanel>(new VekTabPanel(), "vek-drop-zone", 2));
+
+            reordered.Should().BeNull();
+        }
+
+#nullable disable
         [Test]
         public void TabsDragAndDrop_Horizontal_AddsHorizontalDropZoneClass()
         {
@@ -1679,6 +1712,7 @@ namespace Vek.UnitTests.Components
         }
 
         [Test]
+#nullable disable
         public void TabsDragAndDrop_Vertical_AddsVerticalDropZoneClass()
         {
             var comp = Context.Render<TabsDragAndDropTest>(parameters => parameters.Add(p => p.Position, Position.Left));
