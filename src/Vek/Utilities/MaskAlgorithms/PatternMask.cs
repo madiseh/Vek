@@ -29,6 +29,18 @@ public class PatternMask : BaseMask
     public char? Placeholder { get; set; }
 
     /// <summary>
+    /// The prompt character used for characters which haven't yet been typed.
+    /// </summary>
+    /// <remarks>
+    /// Defaults to <c>null</c>. Alias for <see cref="Placeholder"/>.
+    /// </remarks>
+    public char? PromptChar
+    {
+        get => Placeholder;
+        set => Placeholder = value;
+    }
+
+    /// <summary>
     /// The function applied to all input characters, such as converting to upper-case, etc.
     /// </summary>
     /// <remarks>
@@ -46,6 +58,28 @@ public class PatternMask : BaseMask
     public PatternMask(string mask)
     {
         Mask = mask;
+    }
+
+    /// <summary>
+    /// Creates a new mask with the specified prompt character.
+    /// </summary>
+    /// <param name="mask">The characters which define the accepted input.</param>
+    /// <param name="promptChar">The character used for unfilled positions.</param>
+    public PatternMask(string mask, char promptChar) : this(mask)
+    {
+        PromptChar = promptChar;
+    }
+
+    /// <summary>
+    /// Creates a new mask with custom mask characters and an optional prompt character.
+    /// </summary>
+    /// <param name="mask">The characters which define the accepted input.</param>
+    /// <param name="maskChars">The custom mask characters.</param>
+    /// <param name="promptChar">The character used for unfilled positions.</param>
+    public PatternMask(string mask, MaskChar[] maskChars, char? promptChar = null) : this(mask)
+    {
+        MaskChars = maskChars;
+        PromptChar = promptChar;
     }
 
     /// <inheritdoc />
@@ -195,6 +229,14 @@ public class PatternMask : BaseMask
                 alignedText += c;
                 maskIndex++;
             }
+            else if (MaskDictionary.TryGetValue(maskChar, out var maskDef) && maskDef.Optional)
+            {
+                if (maskIndex + 1 < mask.Length && ((IsDelimiter(mask[maskIndex + 1]) && mask[maskIndex + 1] == textChar) || IsMatch(mask[maskIndex + 1], textChar)))
+                {
+                    maskIndex++;
+                    continue;
+                }
+            }
             textIndex++;
             ModifyPartiallyAlignedMask(mask, text, maskOffset, ref textIndex, ref maskIndex, ref alignedText);
         }
@@ -222,7 +264,8 @@ public class PatternMask : BaseMask
     /// <returns>When <c>true</c>, the character is a match for the mask character.</returns>
     protected virtual bool IsMatch(char maskChar, char textChar)
     {
-        var maskDef = MaskDictionary[maskChar];
+        if (!MaskDictionary.TryGetValue(maskChar, out var maskDef))
+            return false;
         return Regex.IsMatch(textChar.ToString(), maskDef.Regex, RegexOptions.None, RegexDefaults.MatchTimeout);
     }
 
@@ -249,10 +292,59 @@ public class PatternMask : BaseMask
         if (string.IsNullOrEmpty(cleanText))
             return string.Empty;
         if (CleanDelimiters)
-            cleanText = new string(cleanText.Where((_, i) => MaskDictionary.ContainsKey(Mask[i])).ToArray());
+            cleanText = new string(cleanText.Where((_, i) => i < Mask.Length && MaskDictionary.ContainsKey(Mask[i])).ToArray());
         if (Placeholder != null)
             cleanText = cleanText.Replace(Placeholder.Value.ToString(), "");
         return cleanText;
+    }
+
+    /// <summary>
+    /// Gets the full mask pattern populated only with delimiters and prompt characters.
+    /// </summary>
+    /// <returns>The prompt mask text, or empty string if no prompt character or mask is defined.</returns>
+    public virtual string GetPromptMaskText()
+    {
+        Init();
+        if (string.IsNullOrEmpty(Mask) || PromptChar is null)
+            return string.Empty;
+
+        var result = new System.Text.StringBuilder(Mask.Length);
+        foreach (var c in Mask)
+        {
+            if (IsDelimiter(c))
+                result.Append(c);
+            else
+                result.Append(PromptChar.Value);
+        }
+        return result.ToString();
+    }
+
+    /// <inheritdoc />
+    public override string GetValueText(bool saveLiterals)
+    {
+        Init();
+        if (string.IsNullOrEmpty(Text))
+            return string.Empty;
+
+        if (!saveLiterals)
+        {
+            var mask = Mask ?? string.Empty;
+            return new string(Text.Where((c, i) =>
+            {
+                if (Placeholder != null && c == Placeholder.Value)
+                    return false;
+                if (i < mask.Length && MaskDictionary.ContainsKey(mask[i]))
+                    return true;
+                return !Delimiters.Contains(c);
+            }).ToArray());
+        }
+
+        var result = Text;
+        if (Placeholder != null)
+        {
+            result = result.Replace(Placeholder.Value.ToString(), string.Empty);
+        }
+        return result;
     }
 
     /// <inheritdoc />

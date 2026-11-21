@@ -25,6 +25,20 @@ public readonly struct MaskChar : IEquatable<MaskChar>
     {
         Char = c;
         Regex = regex;
+        Optional = false;
+    }
+
+    /// <summary>
+    /// Creates a new mask character with its associated regular expression and optional flag.
+    /// </summary>
+    /// <param name="c">The character to use in the mask.</param>
+    /// <param name="regex">The regular expression for allowed values for this character.</param>
+    /// <param name="optional">Indicates whether this character position is optional.</param>
+    public MaskChar(char c, string regex, bool optional)
+    {
+        Char = c;
+        Regex = regex;
+        Optional = optional;
     }
 
     /// <summary>
@@ -38,34 +52,42 @@ public readonly struct MaskChar : IEquatable<MaskChar>
     public string Regex { get; }
 
     /// <summary>
+    /// Indicates whether this character position is optional.
+    /// </summary>
+    public bool Optional { get; }
+
+    /// <summary>
     /// Gets a mask character which allows any letter (uppercase or lowercase).
     /// </summary>
     /// <param name="c">The mask character to create.</param>
+    /// <param name="optional">Whether the character is optional.</param>
     /// <returns>A character with a regular expression of <c>\p{L}</c> for any letter.</returns>
-    public static MaskChar Letter(char c) => new(c, @"\p{L}");
+    public static MaskChar Letter(char c, bool optional = false) => new(c, @"\p{L}", optional);
 
     /// <summary>
     /// Gets a mask character which allows any digit.
     /// </summary>
     /// <param name="c">The mask character to create.</param>
+    /// <param name="optional">Whether the character is optional.</param>
     /// <returns>A character with a regular expression of <c>\d</c> for any digit.</returns>
-    public static MaskChar Digit(char c) => new(c, @"\d");
+    public static MaskChar Digit(char c, bool optional = false) => new(c, @"\d", optional);
 
     /// <summary>
     /// Gets a mask character which allows any letter (uppercase or lowercase) or any digit.
     /// </summary>
     /// <param name="c">The mask character to create.</param>
+    /// <param name="optional">Whether the character is optional.</param>
     /// <returns>A character with a regular expression of <c>\p{L}|\d</c> for any letter or digit.</returns>
-    public static MaskChar LetterOrDigit(char c) => new(c, @"\p{L}|\d");
+    public static MaskChar LetterOrDigit(char c, bool optional = false) => new(c, @"\p{L}|\d", optional);
 
     /// <inheritdoc />
-    public bool Equals(MaskChar other) => Char == other.Char && Regex == other.Regex;
+    public bool Equals(MaskChar other) => Char == other.Char && Regex == other.Regex && Optional == other.Optional;
 
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is MaskChar other && Equals(other);
 
     /// <inheritdoc />
-    public override int GetHashCode() => HashCode.Combine(Char, Regex);
+    public override int GetHashCode() => HashCode.Combine(Char, Regex, Optional);
 
     /// <summary>
     /// Determines whether two <see cref="MaskChar"/> instances are equal.

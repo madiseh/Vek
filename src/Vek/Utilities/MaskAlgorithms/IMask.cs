@@ -25,6 +25,13 @@ namespace Vek
         string? GetCleanText() => Text;
 
         /// <summary>
+        /// Gets the value text, with or without literal characters preserved.
+        /// </summary>
+        /// <param name="saveLiterals">When <c>true</c>, preserves literal formatting; when <c>false</c>, returns clean unformatted text.</param>
+        /// <returns>The formatted or clean value text.</returns>
+        string? GetValueText(bool saveLiterals) => saveLiterals ? Text : GetCleanText();
+
+        /// <summary>
         /// The current cursor position.
         /// </summary>
         int CaretPos { get; set; }

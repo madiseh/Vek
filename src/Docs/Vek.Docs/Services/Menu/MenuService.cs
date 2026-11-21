@@ -103,6 +103,7 @@ namespace Vek.Docs.Services
                 .AddItem("Slider", typeof(VekSlider<T>))
                 .AddItem("Switch", typeof(VekSwitch<T>))
                 .AddItem("Text Field", typeof(VekTextField<T>))
+                .AddItem("Masked Input", typeof(VekMaskedInput), "mask")
                 .AddItem("Numeric Field", typeof(VekNumericField<T>))
                 .AddItem("Form", typeof(VekForm))
                 .AddItem("Autocomplete", typeof(VekAutocomplete<T>))

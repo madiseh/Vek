@@ -48,6 +48,9 @@ public abstract class BaseMask : IMask
     public virtual string? GetCleanText() => Text;
 
     /// <inheritdoc />
+    public virtual string? GetValueText(bool saveLiterals) => saveLiterals ? Text : GetCleanText();
+
+    /// <inheritdoc />
     public int CaretPos { get; set; }
 
     /// <inheritdoc />
