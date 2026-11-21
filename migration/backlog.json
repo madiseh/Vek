@@ -764,10 +764,12 @@
       "title": "TreeView Live Search Filtering with Auto-Expansion of Matching Ancestors",
       "module": "TreeView",
       "priority": 62,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/062-treeview-search-filter-and-auto-expand.md",
       "dependencies": [],
-      "started_at": "2026-11-21T12:50:17Z"
+      "started_at": "2026-11-21T12:50:17Z",
+      "completed_at": "2026-11-21T13:38:37Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/90"
     },
     {
       "id": "063",
