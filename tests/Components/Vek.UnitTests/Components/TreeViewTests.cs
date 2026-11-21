@@ -66,6 +66,30 @@ namespace Vek.UnitTests.Components
             tree.FindAll(".vek-sr-only").Should().BeEmpty();
         }
 
+        /// <summary>
+        /// Live text filtering keeps matching ancestors visible, expands them, and highlights matches.
+        /// </summary>
+        [Test]
+        public async Task FilterText_FiltersExpandsAndHighlightsMatchingAncestors()
+        {
+            Context.AddFakeTimeProvider();
+            var parent = new TreeItemData<string>("parent")
+            {
+                Text = "Documents",
+                Children = [new TreeItemData<string>("report") { Text = "Annual Report" }, new TreeItemData<string>("notes") { Text = "Meeting Notes" }]
+            };
+            var items = new List<ITreeItemData<string>> { parent };
+            var tree = Context.Render<VekTreeView<string>>(parameters => parameters
+                .Add(p => p.Items, items)
+                .Add(p => p.FilterText, "report"));
+
+            tree.Find("mark.vek-tree-highlight").TextContent.Should().Be("Report");
+            tree.FindAll("mark.vek-tree-highlight").Should().ContainSingle();
+            tree.FindAll("mark.vek-tree-highlight").Select(mark => mark.ParentElement!.TextContent).Should().NotContain("Meeting Notes");
+            parent.Expanded.Should().BeTrue();
+            tree.Find("mark.vek-tree-highlight").TextContent.Should().Be("Report");
+        }
+
         [Test]
         public async Task TreeView_ClickWhileDisabled_DoesNotChangeSelection()
         {
