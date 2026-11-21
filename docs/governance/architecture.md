@@ -58,7 +58,7 @@ graph TD
     VekAnalyzers["src/Analyzers/Vek.Analyzers (Roslyn)"]
     VekCodeFixes["src/Analyzers/Vek.Analyzers.CodeFixes"]
     VekDocs["src/Docs/Vek.Docs (Docs content and services)"]
-    VekDocsLanding["src/Docs/Vek.Docs.Landing (Homepage composition)"]
+    VekDocsLanding["src/Docs/Vek.Docs.Landing (Homepage)"]
     VekDocsShowcases["src/Docs/Vek.Docs.Showcases (Interactive examples)"]
     VekDocsServer["src/Docs/Vek.Docs.Server (Server host)"]
     VekDocsWasm["src/Docs/Vek.Docs.Wasm (WASM app)"]
@@ -74,10 +74,11 @@ graph TD
     Vek --> VekDocsShowcases
     VekDocs --> VekDocsShowcases
     VekDocs --> VekDocsLanding
-    VekDocsShowcases --> VekDocsLanding
     VekDocs --> VekDocsServer
     VekDocs --> VekDocsWasm
     VekDocs --> VekDocsWasmHost
+    VekDocsShowcases --> VekDocsServer
+    VekDocsShowcases --> VekDocsWasm
     VekDocsLanding --> VekDocsServer
     VekDocsLanding --> VekDocsWasm
     VekDocsWasm --> VekDocsWasmHost
@@ -94,8 +95,8 @@ graph TD
 
 - **`Vek.Docs`** owns the component documentation pages, shared layouts, services, and reusable docs UI. It references `Vek` and shared example data.
 - **`Vek.Docs.Showcases`** owns complete, interactive use cases such as the Expense Tracker. Add a route page and its reusable view components here; it may reuse the docs layout and Vek components.
-- **`Vek.Docs.Landing`** owns the `/` page and composes content from `Vek.Docs` and `Vek.Docs.Showcases`. Keep dependencies flowing into this composition project; `Vek.Docs` must not reference Landing or Showcases.
-- **`Vek.Docs.Server`** and **`Vek.Docs.Wasm`** host the same route assemblies. Their `App.razor` routers include Landing and Showcases in `AdditionalAssemblies`, so new routes added to Showcases are available in both hosting modes.
+- **`Vek.Docs.Landing`** owns the `/` page and references shared docs content only. Keep it independent from Showcase content; users open examples through the `Showcases` navigation menu.
+- **`Vek.Docs.Server`** and **`Vek.Docs.Wasm`** host the same route assemblies. They reference Landing and Showcases, and their `App.razor` routers include both in `AdditionalAssemblies`, so new routes added to either project are available in both hosting modes.
 
 ### NuGet Packaging Architecture
 - **Shipped Analyzers**: `Vek.Analyzers.dll` and `Vek.Analyzers.CodeFixes.dll` are packed side-by-side into `analyzers/dotnet/cs` of the primary `Vek` NuGet package. They target Roslyn 4.7.0 (via `<VekRoslynShippedVersion>` in the root `Directory.Packages.props`) ensuring full compatibility with consuming consumer IDEs and build compilers. NuGet package versions are centrally managed in this file.

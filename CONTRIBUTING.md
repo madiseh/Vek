@@ -87,7 +87,7 @@ The Bun asset step is skipped above because these examples validate C# and Razor
 
 When a component's behavior or public API changes, update its docs page under `src/Docs/Vek.Docs/Pages/Components`. Add focused examples in that component's `Examples` folder and reference each example from the page. Keep examples runnable, concise, and ordered from basic usage to advanced cases.
 
-For a complete interactive use case, add a route page and reusable UI under `src/Docs/Vek.Docs.Showcases`. Keep the homepage in `src/Docs/Vek.Docs.Landing`; it can compose content from both `Vek.Docs` and `Vek.Docs.Showcases`. Preserve this dependency direction so the shared docs project does not depend on its homepage or showcases. Routes in Showcases are discovered by both the Server and WASM routers through their `AdditionalAssemblies` settings.
+For a complete interactive use case, add a route page and reusable UI under `src/Docs/Vek.Docs.Showcases`. Keep the homepage in `src/Docs/Vek.Docs.Landing` independent from showcase content; users can open showcases from the `Showcases` navigation menu. Preserve this dependency direction so Landing references Docs and Showcases can reuse Docs, while Docs depends on neither project. Routes in Landing and Showcases are discovered by both the Server and WASM routers through their `AdditionalAssemblies` settings.
 
 For changes to shared docs pages, Landing, or Showcases, build the relevant host projects. Route changes should be checked in both hosting modes:
 

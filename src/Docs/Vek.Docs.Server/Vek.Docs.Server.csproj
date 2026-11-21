@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Vek.Docs\Vek.Docs.csproj" />
     <ProjectReference Include="..\Vek.Docs.Landing\Vek.Docs.Landing.csproj" />
+    <ProjectReference Include="..\Vek.Docs.Showcases\Vek.Docs.Showcases.csproj" />
     <ProjectReference Include="..\..\Examples\Vek.Examples.Data\Vek.Examples.Data.csproj" />
   </ItemGroup>
 
