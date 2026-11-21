@@ -27,7 +27,8 @@
                     {
                         <VekDropContainer @ref="_dropContainer" T="VekTabPanel" Class="@WrapperClassnames" Style="@WrapperScrollStyle" Items="_panels"
                                           ItemsSelector="@((item,dropzone) => true)" ItemDropped="@ItemUpdated"
-                                          ItemDisabled="@((item) => Disabled || item.Disabled)" role="tablist">
+                                          ItemDisabled="@((item) => Disabled || item.Disabled)" role="tablist"
+                                          aria-orientation="@(_isVerticalTabs ? "vertical" : "horizontal")">
                             <ChildContent>
                                 <VekDropZone T="VekTabPanel" Identifier="vek-tabs-dropzone" Class="@DropZoneClassnames" AllowReorder="true" />
                                 @if (!HideSlider && _isSliderPositionDetermined)
@@ -42,7 +43,7 @@
                     }
                     else
                     {
-                        <div class="@WrapperClassnames" style="@WrapperScrollStyle" role="tablist">
+                        <div class="@WrapperClassnames" style="@WrapperScrollStyle" role="tablist" aria-orientation="@(_isVerticalTabs ? "vertical" : "horizontal")">
                             @foreach (VekTabPanel panel in _panels)
                             {
                                 @RenderTabWrapperSection(panel)

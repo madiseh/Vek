@@ -1,0 +1,39 @@
+@namespace Vek.UnitTests.TestComponents.Tabs
+
+<CascadingValue Name="RightToLeft" Value="@RightToLeft" IsFixed="true">
+    @if (ExplicitTabPosition.HasValue)
+    {
+        <VekTabs @ref="Tabs"
+                 TabPosition="@ExplicitTabPosition.Value"
+                 Position="@Position"
+                 Border="@Border"
+                 SliderAnimation="@SliderAnimation">
+            <VekTabPanel Text="Tab 1">Content 1</VekTabPanel>
+            <VekTabPanel Text="Tab 2" Disabled="@DisableTab2">Content 2</VekTabPanel>
+            <VekTabPanel Text="Tab 3">Content 3</VekTabPanel>
+            <VekTabPanel Text="Tab 4">Content 4</VekTabPanel>
+        </VekTabs>
+    }
+    else
+    {
+        <VekTabs @ref="Tabs"
+                 Position="@Position"
+                 Border="@Border"
+                 SliderAnimation="@SliderAnimation">
+            <VekTabPanel Text="Tab 1">Content 1</VekTabPanel>
+            <VekTabPanel Text="Tab 2" Disabled="@DisableTab2">Content 2</VekTabPanel>
+            <VekTabPanel Text="Tab 3">Content 3</VekTabPanel>
+            <VekTabPanel Text="Tab 4">Content 4</VekTabPanel>
+        </VekTabs>
+    }
+</CascadingValue>
+
+@code {
+    public VekTabs Tabs { get; set; } = null!;
+    [Parameter] public TabPosition? ExplicitTabPosition { get; set; }
+    [Parameter] public Position Position { get; set; } = Position.Top;
+    [Parameter] public bool Border { get; set; }
+    [Parameter] public bool SliderAnimation { get; set; } = true;
+    [Parameter] public bool RightToLeft { get; set; }
+    [Parameter] public bool DisableTab2 { get; set; }
+}

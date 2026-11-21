@@ -45,6 +45,9 @@ namespace Vek
         private readonly ParameterState<bool> _closeableState;
         private readonly ParameterState<CloseButtonDisplayMode> _closeButtonDisplayModeState;
         private readonly ParameterState<TabsRenderMode> _renderModeState;
+        private readonly ParameterState<TabPosition> _tabPositionState;
+        private readonly ParameterState<Position> _positionState;
+        private bool _tabPositionExplicitlySet;
         private readonly Dictionary<ElementReference, BoundingClientRect> _tabSizes = [];
         /// <summary>
         /// Unique identifier for this VekTabs component instance.
@@ -268,14 +271,53 @@ namespace Vek
         public string MinimumTabWidth { get; set; } = "160px";
 
         /// <summary>
+        /// Specifies the position and orientation of the tab strip relative to the tab panels.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="TabPosition.Top"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.Tabs.Behavior)]
+        public TabPosition TabPosition { get; set; } = TabPosition.Top;
+
+        /// <summary>
         /// The location of the tab header.
         /// </summary>
         /// <remarks>
-        /// Defaults to <see cref="Position.Top"/>.
+        /// Defaults to <see cref="Position.Top"/>. Prefer using <see cref="TabPosition"/> instead.
         /// </remarks>
-        [Parameter]
+        [Parameter, ParameterState]
         [Category(CategoryTypes.Tabs.Behavior)]
         public Position Position { get; set; } = Position.Top;
+
+        /// <summary>
+        /// Resolves the effective tab position, taking into account <see cref="TabPosition"/> and the legacy <see cref="Position"/> parameter.
+        /// </summary>
+        public TabPosition EffectiveTabPosition
+        {
+            get
+            {
+                if (_tabPositionExplicitlySet || _tabPositionState.Value != TabPosition.Top)
+                {
+                    return _tabPositionState.Value;
+                }
+
+                if (_positionState.Value != Position.Top)
+                {
+                    return _positionState.Value switch
+                    {
+                        Position.Bottom => TabPosition.Bottom,
+                        Position.Left => TabPosition.Left,
+                        Position.Right => TabPosition.Right,
+                        Position.Start => RightToLeft ? TabPosition.Right : TabPosition.Left,
+                        Position.End => RightToLeft ? TabPosition.Left : TabPosition.Right,
+                        _ => TabPosition.Top,
+                    };
+                }
+
+                return _tabPositionState.Value;
+            }
+        }
 
         /// <summary>
         /// The color of the tab header.
@@ -613,6 +655,26 @@ namespace Vek
                 .WithParameter(() => CloseButtonDisplayMode);
             _renderModeState = registerScope.RegisterParameter<TabsRenderMode>(nameof(RenderMode))
                 .WithParameter(() => RenderMode);
+            _tabPositionState = registerScope.RegisterParameter<TabPosition>(nameof(TabPosition))
+                .WithParameter(() => TabPosition)
+                .WithChangeHandler(OnTabPositionChanged);
+            _positionState = registerScope.RegisterParameter<Position>(nameof(Position))
+                .WithParameter(() => Position)
+                .WithChangeHandler(OnPositionChanged);
+        }
+
+        private Task OnTabPositionChanged()
+        {
+            _isVerticalTabs = EffectiveTabPosition is TabPosition.Left or TabPosition.Right;
+            _redraw = true;
+            return Task.CompletedTask;
+        }
+
+        private Task OnPositionChanged()
+        {
+            _isVerticalTabs = EffectiveTabPosition is TabPosition.Left or TabPosition.Right;
+            _redraw = true;
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc />
@@ -632,23 +694,29 @@ namespace Vek
 
             _nextIcon = RightToLeft ? PrevIcon : NextIcon;
             _prevIcon = RightToLeft ? NextIcon : PrevIcon;
-            _isVerticalTabs = Position is Position.Left or Position.Right or Position.Start or Position.End;
+            _isVerticalTabs = EffectiveTabPosition is TabPosition.Left or TabPosition.Right;
         }
 
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
+            if (parameters.TryGetValue<TabPosition>(nameof(TabPosition), out _))
+            {
+                _tabPositionExplicitlySet = true;
+            }
+
             var dragAndDropChanged = parameters.TryGetValue<bool>(nameof(EnableDragAndDrop), out var _);
-            var positionChanged = parameters.TryGetValue<Position>(nameof(Position), out var _);
+            var positionChanged = parameters.TryGetValue<Position>(nameof(Position), out var _)
+                || parameters.TryGetValue<TabPosition>(nameof(TabPosition), out var _);
             var scrollModeChanged = parameters.TryGetValue<TabsScrollMode>(nameof(ScrollMode), out var scrollMode) && scrollMode != ScrollMode;
             if (dragAndDropChanged || positionChanged || scrollModeChanged)
             {
                 // need to recalculate the layout since drag and drop and position
                 // changes the tab structure more broadly
                 _redraw = true;
-                _isVerticalTabs = Position is Position.Left or Position.Right or Position.Start or Position.End;
             }
             await base.SetParametersAsync(parameters);
+            _isVerticalTabs = EffectiveTabPosition is TabPosition.Left or TabPosition.Right;
         }
 
         /// <inheritdoc />
@@ -1085,9 +1153,9 @@ namespace Vek
                 .AddClass($"vek-tabs-rounded", ApplyEffectsToContainer && Rounded)
                 .AddClass($"vek-paper-outlined", ApplyEffectsToContainer && Outlined)
                 .AddClass($"vek-elevation-{Elevation}", ApplyEffectsToContainer && Elevation != 0)
-                .AddClass($"vek-tabs-reverse", Position == Position.Bottom)
+                .AddClass($"vek-tabs-reverse", EffectiveTabPosition == TabPosition.Bottom)
                 .AddClass($"vek-tabs-vertical", _isVerticalTabs)
-                .AddClass($"vek-tabs-vertical-reverse", (Position == Position.Right && !RightToLeft) || ((Position == Position.Left) && RightToLeft) || Position == Position.End)
+                .AddClass($"vek-tabs-vertical-reverse", (EffectiveTabPosition == TabPosition.Right && !RightToLeft) || (EffectiveTabPosition == TabPosition.Left && RightToLeft))
                 .AddClass(InternalClassName)
                 .AddClass(Class)
                 .Build();
@@ -1097,7 +1165,7 @@ namespace Vek
                 .AddClass($"vek-tabs-rounded", !ApplyEffectsToContainer && Rounded)
                 .AddClass($"vek-tabs-vertical", _isVerticalTabs)
                 .AddClass($"vek-tabs-tabbar-{Color.ToStringFast(true)}", Color != Color.Default)
-                .AddClass($"vek-tabs-border-{ConvertPosition(Position).ToStringFast(true)}", Border)
+                .AddClass($"vek-tabs-border-{ConvertTabPosition(EffectiveTabPosition)}", Border)
                 .AddClass($"vek-paper-outlined", !ApplyEffectsToContainer && Outlined)
                 .AddClass($"vek-elevation-{Elevation}", !ApplyEffectsToContainer && Elevation != 0)
                 .AddClass("vek-tabs-close-on-hover", _closeButtonDisplayModeState.Value == CloseButtonDisplayMode.OnHover)
@@ -1137,10 +1205,10 @@ namespace Vek
         protected string SliderClass =>
             new CssBuilder("vek-tab-slider")
                 .AddClass($"vek-{SliderColor.ToStringFast(true)}", SliderColor != Color.Inherit)
-                .AddClass($"vek-tab-slider-horizontal", Position is Position.Top or Position.Bottom)
+                .AddClass($"vek-tab-slider-horizontal", !_isVerticalTabs)
                 .AddClass($"vek-tab-slider-vertical", _isVerticalTabs)
-                .AddClass($"vek-tab-slider-horizontal-reverse", Position == Position.Bottom)
-                .AddClass($"vek-tab-slider-vertical-reverse", Position == Position.Right || (Position == Position.Start && RightToLeft) || (Position == Position.End && !RightToLeft))
+                .AddClass($"vek-tab-slider-horizontal-reverse", EffectiveTabPosition == TabPosition.Bottom)
+                .AddClass($"vek-tab-slider-vertical-reverse", EffectiveTabPosition == TabPosition.Right)
                 .Build();
 
         protected string DropZoneClassnames =>
@@ -1166,14 +1234,25 @@ namespace Vek
                 var verticalTransition = SliderAnimation ? "top .3s cubic-bezier(.64,.09,.08,1);" : "none";
 
                 return new StyleBuilder()
-                    .AddStyle("width", _sliderSizePercentage.ToPercent(), Position is Position.Top or Position.Bottom)
-                    .AddStyle(horizontalEdge, _sliderPositionPercentage.ToPercent(), Position is Position.Top or Position.Bottom)
-                    .AddStyle("transition", horizontalTransition, Position is Position.Top or Position.Bottom)
+                    .AddStyle("width", _sliderSizePercentage.ToPercent(), !_isVerticalTabs)
+                    .AddStyle(horizontalEdge, _sliderPositionPercentage.ToPercent(), !_isVerticalTabs)
+                    .AddStyle("transition", horizontalTransition, !_isVerticalTabs)
                     .AddStyle("transition", verticalTransition, _isVerticalTabs)
                     .AddStyle("height", _sliderSizePercentage.ToPercent(), _isVerticalTabs)
                     .AddStyle("top", _sliderPositionPercentage.ToPercent(), _isVerticalTabs)
                     .Build();
             }
+        }
+
+        private static string ConvertTabPosition(TabPosition position)
+        {
+            return position switch
+            {
+                TabPosition.Bottom => "bottom",
+                TabPosition.Left => "left",
+                TabPosition.Right => "right",
+                _ => "top"
+            };
         }
 
         private Position ConvertPosition(Position position)
@@ -1207,11 +1286,11 @@ namespace Vek
 
         private Placement GetTooltipPlacement()
         {
-            return Position switch
+            return EffectiveTabPosition switch
             {
-                Position.Right => Placement.Left,
-                Position.Left => Placement.Right,
-                Position.Bottom => Placement.Top,
+                TabPosition.Right => Placement.Left,
+                TabPosition.Left => Placement.Right,
+                TabPosition.Bottom => Placement.Top,
                 _ => Placement.Bottom
             };
         }
@@ -1625,14 +1704,14 @@ namespace Vek
                 case "ArrowLeft":
                     if (!_isVerticalTabs)
                     {
-                        await MoveFocusToPreviousTab(panel);
+                        await (RightToLeft ? MoveFocusToNextTab(panel) : MoveFocusToPreviousTab(panel));
                     }
                     break;
 
                 case "ArrowRight":
                     if (!_isVerticalTabs)
                     {
-                        await MoveFocusToNextTab(panel);
+                        await (RightToLeft ? MoveFocusToPreviousTab(panel) : MoveFocusToNextTab(panel));
                     }
                     break;
 
@@ -1649,6 +1728,14 @@ namespace Vek
                         await MoveFocusToNextTab(panel);
                     }
                     break;
+
+                case "Home":
+                    await MoveFocusToFirstTab();
+                    break;
+
+                case "End":
+                    await MoveFocusToLastTab();
+                    break;
             }
         }
 
@@ -1659,6 +1746,26 @@ namespace Vek
             {
                 await HandleTabKeyDownAsync(e, focusedPanel);
             }
+        }
+
+        /// <summary>
+        /// Moves focus to the first enabled tab.
+        /// </summary>
+        private async Task MoveFocusToFirstTab()
+        {
+            var enabledPanels = _panels.Where(p => !IsPanelDisabled(p)).ToList();
+            if (enabledPanels.Count == 0) return;
+            await FocusPanel(enabledPanels[0]);
+        }
+
+        /// <summary>
+        /// Moves focus to the last enabled tab.
+        /// </summary>
+        private async Task MoveFocusToLastTab()
+        {
+            var enabledPanels = _panels.Where(p => !IsPanelDisabled(p)).ToList();
+            if (enabledPanels.Count == 0) return;
+            await FocusPanel(enabledPanels[^1]);
         }
 
         /// <summary>
