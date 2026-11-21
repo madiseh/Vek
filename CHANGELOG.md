@@ -31,8 +31,33 @@ For GitHub Releases and downloadable packages, see the [Releases page](https://g
 - Improved technical SEO metadata and documentation sitemap coverage. ([PR #85](https://github.com/madiseh/Vek/pull/85), [PR #86](https://github.com/madiseh/Vek/pull/86))
 - Added release contributors section automation in release skill guidelines. ([PR #87](https://github.com/madiseh/Vek/pull/87))
 
+### 🖼️ Feature Screenshots
+![Vek v1.3.2 component feature screenshots](https://github.com/madiseh/Vek/releases/download/v1.3.2/release-slideshow.gif)
+
+1. ButtonGroup selection modes — [PR #68](https://github.com/madiseh/Vek/pull/68)
+2. Dialog dragging and resizing — [PR #69](https://github.com/madiseh/Vek/pull/69)
+3. TextField custom action buttons — [PR #70](https://github.com/madiseh/Vek/pull/70)
+4. Slider dual-thumb range selection — [PR #71](https://github.com/madiseh/Vek/pull/71)
+5. Tabs lazy rendering mode — [PR #72](https://github.com/madiseh/Vek/pull/72)
+6. Button badge adornments — [PR #73](https://github.com/madiseh/Vek/pull/73)
+7. DataGrid filter builder dialog — [PR #77](https://github.com/madiseh/Vek/pull/77)
+8. MaskedInput pattern rules & literals — [PR #78](https://github.com/madiseh/Vek/pull/78)
+9. Tabs vertical orientation & positioning — [PR #79](https://github.com/madiseh/Vek/pull/79)
+10. DatePicker inline calendar mode — [PR #80](https://github.com/madiseh/Vek/pull/80)
+11. TimePicker interactive radial clock face — [PR #81](https://github.com/madiseh/Vek/pull/81)
+12. DataGrid context menu actions — [PR #83](https://github.com/madiseh/Vek/pull/83)
+13. TreeView on-demand async child loading — [PR #88](https://github.com/madiseh/Vek/pull/88)
+
 ### 👥 Contributors
 - @madiseh ([#68](https://github.com/madiseh/Vek/pull/68), [#69](https://github.com/madiseh/Vek/pull/69), [#70](https://github.com/madiseh/Vek/pull/70), [#71](https://github.com/madiseh/Vek/pull/71), [#72](https://github.com/madiseh/Vek/pull/72), [#73](https://github.com/madiseh/Vek/pull/73), [#75](https://github.com/madiseh/Vek/pull/75), [#76](https://github.com/madiseh/Vek/pull/76), [#77](https://github.com/madiseh/Vek/pull/77), [#78](https://github.com/madiseh/Vek/pull/78), [#79](https://github.com/madiseh/Vek/pull/79), [#80](https://github.com/madiseh/Vek/pull/80), [#81](https://github.com/madiseh/Vek/pull/81), [#82](https://github.com/madiseh/Vek/pull/82), [#83](https://github.com/madiseh/Vek/pull/83), [#84](https://github.com/madiseh/Vek/pull/84), [#85](https://github.com/madiseh/Vek/pull/85), [#86](https://github.com/madiseh/Vek/pull/86), [#87](https://github.com/madiseh/Vek/pull/87), [#88](https://github.com/madiseh/Vek/pull/88), [#89](https://github.com/madiseh/Vek/pull/89))
+
+### ✅ Test Results
+- Unit tests: 6,718 passed, 2 skipped, 0 failed (6,720 total).
+- Documentation tests: 1,528 passed, 0 skipped, 0 failed.
+- Analyzer tests: 391 passed, 0 skipped, 0 failed.
+- Format check: passed.
+- Build-only projects: 2 passed.
+- [Download the JUnit test reports](https://github.com/madiseh/Vek/releases/download/v1.3.2/test-results-v1.3.2.zip) from [candidate CI run 44906144181](https://github.com/madiseh/Vek/actions/runs/44906144181), for commit `fe041384d3f83f84e2bcd5ec081decb519becef4`.
 
 ## [v1.3.1] - 2026-11-20
 

@@ -27,6 +27,16 @@ public enum OpenTo
     Month,
 
     /// <summary>
+    /// The decade picker is displayed.
+    /// </summary>
+    Decade,
+
+    /// <summary>
+    /// The century picker is displayed.
+    /// </summary>
+    Century,
+
+    /// <summary>
     /// The hours picker is displayed.
     /// </summary>
     Hours,

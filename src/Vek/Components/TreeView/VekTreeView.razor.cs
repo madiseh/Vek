@@ -73,6 +73,10 @@ namespace Vek
                 .WithParameter(() => HasChildren);
             _nodeProviderState = registerScope.RegisterParameter<ITreeNodeProvider<T>?>(nameof(NodeProvider))
                 .WithParameter(() => NodeProvider);
+            _filterTextState = registerScope.RegisterParameter<string>(nameof(FilterText))
+                .WithParameter(() => FilterText)
+                .WithEventCallback(() => FilterTextChanged)
+                .WithChangeHandler(OnFilterTextChangedAsync);
             _selection = new();
         }
 
@@ -83,6 +87,7 @@ namespace Vek
         private readonly ParameterState<Func<TreeItemData<T>, Task<IEnumerable<TreeItemData<T>>>>?> _loadChildrenAsyncState;
         private readonly ParameterState<Func<TreeItemData<T>, bool>?> _hasChildrenState;
         private readonly ParameterState<ITreeNodeProvider<T>?> _nodeProviderState;
+        private readonly ParameterState<string> _filterTextState;
 
         internal bool GetAllowDragDrop() => _allowDragDropState.Value;
         internal bool GetAllowReparenting() => _allowReparentingState.Value;
@@ -96,6 +101,7 @@ namespace Vek
         // When the parent replaces Items with new node objects, the old entries can disappear with them.
         private readonly ConditionalWeakTable<ITreeItemData<T>, ServerDataState> _serverDataStates = new();
         private bool _isFirstRender = true;
+        internal bool HasSearchText => !string.IsNullOrWhiteSpace(_filterTextState.Value);
         internal bool MultiSelection => SelectionMode == SelectionMode.MultiSelection;
         private bool ToggleSelection => SelectionMode == SelectionMode.ToggleSelection;
 
@@ -328,6 +334,12 @@ namespace Vek
         }
 
         /// <summary>
+        /// Occurs when <see cref="FilterText"/> changes.
+        /// </summary>
+        [Parameter]
+        public EventCallback<string> FilterTextChanged { get; set; }
+
+        /// <summary>
         /// Determines whether items are displayed.
         /// </summary>
         /// <remarks>
@@ -336,6 +348,22 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.TreeView.Behavior)]
         public Func<ITreeItemData<T>, Task<bool>>? FilterFunc { get; set; }
+
+        /// <summary>
+        /// Filters node text in real time, keeping matching nodes and their ancestors visible.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to an empty string, which shows every node.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.TreeView.Behavior)]
+        public string FilterText { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Occurs when <see cref="FilterText"/> changes.
+        /// </summary>
+        [Parameter]
+        public EventCallback<string> FilterTextChanged { get; set; }
 
         /// <summary>
         /// Shows a ripple effect when an item is clicked.
@@ -501,6 +529,12 @@ namespace Vek
             await base.OnAfterRenderAsync(firstRender);
         }
 
+        private async Task OnFilterTextChangedAsync(ParameterChangedEventArgs<string> args)
+        {
+            await FilterAsync();
+            await UpdateItemsAsync(forceRender: true);
+        }
+
         /// <summary>
         /// Filters all items based on the <see cref="FilterFunc"/> function.
         /// </summary>
@@ -512,7 +546,7 @@ namespace Vek
                 return;
             }
 
-            if (FilterFunc is null)
+            if (FilterFunc is null && string.IsNullOrWhiteSpace(_filterTextState.Value))
             {
                 ResetFilter(Items);
                 return;
@@ -532,17 +566,26 @@ namespace Vek
             {
                 if (item.HasChildren)
                 {
-                    /* Recursively traverse the tree. Since HasChildren performs the null check on the children we can use the null-forgiving operator here.
-                     * Same goes for the FilterFunc which is checked for null in the public Filter function that invokes this function.
-                     */
                     await TraverseFilterAsync(item.Children);
-                    item.Expanded = item.Visible = await FilterFunc!(item) || item.Children.Any(c => c.Visible);
+                    var matches = await MatchesFilterAsync(item);
+                    item.Visible = matches || item.Children.Any(c => c.Visible);
+                    if (!string.IsNullOrWhiteSpace(_filterTextState.Value) && item.Children.Any(c => c.Visible))
+                    {
+                        item.Expanded = true;
+                    }
                 }
                 else
                 {
-                    item.Expanded = item.Visible = await FilterFunc!(item);
+                    item.Visible = await MatchesFilterAsync(item);
                 }
             }
+        }
+
+        private async Task<bool> MatchesFilterAsync(ITreeItemData<T> item)
+        {
+            var predicateMatches = FilterFunc is null || await FilterFunc(item);
+            return predicateMatches && (string.IsNullOrWhiteSpace(_filterTextState.Value)
+                || (item.Text?.Contains(_filterTextState.Value, StringComparison.OrdinalIgnoreCase) ?? false));
         }
 
         /// <summary>

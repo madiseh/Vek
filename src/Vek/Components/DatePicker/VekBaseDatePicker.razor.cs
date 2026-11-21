@@ -463,6 +463,8 @@ namespace Vek
         {
             OpenTo? nextView = CurrentView switch
             {
+                OpenTo.Century => null,
+                OpenTo.Decade => OpenTo.Year,
                 OpenTo.Year => GetNextViewFromYear(),
                 OpenTo.Month => !FixDay.HasValue ? OpenTo.Date : null,
                 _ => null,
@@ -476,6 +478,8 @@ namespace Vek
             {
                 OpenTo.Date => GetPreviousViewFromDate(),
                 OpenTo.Month => !FixYear.HasValue ? OpenTo.Year : null,
+                OpenTo.Year => OpenTo.Decade,
+                OpenTo.Decade => OpenTo.Century,
                 _ => null,
             };
             return previousView;
@@ -728,11 +732,23 @@ namespace Vek
             PickerMonth = GetMonthStart(0).AddYears(1);
         }
 
+        private void SelectRangeYear(int year)
+        {
+            var calendar = GetCulture().Calendar;
+            PickerMonth = new DateTime(year, 1, 1, calendar);
+            CurrentView = CurrentView == OpenTo.Century ? OpenTo.Decade : OpenTo.Year;
+        }
+
+        private void GoToDecadeView()
+        {
+            CurrentView = OpenTo.Decade;
+        }
+
         private void OnYearClick()
         {
             if (!FixYear.HasValue)
             {
-                CurrentView = OpenTo.Year;
+                CurrentView = OpenTo.Century;
                 StateHasChanged();
                 _scrollToYearAfterRender = true;
             }
