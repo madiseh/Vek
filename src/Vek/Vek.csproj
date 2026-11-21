@@ -16,7 +16,7 @@
     <Copyright>Copyright 2026 Amin Sabaghi (Vek)</Copyright>
     <PackageTags>Blazor, Vek, Material, Material Design, Components, Blazor Components, Blazor Library, .NET 8, .NET 10, .NET 11, net8.0, net10.0, net11.0</PackageTags>
     <Description>Enterprise-ready Blazor Component Suite based on Material Design principles with an emphasis on ease of use and extensibility. Built for .NET 8.0, .NET 10.0, and .NET 11.0.</Description>
-    <PackageProjectUrl>https://github.com/madiseh/vek</PackageProjectUrl>
+    <PackageProjectUrl>https://vekui.dev</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/madiseh/vek</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
