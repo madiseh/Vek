@@ -1,15 +1,12 @@
 ﻿@*html head (for server prerendering)*@
 <PageTitle>@(GetTitle())</PageTitle>
 <HeadContent>
-    <meta Name="keywords" Content="@GetKeywords()" />
     <meta Property="og:title" Content="@GetTitle()" />
+    <meta Property="og:url" Content="@GetCanonicalUri()" />
     <meta Name="twitter:title" Content="@GetTitle()" />
-    @if (!string.IsNullOrEmpty(ComputedSubTitle))
-    {
-        <meta Name="description" Content="@ComputedSubTitle" />
-        <meta Property="og:description" Content="@ComputedSubTitle" />
-        <meta Name="twitter:description" Content="@ComputedSubTitle" />
-    }
+    <meta Name="description" Content="@GetMetaDescription()" />
+    <meta Property="og:description" Content="@GetMetaDescription()" />
+    <meta Name="twitter:description" Content="@GetMetaDescription()" />
     <link rel="canonical" href="@GetCanonicalUri()" />
 </HeadContent>
 
