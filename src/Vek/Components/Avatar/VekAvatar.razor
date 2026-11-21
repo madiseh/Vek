@@ -1,9 +1,0 @@
-﻿@namespace Vek
-@inherits VekComponentBase
-
-@if(AvatarGroup == null || !AvatarGroup.MaxGroupReached(this))
-{
-    <div role="@(HasAccessibleName() ? "img" : null)" @attributes="UserAttributes" class="@Classname" style="@Stylesname">
-        @ChildContent
-    </div>
-}
