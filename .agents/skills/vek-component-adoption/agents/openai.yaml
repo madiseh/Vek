@@ -1,0 +1,7 @@
+interface:
+  display_name: "Vek Component Adoption"
+  short_description: "Migrate consumer UI to Vek components"
+  default_prompt: "Use $vek-component-adoption to audit and migrate this Blazor consumer project to Vek components."
+
+policy:
+  allow_implicit_invocation: true
