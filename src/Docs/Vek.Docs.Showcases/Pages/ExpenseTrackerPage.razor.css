@@ -78,6 +78,12 @@
         padding: 1rem;
     }
 
+    .expense-dashboard ::deep button,
+    .expense-dashboard ::deep input,
+    .expense-dashboard ::deep select {
+        min-height: 44px;
+    }
+
     .expense-dashboard ::deep .dashboard-heading,
     .expense-dashboard ::deep .dashboard-actions {
         flex-direction: column;

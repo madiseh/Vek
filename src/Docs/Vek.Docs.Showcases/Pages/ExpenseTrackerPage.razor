@@ -5,9 +5,9 @@
 <VekStack Spacing="5" Class="expense-dashboard" vek-showcase-expense-tracker="">
     <VekStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="dashboard-heading">
         <VekStack Spacing="1" Class="dashboard-title-group">
-            <VekText Typo="Typo.overline" Color="Color.Primary">PERSONAL FINANCE</VekText>
+                    <VekText Typo="Typo.overline">PERSONAL FINANCE</VekText>
             <VekText Typo="Typo.h3">Expense Tracker</VekText>
-            <VekText Typo="Typo.body1" Color="Color.Secondary">A practical view of your spending, trends, and recent activity.</VekText>
+                    <VekText Typo="Typo.body1">A practical view of your spending, trends, and recent activity.</VekText>
             <VekChip T="string" Color="Color.Success" Size="Size.Small" Variant="Variant.Filled">Demo data · saved in this browser</VekChip>
         </VekStack>
 
@@ -18,7 +18,7 @@
                 <VekSelectItem T="int" Value="180">Last 6 months</VekSelectItem>
             </VekSelect>
             <VekStack Spacing="0" Class="account-balance">
-                <VekText Typo="Typo.caption" Color="Color.Secondary">Estimated balance</VekText>
+                        <VekText Typo="Typo.caption">Estimated balance</VekText>
                 <VekText Typo="Typo.h6">@FormatMoney(Balance)</VekText>
             </VekStack>
             <VekButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenNewExpenseForm" aria-expanded="@_showExpenseForm" aria-controls="expense-entry-form">
@@ -39,7 +39,7 @@
                 <VekStack Spacing="4">
                     <VekStack Spacing="1">
                         <VekText Typo="Typo.h5">@(_editingExpenseId is null ? "Add an expense" : "Edit expense")</VekText>
-                        <VekText Typo="Typo.body2" Color="Color.Secondary">Track the details so your summaries stay useful.</VekText>
+                        <VekText Typo="Typo.body2">Track the details so your summaries stay useful.</VekText>
                     </VekStack>
                     <VekGrid Spacing="3">
                         <VekItem xs="12" sm="6">
@@ -77,22 +77,22 @@
     <VekGrid Spacing="3" Class="summary-grid">
         <VekItem xs="12" sm="6" md="3">
             <VekCard Outlined="true" Class="summary-card">
-                <VekCardContent><VekStack Spacing="1"><VekText Typo="Typo.body2" Color="Color.Secondary">Estimated income</VekText><VekText Typo="Typo.h5">@FormatMoney(Income)</VekText><VekText Typo="Typo.caption" Color="Color.Secondary">Based on @FormatMoney(MonthlyIncomeEstimate) per month</VekText></VekStack></VekCardContent>
+                <VekCardContent><VekStack Spacing="1"><VekText Typo="Typo.body2">Estimated income</VekText><VekText Typo="Typo.h5">@FormatMoney(Income)</VekText><VekText Typo="Typo.caption">Based on @FormatMoney(MonthlyIncomeEstimate) per month</VekText></VekStack></VekCardContent>
             </VekCard>
         </VekItem>
         <VekItem xs="12" sm="6" md="3">
             <VekCard Outlined="true" Class="summary-card summary-card-primary">
-                <VekCardContent><VekStack Spacing="1"><VekText Typo="Typo.body2" Color="Color.Secondary">Expenses</VekText><VekText Typo="Typo.h5">@FormatMoney(Expenses)</VekText><VekText Typo="Typo.caption" Color="Color.Secondary">Across the selected period</VekText></VekStack></VekCardContent>
+                <VekCardContent><VekStack Spacing="1"><VekText Typo="Typo.body2">Expenses</VekText><VekText Typo="Typo.h5">@FormatMoney(Expenses)</VekText><VekText Typo="Typo.caption">Across the selected period</VekText></VekStack></VekCardContent>
             </VekCard>
         </VekItem>
         <VekItem xs="12" sm="6" md="3">
             <VekCard Outlined="true" Class="summary-card">
-                <VekCardContent><VekStack Spacing="1"><VekText Typo="Typo.body2" Color="Color.Secondary">Balance</VekText><VekText Typo="Typo.h5">@FormatMoney(Balance)</VekText><VekText Typo="Typo.caption" Color="Color.Secondary">Estimated income after expenses</VekText></VekStack></VekCardContent>
+                <VekCardContent><VekStack Spacing="1"><VekText Typo="Typo.body2">Balance</VekText><VekText Typo="Typo.h5">@FormatMoney(Balance)</VekText><VekText Typo="Typo.caption">Estimated income after expenses</VekText></VekStack></VekCardContent>
             </VekCard>
         </VekItem>
         <VekItem xs="12" sm="6" md="3">
             <VekCard Outlined="true" Class="summary-card">
-                <VekCardContent><VekStack Spacing="1"><VekText Typo="Typo.body2" Color="Color.Secondary">Transactions</VekText><VekText Typo="Typo.h5">@PeriodExpenses.Count.ToString("N0", CultureInfo.InvariantCulture)</VekText><VekText Typo="Typo.caption" Color="Color.Secondary">In the selected period</VekText></VekStack></VekCardContent>
+                <VekCardContent><VekStack Spacing="1"><VekText Typo="Typo.body2">Transactions</VekText><VekText Typo="Typo.h5">@PeriodExpenses.Count.ToString("N0", CultureInfo.InvariantCulture)</VekText><VekText Typo="Typo.caption">In the selected period</VekText></VekStack></VekCardContent>
             </VekCard>
         </VekItem>
     </VekGrid>
@@ -103,12 +103,12 @@
                 <VekCardContent>
                     <VekStack Spacing="4">
                         <VekStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
-                            <VekStack Spacing="1"><VekText Typo="Typo.h5">Spending over time</VekText><VekText Typo="Typo.body2" Color="Color.Secondary">Monthly totals from your recorded expenses</VekText></VekStack>
+                            <VekStack Spacing="1"><VekText Typo="Typo.h5">Spending over time</VekText><VekText Typo="Typo.body2">Monthly totals from your recorded expenses</VekText></VekStack>
                             <VekChip T="string" Size="Size.Small" Variant="Variant.Outlined">@RangeLabel</VekChip>
                         </VekStack>
                         @if (ChartMonths.Count == 0)
                         {
-                            <VekText Typo="Typo.body2" Color="Color.Secondary">Add expenses to see your spending trend.</VekText>
+                            <VekText Typo="Typo.body2">Add expenses to see your spending trend.</VekText>
                         }
                         else
                         {
@@ -119,7 +119,7 @@
                                         <VekStack Spacing="2" AlignItems="AlignItems.Center" Class="chart-column">
                                             <VekText Typo="Typo.caption">@FormatMoney(month.Amount)</VekText>
                                             <VekProgressLinear Value="@month.Percentage" Color="@(month.IsCurrent ? Color.Primary : Color.Info)" Rounded="true" Class="chart-bar" />
-                                            <VekText Typo="Typo.caption" Color="Color.Secondary">@month.Label</VekText>
+                                            <VekText Typo="Typo.caption">@month.Label</VekText>
                                         </VekStack>
                                     </VekItem>
                                 }
@@ -133,16 +133,16 @@
             <VekCard Outlined="true" Class="dashboard-panel category-panel">
                 <VekCardContent>
                     <VekStack Spacing="4">
-                        <VekStack Spacing="1"><VekText Typo="Typo.h5">Spending categories</VekText><VekText Typo="Typo.body2" Color="Color.Secondary">Select a category to filter transactions</VekText></VekStack>
+                        <VekStack Spacing="1"><VekText Typo="Typo.h5">Spending categories</VekText><VekText Typo="Typo.body2">Select a category to filter transactions</VekText></VekStack>
                         @if (CategorySummaries.Count == 0)
                         {
-                            <VekText Typo="Typo.body2" Color="Color.Secondary">No category spending in this period yet.</VekText>
+                            <VekText Typo="Typo.body2">No category spending in this period yet.</VekText>
                         }
                         else
                         {
                             @foreach (var category in CategorySummaries)
                             {
-                                <VekButton Variant="Variant.Text" FullWidth="true" Class="category-item" aria-pressed="@IsCategorySelected(category.Name)" OnClick="@(() => ToggleCategoryFilter(category.Name))">
+                                <VekButton Variant="Variant.Text" FullWidth="true" Class="category-item" aria-label="@GetCategorySummaryAriaLabel(category)" aria-pressed="@(IsCategorySelected(category.Name) ? "true" : "false")" OnClick="@(() => ToggleCategoryFilter(category.Name))">
                                     <VekStack Spacing="2" Class="category-content">
                                         <VekStack Row="true" Justify="Justify.SpaceBetween" Class="category-heading">
                                             <VekText Typo="Typo.body1">@category.Name · @category.Share% of spending</VekText>
@@ -163,7 +163,7 @@
         <VekCardContent>
             <VekStack Spacing="4">
                 <VekStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="transactions-heading">
-                    <VekStack Spacing="1"><VekText Typo="Typo.h5">Recent transactions</VekText><VekText Typo="Typo.body2" Color="Color.Secondary">Search, filter, sort, edit, or remove recorded expenses.</VekText></VekStack>
+                    <VekStack Spacing="1"><VekText Typo="Typo.h5">Recent transactions</VekText><VekText Typo="Typo.body2">Search, filter, sort, edit, or remove recorded expenses.</VekText></VekStack>
                     <VekChip T="string" Size="Size.Small" Variant="Variant.Outlined">@FilteredExpenses.Count transactions</VekChip>
                 </VekStack>
                 <VekGrid Spacing="3" Class="transaction-controls">

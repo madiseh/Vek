@@ -192,6 +192,9 @@ public partial class ExpenseTrackerPage : ComponentBase
 
     private static string FormatMoney(decimal amount) => amount.ToString("C2", CultureInfo.GetCultureInfo("en-US"));
 
+    private static string GetCategorySummaryAriaLabel(CategorySummary category)
+        => $"{category.Name}, {FormatMoney(category.Amount)}, {category.Share}% of spending";
+
     private static Color GetCategoryColor(string category) => category switch
     {
         "Home" => Color.Primary,
