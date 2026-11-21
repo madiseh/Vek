@@ -14,7 +14,7 @@ Vek maintains centralized architecture and governance documentation under `docs/
 | --- | --- | --- | --- |
 | Component C#/Razor behavior | `src/Vek`, `tests/Components/Vek.UnitTests` | Filtered `dotnet test` on `Vek.UnitTests.csproj` | Use `-p:SkipBunCompile=true` unless assets are affected. |
 | Component public API | Component, tests, docs | Unit tests plus relevant docs validation | XML docs and `[Category(...)]` are required. |
-| Docs page/example | `src/Docs/Vek.Docs*` | Relevant docs build or generated docs tests | Do not edit generated docs tests. |
+| Docs page/example | `src/Docs/Vek.Docs`, `src/Docs/Vek.Docs.Landing`, `src/Docs/Vek.Docs.Showcases` | Relevant docs host build or generated docs tests | Do not edit generated docs tests. |
 | TS/style/assets | `TScripts`, styles, `wwwroot`, asset inputs | Normal scoped build | Do not use `-p:SkipBunCompile=true`. |
 | Analyzer/code fix | `src/Analyzers/Vek.Analyzers*` | Filtered analyzer tests | Keep diagnostics, fixes, and tests aligned. |
 | Metadata/prose only | Root markdown, `.github` text | No `dotnet` verification | Do not run build/test/format for prose-only changes. |
@@ -45,7 +45,7 @@ Vek maintains centralized architecture and governance documentation under `docs/
 
 - `src/` contains product and supporting projects. `tests/` contains test projects grouped by component, analyzer, docs, and shared infrastructure.
 - `src/Vek/` is the core component library. Most component, utility, styling, `TScripts`, and `wwwroot` changes land here.
-- `src/Docs/` contains the documentation site and docs build projects; `src/Examples/` contains data shared by documentation examples and the test viewer.
+- `src/Docs/` contains the shared documentation content, homepage composition, interactive showcases, and site hosts; `src/Examples/` contains data shared by documentation examples and the test viewer.
 - `src/Analyzers/` contains analyzer and code-fix product projects. Analyzer tests and test components live in `tests/Analyzers/`.
 - `src/Benchmarks/` contains performance benchmarks.
 - `tests/Components/`, `tests/Analyzers/`, `tests/Docs/`, and `tests/Shared/` separate test projects by responsibility.
@@ -62,7 +62,7 @@ Vek maintains centralized architecture and governance documentation under `docs/
 
 ### Project targets
 - Components: `src/Vek/Vek.csproj` and `tests/Components/Vek.UnitTests/Vek.UnitTests.csproj`
-- Docs: projects under `src/Docs/`, including `Vek.Docs`, `Vek.Docs.Compiler`, `Vek.Docs.Server`, `Vek.Docs.Wasm`, and `Vek.Docs.WasmHost`
+- Docs: projects under `src/Docs/`, including `Vek.Docs`, `Vek.Docs.Landing`, `Vek.Docs.Showcases`, `Vek.Docs.Compiler`, `Vek.Docs.Server`, `Vek.Docs.Wasm`, and `Vek.Docs.WasmHost`
 - Docs tests: `tests/Docs/Vek.UnitTests.Docs/Vek.UnitTests.Docs.csproj`
 - Analyzers and code fixes: `src/Analyzers/Vek.Analyzers/Vek.Analyzers.csproj`, `src/Analyzers/Vek.Analyzers.CodeFixes/Vek.Analyzers.CodeFixes.csproj`, and `tests/Analyzers/Vek.UnitTests.Analyzers/Vek.UnitTests.Analyzers.csproj`
 
@@ -225,6 +225,9 @@ private Task ToggleAsync()
 ## Docs Pages and Examples
 
 - Keep docs in sync with component behavior, public APIs, and parameter changes.
+- Keep component documentation and focused component examples in `src/Docs/Vek.Docs/Pages/Components/`.
+- Put complete, interactive use cases such as the Expense Tracker in `src/Docs/Vek.Docs.Showcases/`; put the homepage that combines docs and showcases in `src/Docs/Vek.Docs.Landing/`.
+- Preserve the dependency direction: Landing may reference Docs and Showcases, but Docs must not reference Landing or Showcases. Both the Server and WASM routers discover routes from these projects through `AdditionalAssemblies`.
 - Use `src/Docs/Vek.Docs/Pages/Components/Button/ButtonPage.razor` or `src/Docs/Vek.Docs/Pages/Components/Menu/MenuPage.razor` as a reference for component docs structure.
 - Start with basic usage, introduce common variants next, group related scenarios with `SectionSubGroups`, and leave advanced or edge-case behavior for the end.
 - Write each component page as a guided progression rather than a catalog dump. Use clear section titles and short descriptions that explain when and why a feature is useful.

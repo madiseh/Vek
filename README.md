@@ -160,6 +160,8 @@ Add the required providers in your `MainLayout.razor` or `Routes.razor`:
 
 Contributions, feature requests, and issue reports are welcome! Feel free to check out the [Issues](https://github.com/madiseh/Vek/issues) page.
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, project locations, documentation guidance, and pull request checks.
+
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your Changes (`git commit -m 'feat: Add some AmazingFeature'`)

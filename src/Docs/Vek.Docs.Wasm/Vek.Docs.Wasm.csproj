@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Vek.Docs\Vek.Docs.csproj" />
+    <ProjectReference Include="..\Vek.Docs.Landing\Vek.Docs.Landing.csproj" />
   </ItemGroup>
 
 </Project>

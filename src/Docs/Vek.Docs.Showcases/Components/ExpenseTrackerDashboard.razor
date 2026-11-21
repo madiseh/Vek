@@ -1,0 +1,237 @@
+<div class="expense-dashboard">
+    <header class="dashboard-heading">
+        <div class="dashboard-title-group">
+            <div class="dashboard-profile" aria-label="Account owner Jordan Morgan">
+                <span class="profile-avatar" aria-hidden="true">JM</span>
+                <div>
+                    <p class="dashboard-eyebrow">PERSONAL FINANCE</p>
+                    <h1>Expense Tracker</h1>
+                    <p class="dashboard-description">Your money, organized at a glance.</p>
+                </div>
+            </div>
+            <VekChip T="string" Color="Color.Success" Size="Size.Small" Variant="Variant.Filled">Demo data</VekChip>
+        </div>
+        <div class="dashboard-actions">
+            <button class="period-button" type="button" @onclick="TogglePeriod" aria-pressed="@_showPreviousMonth">
+                @RangeLabel
+                <span aria-hidden="true">⌄</span>
+            </button>
+            <div class="account-balance">
+                <span>Wallet balance</span>
+                <strong>@Balance.ToString("C0", CultureInfo.GetCultureInfo("en-US"))</strong>
+            </div>
+            <button class="add-expense-button" type="button" @onclick="ToggleExpenseForm" aria-expanded="@_showExpenseForm" aria-controls="expense-entry-form">
+                <span aria-hidden="true">+</span> Add expense
+            </button>
+        </div>
+    </header>
+
+    @if (_showExpenseForm)
+    {
+        <form id="expense-entry-form" class="expense-entry-form" @onsubmit="AddExpense" @onsubmit:preventDefault>
+            <div class="form-field">
+                <label for="expense-description">Description</label>
+                <input id="expense-description" @bind="_newDescription" maxlength="60" required />
+            </div>
+            <div class="form-field">
+                <label for="expense-amount">Amount</label>
+                <input id="expense-amount" type="number" min="0.01" step="0.01" @bind="_newAmount" required />
+            </div>
+            <div class="form-field">
+                <label for="expense-category">Category</label>
+                <select id="expense-category" @bind="_newCategory">
+                    <option>Food</option>
+                    <option>Transport</option>
+                    <option>Shopping</option>
+                    <option>Home</option>
+                    <option>Other</option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button class="form-cancel" type="button" @onclick="ToggleExpenseForm">Cancel</button>
+                <button class="add-expense-button" type="submit" disabled="@(!CanAddExpense)">Save expense</button>
+            </div>
+        </form>
+    }
+
+    <section class="summary-grid" aria-label="Expense summary">
+        <article class="summary-card">
+            <span class="summary-label">Income</span>
+            <strong class="summary-value">@Income.ToString("C0", CultureInfo.GetCultureInfo("en-US"))</strong>
+            <span class="summary-note">Money received in this period</span>
+        </article>
+        <article class="summary-card summary-card-primary">
+            <span class="summary-label">Expenses</span>
+            <strong class="summary-value">@Expenses.ToString("C0", CultureInfo.GetCultureInfo("en-US"))</strong>
+            <span class="summary-note">Across the selected date range</span>
+        </article>
+        <article class="summary-card">
+            <span class="summary-label">Balance</span>
+            <strong class="summary-value">@Balance.ToString("C0", CultureInfo.GetCultureInfo("en-US"))</strong>
+            <span class="summary-note">Income after expenses</span>
+        </article>
+        <article class="summary-card">
+            <span class="summary-label">Transactions</span>
+            <strong class="summary-value">@TransactionCount.ToString("N0", CultureInfo.InvariantCulture)</strong>
+            <span class="summary-note">Recorded in this period</span>
+        </article>
+    </section>
+
+    <div class="dashboard-content-grid">
+        <section class="dashboard-panel spending-panel" aria-labelledby="spending-title">
+            <div class="panel-heading">
+                <div>
+                        <h2 id="spending-title">Total expenses</h2>
+                        <p>Expense trends across the selected date range</p>
+                </div>
+                    <span class="panel-period">Monthly</span>
+            </div>
+                <div class="spending-chart" role="img" aria-label="@ChartAccessibleName">
+                    @foreach (var month in VisibleSpending)
+                {
+                    <div class="chart-column">
+                        <div class="chart-track">
+                                <div class="chart-bar @(month.IsCurrent ? "chart-bar-today" : string.Empty)" style="height: @month.Percentage%"></div>
+                        </div>
+                            <span class="chart-value">@month.Amount.ToString("C0", CultureInfo.GetCultureInfo("en-US"))</span>
+                            <span class="chart-day">@month.Label</span>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <section class="dashboard-panel category-panel" aria-labelledby="category-title">
+            <div class="panel-heading">
+                <div>
+                    <h2 id="category-title">Top categories</h2>
+                    <p>Where your money goes</p>
+                </div>
+                <a href="#transactions" class="panel-link">Details</a>
+            </div>
+            <div class="category-list">
+                @foreach (var category in _categories)
+                {
+                    <div class="category-item">
+                        <div class="category-heading">
+                            <span>@category.Name</span>
+                            <strong>@category.Amount.ToString("C0", CultureInfo.GetCultureInfo("en-US"))</strong>
+                        </div>
+                        <div class="category-track" role="progressbar" aria-label="@category.Name spending" aria-valuemin="0" aria-valuemax="100" aria-valuenow="@category.Percentage">
+                            <span class="category-fill @category.ColorClass" style="width: @category.Percentage%"></span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <section id="transactions" class="dashboard-panel transactions-panel" aria-labelledby="transactions-title">
+            <div class="panel-heading">
+                <div>
+                    <h2 id="transactions-title">Recent transactions</h2>
+                    <p>Your latest purchases, bills, and payments</p>
+                </div>
+                <span class="transaction-count">@_expenses.Count recent</span>
+            </div>
+            <div class="transaction-table-wrap">
+                <table class="transaction-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Transaction</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Date</th>
+                            <th scope="col" class="amount-column">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var expense in _expenses)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="transaction-title">@expense.Description</span>
+                                    <span class="transaction-merchant">@expense.Merchant</span>
+                                </td>
+                                <td><VekChip T="string" Size="Size.Small" Variant="Variant.Outlined">@expense.Category</VekChip></td>
+                                <td>@expense.Date</td>
+                                <td class="amount-column">−@expense.Amount.ToString("C2", CultureInfo.GetCultureInfo("en-US"))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+
+@code {
+    private readonly List<ExpenseEntry> _expenses =
+    [
+        new("Weekly groceries", "Green Market", "Food", DateTime.Today.ToString("MMM d"), 86.42m),
+        new("Monthly subscription", "Streamline", "Entertainment", DateTime.Today.AddDays(-1).ToString("MMM d"), 14.99m),
+        new("Ride to work", "City Transit", "Transport", DateTime.Today.AddDays(-2).ToString("MMM d"), 12.50m),
+        new("Coffee with Maya", "North Coffee", "Food", DateTime.Today.AddDays(-3).ToString("MMM d"), 18.75m),
+        new("Household supplies", "Home Supply Co.", "Home", DateTime.Today.AddDays(-4).ToString("MMM d"), 42.30m)
+    ];
+
+    private readonly IReadOnlyList<SpendingMonth> _spendingMonths =
+    [
+        new("Jun", 5120m, 63, false),
+        new("Jul", 6210m, 77, false),
+        new("Aug", 5430m, 67, false),
+        new("Sep", 5800m, 72, false),
+        new("Oct", 7400m, 91, false),
+        new("Nov", 8100m, 100, true)
+    ];
+
+    private readonly IReadOnlyList<ExpenseCategory> _categories =
+    [
+        new("Home", 1420m, 78, "category-fill-home"),
+        new("Food", 684m, 56, "category-fill-food"),
+        new("Transport", 426m, 38, "category-fill-transport"),
+        new("Shopping", 318m, 27, "category-fill-shopping")
+    ];
+
+    private bool _showPreviousMonth;
+    private bool _showExpenseForm;
+    private string _newDescription = string.Empty;
+    private string _newCategory = "Food";
+    private decimal _newAmount;
+    private decimal _additionalExpenses;
+
+    private string RangeLabel => _showPreviousMonth ? "Sep 1 – Nov 30" : "Jun 1 – Nov 30";
+    private decimal Income => _showPreviousMonth ? 25800m : 43300m;
+    private decimal Expenses => (_showPreviousMonth ? 21300m : 38060m) + _additionalExpenses;
+    private decimal Balance => Income - Expenses;
+    private int TransactionCount => (_showPreviousMonth ? 682 : 1284) + _expenses.Count - 5;
+    private string ChartAccessibleName => $"Monthly expense totals from {(_showPreviousMonth ? "September" : "June")} through November";
+    private IEnumerable<SpendingMonth> VisibleSpending => _showPreviousMonth ? _spendingMonths.Skip(3) : _spendingMonths;
+    private bool CanAddExpense => !string.IsNullOrWhiteSpace(_newDescription) && _newAmount > 0;
+
+    private void TogglePeriod()
+    {
+        _showPreviousMonth = !_showPreviousMonth;
+    }
+
+    private void ToggleExpenseForm()
+    {
+        _showExpenseForm = !_showExpenseForm;
+    }
+
+    private void AddExpense()
+    {
+        if (!CanAddExpense)
+        {
+            return;
+        }
+
+        _expenses.Insert(0, new ExpenseEntry(_newDescription.Trim(), "Added just now", _newCategory, "Today", _newAmount));
+        _additionalExpenses += _newAmount;
+        _newDescription = string.Empty;
+        _newAmount = 0;
+        _newCategory = "Food";
+        _showExpenseForm = false;
+    }
+
+    private sealed record ExpenseEntry(string Description, string Merchant, string Category, string Date, decimal Amount);
+    private sealed record SpendingMonth(string Label, decimal Amount, int Percentage, bool IsCurrent);
+    private sealed record ExpenseCategory(string Name, decimal Amount, int Percentage, string ColorClass);
+}
