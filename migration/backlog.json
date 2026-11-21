@@ -764,9 +764,10 @@
       "title": "TreeView Live Search Filtering with Auto-Expansion of Matching Ancestors",
       "module": "TreeView",
       "priority": 62,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/062-treeview-search-filter-and-auto-expand.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-21T12:50:17Z"
     },
     {
       "id": "063",

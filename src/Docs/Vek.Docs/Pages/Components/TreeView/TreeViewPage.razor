@@ -180,8 +180,8 @@
             <SectionHeader Title="Filtering">
                 <Description>
                     <p>
-                        The TreeView nodes can be filtered using the <CodeInline>Filter</CodeInline> function, which accepts a custom filter delegate.
-                        This function is applied to every item, setting its <CodeInline>Visible</CodeInline> property based on whether it matches the filter criteria.
+                        Set <CodeInline>FilterText</CodeInline> to filter labels as the user types. Matching text is highlighted, irrelevant nodes are hidden, and ancestors of matches expand automatically. Bind <CodeInline>@@bind-FilterText</CodeInline> to keep the search value synchronized.
+                        For custom filtering rules, the asynchronous <CodeInline>FilterFunc</CodeInline> remains available.
                     </p>
                     <br/>
                     <p>

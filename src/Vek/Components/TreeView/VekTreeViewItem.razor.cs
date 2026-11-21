@@ -473,7 +473,7 @@ namespace Vek
             return Value;
         }
 
-        private string? GetText() => string.IsNullOrEmpty(Text) ? _converter.Convert(Value) : Text;
+        private string? GetText() => CurrentItemData?.Text ?? (string.IsNullOrEmpty(Text) ? _converter.Convert(Value) : Text);
 
         private bool GetDisabled() => Disabled || VekTreeRoot?.Disabled == true;
 

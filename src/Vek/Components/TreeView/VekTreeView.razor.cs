@@ -73,6 +73,10 @@ namespace Vek
                 .WithParameter(() => HasChildren);
             _nodeProviderState = registerScope.RegisterParameter<ITreeNodeProvider<T>?>(nameof(NodeProvider))
                 .WithParameter(() => NodeProvider);
+            _filterTextState = registerScope.RegisterParameter<string>(nameof(FilterText))
+                .WithParameter(() => FilterText)
+                .WithEventCallback(() => FilterTextChanged)
+                .WithChangeHandler(OnFilterTextChangedAsync);
             _selection = new();
         }
 
@@ -83,7 +87,10 @@ namespace Vek
         private readonly ParameterState<Func<TreeItemData<T>, Task<IEnumerable<TreeItemData<T>>>>?> _loadChildrenAsyncState;
         private readonly ParameterState<Func<TreeItemData<T>, bool>?> _hasChildrenState;
         private readonly ParameterState<ITreeNodeProvider<T>?> _nodeProviderState;
+        private readonly ParameterState<string> _filterTextState;
 
+        internal string GetFilterText() => _filterTextState.Value;
+        internal bool HasSearchText => !string.IsNullOrWhiteSpace(_filterTextState.Value);
         internal bool GetAllowDragDrop() => _allowDragDropState.Value;
         internal bool GetAllowReparenting() => _allowReparentingState.Value;
         internal Func<TreeItemData<T>, Task<IEnumerable<TreeItemData<T>>>>? GetLoadChildrenAsync() => _loadChildrenAsyncState.Value;
@@ -328,6 +335,22 @@ namespace Vek
         }
 
         /// <summary>
+        /// The text used to filter item labels as the user types.
+        /// </summary>
+        /// <remarks>
+        /// Matching is case-insensitive. Defaults to an empty string, which displays all items.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.TreeView.Behavior)]
+        public string FilterText { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Occurs when <see cref="FilterText"/> changes.
+        /// </summary>
+        [Parameter]
+        public EventCallback<string> FilterTextChanged { get; set; }
+
+        /// <summary>
         /// Determines whether items are displayed.
         /// </summary>
         /// <remarks>
@@ -496,6 +519,10 @@ namespace Vek
             {
                 _isFirstRender = false;
                 await UpdateItemsAsync();
+                if (HasSearchText)
+                {
+                    await FilterAsync();
+                }
             }
 
             await base.OnAfterRenderAsync(firstRender);
@@ -512,13 +539,15 @@ namespace Vek
                 return;
             }
 
-            if (FilterFunc is null)
+            if (FilterFunc is null && !HasSearchText)
             {
                 ResetFilter(Items);
+                await UpdateItemsAsync(forceRender: true);
                 return;
             }
 
             await TraverseFilterAsync(Items);
+            await UpdateItemsAsync(forceRender: true);
         }
 
         /// <summary>
@@ -536,13 +565,25 @@ namespace Vek
                      * Same goes for the FilterFunc which is checked for null in the public Filter function that invokes this function.
                      */
                     await TraverseFilterAsync(item.Children);
-                    item.Expanded = item.Visible = await FilterFunc!(item) || item.Children.Any(c => c.Visible);
+                    var matches = await MatchesFilterAsync(item);
+                    item.Visible = matches || item.Children.Any(c => c.Visible);
+                    if (HasSearchText && item.Children.Any(c => c.Visible))
+                    {
+                        item.Expanded = true;
+                    }
                 }
                 else
                 {
-                    item.Expanded = item.Visible = await FilterFunc!(item);
+                    item.Visible = await MatchesFilterAsync(item);
                 }
             }
+        }
+
+        private async Task<bool> MatchesFilterAsync(ITreeItemData<T> item)
+        {
+            var predicateMatches = FilterFunc is null || await FilterFunc(item);
+            return predicateMatches && (!HasSearchText
+                || (item.Text?.Contains(_filterTextState.Value, StringComparison.OrdinalIgnoreCase) ?? false));
         }
 
         /// <summary>
@@ -609,6 +650,12 @@ namespace Vek
                 return Task.CompletedTask;
             }
             return SetSelectedValuesAsync(args.Value ?? Array.Empty<T>());
+        }
+
+        private async Task OnFilterTextChangedAsync(ParameterChangedEventArgs<string> args)
+        {
+            await FilterAsync();
+            await UpdateItemsAsync(forceRender: true);
         }
 
         private Task OnComparerChangedAsync(ParameterChangedEventArgs<IEqualityComparer<T?>> args)

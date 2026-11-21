@@ -2,8 +2,8 @@
 
 <VekPaper Width="300px" Elevation="0">
     <VekStack AlignItems="AlignItems.Center">
-        <VekTextField T="string" Label="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" TextChanged="OnTextChanged" Immediate="true" Clearable="true" />
-        <VekTreeView Items="@_treeItemData" @ref="_treeView" FilterFunc="MatchesName">
+        <VekTextField T="string" Label="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" @bind-Value="_searchPhrase" Immediate="true" Clearable="true" />
+        <VekTreeView Items="@_treeItemData" FilterText="@_searchPhrase">
             <ItemTemplate>
                 <VekTreeViewItem @bind-Expanded="@context.Expanded" Items="@context.Children" Value="@context.Value"
                                  Icon="@context.Icon" Text="@context.Text" Visible="@context.Visible" />
@@ -15,9 +15,7 @@
 @code {
     private List<TreeItemData<string>> _treeItemData = [];
 
-    private VekTreeView<string> _treeView;
-
-    private string _searchPhrase;
+    private string _searchPhrase = string.Empty;
 
     public class TreeItemPresenter : TreeItemData<string>
     {
@@ -46,19 +44,4 @@
         _treeItemData.Add(new TreeItemPresenter("History", Icons.Material.Filled.Label));
     }
 
-    private async void OnTextChanged(string searchPhrase) 
-    {
-        _searchPhrase = searchPhrase;
-        await _treeView.FilterAsync();
-    }
-
-    private Task<bool> MatchesName(ITreeItemData<string> item)
-    {
-        if (string.IsNullOrEmpty(item.Text))
-        {
-            return Task.FromResult(false);
-        }
-
-        return Task.FromResult(item.Text.Contains(_searchPhrase, StringComparison.OrdinalIgnoreCase));
-    }
 }
