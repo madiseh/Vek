@@ -3,6 +3,37 @@
 All notable changes to Vek will be documented in this file.
 For GitHub Releases and downloadable packages, see the [Releases page](https://github.com/madiseh/Vek/releases).
 
+## [v1.3.2] - 2026-11-21
+
+> Vek v1.3.2 delivers 13 new component features across DataGrid, TreeView, TimePicker, DatePicker, Tabs, Button, Dialog, Slider, TextField, and MaskedInput, alongside an interactive Expense Tracker showcase and documentation enhancements.
+
+### ✨ Component Features
+- **ButtonGroup**: Added single, multiple, and none selection modes. ([PR #68](https://github.com/madiseh/Vek/pull/68))
+- **Dialog**: Added draggable modal dialogs and resizable dialog interactions. ([PR #69](https://github.com/madiseh/Vek/pull/69))
+- **TextField**: Added custom editor action buttons and embedded adornment controls. ([PR #70](https://github.com/madiseh/Vek/pull/70))
+- **Slider**: Added dual-thumb range selection with interval binding. ([PR #71](https://github.com/madiseh/Vek/pull/71))
+- **Tabs**: Added lazy rendering mode with DOM caching. ([PR #72](https://github.com/madiseh/Vek/pull/72))
+- **Button**: Added badge adornments, status dots, and counter badges. ([PR #73](https://github.com/madiseh/Vek/pull/73))
+- **DataGrid**: Added visual filter builder dialog with nested condition logic. ([PR #77](https://github.com/madiseh/Vek/pull/77))
+- **MaskedInput**: Added pattern rules, prompt characters, and literal preservation. ([PR #78](https://github.com/madiseh/Vek/pull/78))
+- **Tabs**: Added vertical orientation and tab strip positioning. ([PR #79](https://github.com/madiseh/Vek/pull/79))
+- **DatePicker**: Added embedded inline calendar display mode. ([PR #80](https://github.com/madiseh/Vek/pull/80))
+- **TimePicker**: Added interactive radial clock face and selector. ([PR #81](https://github.com/madiseh/Vek/pull/81))
+- **DataGrid**: Added context menu actions and right-click cell hooks. ([PR #83](https://github.com/madiseh/Vek/pull/83))
+- **TreeView**: Added on-demand asynchronous child node loading. ([PR #88](https://github.com/madiseh/Vek/pull/88))
+
+### 🌐 Documentation, Showcases & Developer Tools
+- Added an interactive Expense Tracker showcase application at `/showcases/expense-tracker` and split documentation into Docs, Landing, and Showcase modules. ([PR #89](https://github.com/madiseh/Vek/pull/89))
+- Replaced legacy brand glyph with the modern Vek brand icon. ([PR #75](https://github.com/madiseh/Vek/pull/75))
+- Added universal SEO analysis skill. ([PR #76](https://github.com/madiseh/Vek/pull/76))
+- Added consumer component adoption skill and migration workflows. ([PR #82](https://github.com/madiseh/Vek/pull/82))
+- Updated NuGet package project URL and website links. ([PR #84](https://github.com/madiseh/Vek/pull/84))
+- Improved technical SEO metadata and documentation sitemap coverage. ([PR #85](https://github.com/madiseh/Vek/pull/85), [PR #86](https://github.com/madiseh/Vek/pull/86))
+- Added release contributors section automation in release skill guidelines. ([PR #87](https://github.com/madiseh/Vek/pull/87))
+
+### 👥 Contributors
+- @madiseh ([#68](https://github.com/madiseh/Vek/pull/68), [#69](https://github.com/madiseh/Vek/pull/69), [#70](https://github.com/madiseh/Vek/pull/70), [#71](https://github.com/madiseh/Vek/pull/71), [#72](https://github.com/madiseh/Vek/pull/72), [#73](https://github.com/madiseh/Vek/pull/73), [#75](https://github.com/madiseh/Vek/pull/75), [#76](https://github.com/madiseh/Vek/pull/76), [#77](https://github.com/madiseh/Vek/pull/77), [#78](https://github.com/madiseh/Vek/pull/78), [#79](https://github.com/madiseh/Vek/pull/79), [#80](https://github.com/madiseh/Vek/pull/80), [#81](https://github.com/madiseh/Vek/pull/81), [#82](https://github.com/madiseh/Vek/pull/82), [#83](https://github.com/madiseh/Vek/pull/83), [#84](https://github.com/madiseh/Vek/pull/84), [#85](https://github.com/madiseh/Vek/pull/85), [#86](https://github.com/madiseh/Vek/pull/86), [#87](https://github.com/madiseh/Vek/pull/87), [#88](https://github.com/madiseh/Vek/pull/88), [#89](https://github.com/madiseh/Vek/pull/89))
+
 ## [v1.3.1] - 2026-11-20
 
 > Vek v1.3.1 reorganizes the repository project structure, centralizes NuGet dependency management, refreshes documentation branding and contributor guidelines, and removes obsolete integrations.
