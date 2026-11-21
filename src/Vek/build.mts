@@ -200,8 +200,8 @@ async function buildAll() {
     rejectJavaScript();
     await lint();
     await typecheck();
-    await test();
     await buildJS();
+    await test();
     buildSCSS();
     printTimings();
 }

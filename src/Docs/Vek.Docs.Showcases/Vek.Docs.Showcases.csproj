@@ -15,4 +15,8 @@
     <ProjectReference Include="..\Vek.Docs\Vek.Docs.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Pages\ExpenseTrackerPage.razor.css" CssScope="vek-showcase-expense-tracker" />
+  </ItemGroup>
+
 </Project>

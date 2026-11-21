@@ -208,6 +208,7 @@ Vek integrates targeted TypeScript helpers for interactions that require direct 
 ### Toolchain & Architecture
 - **Bun via bundotnet.cli**: Frontend asset compilation is powered by Bun (pinned in `Directory.Build.props`), managed locally through `bundotnet.cli` in `.config/dotnet-tools.json`.
 - **Fast C# Iteration (`-p:SkipBunCompile=true`)**: Normal C#, Razor, test, and doc builds pass `-p:SkipBunCompile=true` to bypass Bun asset bundling. The asset pipeline runs only when `TScripts`, styles, `package.json`, or asset configs are modified.
+- **Fresh-checkout asset tracking**: Build targets include an intermediate `obj` stamp alongside generated bundles. The stamp ensures checked-in bundle timestamps cannot make stale browser assets appear up to date after a checkout. The Bun build verifies the NumericField interop entry point in its generated bundle.
 - **Source Layout**:
   - `src/Vek/TScripts/`: Contains TypeScript sources (`vekHelpers.ts`, `vekRipple.ts`, observers, popover positioning).
   - `entrypoint.ts`: Central export file bundled into `vek.js`.

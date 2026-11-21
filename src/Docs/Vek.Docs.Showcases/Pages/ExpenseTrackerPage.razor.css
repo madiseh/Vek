@@ -1,0 +1,98 @@
+.expense-dashboard {
+    max-width: 1440px;
+    margin-inline: auto;
+    padding: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+.expense-dashboard ::deep .dashboard-heading {
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.expense-dashboard ::deep .dashboard-title-group {
+    min-width: min(100%, 22rem);
+}
+
+.expense-dashboard ::deep .dashboard-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.expense-dashboard ::deep .period-select {
+    min-width: 12rem;
+}
+
+.expense-dashboard ::deep .account-balance {
+    min-width: 9rem;
+}
+
+.expense-dashboard ::deep .summary-card,
+.expense-dashboard ::deep .dashboard-panel {
+    height: 100%;
+}
+
+.expense-dashboard ::deep .summary-card-primary {
+    border-color: var(--vek-palette-primary-main);
+}
+
+.expense-dashboard ::deep .spending-chart {
+    min-height: 13rem;
+    align-items: end;
+}
+
+.expense-dashboard ::deep .chart-column {
+    width: 100%;
+    min-height: 11rem;
+    justify-content: end;
+}
+
+.expense-dashboard ::deep .chart-bar {
+    width: 100%;
+}
+
+.expense-dashboard ::deep .category-content {
+    width: 100%;
+    text-align: start;
+}
+
+.expense-dashboard ::deep .category-heading {
+    width: 100%;
+    gap: 1rem;
+}
+
+.expense-dashboard ::deep .transactions-heading {
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.expense-dashboard ::deep .transaction-controls {
+    align-items: center;
+}
+
+.expense-dashboard ::deep .transaction-grid {
+    overflow-x: auto;
+}
+
+@media (max-width: 720px) {
+    .expense-dashboard {
+        padding: 1rem;
+    }
+
+    .expense-dashboard ::deep button,
+    .expense-dashboard ::deep input,
+    .expense-dashboard ::deep select {
+        min-height: 44px;
+    }
+
+    .expense-dashboard ::deep .dashboard-heading,
+    .expense-dashboard ::deep .dashboard-actions {
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+    }
+
+    .expense-dashboard ::deep .account-balance,
+    .expense-dashboard ::deep .period-select {
+        min-width: 100%;
+    }
+}

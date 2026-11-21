@@ -122,7 +122,7 @@
     <BuildScriptInputs Include="../tsconfig.json" />
     <WebAssetInputs Include="@(JsAssetInputs);@(TsAssetInputs);@(ScssAssetInputs);@(BuildScriptInputs);@(BunToolchainInputs)" />
     <UpToDateCheckInput Include="@(WebAssetInputs)" />
-    <WebAssetOutputs Include="wwwroot/Vek.min.js;wwwroot/Vek.min.js.map;wwwroot/Vek.min.css" />
+    <WebAssetOutputs Include="wwwroot/Vek.min.js;wwwroot/Vek.min.js.map;wwwroot/Vek.min.css;$(BaseIntermediateOutputPath)VekWebAssets.stamp" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -148,6 +148,9 @@
 
     <Exec Command="$(BunWrapper) run build.mts"
           WorkingDirectory="$(MSBuildProjectDirectory)" />
+
+      <Touch Files="$(BaseIntermediateOutputPath)VekWebAssets.stamp"
+             AlwaysCreate="true" />
   </Target>
 
   <Target Name="BuildWebAssetsInner"
@@ -170,6 +173,9 @@
 
     <Exec Command="$(BunWrapper) run build.mts"
           WorkingDirectory="$(MSBuildProjectDirectory)" />
+
+      <Touch Files="$(BaseIntermediateOutputPath)VekWebAssets.stamp"
+             AlwaysCreate="true" />
   </Target>
 
   <Target Name="RegisterGeneratedAssets"
