@@ -1,0 +1,194 @@
+// Copyright (c) Vek 2021
+// Vek licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+.vek-clock-face {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  user-select: none;
+  touch-action: none;
+
+  &.vek-disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  &.vek-readonly {
+    pointer-events: none;
+  }
+}
+
+.vek-clock-face-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+
+  .vek-clock-face-time-button {
+    font-size: 2rem;
+    font-weight: 500;
+    line-height: 1;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 4px 8px;
+    border-radius: var(--vek-default-borderradius, 4px);
+    color: var(--vek-palette-text-secondary);
+    transition: color 150ms ease, background-color 150ms ease;
+
+    &:hover {
+      background-color: var(--vek-palette-action-hover);
+    }
+
+    &.vek-active {
+      color: var(--vek-palette-text-primary);
+      font-weight: 700;
+    }
+  }
+
+  .vek-clock-face-separator {
+    font-size: 2rem;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--vek-palette-text-secondary);
+  }
+
+  .vek-clock-face-ampm {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-left: 8px;
+
+    .vek-clock-face-ampm-btn {
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      padding: 2px 6px;
+      border-radius: var(--vek-default-borderradius, 4px);
+      color: var(--vek-palette-text-secondary);
+
+      &:hover {
+        background-color: var(--vek-palette-action-hover);
+      }
+
+      &.vek-active {
+        color: var(--vek-palette-primary);
+        font-weight: 700;
+      }
+    }
+  }
+}
+
+.vek-clock-face-dial {
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  cursor: pointer;
+  outline: none;
+  touch-action: none;
+  overflow: visible;
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--vek-palette-primary);
+  }
+
+  .vek-clock-face-dial-bg {
+    fill: var(--vek-palette-background-gray, rgba(0, 0, 0, 0.04));
+    transition: fill 200ms ease;
+  }
+
+  .vek-clock-face-pin {
+    fill: var(--vek-palette-primary);
+  }
+
+  .vek-clock-face-hand {
+    stroke: var(--vek-palette-primary);
+    stroke-width: 2px;
+    stroke-linecap: round;
+  }
+
+  .vek-clock-face-thumb {
+    fill: var(--vek-palette-primary);
+    cursor: pointer;
+  }
+
+  .vek-clock-face-thumb-center {
+    fill: var(--vek-palette-primary-text, #ffffff);
+  }
+
+  &.vek-clock-face-animated {
+    .vek-clock-face-hand,
+    .vek-clock-face-thumb,
+    .vek-clock-face-thumb-center {
+      transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
+
+  .vek-clock-dial-number {
+    cursor: pointer;
+
+    .vek-clock-dial-text {
+      fill: var(--vek-palette-text-primary);
+      font-size: 14px;
+      font-weight: 400;
+      user-select: none;
+      transition: fill 120ms ease;
+      pointer-events: none;
+    }
+
+    &.vek-selected .vek-clock-dial-text {
+      fill: var(--vek-palette-primary-text, #ffffff);
+      font-weight: 600;
+    }
+
+    &.vek-clock-dial-inner {
+      .vek-clock-dial-text {
+        font-size: 11px;
+        fill: var(--vek-palette-text-secondary);
+      }
+
+      &.vek-selected .vek-clock-dial-text {
+        fill: var(--vek-palette-primary-text, #ffffff);
+        font-weight: 600;
+      }
+    }
+  }
+
+  .vek-clock-dial-tick {
+    fill: var(--vek-palette-text-disabled);
+    pointer-events: none;
+
+    &.vek-clock-dial-tick-major {
+      fill: var(--vek-palette-text-secondary);
+    }
+  }
+
+  @each $color in ('primary', 'secondary', 'tertiary', 'info', 'success', 'warning', 'error', 'dark') {
+    &.vek-color-#{$color} {
+      .vek-clock-face-pin {
+        fill: var(--vek-palette-#{$color});
+      }
+      .vek-clock-face-hand {
+        stroke: var(--vek-palette-#{$color});
+      }
+      .vek-clock-face-thumb {
+        fill: var(--vek-palette-#{$color});
+      }
+      .vek-clock-face-thumb-center {
+        fill: var(--vek-palette-#{$color}-text, #ffffff);
+      }
+      .vek-clock-dial-number.vek-selected .vek-clock-dial-text {
+        fill: var(--vek-palette-#{$color}-text, #ffffff);
+      }
+      &:focus-visible {
+        box-shadow: 0 0 0 2px var(--vek-palette-#{$color});
+      }
+    }
+  }
+}

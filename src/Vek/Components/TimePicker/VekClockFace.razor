@@ -1,0 +1,218 @@
+@namespace Vek
+@inherits VekComponentBase
+
+<div class="@ClassName" style="@Style" @attributes="UserAttributes">
+    @if (_showHeaderState.Value)
+    {
+        <div class="vek-clock-face-header">
+            <button type="button"
+                    class="@GetHeaderHourButtonClass()"
+                    @onclick="@(() => SetViewAsync(OpenTo.Hours))"
+                    aria-label="Switch to hours">
+                @GetHourString()
+            </button>
+            <span class="vek-clock-face-separator">:</span>
+            <button type="button"
+                    class="@GetHeaderMinuteButtonClass()"
+                    @onclick="@(() => SetViewAsync(OpenTo.Minutes))"
+                    aria-label="Switch to minutes">
+                @GetMinuteString()
+            </button>
+            @if (_showSecondsState.Value)
+            {
+                <span class="vek-clock-face-separator">:</span>
+                <button type="button"
+                        class="@GetHeaderSecondButtonClass()"
+                        @onclick="@(() => SetViewAsync(OpenTo.Seconds))"
+                        aria-label="Switch to seconds">
+                    @GetSecondString()
+                </button>
+            }
+            @if (!Is24Hour)
+            {
+                <div class="vek-clock-face-ampm">
+                    <button type="button"
+                            class="vek-clock-face-ampm-btn @(IsAm ? "vek-active" : "")"
+                            @onclick="@(() => SetAmPmAsync(true))"
+                            aria-label="Set AM">
+                        AM
+                    </button>
+                    <button type="button"
+                            class="vek-clock-face-ampm-btn @(!IsAm ? "vek-active" : "")"
+                            @onclick="@(() => SetAmPmAsync(false))"
+                            aria-label="Set PM">
+                        PM
+                    </button>
+                </div>
+            }
+        </div>
+    }
+
+    <svg class="vek-clock-face-dial @(IsDragging ? "vek-clock-face-dragging" : "vek-clock-face-animated")"
+         viewBox="0 0 260 260"
+         tabindex="@(_disabledState.Value ? -1 : 0)"
+         role="slider"
+         aria-label="@AriaLabelText"
+         aria-valuenow="@CurrentAriaValue"
+         aria-valuemin="@AriaValueMin"
+         aria-valuemax="@AriaValueMax"
+         aria-valuetext="@AriaValueText"
+         aria-disabled="@_disabledState.Value"
+         aria-readonly="@_readOnlyState.Value"
+         @onpointerdown="HandlePointerDown"
+         @onpointermove="HandlePointerMove"
+         @onpointerup="HandlePointerUp"
+         @onpointercancel="HandlePointerCancel"
+         @onkeydown="HandleKeyDownAsync">
+
+        <!-- Dial face background -->
+        <circle cx="130" cy="130" r="126" class="vek-clock-face-dial-bg" />
+
+        <!-- Clock Numbers and Ticks -->
+        @if (_viewState.Value == OpenTo.Hours)
+        {
+            @if (Is24Hour)
+            {
+                <!-- 24-hour mode: Outer ring 1-12 -->
+                @for (int i = 1; i <= 12; i++)
+                {
+                    var hourVal = i;
+                    var angle = hourVal * 30.0;
+                    var (x, y) = GetCoordinates(angle, OuterRadius);
+                    var isSelected = CurrentHour == hourVal;
+                    <g class="vek-clock-dial-number @(isSelected ? "vek-selected" : "")"
+                       transform="@($"translate({x.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)}, {y.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)})")"
+                       @onclick="@(() => OnNumberClickAsync(hourVal, isInner: false))"
+                       @onclick:stopPropagation
+                       data-value="@hourVal"
+                       role="button">
+                        <text text-anchor="middle" dominant-baseline="central" class="vek-clock-dial-text">@hourVal</text>
+                    </g>
+                }
+
+                <!-- 24-hour mode: Inner ring 13-24 (00) -->
+                @for (int i = 1; i <= 12; i++)
+                {
+                    var hourVal = (i == 12) ? 0 : (i + 12);
+                    var angle = i * 30.0;
+                    var (x, y) = GetCoordinates(angle, InnerRadius);
+                    var isSelected = CurrentHour == hourVal;
+                    var displayText = hourVal == 0 ? "00" : hourVal.ToString("D2");
+                    <g class="vek-clock-dial-number vek-clock-dial-inner @(isSelected ? "vek-selected" : "")"
+                       transform="@($"translate({x.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)}, {y.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)})")"
+                       @onclick="@(() => OnNumberClickAsync(hourVal, isInner: true))"
+                       @onclick:stopPropagation
+                       data-value="@hourVal"
+                       role="button">
+                        <text text-anchor="middle" dominant-baseline="central" class="vek-clock-dial-text">@displayText</text>
+                    </g>
+                }
+            }
+            else
+            {
+                <!-- 12-hour mode: Outer ring 1-12 -->
+                @for (int i = 1; i <= 12; i++)
+                {
+                    var hourVal = i;
+                    var angle = hourVal * 30.0;
+                    var (x, y) = GetCoordinates(angle, OuterRadius);
+                    var isSelected = (CurrentHour % 12 == 0 ? 12 : CurrentHour % 12) == hourVal;
+                    <g class="vek-clock-dial-number @(isSelected ? "vek-selected" : "")"
+                       transform="@($"translate({x.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)}, {y.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)})")"
+                       @onclick="@(() => OnNumberClickAsync(hourVal, isInner: false))"
+                       @onclick:stopPropagation
+                       data-value="@hourVal"
+                       role="button">
+                        <text text-anchor="middle" dominant-baseline="central" class="vek-clock-dial-text">@hourVal</text>
+                    </g>
+                }
+            }
+        }
+        else if (_viewState.Value == OpenTo.Minutes)
+        {
+            <!-- Minute ticks for all 60 minutes -->
+            @for (int m = 0; m < 60; m++)
+            {
+                var minVal = m;
+                var angle = minVal * 6.0;
+                var (tx, ty) = GetCoordinates(angle, TickRadius);
+                var isMajor = minVal % 5 == 0;
+                <circle cx="@tx.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+                        cy="@ty.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+                        r="@(isMajor ? "2" : "1")"
+                        class="vek-clock-dial-tick @(isMajor ? "vek-clock-dial-tick-major" : "")" />
+            }
+
+            <!-- Minute numbers 00, 05, 10, ... 55 -->
+            @for (int i = 0; i < 12; i++)
+            {
+                var minVal = i * 5;
+                var angle = minVal * 6.0;
+                var (x, y) = GetCoordinates(angle, OuterRadius);
+                var isSelected = CurrentMinute == minVal;
+                <g class="vek-clock-dial-number @(isSelected ? "vek-selected" : "")"
+                   transform="@($"translate({x.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)}, {y.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)})")"
+                   @onclick="@(() => OnMinuteClickAsync(minVal))"
+                   @onclick:stopPropagation
+                   data-value="@minVal"
+                   role="button">
+                    <text text-anchor="middle" dominant-baseline="central" class="vek-clock-dial-text">@minVal.ToString("D2")</text>
+                </g>
+            }
+        }
+        else if (_viewState.Value == OpenTo.Seconds)
+        {
+            <!-- Second ticks for all 60 seconds -->
+            @for (int s = 0; s < 60; s++)
+            {
+                var secVal = s;
+                var angle = secVal * 6.0;
+                var (tx, ty) = GetCoordinates(angle, TickRadius);
+                var isMajor = secVal % 5 == 0;
+                <circle cx="@tx.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+                        cy="@ty.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+                        r="@(isMajor ? "2" : "1")"
+                        class="vek-clock-dial-tick @(isMajor ? "vek-clock-dial-tick-major" : "")" />
+            }
+
+            <!-- Second numbers 00, 05, 10, ... 55 -->
+            @for (int i = 0; i < 12; i++)
+            {
+                var secVal = i * 5;
+                var angle = secVal * 6.0;
+                var (x, y) = GetCoordinates(angle, OuterRadius);
+                var isSelected = CurrentSecond == secVal;
+                <g class="vek-clock-dial-number @(isSelected ? "vek-selected" : "")"
+                   transform="@($"translate({x.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)}, {y.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)})")"
+                   @onclick="@(() => OnSecondClickAsync(secVal))"
+                   @onclick:stopPropagation
+                   data-value="@secVal"
+                   role="button">
+                    <text text-anchor="middle" dominant-baseline="central" class="vek-clock-dial-text">@secVal.ToString("D2")</text>
+                </g>
+            }
+        }
+
+        <!-- Clock Hand: Line from Center to HandEndX, HandEndY -->
+        <line x1="130"
+              y1="130"
+              x2="@HandEndX.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+              y2="@HandEndY.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+              class="vek-clock-face-hand" />
+
+        <!-- Hand Selector Thumb: Circle at End of Hand -->
+        <circle cx="@HandEndX.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+                cy="@HandEndY.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+                r="@ThumbRadius"
+                class="vek-clock-face-thumb" />
+
+        <!-- Hand Thumb Center Dot -->
+        <circle cx="@HandEndX.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+                cy="@HandEndY.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+                r="2"
+                class="vek-clock-face-thumb-center" />
+
+        <!-- Center Pin -->
+        <circle cx="130" cy="130" r="4" class="vek-clock-face-pin" />
+    </svg>
+</div>
