@@ -1,5 +1,0 @@
-@for $i from 0 through 25 {
-  .vek-elevation-#{$i} {
-    box-shadow: var(--vek-elevation-#{$i});
-  }
-}
