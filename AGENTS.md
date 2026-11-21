@@ -14,7 +14,7 @@ Vek maintains centralized architecture and governance documentation under `docs/
 | --- | --- | --- | --- |
 | Component C#/Razor behavior | `src/Vek`, `tests/Components/Vek.UnitTests` | Filtered `dotnet test` on `Vek.UnitTests.csproj` | Use `-p:SkipBunCompile=true` unless assets are affected. |
 | Component public API | Component, tests, docs | Unit tests plus relevant docs validation | XML docs and `[Category(...)]` are required. |
-| Docs page/example | `src/Docs/Vek.Docs*` | Relevant docs build or generated docs tests | Do not edit generated docs tests. |
+| Docs page/example | `src/Docs/Vek.Docs`, `src/Docs/Vek.Docs.Landing`, `src/Docs/Vek.Docs.Showcases` | Relevant docs host build or generated docs tests | Do not edit generated docs tests. |
 | TS/style/assets | `TScripts`, styles, `wwwroot`, asset inputs | Normal scoped build | Do not use `-p:SkipBunCompile=true`. |
 | Analyzer/code fix | `src/Analyzers/Vek.Analyzers*` | Filtered analyzer tests | Keep diagnostics, fixes, and tests aligned. |
 | Metadata/prose only | Root markdown, `.github` text | No `dotnet` verification | Do not run build/test/format for prose-only changes. |
@@ -45,7 +45,7 @@ Vek maintains centralized architecture and governance documentation under `docs/
 
 - `src/` contains product and supporting projects. `tests/` contains test projects grouped by component, analyzer, docs, and shared infrastructure.
 - `src/Vek/` is the core component library. Most component, utility, styling, `TScripts`, and `wwwroot` changes land here.
-- `src/Docs/` contains the documentation site and docs build projects; `src/Examples/` contains data shared by documentation examples and the test viewer.
+- `src/Docs/` contains the shared documentation content, homepage composition, interactive showcases, and site hosts; `src/Examples/` contains data shared by documentation examples and the test viewer.
 - `src/Analyzers/` contains analyzer and code-fix product projects. Analyzer tests and test components live in `tests/Analyzers/`.
 - `src/Benchmarks/` contains performance benchmarks.
 - `tests/Components/`, `tests/Analyzers/`, `tests/Docs/`, and `tests/Shared/` separate test projects by responsibility.
@@ -62,7 +62,7 @@ Vek maintains centralized architecture and governance documentation under `docs/
 
 ### Project targets
 - Components: `src/Vek/Vek.csproj` and `tests/Components/Vek.UnitTests/Vek.UnitTests.csproj`
-- Docs: projects under `src/Docs/`, including `Vek.Docs`, `Vek.Docs.Compiler`, `Vek.Docs.Server`, `Vek.Docs.Wasm`, and `Vek.Docs.WasmHost`
+- Docs: projects under `src/Docs/`, including `Vek.Docs`, `Vek.Docs.Landing`, `Vek.Docs.Showcases`, `Vek.Docs.Compiler`, `Vek.Docs.Server`, `Vek.Docs.Wasm`, and `Vek.Docs.WasmHost`
 - Docs tests: `tests/Docs/Vek.UnitTests.Docs/Vek.UnitTests.Docs.csproj`
 - Analyzers and code fixes: `src/Analyzers/Vek.Analyzers/Vek.Analyzers.csproj`, `src/Analyzers/Vek.Analyzers.CodeFixes/Vek.Analyzers.CodeFixes.csproj`, and `tests/Analyzers/Vek.UnitTests.Analyzers/Vek.UnitTests.Analyzers.csproj`
 
@@ -225,44 +225,13 @@ private Task ToggleAsync()
 ## Docs Pages and Examples
 
 - Keep docs in sync with component behavior, public APIs, and parameter changes.
+- Keep component documentation and focused component examples in `src/Docs/Vek.Docs/Pages/Components/`.
+- Put complete, interactive use cases such as the Expense Tracker in `src/Docs/Vek.Docs.Showcases/`; keep the homepage in `src/Docs/Vek.Docs.Landing/` independent from showcase content.
+- Preserve the dependency direction: Landing references Docs, and Showcases may reuse Docs. Both the Server and WASM hosts reference and discover Landing and Showcases routes through `AdditionalAssemblies`; Docs must not reference either project.
 - Use `src/Docs/Vek.Docs/Pages/Components/Button/ButtonPage.razor` or `src/Docs/Vek.Docs/Pages/Components/Menu/MenuPage.razor` as a reference for component docs structure.
 - Start with basic usage, introduce common variants next, group related scenarios with `SectionSubGroups`, and leave advanced or edge-case behavior for the end.
 - Write each component page as a guided progression rather than a catalog dump. Use clear section titles and short descriptions that explain when and why a feature is useful.
-- Order examples from simple to complex. Start with a small canonical example, then add focused examples for common variants, composition patterns, binding, edge cases, and advanced behavior.
-- Keep examples in `src/Docs/Vek.Docs/Pages/Components/<ComponentName>/Examples/` and name them after the component and scenario, such as `<ComponentName>SimpleExample`, `<ComponentName>DenseExample`, or `<ComponentName>TwoWayBindingExample`.
-- Do not leave orphaned example components under `Examples/`. Every example should be referenced by the docs page or removed.
-- Prefer minimal examples that demonstrate one concept at a time. Make them realistic enough to teach the workflow, but avoid extra state, styling, or unrelated component features that distract from the documented behavior.
-- Use meaningful labels and sample content in examples. Avoid `Item 1`, `Item 2`, or placeholder text unless the content is irrelevant to the behavior being demonstrated.
-- Reference example components from pages with `Code="@nameof(...)"` so renames stay compiler-checked.
-- Show code for simple, canonical examples by default. Also show code when the markup, binding, accessibility attribute, or event pattern is the behavior being taught. Collapse examples longer than 15 lines, and use `ShowCode="false"` on secondary examples when the rendered behavior is more important than repeating similar markup.
-- Use `CodeInline` for parameter, component, and member names in descriptions. Use `VekLink` for cross-links to related component pages when that helps users continue learning.
-- Descriptions and examples must agree with the component's actual defaults and current behavior. Verify ambiguous defaults against the component code or tests before documenting them.
-- Include practical guidance near the relevant example for accessibility-sensitive behavior, keyboard interaction, focus management, and other usage constraints. When prose mentions an accessibility requirement, the example should demonstrate it.
-- Docs examples are exercised by generated tests, so they must render without exceptions.
-- Generated docs tests are emitted as `Generated/*.generated.cs` files and must not be edited by hand.
-- `Vek.UnitTests.Docs` does not generate docs tests in the default local build unless `GenerateDocsTests=true`.
-- `ApiDocumentation.generated.cs` and `Snippets.generated.cs` are gitignored build outputs and can lag the live API locally. Do not hand-edit them; for public API changes, verify no tracked file still references a removed symbol and let CI regenerate them.
-
-## Breaking Changes and Compatibility
-
-- Avoid breaking changes whenever possible.
-- Prefer additive APIs, safe defaults, or obsoleting old behavior while keeping the current PR scoped to the requested fix or feature.
-- If a breaking change is required, call it out explicitly in the PR description and update docs and tests accordingly.
-- For parameter renames or removals, consider `[Obsolete]` with a clear message and migration path.
-- When a parameter is removed, including by renaming it, add a VEK0002 migration hint to `src/Analyzers/Vek.Analyzers/Internal/ParameterMigration.cs`, with a case in `MigrationHintCases` and a row on the analyzer docs page. Verify the conversion against the component source, not the migration guide.
-- A binary break is still a breaking change even when source-compatible. For example, changing a parameter from `EventCallback` to `EventCallback<T>` keeps existing Razor markup compiling but breaks precompiled consumers until they rebuild.
-- When current behavior is wrong compared to common web standards, prefer fixing the default over adding a parameter or `VekGlobal` setting to opt out of the fix. If the corrected default is breaking, hold it for the next major version as a single change.
-
-## Testing Rules
-
-### General testing guidance
-- Run the narrowest relevant test filter first.
-- Test logic rather than full HTML snapshots.
-- Prefer a fail-first workflow: add or update the test to fail for the target behavior before implementing the fix.
-- Keep tests isolated so they can run in parallel. The suite runs fixtures in parallel (`[assembly: Parallelizable(ParallelScope.Fixtures)]`) with a fresh fixture instance per test (`InstancePerTestCase`). Do not switch the assembly to `ParallelScope.All`: bUnit's renderer requires the test code and render code to share a thread (memory-coherence locking, see bUnit#124), so parallelizing tests *within* a fixture is unsafe. Get throughput from independent fixtures, not from intra-fixture parallelism.
-- Async tests and async helpers must return `Task`, not `async void`.
-- Do not add mutable static state in tests or viewer test components.
-- If a test modifies shared or static state, restore it in `[TearDown]` and keep `[NonParallelizable]` until the shared-state dependency is removed.
+- Order examples from simple to complex. Start with a small canonical example, then add focused…1185 tokens truncated…izable]` until the shared-state dependency is removed.
 - Use `[NonParallelizable]` only when isolation is not feasible, and document the shared resource it protects. Before removing an existing `[NonParallelizable]`, prove the fixture is parallel-safe by running the suite repeatedly under heavy parallel load — bUnit renderer timing under fake time is a common hidden dependency that only surfaces under concurrency.
 - Keep the debounced-input re-render tests and the `DialogTests` fixture `[NonParallelizable]`, and do not try to parallelize them. NUnit runs an `async Task` test by blocking its worker thread (sync-over-async), so under parallel CPU contention their renderer dispatch deadlocks or races past the `WaitForAssertion` window.
 - Prefer fixed test data. Use random data only when randomness is the behavior under test or when the random source is seeded per test.

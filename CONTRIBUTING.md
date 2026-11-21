@@ -43,14 +43,17 @@ The repository contains the component library, docs, tests, and visual test view
 | Project | Purpose |
 | --- | --- |
 | `src/Vek` | Components, utilities, styles, and browser assets |
-| `src/Vek.Docs` | Documentation pages and component examples |
-| `src/Vek.UnitTests` | bUnit and unit tests |
-| `src/Vek.UnitTests.Viewer` | Interactive visual test scenarios |
+| `src/Docs/Vek.Docs` | Component documentation pages, shared layouts, and services |
+| `src/Docs/Vek.Docs.Landing` | Homepage composition from docs content and showcases |
+| `src/Docs/Vek.Docs.Showcases` | Complete interactive use cases, such as the Expense Tracker |
+| `src/Docs/Vek.Docs.Server`, `src/Docs/Vek.Docs.Wasm`, `src/Docs/Vek.Docs.WasmHost` | Documentation site hosts |
+| `tests/Components/Vek.UnitTests` | bUnit and unit tests |
+| `tests/Components/Vek.UnitTests.Viewer` | Interactive visual test scenarios |
 
 For a quick component check, run the narrowest relevant test filter:
 
 ```bash
-dotnet test --project src/Vek.UnitTests/Vek.UnitTests.csproj --no-restore -p:SkipBunCompile=true -- --filter "FullyQualifiedName~ButtonTests"
+dotnet test --project tests/Components/Vek.UnitTests/Vek.UnitTests.csproj --no-restore -p:SkipBunCompile=true -- --filter "FullyQualifiedName~ButtonTests"
 ```
 
 Replace `ButtonTests` with the fixture or test name you changed. The test project builds the component library as part of this command.
@@ -82,7 +85,16 @@ The Bun asset step is skipped above because these examples validate C# and Razor
 
 ### Documentation and examples
 
-When a component's behavior or public API changes, update its docs page under `src/Vek.Docs/Pages/Components`. Add focused examples in that component's `Examples` folder and reference each example from the page. Keep examples runnable, concise, and ordered from basic usage to advanced cases.
+When a component's behavior or public API changes, update its docs page under `src/Docs/Vek.Docs/Pages/Components`. Add focused examples in that component's `Examples` folder and reference each example from the page. Keep examples runnable, concise, and ordered from basic usage to advanced cases.
+
+For a complete interactive use case, add a route page and reusable UI under `src/Docs/Vek.Docs.Showcases`. Keep the homepage in `src/Docs/Vek.Docs.Landing` independent from showcase content; users can open showcases from the `Showcases` navigation menu. Preserve this dependency direction so Landing references Docs and Showcases can reuse Docs, while Docs depends on neither project. Routes in Landing and Showcases are discovered by both the Server and WASM routers through their `AdditionalAssemblies` settings.
+
+For changes to shared docs pages, Landing, or Showcases, build the relevant host projects. Route changes should be checked in both hosting modes:
+
+```bash
+dotnet build src/Docs/Vek.Docs.Server/Vek.Docs.Server.csproj -p:SkipBunCompile=true
+dotnet build src/Docs/Vek.Docs.WasmHost/Vek.Docs.WasmHost.csproj -p:SkipBunCompile=true
+```
 
 Document public component parameters with XML summaries and the appropriate `Category` attribute. Include defaults or usage constraints when they help consumers make the right choice.
 

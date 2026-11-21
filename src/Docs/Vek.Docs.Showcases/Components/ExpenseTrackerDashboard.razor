@@ -1,0 +1,638 @@
+@using System.Globalization
+@using System.Text.Json
+@inject IJSRuntime JSRuntime
+
+<div class="expense-dashboard">
+    <header class="dashboard-heading">
+        <div class="dashboard-title-group">
+            <div class="dashboard-profile" aria-label="Account owner Jordan Morgan">
+                <span class="profile-avatar" aria-hidden="true">JM</span>
+                <div>
+                    <p class="dashboard-eyebrow">PERSONAL FINANCE</p>
+                    <h1>Expense Tracker</h1>
+                    <p class="dashboard-description">A practical view of your spending, trends, and recent activity.</p>
+                </div>
+            </div>
+            <VekChip T="string" Color="Color.Success" Size="Size.Small" Variant="Variant.Filled">Demo data · saved in this browser</VekChip>
+        </div>
+
+        <div class="dashboard-actions">
+            <label class="period-control">
+                <span>Time period</span>
+                <select value="@_periodDays" @onchange="ChangePeriod" aria-label="Time period">
+                    <option value="30">Last 30 days</option>
+                    <option value="90">Last 90 days</option>
+                    <option value="180">Last 6 months</option>
+                </select>
+            </label>
+            <div class="account-balance">
+                <span>Estimated balance</span>
+                <strong>@FormatMoney(Balance)</strong>
+            </div>
+            <button class="add-expense-button" type="button" @onclick="OpenNewExpenseForm" aria-expanded="@_showExpenseForm" aria-controls="expense-entry-form">
+                <span aria-hidden="true">+</span> Add expense
+            </button>
+        </div>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(_feedback))
+    {
+        <p class="dashboard-feedback" role="status">@_feedback</p>
+    }
+
+    @if (_showExpenseForm)
+    {
+        <form id="expense-entry-form" class="expense-entry-form" @onsubmit="SaveExpenseAsync" @onsubmit:preventDefault>
+            <div class="form-heading">
+                <div>
+                    <h2>@(_editingExpenseId is null ? "Add an expense" : "Edit expense")</h2>
+                    <p>Track the details so your summaries stay useful.</p>
+                </div>
+            </div>
+            <div class="form-field">
+                <label for="expense-description">Description</label>
+                <input id="expense-description" @bind="_newDescription" @bind:event="oninput" maxlength="60" placeholder="e.g. Weekly groceries" required />
+            </div>
+            <div class="form-field">
+                <label for="expense-merchant">Merchant</label>
+                <input id="expense-merchant" @bind="_newMerchant" @bind:event="oninput" maxlength="60" placeholder="e.g. Green Market" required />
+            </div>
+            <div class="form-field">
+                <label for="expense-amount">Amount</label>
+                <input id="expense-amount" type="number" min="0.01" step="0.01" @bind="_newAmount" @bind:event="oninput" required />
+            </div>
+            <div class="form-field">
+                <label for="expense-category">Category</label>
+                <select id="expense-category" @bind="_newCategory">
+                    @foreach (var category in CategoryNames)
+                    {
+                        <option value="@category">@category</option>
+                    }
+                </select>
+            </div>
+            <div class="form-field">
+                <label for="expense-date">Date</label>
+                <input id="expense-date" type="date" max="@Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" @bind="_newDate" @bind:event="oninput" required />
+            </div>
+            <div class="form-actions">
+                <button class="form-cancel" type="button" @onclick="CloseExpenseForm">Cancel</button>
+                <button class="add-expense-button" type="submit" disabled="@(!CanSaveExpense)">
+                    @(_editingExpenseId is null ? "Save expense" : "Save changes")
+                </button>
+            </div>
+        </form>
+    }
+
+    <section class="summary-grid" aria-label="Expense summary for @RangeLabel">
+        <article class="summary-card">
+            <span class="summary-label">Estimated income</span>
+            <strong class="summary-value">@FormatMoney(Income)</strong>
+            <span class="summary-note">Based on @FormatMoney(MonthlyIncomeEstimate) per month</span>
+        </article>
+        <article class="summary-card summary-card-primary">
+            <span class="summary-label">Expenses</span>
+            <strong class="summary-value">@FormatMoney(Expenses)</strong>
+            <span class="summary-note">Across the selected period</span>
+        </article>
+        <article class="summary-card">
+            <span class="summary-label">Balance</span>
+            <strong class="summary-value">@FormatMoney(Balance)</strong>
+            <span class="summary-note">Estimated income after expenses</span>
+        </article>
+        <article class="summary-card">
+            <span class="summary-label">Transactions</span>
+            <strong class="summary-value">@PeriodExpenses.Count.ToString("N0", CultureInfo.InvariantCulture)</strong>
+            <span class="summary-note">In the selected period</span>
+        </article>
+    </section>
+
+    <div class="dashboard-content-grid">
+        <section class="dashboard-panel spending-panel" aria-labelledby="spending-title">
+            <div class="panel-heading">
+                <div>
+                    <h2 id="spending-title">Spending over time</h2>
+                    <p>Monthly totals from your recorded expenses</p>
+                </div>
+                <span class="panel-period">@RangeLabel</span>
+            </div>
+            @if (ChartMonths.Count == 0)
+            {
+                <p class="empty-chart">Add expenses to see your spending trend.</p>
+            }
+            else
+            {
+                <div class="spending-chart" role="img" aria-label="@ChartAccessibleName">
+                    @foreach (var month in ChartMonths)
+                    {
+                        <div class="chart-column">
+                            <span class="chart-value">@FormatMoney(month.Amount)</span>
+                            <div class="chart-track">
+                                <div class="chart-bar @(month.IsCurrent ? "chart-bar-today" : string.Empty)" style="height: @month.Percentage%"></div>
+                            </div>
+                            <span class="chart-day">@month.Label</span>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+
+        <section class="dashboard-panel category-panel" aria-labelledby="category-title">
+            <div class="panel-heading">
+                <div>
+                    <h2 id="category-title">Spending categories</h2>
+                    <p>Select a category to filter transactions</p>
+                </div>
+                <a href="/showcases/expense-tracker#transactions" class="panel-link">View transactions</a>
+            </div>
+            @if (CategorySummaries.Count == 0)
+            {
+                <p class="empty-chart">No category spending in this period yet.</p>
+            }
+            else
+            {
+                <div class="category-list">
+                    @foreach (var category in CategorySummaries)
+                    {
+                        <button class="category-item @(IsCategorySelected(category.Name) ? "category-item-selected" : string.Empty)"
+                                type="button"
+                                @onclick="() => ToggleCategoryFilter(category.Name)"
+                                aria-pressed="@IsCategorySelected(category.Name)"
+                                title="Filter transactions to @category.Name">
+                            <span class="category-heading">
+                                <span>@category.Name <span class="category-share">@category.Share% of spending</span></span>
+                                <strong>@FormatMoney(category.Amount)</strong>
+                            </span>
+                            <span class="category-track" aria-hidden="true">
+                                <span class="category-fill @category.ColorClass" style="width: @category.RelativePercent%"></span>
+                            </span>
+                        </button>
+                    }
+                </div>
+            }
+        </section>
+
+        <section id="transactions" class="dashboard-panel transactions-panel" aria-labelledby="transactions-title">
+            <div class="panel-heading transactions-heading">
+                <div>
+                    <h2 id="transactions-title">Transactions</h2>
+                    <p>Search, filter, sort, edit, or remove recorded expenses.</p>
+                </div>
+                <span class="transaction-count">@FilteredExpenses.Count transaction@(FilteredExpenses.Count == 1 ? string.Empty : "s")</span>
+            </div>
+
+            <div class="transaction-controls">
+                <label class="search-control">
+                    <span class="visually-hidden">Search transactions</span>
+                    <input type="search" value="@_searchText" @oninput="ChangeSearch" placeholder="Search description or merchant" aria-label="Search transactions" />
+                </label>
+                <label class="filter-control">
+                    <span class="visually-hidden">Filter by category</span>
+                    <select value="@_categoryFilter" @onchange="ChangeCategory" aria-label="Filter by category">
+                        <option value="">All categories</option>
+                        @foreach (var category in CategoryNames)
+                        {
+                            <option value="@category">@category</option>
+                        }
+                    </select>
+                </label>
+                <label class="filter-control">
+                    <span class="visually-hidden">Sort transactions</span>
+                    <select value="@_sortOrder" @onchange="ChangeSort" aria-label="Sort transactions">
+                        <option value="newest">Newest first</option>
+                        <option value="oldest">Oldest first</option>
+                        <option value="highest">Amount: high to low</option>
+                        <option value="lowest">Amount: low to high</option>
+                    </select>
+                </label>
+                @if (HasActiveFilters)
+                {
+                    <button class="clear-filters-button" type="button" @onclick="ClearFilters">Clear filters</button>
+                }
+            </div>
+
+            @if (FilteredExpenses.Count == 0)
+            {
+                <div class="empty-transactions">
+                    <strong>No transactions match these filters.</strong>
+                    <span>Try another search or clear the selected filters.</span>
+                    <button class="form-cancel" type="button" @onclick="ClearFilters">Clear filters</button>
+                </div>
+            }
+            else
+            {
+                <div class="transaction-table-wrap">
+                    <table class="transaction-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Transaction</th>
+                                <th scope="col">Category</th>
+                                <th scope="col">Date</th>
+                                <th scope="col" class="amount-column">Amount</th>
+                                <th scope="col"><span class="visually-hidden">Actions</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var expense in PagedExpenses)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="transaction-title">@expense.Description</span>
+                                        <span class="transaction-merchant">@expense.Merchant</span>
+                                    </td>
+                                    <td><VekChip T="string" Size="Size.Small" Variant="Variant.Outlined">@expense.Category</VekChip></td>
+                                    <td>@expense.Date.ToString("MMM d, yyyy", CultureInfo.GetCultureInfo("en-US"))</td>
+                                    <td class="amount-column">−@FormatMoney(expense.Amount)</td>
+                                    <td class="transaction-actions">
+                                        <button class="transaction-action" type="button" @onclick="() => EditExpense(expense)" aria-label="@("Edit " + expense.Description)">Edit</button>
+                                        <button class="transaction-action transaction-action-danger" type="button" @onclick="() => DeleteExpenseAsync(expense)" aria-label="@("Delete " + expense.Description)">Delete</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-footer">
+                    <span>Showing @FirstVisibleRow–@LastVisibleRow of @FilteredExpenses.Count</span>
+                    <div class="pagination-controls" aria-label="Transaction pages">
+                        <button type="button" class="page-button" @onclick="PreviousPage" disabled="@(_currentPage <= 1)" aria-label="Previous page">Previous</button>
+                        <span>Page @_currentPage of @PageCount</span>
+                        <button type="button" class="page-button" @onclick="NextPage" disabled="@(_currentPage >= PageCount)" aria-label="Next page">Next</button>
+                    </div>
+                </div>
+            }
+        </section>
+    </div>
+</div>
+
+@code {
+    private const string StorageKey = "vek.expense-tracker.expenses.v1";
+    private const decimal MonthlyIncomeEstimate = 5400m;
+    private const int PageSize = 6;
+
+    private static readonly string[] CategoryNames =
+    [
+        "Food", "Home", "Transport", "Shopping", "Entertainment", "Health", "Travel", "Education", "Other"
+    ];
+
+    private List<ExpenseEntry> _expenses = CreateSampleExpenses();
+    private bool _showExpenseForm;
+    private bool _storageLoaded;
+    private Guid? _editingExpenseId;
+    private string _newDescription = string.Empty;
+    private string _newMerchant = string.Empty;
+    private string _newCategory = "Food";
+      private DateTime _newDate = DateTime.Today;
+    private decimal _newAmount;
+    private string _searchText = string.Empty;
+    private string _categoryFilter = string.Empty;
+    private string _sortOrder = "newest";
+    private string _feedback = string.Empty;
+    private int _periodDays = 180;
+    private int _currentPage = 1;
+
+    private DateOnly Today => DateOnly.FromDateTime(DateTime.Today);
+    private DateOnly RangeStart => Today.AddDays(-(_periodDays - 1));
+    private string RangeLabel => _periodDays switch
+    {
+        30 => "Last 30 days",
+        90 => "Last 90 days",
+        _ => "Last 6 months"
+    };
+
+    private decimal Income => decimal.Round(MonthlyIncomeEstimate * _periodDays / 30m, 2);
+    private decimal Expenses => PeriodExpenses.Sum(expense => expense.Amount);
+    private decimal Balance => Income - Expenses;
+    private string ChartAccessibleName => $"Monthly expense totals for {RangeLabel.ToLowerInvariant()}";
+    private bool CanSaveExpense => !string.IsNullOrWhiteSpace(_newDescription)
+        && !string.IsNullOrWhiteSpace(_newMerchant)
+        && _newAmount > 0
+          && _newDate != default;
+
+    private bool HasActiveFilters => !string.IsNullOrWhiteSpace(_searchText)
+        || !string.IsNullOrWhiteSpace(_categoryFilter);
+
+    private List<ExpenseEntry> PeriodExpenses => _expenses
+        .Where(expense => expense.Date >= RangeStart && expense.Date <= Today)
+        .OrderByDescending(expense => expense.Date)
+        .ThenBy(expense => expense.Description, StringComparer.OrdinalIgnoreCase)
+        .ToList();
+
+    private List<ExpenseEntry> FilteredExpenses
+    {
+        get
+        {
+            IEnumerable<ExpenseEntry> query = PeriodExpenses;
+            if (!string.IsNullOrWhiteSpace(_categoryFilter))
+            {
+                query = query.Where(expense => expense.Category == _categoryFilter);
+            }
+
+            if (!string.IsNullOrWhiteSpace(_searchText))
+            {
+                query = query.Where(expense =>
+                    expense.Description.Contains(_searchText, StringComparison.OrdinalIgnoreCase)
+                    || expense.Merchant.Contains(_searchText, StringComparison.OrdinalIgnoreCase));
+            }
+
+            query = _sortOrder switch
+            {
+                "oldest" => query.OrderBy(expense => expense.Date).ThenBy(expense => expense.Description),
+                "highest" => query.OrderByDescending(expense => expense.Amount).ThenByDescending(expense => expense.Date),
+                "lowest" => query.OrderBy(expense => expense.Amount).ThenByDescending(expense => expense.Date),
+                _ => query.OrderByDescending(expense => expense.Date).ThenBy(expense => expense.Description)
+            };
+
+            return query.ToList();
+        }
+    }
+
+    private List<ExpenseEntry> PagedExpenses => FilteredExpenses
+        .Skip((_currentPage - 1) * PageSize)
+        .Take(PageSize)
+        .ToList();
+
+    private int PageCount => Math.Max(1, (int)Math.Ceiling(FilteredExpenses.Count / (double)PageSize));
+    private int FirstVisibleRow => FilteredExpenses.Count == 0 ? 0 : ((_currentPage - 1) * PageSize) + 1;
+    private int LastVisibleRow => Math.Min(_currentPage * PageSize, FilteredExpenses.Count);
+
+    private List<SpendingMonth> ChartMonths
+    {
+        get
+        {
+            var totals = PeriodExpenses
+                .GroupBy(expense => new DateOnly(expense.Date.Year, expense.Date.Month, 1))
+                .ToDictionary(group => group.Key, group => group.Sum(expense => expense.Amount));
+
+            var firstMonth = new DateOnly(RangeStart.Year, RangeStart.Month, 1);
+            var lastMonth = new DateOnly(Today.Year, Today.Month, 1);
+            var months = new List<SpendingMonth>();
+            for (var month = firstMonth; month <= lastMonth; month = month.AddMonths(1))
+            {
+                totals.TryGetValue(month, out var amount);
+                months.Add(new SpendingMonth(
+                    month.ToString("MMM", CultureInfo.GetCultureInfo("en-US")),
+                    amount,
+                    0,
+                    month.Year == Today.Year && month.Month == Today.Month));
+            }
+
+            var maxAmount = months.Select(month => month.Amount).DefaultIfEmpty(0m).Max();
+            return months.Select(month => month with
+            {
+                Percentage = maxAmount == 0 ? 0 : Math.Max(4, (int)Math.Round(month.Amount / maxAmount * 100m))
+            }).ToList();
+        }
+    }
+
+    private List<CategorySummary> CategorySummaries
+    {
+        get
+        {
+            var totals = PeriodExpenses
+                .GroupBy(expense => expense.Category)
+                .Select(group => new { Name = group.Key, Amount = group.Sum(expense => expense.Amount) })
+                .OrderByDescending(category => category.Amount)
+                .ToList();
+            var totalExpenses = totals.Sum(category => category.Amount);
+            var maxAmount = totals.Select(category => category.Amount).DefaultIfEmpty(0m).Max();
+
+            return totals.Select(category => new CategorySummary(
+                category.Name,
+                category.Amount,
+                totalExpenses == 0 ? 0 : (int)Math.Round(category.Amount / totalExpenses * 100m),
+                maxAmount == 0 ? 0 : (int)Math.Round(category.Amount / maxAmount * 100m),
+                GetCategoryClass(category.Name))).ToList();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            var savedJson = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", StorageKey);
+            if (savedJson is not null)
+            {
+                _expenses = JsonSerializer.Deserialize<List<ExpenseEntry>>(savedJson) ?? [];
+            }
+        }
+        catch (JsonException)
+        {
+            _feedback = "Saved demo data could not be read. The sample transactions are still available.";
+        }
+        catch (JSException)
+        {
+            // Storage can be unavailable in a restricted browser; the in-memory tracker still works.
+        }
+
+        _storageLoaded = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private static List<ExpenseEntry> CreateSampleExpenses()
+    {
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        return
+        [
+            new(Guid.NewGuid(), "Weekly groceries", "Green Market", "Food", today.AddDays(-1), 86.42m),
+            new(Guid.NewGuid(), "Monthly subscription", "Streamline", "Entertainment", today.AddDays(-2), 14.99m),
+            new(Guid.NewGuid(), "Ride to work", "City Transit", "Transport", today.AddDays(-3), 12.50m),
+            new(Guid.NewGuid(), "Coffee with Maya", "North Coffee", "Food", today.AddDays(-4), 18.75m),
+            new(Guid.NewGuid(), "Household supplies", "Home Supply Co.", "Home", today.AddDays(-5), 42.30m),
+            new(Guid.NewGuid(), "Dinner with friends", "The Copper Table", "Food", today.AddDays(-8), 74.80m),
+            new(Guid.NewGuid(), "Prescription refill", "WellCare Pharmacy", "Health", today.AddDays(-12), 28.17m),
+            new(Guid.NewGuid(), "Fuel", "Westside Fuel", "Transport", today.AddDays(-17), 54.60m),
+            new(Guid.NewGuid(), "Groceries", "Green Market", "Food", today.AddDays(-23), 121.05m),
+            new(Guid.NewGuid(), "Internet bill", "FiberHome", "Home", today.AddDays(-29), 69.99m),
+            new(Guid.NewGuid(), "Music subscription", "Soundbox", "Entertainment", today.AddDays(-36), 10.99m),
+            new(Guid.NewGuid(), "Running shoes", "Stride", "Shopping", today.AddDays(-43), 112.40m),
+            new(Guid.NewGuid(), "Electricity bill", "City Power", "Home", today.AddDays(-51), 132.60m),
+            new(Guid.NewGuid(), "Lunch near the office", "North Coffee", "Food", today.AddDays(-62), 24.70m),
+            new(Guid.NewGuid(), "Transit pass", "City Transit", "Transport", today.AddDays(-71), 65.20m),
+            new(Guid.NewGuid(), "Vet visit", "Oak Animal Clinic", "Health", today.AddDays(-84), 210m),
+            new(Guid.NewGuid(), "Kitchen organizer", "Home Supply Co.", "Shopping", today.AddDays(-96), 48.90m),
+            new(Guid.NewGuid(), "Weekend hotel", "Harbor Hotel", "Travel", today.AddDays(-108), 284m),
+            new(Guid.NewGuid(), "Online course", "LearnWell", "Education", today.AddDays(-120), 159m),
+            new(Guid.NewGuid(), "Monthly rent", "Morgan Properties", "Home", today.AddDays(-132), 1450m),
+            new(Guid.NewGuid(), "Groceries", "Green Market", "Food", today.AddDays(-144), 98.30m),
+            new(Guid.NewGuid(), "Car service", "Westside Auto", "Transport", today.AddDays(-156), 360m),
+            new(Guid.NewGuid(), "Winter jacket", "North Outfitters", "Shopping", today.AddDays(-168), 174.50m),
+            new(Guid.NewGuid(), "Home insurance", "Harbor Mutual", "Home", today.AddDays(-178), 118m),
+            new(Guid.NewGuid(), "Concert tickets", "Civic Hall", "Entertainment", today.AddDays(-190), 96m),
+            new(Guid.NewGuid(), "Annual checkup", "Oak Medical", "Health", today.AddDays(-205), 120m)
+        ];
+    }
+
+    private static string FormatMoney(decimal amount) =>
+        amount.ToString("C2", CultureInfo.GetCultureInfo("en-US"));
+
+    private static string GetCategoryClass(string category) => category switch
+    {
+        "Home" => "category-fill-home",
+        "Food" => "category-fill-food",
+        "Transport" => "category-fill-transport",
+        "Shopping" => "category-fill-shopping",
+        "Health" => "category-fill-health",
+        "Entertainment" => "category-fill-entertainment",
+        "Travel" => "category-fill-travel",
+        _ => "category-fill-other"
+    };
+
+    private bool IsCategorySelected(string category) => _categoryFilter == category;
+
+    private void ToggleCategoryFilter(string category)
+    {
+        _categoryFilter = IsCategorySelected(category) ? string.Empty : category;
+        _currentPage = 1;
+    }
+
+    private void ChangePeriod(ChangeEventArgs args)
+    {
+        if (int.TryParse(args.Value?.ToString(), out var days) && days is 30 or 90 or 180)
+        {
+            _periodDays = days;
+            _currentPage = 1;
+        }
+    }
+
+    private void ChangeSearch(ChangeEventArgs args)
+    {
+        _searchText = args.Value?.ToString() ?? string.Empty;
+        _currentPage = 1;
+    }
+
+    private void ChangeCategory(ChangeEventArgs args)
+    {
+        _categoryFilter = args.Value?.ToString() ?? string.Empty;
+        _currentPage = 1;
+    }
+
+    private void ChangeSort(ChangeEventArgs args)
+    {
+        _sortOrder = args.Value?.ToString() ?? "newest";
+        _currentPage = 1;
+    }
+
+    private void ClearFilters()
+    {
+        _searchText = string.Empty;
+        _categoryFilter = string.Empty;
+        _sortOrder = "newest";
+        _currentPage = 1;
+    }
+
+    private void PreviousPage() => _currentPage = Math.Max(1, _currentPage - 1);
+    private void NextPage() => _currentPage = Math.Min(PageCount, _currentPage + 1);
+
+    private void OpenNewExpenseForm()
+    {
+        ResetForm();
+        _showExpenseForm = true;
+    }
+
+    private void EditExpense(ExpenseEntry expense)
+    {
+        _editingExpenseId = expense.Id;
+        _newDescription = expense.Description;
+        _newMerchant = expense.Merchant;
+        _newCategory = expense.Category;
+          _newDate = expense.Date.ToDateTime(TimeOnly.MinValue);
+        _newAmount = expense.Amount;
+        _showExpenseForm = true;
+    }
+
+    private void CloseExpenseForm()
+    {
+        _showExpenseForm = false;
+        ResetForm();
+    }
+
+    private void ResetForm()
+    {
+        _editingExpenseId = null;
+        _newDescription = string.Empty;
+        _newMerchant = string.Empty;
+        _newCategory = "Food";
+          _newDate = Today.ToDateTime(TimeOnly.MinValue);
+        _newAmount = 0;
+    }
+
+    private async Task SaveExpenseAsync()
+    {
+        if (!CanSaveExpense)
+        {
+              _feedback = "Enter a description, merchant, valid amount, and date before saving.";
+            return;
+        }
+
+        var expense = new ExpenseEntry(
+            _editingExpenseId ?? Guid.NewGuid(),
+            _newDescription.Trim(),
+            _newMerchant.Trim(),
+            _newCategory,
+              DateOnly.FromDateTime(_newDate),
+            _newAmount);
+
+        var existingIndex = _editingExpenseId is Guid editingId
+            ? _expenses.FindIndex(item => item.Id == editingId)
+            : -1;
+        var isEditing = existingIndex >= 0;
+        if (isEditing)
+        {
+            _expenses[existingIndex] = expense;
+        }
+        else
+        {
+            _expenses.Add(expense);
+        }
+
+        await PersistExpensesAsync();
+        _feedback = isEditing ? "Expense updated." : "Expense added.";
+        _currentPage = 1;
+        _showExpenseForm = false;
+        ResetForm();
+    }
+
+    private async Task DeleteExpenseAsync(ExpenseEntry expense)
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Delete “{expense.Description}” from your transactions?");
+        if (!confirmed)
+        {
+            return;
+        }
+
+        _expenses.RemoveAll(item => item.Id == expense.Id);
+        await PersistExpensesAsync();
+        _feedback = "Expense deleted.";
+        if (_currentPage > PageCount)
+        {
+            _currentPage = PageCount;
+        }
+    }
+
+    private async Task PersistExpensesAsync()
+    {
+        if (!_storageLoaded)
+        {
+            return;
+        }
+
+        try
+        {
+            var json = JsonSerializer.Serialize(_expenses);
+            await JSRuntime.InvokeVoidAsync("localStorage.setItem", StorageKey, json);
+        }
+        catch (JSException)
+        {
+            _feedback = "This change is available for this session, but browser storage is unavailable.";
+        }
+    }
+
+    private sealed record ExpenseEntry(Guid Id, string Description, string Merchant, string Category, DateOnly Date, decimal Amount);
+    private sealed record SpendingMonth(string Label, decimal Amount, int Percentage, bool IsCurrent);
+    private sealed record CategorySummary(string Name, decimal Amount, int Share, int RelativePercent, string ColorClass);
+}

@@ -1,4 +1,5 @@
-﻿<Router AppAssembly="@typeof(Vek.Docs.Pages.Index).Assembly">
+﻿<Router AppAssembly="@typeof(Vek.Docs.Shared.MainLayout).Assembly"
+        AdditionalAssemblies="@(new[] { typeof(Vek.Docs.Landing.Pages.Index).Assembly, typeof(Vek.Docs.Showcases.Pages.ExpenseTrackerPage).Assembly })">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(Vek.Docs.Shared.MainLayout)" />
     </Found>

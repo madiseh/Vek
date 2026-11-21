@@ -20,12 +20,12 @@
     <PackageVersion Include="LoxSmoke.DocXml" Version="3.9.0" />
     <PackageVersion Include="Markdig" Version="1.5.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Components" Version="10.0.1" Condition="('$(MSBuildProjectName)' == 'Vek') And ( '$(TargetFramework)' == 'net10.0' )" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components" Version="10.0.14" Condition="('$(MSBuildProjectName)' == 'Vek.Benchmarks' Or '$(MSBuildProjectName)' == 'Vek.Docs')" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components" Version="10.0.14" Condition="('$(MSBuildProjectName)' == 'Vek.Benchmarks' Or '$(MSBuildProjectName)' == 'Vek.Docs' Or '$(MSBuildProjectName)' == 'Vek.Docs.Landing' Or '$(MSBuildProjectName)' == 'Vek.Docs.Showcases')" />
     <PackageVersion Include="Microsoft.AspNetCore.Components" Version="11.0.0" Condition="('$(MSBuildProjectName)' == 'Vek') And ( '$(TargetFramework)' == 'net11.0' )" />
     <PackageVersion Include="Microsoft.AspNetCore.Components" Version="8.0.12" Condition="('$(MSBuildProjectName)' == 'Vek') And ( '$(TargetFramework)' == 'net8.0' )" />
     <PackageVersion Include="Microsoft.AspNetCore.Components" Version="9.0.1" Condition="('$(MSBuildProjectName)' == 'Vek') And ( '$(TargetFramework)' == 'net9.0' )" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="10.0.1" Condition="('$(MSBuildProjectName)' == 'Vek') And ( '$(TargetFramework)' == 'net10.0' )" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="10.0.14" Condition="('$(MSBuildProjectName)' == 'Vek.Docs')" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="10.0.14" Condition="('$(MSBuildProjectName)' == 'Vek.Docs' Or '$(MSBuildProjectName)' == 'Vek.Docs.Landing' Or '$(MSBuildProjectName)' == 'Vek.Docs.Showcases')" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="11.0.0" Condition="('$(MSBuildProjectName)' == 'Vek') And ( '$(TargetFramework)' == 'net11.0' )" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="8.0.12" Condition="('$(MSBuildProjectName)' == 'Vek') And ( '$(TargetFramework)' == 'net8.0' )" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="9.0.1" Condition="('$(MSBuildProjectName)' == 'Vek') And ( '$(TargetFramework)' == 'net9.0' )" />
