@@ -38,23 +38,6 @@ namespace Vek.UnitTests.Components
             picker.FixDay.Should().Be(null);
         }
 
-        /// <summary>
-        /// Century selection drills into a decade and then a year.
-        /// </summary>
-        [Test]
-        public async Task CenturySelectionDrillsIntoYear()
-        {
-            var component = Context.Render<VekDatePicker>(parameters => parameters
-                .Add(picker => picker.OpenTo, OpenTo.Century)
-                .Add(picker => picker.PickerVariant, PickerVariant.Static)
-                .Add(picker => picker.PickerMonth, new DateTime(2026, 1, 1)));
-
-            await component.Find("button[aria-label='Decade 2020 to 2029']").ClickAsync();
-            component.Find("button[aria-label='Year 2026']").Should().NotBeNull();
-            await component.Find("button[aria-label='Year 2026']").ClickAsync();
-            component.FindAll(".vek-picker-month").Should().HaveCount(12);
-        }
-
         [Test]
         public void DatePickerOpenButtonDefaultAriaLabel()
         {

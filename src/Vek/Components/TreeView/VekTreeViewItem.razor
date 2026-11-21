@@ -48,15 +48,7 @@
                 }
                 else
                 {
-                    @if (VekTreeRoot?.HasSearchText == true && GetText() is { } label && label.Contains(VekTreeRoot.FilterText, StringComparison.OrdinalIgnoreCase))
-                    {
-                        var matchIndex = label.IndexOf(VekTreeRoot.FilterText, StringComparison.OrdinalIgnoreCase);
-                        @VekText.RenderText(TextTypo, TextClassname, label[..matchIndex], MultiSelection ? _checkboxTextId : null)<mark class="vek-tree-highlight">@label.Substring(matchIndex, VekTreeRoot.FilterText.Length)</mark>@VekText.RenderText(TextTypo, TextClassname, label[(matchIndex + VekTreeRoot.FilterText.Length)..])
-                    }
-                    else
-                    {
-                        @VekText.RenderText(TextTypo, TextClassname, GetText(), MultiSelection ? _checkboxTextId : null)
-                    }
+                    @VekText.RenderText(TextTypo, TextClassname, GetText(), MultiSelection ? _checkboxTextId : null)
 
                     @if (!string.IsNullOrEmpty(EndText))
                     {

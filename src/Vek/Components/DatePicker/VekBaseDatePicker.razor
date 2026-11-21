@@ -36,22 +36,8 @@
                     int tempMonth = displayMonth; //without local variable month names are wrong
 
                     <div class="vek-picker-calendar-container">
-                        @if (tempMonth == 0 && CurrentView is OpenTo.Century or OpenTo.Decade)
+                        @if (tempMonth == 0 && CurrentView == OpenTo.Year)
                         {
-                            var selectedYear = calendar.GetYear(PickerMonth ?? TimeProvider.GetLocalNow().Date);
-                            var startYear = CurrentView == OpenTo.Century ? Math.Max(GetMinYear(), (selectedYear / 100) * 100) : Math.Max(GetMinYear(), (selectedYear / 10) * 10);
-                            var endYear = Math.Min(GetMaxYear(), startYear + (CurrentView == OpenTo.Century ? 99 : 9));
-                            <div class="vek-picker-month-container" role="group" aria-label="@(CurrentView == OpenTo.Century ? "Choose decade" : "Choose year range")">
-                                @for (var year = startYear; year <= endYear; year += CurrentView == OpenTo.Century ? 10 : 1)
-                                {
-                                    var selectedRangeYear = year;
-                                    <button type="button" aria-label="@(CurrentView == OpenTo.Century ? $"Decade {year} to {Math.Min(year + 9, GetMaxYear())}" : $"Year {year}")" class="vek-picker-month vek-button-root" @onclick="@(() => SelectRangeYear(selectedRangeYear))">@year</button>
-                                }
-                            </div>
-                        }
-                        else if (tempMonth == 0 && CurrentView == OpenTo.Year)
-                        {
-                            <div class="vek-picker-calendar-header"><div class="vek-picker-calendar-header-switch"><button type="button" aria-label="Back to decade selection" class="vek-picker-slide-transition vek-picker-calendar-header-transition" @onclick="GoToDecadeView">@GetFormattedYearString()</button></div></div>
                             <div id="pickerYears" class="vek-picker-year-container">
                                 @for (int i = GetMinYear(); i <= GetMaxYear(); i++)
                                 {
