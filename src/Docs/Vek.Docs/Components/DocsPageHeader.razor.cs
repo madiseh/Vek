@@ -2,7 +2,6 @@
 // Vek licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Components;
 using Vek.Docs.Extensions;
 using Vek.Docs.Models;
@@ -116,6 +115,16 @@ public sealed partial class DocsPageHeader
     private string GetTitle() => $"{Title} - Vek";
 
     /// <summary>
+    /// Gets the page description for search and social previews.
+    /// </summary>
+    private string GetMetaDescription()
+    {
+        return string.IsNullOrWhiteSpace(ComputedSubTitle)
+            ? "Vek is an open-source Blazor component library with accessible, customizable UI components for .NET 8–11."
+            : ComputedSubTitle.TrimEnd('.');
+    }
+
+    /// <summary>
     /// Gets the subtitle for this page.
     /// </summary>
     /// <returns></returns>
@@ -127,30 +136,20 @@ public sealed partial class DocsPageHeader
     }
 
     /// <summary>
-    /// Gets the keywords for this page.
-    /// </summary>
-    /// <returns></returns>
-    private string GetKeywords()
-    {
-        var keywords = new HashSet<string>
-        {
-            Title,
-            Component,
-            Component?.Replace("Vek", ""),
-            "vek",
-            "blazor",
-            "component",
-            "material design"
-        };
-        return string.Join(", ", keywords);
-    }
-
-    /// <summary>
     /// Gets the canonical URL for this page.
     /// </summary>
     /// <returns></returns>
     private string GetCanonicalUri()
     {
-        return NavigationManager.Uri.Replace(NavigationManager.BaseUri, "https://github.com/madiseh/vek");
+        var canonicalUri = new UriBuilder(NavigationManager.Uri)
+        {
+            Scheme = Uri.UriSchemeHttps,
+            Host = "vekui.dev",
+            Port = -1,
+            Query = string.Empty,
+            Fragment = string.Empty
+        };
+
+        return canonicalUri.Uri.GetLeftPart(UriPartial.Path);
     }
 }
