@@ -160,6 +160,23 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Asynchronous Child Node Fetching on Expand">
+                <Description>
+                    <p>
+                        For deeply nested or high-volume hierarchies, <CodeInline>LoadChildrenAsync</CodeInline> allows child nodes to be loaded on demand when the parent node's chevron is clicked.
+                    </p>
+                    <p>
+                        An inline animated loading spinner appears while children are being fetched. Once loaded, the nodes are cached so subsequent collapse and expand operations do not refetch.
+                        The <CodeInline>HasChildren</CodeInline> predicate determines whether an expand chevron should be rendered before children are fetched. Use <CodeInline>ReloadNodeAsync</CodeInline> on the tree view or <CodeInline>ReloadAsync</CodeInline> on an item to invalidate the cache and fetch fresh child nodes.
+                    </p>
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TreeViewLazyLoadExample)">
+                <TreeViewLazyLoadExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Filtering">
                 <Description>
                     <p>

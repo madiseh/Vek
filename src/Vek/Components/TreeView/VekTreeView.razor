@@ -30,6 +30,15 @@
                 </CascadingValue>
             }
         }
+        else if (Items != null && Items.Count > 0)
+        {
+            @foreach (var item in Items)
+            {
+                <CascadingValue Name="@VekTreeViewCascadingValues.ItemData" Value="item" IsFixed="true">
+                    <VekTreeViewItem T="T" Value="@item.Value" Text="@item.Text" Items="@item.Children" CanExpand="@item.Expandable" Expanded="@item.Expanded" Icon="@item.Icon" />
+                </CascadingValue>
+            }
+        }
         else if (ChildContent != null)
         {
             // Hand-written children must not inherit the data node of an enclosing ItemTemplate item.
