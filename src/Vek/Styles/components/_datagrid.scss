@@ -487,3 +487,147 @@
   box-shadow: var(--vek-elevation-8);
   background-color: var(--vek-palette-surface);
 }
+
+// Filter Builder
+.vek-filter-builder {
+  display: flex;
+  flex-direction: column;
+  min-width: 320px;
+  max-width: 680px;
+  padding: 16px;
+  box-sizing: border-box;
+  background-color: var(--vek-palette-surface);
+  color: var(--vek-palette-text-primary);
+  border-radius: var(--vek-default-borderradius);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  &__title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: 480px;
+    padding: 4px 0;
+    gap: 8px;
+  }
+
+  &__validation {
+    color: var(--vek-palette-error);
+    background-color: var(--vek-palette-error-hover, rgba(244, 67, 54, 0.08));
+    padding: 8px 12px;
+    border-radius: var(--vek-default-borderradius);
+    font-size: 0.875rem;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--vek-palette-table-lines);
+  }
+}
+
+.vek-filter-builder-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--vek-palette-table-lines);
+  border-radius: var(--vek-default-borderradius);
+  background-color: var(--vek-palette-background-grey, rgba(0, 0, 0, 0.02));
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  &__logic-select {
+    padding: 4px 8px;
+    border: 1px solid var(--vek-palette-table-lines);
+    border-radius: var(--vek-default-borderradius);
+    background-color: var(--vek-palette-surface);
+    color: var(--vek-palette-text-primary);
+    font-size: 0.875rem;
+  }
+
+  &__children {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-left: 12px;
+    border-left: 2px solid var(--vek-palette-primary);
+    padding-left: 10px;
+  }
+
+  &__child {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+}
+
+.vek-filter-builder-condition {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  flex-wrap: wrap;
+
+  select, input {
+    padding: 6px 10px;
+    border: 1px solid var(--vek-palette-table-lines);
+    border-radius: var(--vek-default-borderradius);
+    background-color: var(--vek-palette-surface);
+    color: var(--vek-palette-text-primary);
+    font-size: 0.875rem;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: var(--vek-palette-primary);
+    }
+  }
+
+  &__field-select {
+    min-width: 130px;
+  }
+
+  &__operator-select {
+    min-width: 120px;
+  }
+
+  &__value-input {
+    flex: 1;
+    min-width: 100px;
+  }
+}
+
+.vek-datagrid-filter-builder-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: var(--vek-zindex-dialog, 1400);
+  outline: none;
+  border-radius: var(--vek-default-borderradius);
+  box-shadow: var(--vek-elevation-8);
+  background-color: var(--vek-palette-surface);
+}

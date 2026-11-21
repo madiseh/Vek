@@ -4,9 +4,12 @@
 - **Feature ID**: 012
 - **Feature Slug**: datagrid-filter-builder-dialog
 - **Module**: DataGrid
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 12
 - **Dependencies**: ["004"]
+- **Pull Request**: https://github.com/madiseh/Vek/pull/77
+- **Started At**: 2026-11-20T22:33:17Z
+- **Completed At**: 2026-11-20T23:20:07Z
 
 ---
 

@@ -1,0 +1,32 @@
+@namespace TestComponents.DataGrid
+
+<VekPopoverProvider />
+
+<VekDataGrid @ref="_grid" T="FilterBuilderItem" Items="Items" Filterable="true">
+    <Columns>
+        <PropertyColumn Property="x => x.Name" Title="Name" Filterable="true" />
+        <PropertyColumn Property="x => x.Department" Title="Department" Filterable="true" />
+        <PropertyColumn Property="x => x.Age" Title="Age" Filterable="true" />
+    </Columns>
+</VekDataGrid>
+
+@code {
+    private VekDataGrid<FilterBuilderItem> _grid = null!;
+
+    public sealed record FilterBuilderItem(string Name, string Department, int Age);
+
+    private static readonly List<FilterBuilderItem> Items =
+    [
+        new("Alice Johnson", "R&D", 30),
+        new("Bob Smith", "Product", 25),
+        new("Charlie Brown", "R&D", 40)
+    ];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await _grid.ShowFilterBuilderAsync();
+        }
+    }
+}
