@@ -15,7 +15,7 @@ public class TreeItemData<T> : ITreeItemData<T>, IEquatable<TreeItemData<T>>
 {
     public TreeItemData() : this(default) { }
 
-    protected TreeItemData(T? value)
+    public TreeItemData(T? value)
     {
         Value = value;
     }
@@ -76,16 +76,25 @@ public class TreeItemData<T> : ITreeItemData<T>, IEquatable<TreeItemData<T>>
     /// </remarks>
     public virtual bool Visible { get; set; } = true;
 
+    private bool? _hasChildren;
+
     /// <summary>
     /// The child items underneath this item.
     /// </summary>
     public virtual IReadOnlyCollection<ITreeItemData<T>>? Children { get; set; }
 
     /// <summary>
-    /// Whether this item contains child items.
+    /// Whether this item contains child items or can be expanded to load child items.
     /// </summary>
-    [MemberNotNullWhen(true, nameof(Children))]
-    public virtual bool HasChildren => Children is not null && Children.Count > 0;
+    /// <remarks>
+    /// Defaults to evaluating whether <see cref="Children"/> is non-null and not empty.
+    /// Can be explicitly set to <c>true</c> for lazy-loaded nodes before children are fetched.
+    /// </remarks>
+    public virtual bool HasChildren
+    {
+        get => _hasChildren ?? (Children is not null && Children.Count > 0);
+        set => _hasChildren = value;
+    }
 
     /// <summary>
     /// Whether this item is the same as the specified item.

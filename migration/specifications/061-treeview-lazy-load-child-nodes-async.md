@@ -4,9 +4,12 @@
 - **Feature ID**: 061
 - **Feature Slug**: treeview-lazy-load-child-nodes-async
 - **Module**: TreeView
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 61
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/88
+- **Started At**: 2026-11-21T06:48:18Z
+- **Completed At**: 2026-11-21T09:13:14Z
 
 ---
 

@@ -24,6 +24,8 @@ namespace Vek
         private readonly ParameterState<bool> _selectedState;
         private readonly ParameterState<bool> _expandedState;
         private readonly ParameterState<IReadOnlyCollection<ITreeItemData<T>>?> _itemsState;
+        private readonly ParameterState<Func<TreeItemData<T>, Task<IEnumerable<TreeItemData<T>>>>?> _loadChildrenAsyncState;
+        private readonly ParameterState<bool?> _hasChildrenState;
         private readonly DefaultConverter<T?> _converter = new();
         private readonly HashSet<VekTreeViewItem<T>> _childItems = new();
         private readonly string _checkboxTextId = Identifier.Create("treeviewitem-label");
@@ -41,6 +43,10 @@ namespace Vek
             _itemsState = registerScope.RegisterParameter<IReadOnlyCollection<ITreeItemData<T>>?>(nameof(Items))
                 .WithParameter(() => Items)
                 .WithEventCallback(() => ItemsChanged);
+            _loadChildrenAsyncState = registerScope.RegisterParameter<Func<TreeItemData<T>, Task<IEnumerable<TreeItemData<T>>>>?>(nameof(LoadChildrenAsync))
+                .WithParameter(() => LoadChildrenAsync);
+            _hasChildrenState = registerScope.RegisterParameter<bool?>(nameof(HasChildren))
+                .WithParameter(() => HasChildren);
         }
 
         protected string Classname =>
@@ -56,8 +62,8 @@ namespace Vek
 
         protected string ContentClassname =>
             new CssBuilder("vek-treeview-item-content")
-                .AddClass("cursor-pointer", !GetDisabled() && (!GetReadOnly() || (GetExpandOnClick() && HasChildren())))
-                .AddClass("vek-ripple", GetRipple() && !GetDisabled() && !GetExpandOnDoubleClick() && (!GetReadOnly() || (GetExpandOnClick() && HasChildren())))
+                .AddClass("cursor-pointer", !GetDisabled() && (!GetReadOnly() || (GetExpandOnClick() && DetermineHasChildren())))
+                .AddClass("vek-ripple", GetRipple() && !GetDisabled() && !GetExpandOnDoubleClick() && (!GetReadOnly() || (GetExpandOnClick() && DetermineHasChildren())))
                 .AddClass("vek-treeview-item-selected", !GetDisabled() && !MultiSelection && _selectedState)
                 .Build();
 
@@ -76,7 +82,7 @@ namespace Vek
 
         // When the item comes from ItemTemplate, this links the component instance to its backing node object.
         [CascadingParameter(Name = VekTreeViewCascadingValues.ItemData)]
-        private ITreeItemData<T>? CurrentItemData { get; set; }
+        internal ITreeItemData<T>? CurrentItemData { get; set; }
 
         /// <summary>
         /// The value associated with this item.
@@ -188,6 +194,26 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.TreeView.Behavior)]
         public bool CanExpand { get; set; } = true;
+
+        /// <summary>
+        /// An asynchronous delegate called to load child nodes on demand when this specific item is expanded.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>. When set, overrides any tree-level loading delegate for this item.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.TreeView.Data)]
+        public Func<TreeItemData<T>, Task<IEnumerable<TreeItemData<T>>>>? LoadChildrenAsync { get; set; }
+
+        /// <summary>
+        /// Explicitly specifies whether this item has child nodes to expand, controlling the display of the expand chevron.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>. When set, this controls whether the expand chevron is shown before children are loaded.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.TreeView.Behavior)]
+        public bool? HasChildren { get; set; }
 
         /// <summary>
         /// The child items within this item.
@@ -378,11 +404,55 @@ namespace Vek
 
         private bool _hasRenderedCheckBoxState;
 
-        private bool HasChildren()
+        internal bool DetermineHasChildren()
         {
-            return ChildContent != null
-                || (VekTreeRoot != null && GetItems().Count != 0)
-                || (VekTreeRoot?.ServerData != null && CanExpand && !GetServerDataLoaded() && GetItems().Count == 0);
+            if (_hasChildrenState.Value.HasValue)
+            {
+                return _hasChildrenState.Value.Value;
+            }
+
+            if (GetItems().Count > 0)
+            {
+                return true;
+            }
+
+            if (ChildContent != null)
+            {
+                return true;
+            }
+
+            if (CurrentItemData is TreeItemData<T> treeItemData)
+            {
+                if (VekTreeRoot?.GetHasChildren() is not null)
+                {
+                    return VekTreeRoot.GetHasChildren()!(treeItemData);
+                }
+
+                if (VekTreeRoot?.GetNodeProvider() is not null)
+                {
+                    return VekTreeRoot.GetNodeProvider()!.HasChildren(treeItemData);
+                }
+
+                if (treeItemData.HasChildren)
+                {
+                    return true;
+                }
+            }
+
+            if (IsAsyncLoadingConfigured() && CanExpand && !GetServerDataLoaded() && GetItems().Count == 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool IsAsyncLoadingConfigured()
+        {
+            return _loadChildrenAsyncState.Value is not null
+                || VekTreeRoot?.GetLoadChildrenAsync() is not null
+                || VekTreeRoot?.GetNodeProvider() is not null
+                || VekTreeRoot?.ServerData is not null;
         }
 
         private bool AreChildrenVisible() => _itemsState.Value is null || _itemsState.Value.Any(i => i.Visible);
@@ -591,7 +661,7 @@ namespace Vek
         // A leaf without a value has nothing to select, so a click changes nothing in the tree.
         // The checkbox would still move to its next state on its own and show a selection that doesn't exist.
         // A parent stays clickable because its children may have values to select.
-        private bool GetCheckBoxReadOnly() => GetReadOnly() || (GetValue() is null && !HasChildren());
+        private bool GetCheckBoxReadOnly() => GetReadOnly() || (GetValue() is null && !DetermineHasChildren());
 
         private bool GetExpandOnClick() => VekTreeRoot?.ExpandOnClick == true;
 
@@ -604,10 +674,13 @@ namespace Vek
         private async Task OnItemClickedAsync(MouseEventArgs ev)
         {
             // note: when both click and doubleClick are enabled, doubleClick wins
-            if (HasChildren() && GetExpandOnClick() && !GetExpandOnDoubleClick())
+            if (DetermineHasChildren() && GetExpandOnClick() && !GetExpandOnDoubleClick())
             {
                 await _expandedState.SetValueAsync(!_expandedState);
-                await TryInvokeServerLoadFunc();
+                if (_expandedState.Value)
+                {
+                    await TryInvokeServerLoadFunc();
+                }
             }
             if (GetDisabled())
             {
@@ -630,10 +703,13 @@ namespace Vek
 
         private async Task OnItemDoubleClickedAsync(MouseEventArgs ev)
         {
-            if (HasChildren() && GetExpandOnDoubleClick())
+            if (DetermineHasChildren() && GetExpandOnDoubleClick())
             {
                 await _expandedState.SetValueAsync(!_expandedState);
-                await TryInvokeServerLoadFunc();
+                if (_expandedState.Value)
+                {
+                    await TryInvokeServerLoadFunc();
+                }
             }
             if (GetDisabled())
             {
@@ -654,12 +730,15 @@ namespace Vek
             if (_expandedState != expanded)
             {
                 await _expandedState.SetValueAsync(expanded);
-                await TryInvokeServerLoadFunc();
+                if (expanded)
+                {
+                    await TryInvokeServerLoadFunc();
+                }
             }
         }
 
         /// <summary>
-        /// Clears the children under this item.
+        /// Clears the children under this item and reloads them from the asynchronous source.
         /// </summary>
         public async Task ReloadAsync()
         {
@@ -668,6 +747,10 @@ namespace Vek
             if (_itemsState.Value is not null)
             {
                 await _itemsState.SetValueAsync(Array.Empty<ITreeItemData<T>>());
+            }
+            if (CurrentItemData is TreeItemData<T> current)
+            {
+                current.Children = null;
             }
             await TryInvokeServerLoadFunc();
 
@@ -709,15 +792,23 @@ namespace Vek
 
         internal async Task TryInvokeServerLoadFunc()
         {
-            if (GetItems().Count != 0 || !CanExpand || VekTreeRoot?.ServerData == null)
+            if (GetItems().Count != 0 || !CanExpand || !IsAsyncLoadingConfigured() || GetServerDataLoaded())
                 return;
             _loading = true;
             StateHasChanged();
             var loaded = false;
             try
             {
-                var items = await VekTreeRoot.ServerData(GetValue());
-                await _itemsState.SetValueAsync(items);
+                var items = await FetchChildrenAsync();
+                if (items is not null)
+                {
+                    var itemList = items as IReadOnlyCollection<ITreeItemData<T>> ?? items.ToList();
+                    await _itemsState.SetValueAsync(itemList);
+                    if (CurrentItemData is TreeItemData<T> current)
+                    {
+                        current.Children = itemList;
+                    }
+                }
                 loaded = true;
             }
             finally
@@ -727,6 +818,34 @@ namespace Vek
 
                 StateHasChanged();
             }
+        }
+
+        private async Task<IEnumerable<ITreeItemData<T>>?> FetchChildrenAsync()
+        {
+            var nodeData = CurrentItemData as TreeItemData<T>
+                ?? new TreeItemData<T>(GetValue()) { Text = GetText(), Icon = GetIcon() };
+
+            if (_loadChildrenAsyncState.Value is not null)
+            {
+                return await _loadChildrenAsyncState.Value(nodeData);
+            }
+
+            if (VekTreeRoot?.GetLoadChildrenAsync() is not null)
+            {
+                return await VekTreeRoot.GetLoadChildrenAsync()!(nodeData);
+            }
+
+            if (VekTreeRoot?.GetNodeProvider() is not null)
+            {
+                return await VekTreeRoot.GetNodeProvider()!.LoadChildrenAsync(nodeData);
+            }
+
+            if (VekTreeRoot?.ServerData is not null)
+            {
+                return await VekTreeRoot.ServerData(GetValue());
+            }
+
+            return null;
         }
 
         /// <summary>

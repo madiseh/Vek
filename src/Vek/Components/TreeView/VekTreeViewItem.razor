@@ -20,7 +20,7 @@
             }
             else
             {
-                @if (HasChildren())
+                @if (DetermineHasChildren())
                 {
                     <VekTreeViewItemToggleButton Disabled="@GetDisabled()" Loading="_loading" Expanded="_expandedState.Value" ExpandedChanged="OnItemExpanded" Visible="@AreChildrenVisible()" ExpandedIcon="@ExpandButtonIcon" ExpandedIconColor="@ExpandButtonIconColor" LoadingIcon="@LoadingIcon" LoadingIconColor="LoadingIconColor"></VekTreeViewItemToggleButton>
                 }
@@ -64,7 +64,7 @@
                 }
             }
         </div>
-        @if (HasChildren())
+        @if (DetermineHasChildren())
         {
             <VekCollapse Expanded="@_expandedState.Value">
                 @if (VekTreeRoot is null)

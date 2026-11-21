@@ -67,6 +67,12 @@ namespace Vek
             _allowReparentingState = registerScope.RegisterParameter<bool>(nameof(AllowReparenting))
                 .WithParameter(() => AllowReparenting)
                 .WithChangeHandler(OnParameterChangedAsync);
+            _loadChildrenAsyncState = registerScope.RegisterParameter<Func<TreeItemData<T>, Task<IEnumerable<TreeItemData<T>>>>?>(nameof(LoadChildrenAsync))
+                .WithParameter(() => LoadChildrenAsync);
+            _hasChildrenState = registerScope.RegisterParameter<Func<TreeItemData<T>, bool>?>(nameof(HasChildren))
+                .WithParameter(() => HasChildren);
+            _nodeProviderState = registerScope.RegisterParameter<ITreeNodeProvider<T>?>(nameof(NodeProvider))
+                .WithParameter(() => NodeProvider);
             _selection = new();
         }
 
@@ -74,9 +80,15 @@ namespace Vek
         private readonly ParameterState<IReadOnlyCollection<T>?> _selectedValuesState;
         private readonly ParameterState<bool> _allowDragDropState;
         private readonly ParameterState<bool> _allowReparentingState;
+        private readonly ParameterState<Func<TreeItemData<T>, Task<IEnumerable<TreeItemData<T>>>>?> _loadChildrenAsyncState;
+        private readonly ParameterState<Func<TreeItemData<T>, bool>?> _hasChildrenState;
+        private readonly ParameterState<ITreeNodeProvider<T>?> _nodeProviderState;
 
         internal bool GetAllowDragDrop() => _allowDragDropState.Value;
         internal bool GetAllowReparenting() => _allowReparentingState.Value;
+        internal Func<TreeItemData<T>, Task<IEnumerable<TreeItemData<T>>>>? GetLoadChildrenAsync() => _loadChildrenAsyncState.Value;
+        internal Func<TreeItemData<T>, bool>? GetHasChildren() => _hasChildrenState.Value;
+        internal ITreeNodeProvider<T>? GetNodeProvider() => _nodeProviderState.Value;
 
         private HashSet<T> _selection;
         private readonly HashSet<VekTreeViewItem<T>> _childItems = new();
@@ -408,6 +420,33 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.TreeView.Data)]
         public Func<T?, Task<IReadOnlyCollection<TreeItemData<T>>>>? ServerData { get; set; }
+
+        /// <summary>
+        /// An asynchronous delegate called to load child nodes on demand when an item is expanded.
+        /// </summary>
+        /// <remarks>
+        /// Loaded child nodes are cached to avoid refetching on subsequent collapse and re-expand actions.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.TreeView.Data)]
+        public Func<TreeItemData<T>, Task<IEnumerable<TreeItemData<T>>>>? LoadChildrenAsync { get; set; }
+
+        /// <summary>
+        /// An optional predicate function determining whether a node has children and should display an expand chevron.
+        /// </summary>
+        /// <remarks>
+        /// When supplied, this predicate controls whether the chevron appears before children are fetched.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.TreeView.Behavior)]
+        public Func<TreeItemData<T>, bool>? HasChildren { get; set; }
+
+        /// <summary>
+        /// A provider for resolving and loading hierarchical tree node data on demand.
+        /// </summary>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.TreeView.Data)]
+        public ITreeNodeProvider<T>? NodeProvider { get; set; }
 
         /// <summary>
         /// Prevents selections from being changed.
@@ -854,6 +893,35 @@ namespace Vek
             return values;
         }
 
+
+        /// <summary>
+        /// Clears cached children and reloads the child nodes for the specified data item.
+        /// </summary>
+        /// <param name="item">The data item whose children should be reloaded.</param>
+        public async Task ReloadNodeAsync(ITreeItemData<T> item)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+            SetServerDataLoaded(item, false);
+            item.Children = null;
+
+            foreach (var rootItem in _childItems)
+            {
+                if (ReferenceEquals(rootItem.CurrentItemData, item) || Equals(rootItem.GetValue(), item.Value))
+                {
+                    await rootItem.ReloadAsync();
+                    return;
+                }
+
+                foreach (var child in rootItem.GetChildItemsRecursive())
+                {
+                    if (ReferenceEquals(child.CurrentItemData, item) || Equals(child.GetValue(), item.Value))
+                    {
+                        await child.ReloadAsync();
+                        return;
+                    }
+                }
+            }
+        }
 
         internal bool GetServerDataLoaded(ITreeItemData<T> item) => _serverDataStates.GetOrCreateValue(item).IsLoaded;
 

@@ -751,9 +751,12 @@
       "title": "TreeView On-Demand Asynchronous Child Node Fetching on Expand",
       "module": "TreeView",
       "priority": 61,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/061-treeview-lazy-load-child-nodes-async.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-21T06:48:18Z",
+      "completed_at": "2026-11-21T09:13:14Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/88"
     },
     {
       "id": "062",
