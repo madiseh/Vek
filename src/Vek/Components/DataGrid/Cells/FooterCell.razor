@@ -5,7 +5,11 @@
 @if (Column != null)
 {
     var footerTemplate = Column.GetFooterTemplate();
-    <td class="@Classname" style="@Stylename" colspan="@Column.FooterColSpan" @attributes="@UserAttributes">
+    <td class="@Classname" style="@Stylename" colspan="@Column.FooterColSpan"
+        @oncontextmenu="@GetContextMenuCallback()"
+        @oncontextmenu:preventDefault="@HasFooterContextMenu"
+        @oncontextmenu:stopPropagation="@HasFooterContextMenu"
+        @attributes="@UserAttributes">
         @if (Column.AggregateDefinition != null)
         {
             var aggregateTemplate = Column.GetAggregateTemplate();

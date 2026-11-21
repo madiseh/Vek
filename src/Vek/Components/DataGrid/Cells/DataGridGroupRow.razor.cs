@@ -120,7 +120,7 @@ namespace Vek
 
         // DataGridVirtualizeRow gates its context-menu listener on the same condition, so without a grid-level handler this forwarder could never fire.
         private EventCallback<(MouseEventArgs args, T item, int index)> GetContextRowClickCallback()
-            => DataGrid.RowContextMenuClick.HasDelegate
+            => (DataGrid.RowContextMenuClick.HasDelegate || DataGrid.HasRowContextMenu)
                 ? EventCallback.Factory.Create(
                     this,
                     _contextRowClickForwarder ??= this.AsNonRenderingEventHandler<(MouseEventArgs args, T item, int index)>(

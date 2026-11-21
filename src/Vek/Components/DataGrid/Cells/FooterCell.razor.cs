@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Vek.Utilities;
 
 namespace Vek
@@ -82,6 +83,23 @@ namespace Vek
                 Debug.Assert(DataGrid is not null);
                 return CurrentItems ?? DataGrid.CurrentPageItems;
             }
+        }
+
+        private bool HasFooterContextMenu => DataGrid?.HasFooterContextMenu ?? false;
+
+        private EventCallback<MouseEventArgs> GetContextMenuCallback()
+            => HasFooterContextMenu
+                ? EventCallback.Factory.Create<MouseEventArgs>(this, OnContextMenuAsync)
+                : default;
+
+        private Task OnContextMenuAsync(MouseEventArgs args)
+        {
+            if (Column is not null && DataGrid is not null)
+            {
+                return DataGrid.OnFooterContextMenuClickedAsync(args, Column);
+            }
+
+            return Task.CompletedTask;
         }
     }
 }

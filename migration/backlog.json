@@ -171,9 +171,11 @@
       "title": "DataGrid Context Menu Actions and Right-Click Cell Hooks",
       "module": "DataGrid",
       "priority": 13,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/013-datagrid-context-menu-actions.md",
-      "dependencies": []
+      "dependencies": [],
+      "completed_at": "2026-11-21T07:46:46Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/83"
     },
     {
       "id": "014",
