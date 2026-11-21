@@ -4,9 +4,11 @@
 - **Feature ID**: 013
 - **Feature Slug**: datagrid-context-menu-actions
 - **Module**: DataGrid
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 13
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/83
+- **Completed At**: 2026-11-21T07:46:46Z
 
 ---
 
