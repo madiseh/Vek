@@ -70,6 +70,11 @@ This section MUST include:
 - A breakdown of test results for EVERY test project.
 - A working download link to `test-results-vX.Y.Z.zip`.
 
+The GitHub Release description MUST also contain a section
+named "Contributors" that identifies the people who contributed
+to the release range. Its handles and PR links must match the
+verified release range.
+
 These requirements apply to the actual GitHub Release
 description, not only to CHANGELOG.md.
 
@@ -84,10 +89,11 @@ Before changing a draft Release into a published Release:
 1. Retrieve the draft Release using the GitHub API.
 2. Verify that all required Release assets exist.
 3. Verify that the Test Results section is present.
-4. Verify that every test project's counts are included.
-5. Verify that the JUnit ZIP download link is correct.
-6. Verify that the release tag points to the expected SHA.
-7. Verify that the slideshow and its references are valid.
+4. Verify that the Contributors section is present and its handles/PR links match the verified release range.
+5. Verify that every test project's counts are included.
+6. Verify that the JUnit ZIP download link is correct.
+7. Verify that the release tag points to the expected SHA.
+8. Verify that the slideshow and its references are valid.
 
 If ANY verification fails:
 
@@ -102,10 +108,11 @@ After publishing:
 
 1. Fetch the published Release from GitHub again.
 2. Verify that the Test Results section still exists.
-3. Verify that all test counts are unchanged.
-4. Verify that the JUnit ZIP is still downloadable.
-5. Verify all expected Release assets.
-6. Continue with NuGet and deployment verification.
+3. Verify that the Contributors section is still present and unchanged.
+4. Verify that all test counts are unchanged.
+5. Verify that the JUnit ZIP is still downloadable.
+6. Verify all expected Release assets.
+7. Continue with NuGet and deployment verification.
 
 ### Completion Contract
 
@@ -144,12 +151,14 @@ the blocker and mark the release workflow as incomplete.
 
 1. Generate the release text from the verified range, not from memory. Use merged PR titles and descriptions as evidence, and link each user-visible change to its PR when possible.
 2. Follow `.github/release.yml` categories and exclude `skip changelog` items. Review GitHub-generated release notes and keep the final text factual and concise. Do not rely on Nuntia preview or post-publish generation until its repository-owner condition is corrected: the current remote is `madiseh/Vek`, while the workflow only runs when `github.repository_owner == 'Vek'`.
-3. Update `CHANGELOG.md` with the new version, release date, a short summary, grouped user-visible changes, and a test-results section sourced from the exact candidate CI run. List each test project with passed, skipped, and failed counts before the full-changelog link.
-4. For each merged PR with relevant screenshots or product images, collect the image URLs from the PR description or comments, preserve their association with the feature, and add a short caption naming the feature and PR. Skip duplicates, unrelated images, and images that cannot be fetched or verified.
-5. Build one animated GIF slideshow from the selected screenshots in release order. Use a readable frame duration and fit images without distorting them. Save it as `release-slideshow.gif` and add a numbered list of image captions and PR links in the release notes so the changes remain understandable if the GIF does not animate in a viewer.
-6. Download the JUnit XML reports from the exact candidate CI run and package them as `test-results-vX.Y.Z.zip`. Inspect the reports for sensitive content, then attach the ZIP to the Release and link it from the test-results section. If JUnit artifacts are unavailable, report the blocker and do not claim that test results were uploaded.
-7. If GIF creation is unavailable, add the verified images as a clearly captioned static gallery and report that an animated slideshow could not be produced. Do not describe a static gallery as a slideshow.
-8. Use GitHub's generated notes to cross-check the PR range, then verify that no merged user-visible PR is missing and no unmerged PR is included.
+3. Add a `Contributors` section to the GitHub Release description and `CHANGELOG.md`. Include every distinct human credited as an author of a merged PR or as a co-author on a commit in the verified release range, excluding bots. Deduplicate accounts, link each GitHub handle to its profile, and link the PR or PRs that credit them so readers can see who contributed to this version.
+4. If GitHub's contribution history confirms that someone is making their first contribution to the repository, note that beside their handle and link the verified first PR (for example, `@handle made their first contribution in #123`). Do not infer first-time status from the current release range alone; omit that claim when repository history cannot verify it.
+5. Update `CHANGELOG.md` with the new version, release date, a short summary, grouped user-visible changes, the Contributors section, and a test-results section sourced from the exact candidate CI run. List each test project with passed, skipped, and failed counts before the full-changelog link.
+6. For each merged PR with relevant screenshots or product images, collect the image URLs from the PR description or comments, preserve their association with the feature, and add a short caption naming the feature and PR. Skip duplicates, unrelated images, and images that cannot be fetched or verified.
+7. Build one animated GIF slideshow from the selected screenshots in release order. Use a readable frame duration and fit images without distorting them. Save it as `release-slideshow.gif` and add a numbered list of image captions and PR links in the release notes so the changes remain understandable if the GIF does not animate in a viewer.
+8. Download the JUnit XML reports from the exact candidate CI run and package them as `test-results-vX.Y.Z.zip`. Inspect the reports for sensitive content, then attach the ZIP to the Release and link it from the test-results section. If JUnit artifacts are unavailable, report the blocker and do not claim that test results were uploaded.
+9. If GIF creation is unavailable, add the verified images as a clearly captioned static gallery and report that an animated slideshow could not be produced. Do not describe a static gallery as a slideshow.
+10. Use GitHub's generated notes to cross-check the PR range, then verify that no merged user-visible PR is missing and no unmerged PR is included.
 
 ## 4. Create the tag and draft Release
 
