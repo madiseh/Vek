@@ -1,9 +1,0 @@
-﻿@inherits VekComponentBase
-@namespace Vek.UnitTests
-
-<VekButton id="@($"childBtn{Id}")" OnClick="ToggleAsync">@(_expandedState.Value ? "Show" : "Hide")</VekButton>
-
-@if (_expandedState.Value)
-{
-    <VekAlert id="@($"childAlert{Id}")">@($"Oh my! We got secret content{Id}!")</VekAlert>
-}

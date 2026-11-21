@@ -1,9 +1,0 @@
-﻿@inherits LayoutComponentBase
-
-<VekRTLProvider RightToLeft="@LayoutService.IsRTL">
-    <VekThemeProvider @ref="@_vekThemeProvider" Theme="@LayoutService.CurrentTheme" ObserveSystemDarkModeChange="@LayoutService.ObserveSystemDarkModeChange" IsDarkMode="@LayoutService.IsDarkMode" IsDarkModeChanged="@((dark) => LayoutService.UpdateDarkModeState(dark))" />
-    <VekPopoverProvider />
-    <VekSnackbarProvider/>
-    <VekDialogProvider FullWidth="true" MaxWidth="MaxWidth.ExtraSmall"/>
-    @Body
-</VekRTLProvider>

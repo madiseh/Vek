@@ -1,9 +1,0 @@
-﻿<VekForm @bind-IsValid="@_isValid" ValidationDelay="0">
-    <VekTextField T="int" Immediate="true" />
-</VekForm>
-<VekButton Disabled="@(!_isValid)" Variant="Variant.Filled" Color="Color.Primary">Submit</VekButton>
-
-@code
-{
-    private bool _isValid = true;
-}
