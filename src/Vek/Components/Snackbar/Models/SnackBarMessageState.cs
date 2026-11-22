@@ -11,8 +11,11 @@ namespace Vek
         public bool UserHasInteracted { get; set; }
         public SnackbarOptions Options { get; }
         public SnackbarState SnackbarState { get; set; }
+        internal bool IsPaused => _paused;
         private readonly TimeProvider _timeProvider;
         private DateTimeOffset _transitionStartTime;
+        private bool _paused;
+        private DateTimeOffset _pausedAt;
 
         public SnackBarMessageState(SnackbarOptions options, TimeProvider timeProvider)
         {
@@ -30,9 +33,26 @@ namespace Vek
             _transitionStartTime = now;
         }
 
-        private long GetElapsedMilliseconds()
+        internal void PauseTimer(bool pause)
         {
             var now = _timeProvider.GetUtcNow();
+            if (pause && !_paused)
+            {
+                _paused = true;
+                _pausedAt = now;
+                return;
+            }
+
+            if (!pause && _paused)
+            {
+                _transitionStartTime += now - _pausedAt;
+                _paused = false;
+            }
+        }
+
+        private long GetElapsedMilliseconds()
+        {
+            var now = _paused ? _pausedAt : _timeProvider.GetUtcNow();
             return (long)(now - _transitionStartTime).TotalMilliseconds;
         }
         private string Opacity => ((decimal)Options.MaximumOpacity / 100).ToPercentage();
@@ -60,7 +80,8 @@ namespace Vek
                         return Format(Template, 0, hidingDuration, AnimationId);
 
                     case SnackbarState.Visible:
-                        return $"opacity: {Opacity};";
+                        var visibleDuration = RemainingTransitionMilliseconds(Options.VisibleStateDuration);
+                        return $"opacity: {Opacity}; --vek-snackbar-progress-duration: {visibleDuration}ms;";
 
                     default:
                         return Empty;

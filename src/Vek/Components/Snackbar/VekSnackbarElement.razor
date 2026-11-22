@@ -32,6 +32,11 @@
         </div>
     }
 
+    @if (Snackbar?.State.Options.VisibleStateDuration > 0 && !Snackbar.State.Options.RequiresInteraction && !Snackbar.State.IsPaused)
+    {
+        <div class="vek-snackbar-progress" aria-hidden="true"></div>
+    }
+
     <div class="vek-snackbar-content-message">
         @if (Message?.ComponentType != null)
         {

@@ -387,6 +387,41 @@ namespace Vek.UnitTests.Components
             messages.Should().Equal(expectedOrder);
         }
 
+        /// <summary>
+        /// Uses the provider limit to control visible notifications and leaves the remainder queued.
+        /// </summary>
+        [Test]
+        public async Task ProviderLimitStacksNotifications()
+        {
+            _service.Configuration.MaxDisplayedSnackbars = 5;
+            Action<SnackbarOptions> allowDuplicates = o => o.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow;
+            var provider = Context.Render<VekSnackbarProvider>(parameters => parameters.Add(p => p.MaxDisplayedSnackbars, 1));
+            await provider.InvokeAsync(() =>
+            {
+                _service.Add("First", configure: allowDuplicates);
+                _service.Add("Second", configure: allowDuplicates);
+            });
+
+            provider.FindAll(".vek-snackbar").Count.Should().Be(1);
+        }
+
+        /// <summary>
+        /// Renders a countdown bar for dismissible notifications and removes it for persistent ones.
+        /// </summary>
+        [Test]
+        public async Task CountdownAppearsOnlyForTimedNotifications()
+        {
+            await _provider.InvokeAsync(() => _service.Add("Timed", configure: options =>
+            {
+                options.ShowTransitionDuration = 0;
+                options.VisibleStateDuration = 3000;
+            }));
+            _provider.Find(".vek-snackbar-progress").GetAttribute("aria-hidden").Should().Be("true");
+
+            await _provider.InvokeAsync(() => _service.Add("Persistent", configure: options => options.RequireInteraction = true));
+            _provider.FindAll(".vek-snackbar-progress").Count.Should().Be(1);
+        }
+
         [Test]
         public async Task MaxDisplayedSnackbarsLimitsWhatIsShown()
         {

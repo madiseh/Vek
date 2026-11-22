@@ -1,5 +1,6 @@
 
 .vek-snackbar {
+  --vek-snackbar-progress-duration: 0ms;
   display: flex;
   flex-grow: initial;
   padding: 6px 16px;
@@ -26,6 +27,18 @@
 
   &.vek-snackbar-surface {
     background: var(--vek-palette-surface);
+  }
+
+  .vek-snackbar-progress {
+    position: absolute;
+    inset-inline-start: 0;
+    bottom: 0;
+    width: 100%;
+    height: 3px;
+    background: currentColor;
+    transform-origin: left center;
+    animation: vek-snackbar-countdown var(--vek-snackbar-progress-duration) linear forwards;
+    pointer-events: none;
   }
 
   .vek-snackbar-content-message {
@@ -88,6 +101,11 @@
       left: 24px
     }
   }
+}
+
+@keyframes vek-snackbar-countdown {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
 }
 
 #vek-snackbar-container {

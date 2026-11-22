@@ -1092,11 +1092,12 @@
       "title": "Snackbar Multi-Toast Queue Stacking, Visual Progress Countdown, and Pause on Hover",
       "module": "Snackbar",
       "priority": 90,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/090-snackbar-queue-stacking-and-auto-dismiss-timer.md",
       "dependencies": [
         "089"
-      ]
+      ],
+      "started_at": "2026-11-22T11:24:03Z"
     },
     {
       "id": "091",
