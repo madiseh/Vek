@@ -38,6 +38,19 @@ namespace Vek.UnitTests.Components
         }
 
         /// <summary>
+        /// Aspect ratio controls the media box sizing without changing the default fixed height.
+        /// </summary>
+        [TestCase("16 / 9")]
+        [TestCase("4 / 3")]
+        [TestCase("1 / 1")]
+        public void CardMedia_AspectRatio_SetsNativeRatio(string ratio)
+        {
+            var comp = Context.Render<VekCardMedia>(parameters => parameters.Add(p => p.AspectRatio, ratio));
+
+            comp.Find("div").GetAttribute("style").Should().Contain($"aspect-ratio: {ratio};").And.NotContain("height:");
+        }
+
+        /// <summary>
         /// The header toggle updates the expanded state and its accessible state.
         /// </summary>
         [Test]
