@@ -202,6 +202,13 @@
     margin-right: 8px;
     margin-inline-end: 8px;
     margin-inline-start: unset;
+
+    &.vek-tab-icon-end {
+      margin-right: unset;
+      margin-inline-end: unset;
+      margin-left: 8px;
+      margin-inline-start: 8px;
+    }
   }
 
   .vek-tab-close-wrapper {

@@ -4,9 +4,10 @@
 - **Feature ID**: 049
 - **Feature Slug**: tabs-badge-and-custom-header-template
 - **Module**: Tabs
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 49
 - **Dependencies**: []
+- **Started At**: 2026-11-22T07:28:42Z
 
 ---
 
