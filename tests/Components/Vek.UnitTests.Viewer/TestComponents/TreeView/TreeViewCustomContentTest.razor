@@ -1,0 +1,17 @@
+@namespace Vek.UnitTests.TestComponents.TreeView
+
+<VekTreeView T="string" Items="@Items" SelectionMode="SelectionMode.SingleSelection" @bind-SelectedValue="Selected">
+    <BodyContent Context="node">
+        <span class="custom-node-name">@node.Text</span>
+        <span class="custom-node-badge">@node.Value</span>
+        <VekIconButton Icon="@Icons.Material.Filled.Delete" aria-label="Delete node" OnClick="@(() => LastAction = $"Delete {node.Text}")" />
+    </BodyContent>
+</VekTreeView>
+
+@code {
+    private string? Selected { get; set; }
+    private string? LastAction { get; set; }
+    private List<ITreeItemData<string>> Items { get; } = [
+        new TreeItemData<string>("Folder") { Text = "Folder", Children = [new TreeItemData<string>("File") { Text = "File" }] }
+    ];
+}

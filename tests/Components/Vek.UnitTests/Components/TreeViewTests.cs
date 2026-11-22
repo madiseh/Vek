@@ -67,6 +67,134 @@ namespace Vek.UnitTests.Components
         }
 
         /// <summary>
+        /// A tree-level body template applies to generated descendants and receives their owning item.
+        /// </summary>
+        [Test]
+        public void BodyContent_TreeTemplate_RendersForEveryNestedNode()
+        {
+            Context.AddFakeTimeProvider();
+            var tree = Context.Render<VekTreeView<string>>(parameters => parameters
+                .Add(p => p.Items, new List<ITreeItemData<string>>
+                {
+                    new TreeItemData<string>("folder") { Text = "Folder", Children = [new TreeItemData<string>("file") { Text = "File" }] }
+                })
+                .Add(p => p.BodyContent, node => builder => builder.AddContent(0, $"custom:{node.Text}")));
+
+            tree.Markup.Should().Contain("custom:Folder");
+            tree.Markup.Should().Contain("custom:File");
+        }
+
+        /// <summary>
+        /// A node-level body template takes precedence over the tree-level template.
+        /// </summary>
+        [Test]
+        public void BodyContent_NodeTemplate_TakesPrecedence()
+        {
+            Context.AddFakeTimeProvider();
+            var tree = Context.Render<VekTreeView<string>>(parameters => parameters
+                .Add(p => p.BodyContent, _ => builder => builder.AddContent(0, "tree template"))
+                .AddChildContent<VekTreeViewItem<string>>(item => item
+                    .Add(x => x.Value, "node")
+                    .Add(x => x.Text, "Node")
+                    .Add(x => x.BodyContent, _ => builder => builder.AddContent(0, "item template"))));
+
+            tree.Markup.Should().Contain("item template");
+            tree.Markup.Should().NotContain("tree template");
+        }
+
+        /// <summary>
+        /// Disabled or read-only nodes disable custom action buttons and prevent their handlers running.
+        /// </summary>
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        public async Task BodyContent_ActionsRespectDisabledAndReadOnly(bool disabled, bool readOnly)
+        {
+            Context.AddFakeTimeProvider();
+            var actions = 0;
+            var tree = Context.Render<VekTreeView<string>>(parameters => parameters
+                .Add(p => p.Disabled, disabled)
+                .Add(p => p.ReadOnly, readOnly)
+                .AddChildContent<VekTreeViewItem<string>>(item => item
+                    .Add(x => x.Value, "node")
+                    .Add(x => x.Text, "Node")
+                    .Add(x => x.BodyContent, _ => builder =>
+                    {
+                        builder.OpenComponent<VekIconButton>(0);
+                        builder.AddAttribute(1, "Icon", Icons.Material.Filled.Delete);
+                        builder.AddAttribute(2, "Disabled", disabled || readOnly);
+                        builder.AddAttribute(3, "OnClick", EventCallback.Factory.Create<MouseEventArgs>(this, () => actions++));
+                        builder.CloseComponent();
+                    })));
+
+            var button = tree.Find("button");
+            button.HasAttribute("disabled").Should().BeTrue();
+            await button.ClickAsync();
+            actions.Should().Be(0);
+        }
+
+        /// <summary>
+        /// A custom action stops click propagation so it does not select its node.
+        /// </summary>
+        [Test]
+        public async Task BodyContent_ActionClick_DoesNotSelectNode()
+        {
+            Context.AddFakeTimeProvider();
+            var actions = 0;
+            var tree = Context.Render<VekTreeView<string>>(parameters => parameters
+                .Add(p => p.SelectionMode, SelectionMode.SingleSelection)
+                .Add(p => p.AllowNodeRenaming, true)
+                .Add(p => p.ExpandOnClick, true)
+                .AddChildContent<VekTreeViewItem<string>>(item => item
+                    .Add(x => x.Value, "node")
+                    .Add(x => x.Text, "Node")
+                    .AddChildContent<VekTreeViewItem<string>>(child => child
+                        .Add(x => x.Value, "child")
+                        .Add(x => x.Text, "Child"))
+                    .Add(x => x.Expanded, false)
+                    .Add(x => x.BodyContent, _ => builder =>
+                    {
+                        builder.OpenElement(0, "button");
+                        builder.AddAttribute(1, "onclick", EventCallback.Factory.Create<MouseEventArgs>(this, () => actions++));
+                        builder.AddEventStopPropagationAttribute(2, "onclick", true);
+                        builder.AddAttribute(3, "ondblclick", EventCallback.Factory.Create<MouseEventArgs>(this, () => actions++));
+                        builder.AddEventStopPropagationAttribute(4, "ondblclick", true);
+                        builder.AddContent(5, "Action");
+                        builder.CloseElement();
+                    })));
+
+            var button = tree.FindAll("button").Single(element => element.TextContent == "Action");
+            await button.ClickAsync();
+
+            actions.Should().Be(1);
+            tree.Find(".vek-treeview-item").ClassList.Should().NotContain("vek-treeview-item-selected");
+            tree.FindAll(".vek-treeview-item").Select(item => item.ClassName).Distinct().Should().ContainSingle();
+            tree.FindAll("input.vek-treeview-item-input").Should().BeEmpty();
+
+            await tree.Find(".vek-treeview-item-content").DoubleClickAsync();
+
+            actions.Should().Be(1);
+            tree.Find(".vek-treeview-item").ClassList.Should().NotContain("vek-treeview-item-selected");
+            tree.FindAll("input.vek-treeview-item-input").Should().BeEmpty();
+        }
+
+        /// <summary>
+        /// A named custom body template gives the multi-selection checkbox an accessible name.
+        /// </summary>
+        [Test]
+        public void BodyContent_MultiSelectionCheckbox_HasAccessibleName()
+        {
+            Context.AddFakeTimeProvider();
+            var tree = Context.Render<VekTreeView<string>>(parameters => parameters
+                .Add(p => p.SelectionMode, SelectionMode.MultiSelection)
+                .Add(p => p.BodyContent, _ => builder => builder.AddContent(0, "custom label"))
+                .AddChildContent<VekTreeViewItem<string>>(item => item
+                    .Add(x => x.Value, "node")
+                    .Add(x => x.Text, "Node")));
+
+            tree.Find("input.vek-checkbox-input").GetAttribute("aria-label").Should().Be("Node");
+        }
+
+        /// <summary>
         /// Live text filtering keeps matching ancestors visible, expands them, and highlights matches.
         /// </summary>
         [Test]

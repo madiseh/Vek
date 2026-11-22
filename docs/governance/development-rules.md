@@ -67,6 +67,7 @@ Every public API surface in Vek must be thoroughly, concisely, and consistently 
 - Components must expose `[Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? UserAttributes { get; set; }`.
 - When rendering attributes, specify framework-computed attributes first and merge user attributes afterwards, allowing consumers to override defaults (e.g. `class` or `style`) without breaking core structural behavior.
 - Fallback attribute values must be used for ARIA and HTML properties unless the component's contract strictly dictates immutable values.
+- Optional controls revealed on hover must also be visible with `:focus-within` for keyboard access.
 
 ### Naming Conventions
 - Prefer positive parameter names (e.g. `Gutters` rather than `DisableGutters`).

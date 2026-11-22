@@ -798,9 +798,10 @@
       "title": "TreeView Custom Node Templates, Action Buttons, and Status Badges",
       "module": "TreeView",
       "priority": 64,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/064-treeview-custom-node-templates-and-badges.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-22T11:46:56Z"
     },
     {
       "id": "065",

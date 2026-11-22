@@ -490,6 +490,16 @@ namespace Vek
         public RenderFragment<ITreeItemData<T>>? ItemTemplate { get; set; }
 
         /// <summary>
+        /// Customizes the text, end text, and end icon area for every item unless the item supplies its own <see cref="VekTreeViewItem{T}.BodyContent"/>.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to the built-in text and adornment rendering. The item itself is the fragment context.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.TreeView.Data)]
+        public RenderFragment<VekTreeViewItem<T>>? BodyContent { get; set; }
+
+        /// <summary>
         /// The comparer used to check if two items are equal.
         /// </summary>
         [Parameter]

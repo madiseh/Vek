@@ -17,7 +17,7 @@
              tabindex="@GetTabIndex()"
              @onclick="OnItemClickedAsync"
              @onclick:stopPropagation="true"
-             @ondblclick="OnContentDoubleClickedAsync"
+             @ondblclick="OnItemDoubleClickedAsync"
              @ondblclick:stopPropagation="true"
              @onkeydown="OnKeyDownAsync">
             @if (Content != null)
@@ -37,7 +37,7 @@
 
                 @if (MultiSelection)
                 {
-                    <VekCheckBox T="bool?" TriState aria-labelledby="@(BodyContent is null ? _checkboxTextId : null)" Class="vek-treeview-item-checkbox" CheckedIcon="@CheckedIcon" UncheckedIcon="@UncheckedIcon" IndeterminateIcon="@GetIndeterminateIcon()"
+                    <VekCheckBox T="bool?" TriState aria-labelledby="@(BodyContent is null && VekTreeRoot?.BodyContent is null ? _checkboxTextId : null)" aria-label="@(BodyContent is not null || VekTreeRoot?.BodyContent is not null ? GetText() : null)" Class="vek-treeview-item-checkbox" CheckedIcon="@CheckedIcon" UncheckedIcon="@UncheckedIcon" IndeterminateIcon="@GetIndeterminateIcon()"
                                  @bind-Value:get="GetCheckBoxStateTriState()" @bind-Value:set="@(x => OnCheckboxChangedAsync())" Disabled="@GetDisabled()" ReadOnly="@GetCheckBoxReadOnly()"></VekCheckBox>
                 }
 
@@ -65,6 +65,10 @@
                 else if (BodyContent != null)
                 {
                     @BodyContent(this)
+                }
+                else if (VekTreeRoot?.BodyContent is { } rootBodyContent)
+                {
+                    @rootBodyContent(this)
                 }
                 else
                 {
@@ -115,7 +119,7 @@
     private void RenderChildTree(RenderTreeBuilder __builder)
     {
         <CascadingValue Value="this" IsFixed="true">
-            <VekTreeView Items="@_itemsState.Value" ItemTemplate="VekTreeRoot?.ItemTemplate" Class="vek-treeview-group">
+            <VekTreeView Items="@_itemsState.Value" ItemTemplate="VekTreeRoot?.ItemTemplate" BodyContent="VekTreeRoot?.BodyContent" Class="vek-treeview-group">
                 @ChildContent
             </VekTreeView>
         </CascadingValue>
