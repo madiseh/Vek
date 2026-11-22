@@ -1,0 +1,10 @@
+@namespace Vek.Docs.Examples
+
+<VekStack Class="gap-4" Style="width: 100%;">
+    <VekText Typo="Typo.body2">Drop one or more files anywhere in this area, or use the browse button.</VekText>
+    <VekFileUpload T="IReadOnlyList<IBrowserFile>"
+                   DragAndDrop
+                   AppendMultipleFiles
+                   MaximumFileCount="20"
+                   aria-label="Choose files to upload" />
+</VekStack>

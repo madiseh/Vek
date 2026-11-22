@@ -889,9 +889,12 @@
       "title": "FileUpload Full-Surface Drag-and-Drop Area with Hover Visual Cue",
       "module": "FileUpload",
       "priority": 72,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/072-fileupload-drag-and-drop-zone.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-22T11:44:36Z",
+      "completed_at": "2026-11-22T14:14:11Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/108"
     },
     {
       "id": "073",

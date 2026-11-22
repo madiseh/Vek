@@ -176,20 +176,20 @@ namespace Vek
         public string? Accept { get; set; }
 
         /// <summary>
-        /// Hides the internal <see cref="InputFile"/> element.
+        /// Hides the internal <see cref="InputFile"/> element when full-surface drag and drop is disabled.
         /// </summary>
         /// <remarks>
-        /// Defaults to <c>true</c>.  When <c>false</c>, the input is visible.
+        /// Defaults to <c>true</c>. When <see cref="DragAndDrop"/> is <c>true</c>, the input remains present for full-surface dropping.
         /// </remarks>
         [Parameter]
         [Category(CategoryTypes.FileUpload.Appearance)]
         public bool Hidden { get; set; } = true;
 
         /// <summary>
-        /// Enables a drag-and-drop area inside the component.
+        /// Enables full-surface file dropping inside the component.
         /// </summary>
         /// <remarks>
-        /// Defaults to <c>false</c>.  During drag operations, the internal <see cref="InputFile"/> element can be shown to capture drop events even when <see cref="Hidden"/> is <c>true</c>.
+        /// Defaults to <c>false</c>. Files can also be selected with the browse button; multiple files are supported when <c>T</c> is <see cref="IReadOnlyList{IBrowserFile}">IReadOnlyList&lt;IBrowserFile&gt;</see>.
         /// </remarks>
         [Parameter]
         [Category(CategoryTypes.FileUpload.Behavior)]

@@ -1,3 +1,16 @@
+@keyframes vek-file-upload-drag-pulse {
+  50% {
+    border-color: var(--vek-palette-primary);
+    background-color: var(--vek-palette-action-default-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vek-file-upload .vek-file-upload-dragarea.vek-border-primary {
+    animation: none;
+  }
+}
+
 .vek-file-upload {
   flex-grow: 0;
 
@@ -11,19 +24,36 @@
 
   .vek-file-upload-dragover {
     position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     opacity: 0;
-    top: 0;
-    left: 0;
-    z-index: 2;
+    z-index: 0;
+  }
+
+  &:has(> .vek-input-control-input-container > input.vek-file-upload-dragover:focus-visible) {
+    .vek-file-upload-dragarea {
+      outline: 2px solid var(--vek-palette-primary);
+      outline-offset: 2px;
+    }
+  }
+
+  &:has(> .vek-input-control-input-container > input.vek-file-upload-dragover) {
+    position: relative;
   }
 
   .vek-file-upload-dragarea {
     background-color: var(--vek-palette-surface);
     position: relative;
+    z-index: 2;
     display: flex;
     flex-direction: column;
+
+    &:focus-visible {
+      outline: 2px solid var(--vek-palette-primary);
+      outline-offset: 2px;
+    }
+
     justify-content: center;
     align-items: center;
     width: 100%;
@@ -33,6 +63,10 @@
     border-width: 2px;
     border-style: dashed;
     border-color: var(--vek-palette-lines-default);
+
+    &.vek-border-primary {
+      animation: vek-file-upload-drag-pulse 1.2s ease-in-out infinite;
+    }
 
     &:disabled {
       cursor: default;
