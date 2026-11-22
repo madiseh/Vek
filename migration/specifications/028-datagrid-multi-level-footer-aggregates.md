@@ -4,7 +4,7 @@
 - **Feature ID**: 028
 - **Feature Slug**: datagrid-multi-level-footer-aggregates
 - **Module**: DataGrid
-- **Status**: Backlog
+- **Status**: Ready
 - **Priority**: 28
 - **Dependencies**: ["015"]
 
