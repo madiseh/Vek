@@ -24,6 +24,17 @@ public partial class VekCalendar : VekComponentBase
     private DateTime? _focusedDate;
     private bool _scrollToYearAfterRender;
 
+    private enum CalendarViewMode
+    {
+        Days,
+        Months,
+        Years,
+        Decades
+    }
+
+    private CalendarViewMode _viewMode = CalendarViewMode.Days;
+    private int _displayYear;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="VekCalendar"/> component.
     /// </summary>
@@ -369,6 +380,12 @@ public partial class VekCalendar : VekComponentBase
     {
         base.OnInitialized();
         CurrentView = OpenTo;
+        _viewMode = CurrentView switch
+        {
+            OpenTo.Month => CalendarViewMode.Months,
+            OpenTo.Year => CalendarViewMode.Years,
+            _ => CalendarViewMode.Days
+        };
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -579,27 +596,64 @@ public partial class VekCalendar : VekComponentBase
 
     private void GoToSelectedYear()
     {
-        CurrentView = OpenTo.Year;
-        _scrollToYearAfterRender = true;
-        StateHasChanged();
+        OnYearGridClick();
     }
 
     private void OnFormattedDateClick()
     {
         CurrentView = OpenTo.Date;
+        _viewMode = CalendarViewMode.Days;
         StateHasChanged();
     }
 
     private void OnYearClick()
     {
-        CurrentView = OpenTo.Year;
-        _scrollToYearAfterRender = true;
-        StateHasChanged();
+        OnYearGridClick();
     }
 
     private void OnMonthClick()
     {
-        CurrentView = OpenTo.Month;
+        _viewMode = CalendarViewMode.Months;
+        StateHasChanged();
+    }
+
+    private void OnYearGridClick()
+    {
+        _viewMode = CalendarViewMode.Years;
+        _displayYear = GetCalendarYear(GetMonthStart());
+        StateHasChanged();
+    }
+
+    private void OnDecadeClick()
+    {
+        _viewMode = CalendarViewMode.Decades;
+        _displayYear = GetCalendarYear(GetMonthStart());
+        StateHasChanged();
+    }
+
+    private int GetDecadeStart() => (_displayYear / 10) * 10;
+
+    private IEnumerable<int> GetDisplayedYears()
+    {
+        var start = _viewMode == CalendarViewMode.Decades ? (_displayYear / 100) * 100 : GetDecadeStart() - 1;
+        var count = _viewMode == CalendarViewMode.Decades ? 100 : 12;
+        return Enumerable.Range(start, count);
+    }
+
+    private async Task SelectYearAsync(int year)
+    {
+        var calendar = GetCulture().Calendar;
+        var current = GetMonthStart();
+        await SetPickerMonthAsync(new DateTime(year, calendar.GetMonth(current), 1, calendar));
+        if (_viewMode == CalendarViewMode.Decades)
+        {
+            _displayYear = year;
+            _viewMode = CalendarViewMode.Years;
+        }
+        else
+        {
+            _viewMode = CalendarViewMode.Days;
+        }
         StateHasChanged();
     }
 
@@ -611,6 +665,7 @@ public partial class VekCalendar : VekComponentBase
         var newMonth = new DateTime(year, calendar.GetMonth(current), 1, calendar);
         await SetPickerMonthAsync(newMonth);
         CurrentView = OpenTo.Date;
+        _viewMode = CalendarViewMode.Days;
         StateHasChanged();
     }
 
@@ -622,6 +677,7 @@ public partial class VekCalendar : VekComponentBase
         var newMonth = new DateTime(calendar.GetYear(current), calendar.GetMonth(month), 1, calendar);
         await SetPickerMonthAsync(newMonth);
         CurrentView = OpenTo.Date;
+        _viewMode = CalendarViewMode.Days;
         StateHasChanged();
     }
 

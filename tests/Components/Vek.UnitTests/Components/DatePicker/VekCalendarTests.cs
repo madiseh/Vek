@@ -172,6 +172,22 @@ public class VekCalendarTests : BunitTest
     }
 
     [Test]
+    public void HeaderNavigation_SwitchesThroughYearAndDecadeViews()
+    {
+        var comp = Context.Render<VekCalendar>(parameters => parameters
+            .Add(p => p.Culture, CultureInfo.InvariantCulture)
+            .Add(p => p.PickerMonth, new DateTime(2026, 5, 1)));
+
+        comp.Find(".vek-button-year").Click();
+        comp.Find(".vek-picker-year-container").TextContent.Should().Contain("2026");
+        comp.Find(".vek-picker-year-container button.vek-picker-calendar-header-transition").Click();
+        comp.Find(".vek-picker-year-container").TextContent.Should().Contain("2020s");
+        comp.Find("button[aria-label='2030s']").Click();
+        comp.Find(".vek-picker-year-container").TextContent.Should().Contain("2030");
+        comp.Find(".vek-picker-year").FirstElementChild.Should().NotBeNull();
+    }
+
+    [Test]
     public void MinMaxDate_ShouldDisableOutOfRangeDays()
     {
         var minDate = new DateTime(2026, 5, 10);
