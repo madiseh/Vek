@@ -107,6 +107,9 @@ public partial class ExpenseTrackerPage : ComponentBase
         }
     }
 
+    private List<ChartSeries<double>> CategoryChartSeries => CategorySummaries.Select(category => (double)category.Amount).ToArray().AsChartDataSet();
+    private string[] CategoryChartLabels => CategorySummaries.Select(category => category.Name).ToArray();
+
     private List<CategorySummary> CategorySummaries
     {
         get
@@ -223,6 +226,27 @@ public partial class ExpenseTrackerPage : ComponentBase
         ResetForm();
         _showExpenseForm = true;
         _feedback = string.Empty;
+    }
+
+    private void EditLatestExpense()
+    {
+        var latestExpense = PeriodExpenses.FirstOrDefault();
+        if (latestExpense is not null)
+        {
+            EditExpense(latestExpense);
+        }
+        else
+        {
+            _feedback = "There are no expenses in this period to edit.";
+        }
+    }
+
+    private async Task ResetDemoDataAsync()
+    {
+        _expenses = CreateSampleExpenses();
+        ClearFilters();
+        await PersistExpensesAsync();
+        _feedback = "Demo transactions restored.";
     }
 
     private void EditExpense(ExpenseEntry expense)

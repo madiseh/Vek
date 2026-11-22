@@ -3,11 +3,27 @@
 @inject IJSRuntime JSRuntime
 
 <VekStack Spacing="5" Class="expense-dashboard" vek-showcase-expense-tracker="">
-    <VekStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="dashboard-heading">
+    <VekStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="top-menu">
+        <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+            <VekIcon Icon="@Icons.Material.Filled.AccountBalanceWallet" Color="Color.Primary" />
+            <VekText Typo="Typo.h6">Pennywise</VekText>
+        </VekStack>
+        <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+            <VekButton Variant="Variant.Text" Href="#overview">Overview</VekButton>
+            <VekButton Variant="Variant.Text" Href="#insights">Insights</VekButton>
+            <VekButton Variant="Variant.Text" Href="#transactions">Transactions</VekButton>
+            <VekMenu Label="Edit" Variant="Variant.Text" AriaLabel="Edit expenses">
+                <VekMenuItem OnClick="EditLatestExpense" Icon="@Icons.Material.Filled.Edit">Edit latest expense</VekMenuItem>
+                <VekMenuItem OnClick="OpenNewExpenseForm" Icon="@Icons.Material.Filled.Add">Add expense</VekMenuItem>
+            </VekMenu>
+        </VekStack>
+    </VekStack>
+
+    <VekStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="dashboard-heading" id="overview">
         <VekStack Spacing="1" Class="dashboard-title-group">
-                    <VekText Typo="Typo.overline">PERSONAL FINANCE</VekText>
+            <VekText Typo="Typo.overline">PERSONAL FINANCE</VekText>
             <VekText Typo="Typo.h3">Expense Tracker</VekText>
-                    <VekText Typo="Typo.body1">A practical view of your spending, trends, and recent activity.</VekText>
+            <VekText Typo="Typo.body1">A practical view of your spending, trends, and recent activity.</VekText>
             <VekChip T="string" Color="Color.Success" Size="Size.Small" Variant="Variant.Filled">Demo data · saved in this browser</VekChip>
         </VekStack>
 
@@ -97,7 +113,7 @@
         </VekItem>
     </VekGrid>
 
-    <VekGrid Spacing="4" Class="insights-grid">
+    <VekGrid Spacing="4" Class="insights-grid" id="insights">
         <VekItem xs="12" md="7">
             <VekCard Outlined="true" Class="dashboard-panel spending-panel">
                 <VekCardContent>
@@ -131,6 +147,15 @@
         </VekItem>
         <VekItem xs="12" md="5">
             <VekCard Outlined="true" Class="dashboard-panel category-panel">
+                <VekCardContent>
+                    <VekStack Spacing="2" AlignItems="AlignItems.Center">
+                        <VekStack Spacing="1" Class="chart-heading"><VekText Typo="Typo.h5">Spending mix</VekText><VekText Typo="Typo.body2">How your expenses are distributed</VekText></VekStack>
+                        @if (CategorySummaries.Count > 0)
+                        {
+                            <VekChart T="double" ChartType="ChartType.Pie" ChartSeries="@CategoryChartSeries" ChartLabels="@CategoryChartLabels" Width="100%" Height="260px" />
+                        }
+                    </VekStack>
+                </VekCardContent>
                 <VekCardContent>
                     <VekStack Spacing="4">
                         <VekStack Spacing="1"><VekText Typo="Typo.h5">Spending categories</VekText><VekText Typo="Typo.body2">Select a category to filter transactions</VekText></VekStack>
