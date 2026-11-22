@@ -228,27 +228,6 @@ public partial class ExpenseTrackerPage : ComponentBase
         _feedback = string.Empty;
     }
 
-    private void EditLatestExpense()
-    {
-        var latestExpense = PeriodExpenses.FirstOrDefault();
-        if (latestExpense is not null)
-        {
-            EditExpense(latestExpense);
-        }
-        else
-        {
-            _feedback = "There are no expenses in this period to edit.";
-        }
-    }
-
-    private async Task ResetDemoDataAsync()
-    {
-        _expenses = CreateSampleExpenses();
-        ClearFilters();
-        await PersistExpensesAsync();
-        _feedback = "Demo transactions restored.";
-    }
-
     private void EditExpense(ExpenseEntry expense)
     {
         _editingExpenseId = expense.Id;

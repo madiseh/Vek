@@ -1,25 +1,10 @@
 @page "/showcases/expense-tracker"
+@layout DocsLayout
 @using System.Globalization
 @inject IJSRuntime JSRuntime
 
 <VekStack Spacing="5" Class="expense-dashboard" vek-showcase-expense-tracker="">
-    <VekStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="top-menu">
-        <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
-            <VekIcon Icon="@Icons.Material.Filled.AccountBalanceWallet" Color="Color.Primary" />
-            <VekText Typo="Typo.h6">Pennywise</VekText>
-        </VekStack>
-        <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-            <VekButton Variant="Variant.Text" Href="#overview">Overview</VekButton>
-            <VekButton Variant="Variant.Text" Href="#insights">Insights</VekButton>
-            <VekButton Variant="Variant.Text" Href="#transactions">Transactions</VekButton>
-            <VekMenu Label="Edit" Variant="Variant.Text" AriaLabel="Edit expenses">
-                <VekMenuItem OnClick="EditLatestExpense" Icon="@Icons.Material.Filled.Edit">Edit latest expense</VekMenuItem>
-                <VekMenuItem OnClick="OpenNewExpenseForm" Icon="@Icons.Material.Filled.Add">Add expense</VekMenuItem>
-            </VekMenu>
-        </VekStack>
-    </VekStack>
-
-    <VekStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="dashboard-heading" id="overview">
+    <VekStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="dashboard-heading">
         <VekStack Spacing="1" Class="dashboard-title-group">
             <VekText Typo="Typo.overline">PERSONAL FINANCE</VekText>
             <VekText Typo="Typo.h3">Expense Tracker</VekText>
@@ -113,7 +98,7 @@
         </VekItem>
     </VekGrid>
 
-    <VekGrid Spacing="4" Class="insights-grid" id="insights">
+    <VekGrid Spacing="4" Class="insights-grid">
         <VekItem xs="12" md="7">
             <VekCard Outlined="true" Class="dashboard-panel spending-panel">
                 <VekCardContent>
