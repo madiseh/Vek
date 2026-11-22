@@ -20,6 +20,28 @@ public class SplitPanelTests : BunitTest
         childPanels[0].ToMarkup().Should().BeEquivalentTo(childPanels[1].ToMarkup());
     }
 
+    /// <summary>
+    /// Nested split panels preserve independent vertical and horizontal separators.
+    /// </summary>
+    [Test]
+    public void NestedPanels_RenderVerticalParentAndHorizontalChild()
+    {
+        var comp = Context.Render<VekSplitPanel>(parameters => parameters
+            .Add(p => p.FirstPanel, (RenderFragment)(builder =>
+            {
+                builder.OpenComponent<VekSplitPanel>(0);
+                builder.AddAttribute(1, nameof(VekSplitPanel.Horizontal), true);
+                builder.CloseComponent();
+            }))
+            .Add(p => p.SecondPanel, builder => builder.AddContent(0, "Right pane")));
+
+        comp.FindAll(".vek-split-panel").Count.Should().Be(2);
+        comp.FindAll("[role='separator']").Count.Should().Be(2);
+        var panels = comp.FindAll(".vek-split-panel");
+        panels[0].Children[1].ClassList.Should().NotContain("horizontal");
+        panels[1].Children[1].ClassList.Should().Contain("horizontal");
+    }
+
     [Test]
     public void VisualParametersRenderCorrectly()
     {
