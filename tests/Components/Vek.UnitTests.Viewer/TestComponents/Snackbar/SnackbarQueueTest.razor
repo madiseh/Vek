@@ -1,0 +1,19 @@
+@namespace Vek.UnitTests.TestComponents.Snackbar
+
+<VekSnackbarProvider />
+<VekButton OnClick="Add">Add notification</VekButton>
+
+@code {
+    [Inject] private ISnackbar Snackbar { get; set; } = null!;
+    private int _count;
+
+    private void Add()
+    {
+        Snackbar.Add($"Saved item {_count++}", Severity.Success, options =>
+        {
+            options.ShowTransitionDuration = 0;
+            options.VisibleStateDuration = 12000;
+            options.HideTransitionDuration = 300;
+        });
+    }
+}

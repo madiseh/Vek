@@ -1,0 +1,37 @@
+@namespace Vek.Docs.Examples
+
+@inject ISnackbar Snackbar
+
+<div class="d-flex flex-wrap gap-2">
+    <VekButton Color="Color.Primary" OnClick="ShowBottomRight">Add bottom-right notification</VekButton>
+    <VekButton Color="Color.Secondary" OnClick="ShowTopCenter">Add top-center notification</VekButton>
+</div>
+<VekText Class="mt-2">Up to three notifications are visible. Hover a notification to pause its countdown.</VekText>
+
+@code {
+    private int _count;
+
+    private void ShowBottomRight()
+    {
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 3;
+        Snackbar.Add($"Saved item {_count++}", Severity.Success, options =>
+        {
+            options.ShowTransitionDuration = 0;
+            options.VisibleStateDuration = 6000;
+            options.HideTransitionDuration = 300;
+        });
+    }
+
+    private void ShowTopCenter()
+    {
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 3;
+        Snackbar.Add($"Background update {_count++}", Severity.Info, options =>
+        {
+            options.ShowTransitionDuration = 0;
+            options.VisibleStateDuration = 6000;
+            options.HideTransitionDuration = 300;
+        });
+    }
+}

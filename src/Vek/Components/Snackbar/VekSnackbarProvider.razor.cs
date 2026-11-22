@@ -17,14 +17,31 @@ namespace Vek
         private ISnackbar Snackbars { get; set; } = null!;
 
         /// <summary>
+        /// Limits the number of notifications rendered at once; additional notifications remain queued.
+        /// </summary>
+        /// <remarks>Defaults to the snackbar service configuration.</remarks>
+        [Parameter]
+        [Category(CategoryTypes.General.Behavior)]
+        public int? MaxDisplayedSnackbars { get; set; }
+
+        protected override void OnParametersSet()
+        {
+            base.OnParametersSet();
+            if (MaxDisplayedSnackbars < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(MaxDisplayedSnackbars), MaxDisplayedSnackbars, "The maximum number of displayed snackbars cannot be negative.");
+            }
+        }
+
+        /// <summary>
         /// Displays snackbar positions right-to-left.
         /// </summary>
         [CascadingParameter(Name = "RightToLeft")]
         public bool RightToLeft { get; set; }
 
-        protected IEnumerable<Snackbar> Snackbar => Snackbars.Configuration.NewestOnTop
+        protected IEnumerable<Snackbar> Snackbar => (Snackbars.Configuration.NewestOnTop
                 ? Snackbars.ShownSnackbars.Reverse()
-                : Snackbars.ShownSnackbars;
+                : Snackbars.ShownSnackbars).Take(MaxDisplayedSnackbars ?? int.MaxValue);
 
         protected string Classname =>
             new CssBuilder(Class)

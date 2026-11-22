@@ -13,7 +13,7 @@
 @inject InternalVekLocalizer Localizer
 
 @_css
-<div role="alert"
+<div role="status"
      aria-live="polite"
      class="@SnackbarClass"
      style="@AnimationStyle"
@@ -30,6 +30,11 @@
         <div class="vek-snackbar-icon">
             <VekIcon Icon="@Icon" Color="@IconColor" Size="@IconSize" />
         </div>
+    }
+
+    @if (Snackbar?.State.Options.VisibleStateDuration > 0 && !Snackbar.State.Options.RequiresInteraction && !Snackbar.State.IsPaused)
+    {
+        <div class="vek-snackbar-progress" aria-hidden="true"></div>
     }
 
     <div class="vek-snackbar-content-message">

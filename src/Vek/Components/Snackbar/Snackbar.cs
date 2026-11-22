@@ -155,6 +155,7 @@ namespace Vek
 
             // Pause any transitions and stay visible.
             _paused = pause;
+            State.PauseTimer(pause);
 
             if (pause)
             {

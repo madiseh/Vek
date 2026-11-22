@@ -41,6 +41,7 @@ namespace Vek
             get => _maxDisplayedSnackbars;
             set
             {
+                ArgumentOutOfRangeException.ThrowIfNegative(value);
                 _maxDisplayedSnackbars = value;
                 OnUpdate?.Invoke();
             }
