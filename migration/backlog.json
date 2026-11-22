@@ -949,9 +949,12 @@
       "title": "Slider Vertical Layout Orientation with Touch-Accurate Scrubbing",
       "module": "Slider",
       "priority": 79,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/079-slider-vertical-orientation-and-touch-track.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-22T09:39:59Z",
+      "completed_at": "2026-11-22T10:16:32Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/99"
     },
     {
       "id": "080",
