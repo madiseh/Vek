@@ -434,6 +434,7 @@ namespace Vek.UnitTests.Components
 
             comp.Find("input[type=file]").ClassList.Should().Contain("vek-file-upload-dragover");
             comp.Find("button.vek-file-upload-dragarea").Should().NotBeNull();
+            comp.Find("button.vek-file-upload-dragarea").HasAttribute("disabled").Should().BeFalse();
             comp.Find("input[type=file]").HasAttribute("multiple").Should().BeTrue();
         }
 
