@@ -24,6 +24,7 @@ namespace Vek
     {
         private DialogOptions _globalDialogOptions = new();
         private readonly List<IDialogReference> _dialogs = [];
+        private readonly DialogStackManager _stackManager = new();
         private string? _currentUri;
 
         [Inject]
@@ -165,6 +166,20 @@ namespace Vek
             return base.OnAfterRenderAsync(firstRender);
         }
 
+        internal int GetStackIndex(Guid id) => _stackManager.GetIndex(id);
+
+        internal void ActivateDialog(Guid id)
+        {
+            if (_stackManager.Activate(id))
+            {
+                StateHasChanged();
+            }
+        }
+
+        internal bool ShouldRenderBackdrop(Guid id) => _stackManager.IsBackdropOwner(id);
+
+        internal bool IsTopmost(Guid id) => _stackManager.IsBackdropOwner(id);
+
         internal void SetOptions(Guid id, DialogOptions options)
         {
             var reference = GetDialogReference(id);
@@ -202,6 +217,7 @@ namespace Vek
         private Task AddInstanceAsync(IDialogReference dialog)
         {
             _dialogs.Add(dialog);
+            _stackManager.Add(dialog.Id);
             return InvokeAsync(StateHasChanged);
         }
 
@@ -222,6 +238,7 @@ namespace Vek
             if (!dialog.Dismiss(result)) return;
 
             _dialogs.Remove(dialog);
+            _stackManager.Remove(dialog.Id);
             StateHasChanged();
         }
 

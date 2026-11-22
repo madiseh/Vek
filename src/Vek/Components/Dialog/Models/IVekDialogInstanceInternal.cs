@@ -6,6 +6,8 @@ namespace Vek;
 
 internal interface IVekDialogInstanceInternal : IVekDialogInstance
 {
+    bool IsTopmost { get; }
+
     /// <summary>
     /// Links a dialog with this instance.
     /// </summary>

@@ -195,9 +195,11 @@ namespace Vek
             await base.OnAfterRenderAsync(firstRender);
         }
 
+        private void ActivateDialog() => Parent?.ActivateDialog(Id);
+
         private Task HandleEscapeAsync()
         {
-            if (GetCloseOnEscapeKey())
+            if ((Parent?.IsTopmost(Id) ?? true) && GetCloseOnEscapeKey())
             {
                 ((IVekDialogInstance)this).Cancel();
             }
@@ -433,6 +435,8 @@ namespace Vek
         }
 
         /// <inheritdoc />
+        bool IVekDialogInstanceInternal.IsTopmost => Parent?.IsTopmost(Id) ?? true;
+
         string IVekDialogInstance.ElementId => ElementId;
 
         /// <inheritdoc />

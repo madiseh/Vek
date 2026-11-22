@@ -43,6 +43,8 @@ namespace Vek
             .AddClass(ContentClass)
             .Build();
 
+        protected bool DialogIsTopmost => DialogInstance?.IsTopmost ?? true;
+
         protected string ActionsClassname => new CssBuilder("vek-dialog-actions")
             .AddClass(ActionsClass)
             .Build();

@@ -4,9 +4,11 @@
 - **Feature ID**: 067
 - **Feature Slug**: dialog-modal-stacking-and-z-index-manager
 - **Module**: Dialog
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 67
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/97
+- **Completed At**: 2026-11-22T10:12:22Z
 
 ---
 
