@@ -3,7 +3,7 @@
 @inherits VekComponentBase
 @typeparam T
 
-<div class="@Classname" style="@Style">
+<div class="@Classname" style="@RootStyle">
     @if (ChildContent is not null)
     {
         <VekText Typo="Typo.body1">@ChildContent</VekText>
@@ -12,7 +12,7 @@
         @if (Variant == Variant.Filled)
         {
             <div class="vek-slider-inner-container">
-                <div class="vek-slider-filled" style="@($"width:{Width}%;")"></div>
+                <div class="vek-slider-filled" style="@(Vertical ? $"height:{100 - CalculatePosition()}%;" : $"width:{Width}%;")"></div>
             </div>
         }
                 @if (ShouldShowTicks)

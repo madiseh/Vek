@@ -35,6 +35,7 @@ namespace Vek
                 .AddClass($"vek-slider-{Size.ToStringFast(true)}")
                 .AddClass($"vek-slider-{Color.ToStringFast(true)}")
                 .AddClass("vek-slider-vertical", Vertical)
+                .AddClass("vek-slider-inverted", Inverted)
                 .AddClass(Class)
                 .Build();
 
@@ -151,6 +152,26 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.Slider.Appearance)]
         public bool Vertical { get; set; } = false;
+
+        /// <summary>
+        /// Sets the vertical track length.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to the available height when <see cref="Vertical"/> is enabled.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Slider.Appearance)]
+        public string? Height { get; set; }
+
+        /// <summary>
+        /// Reverses the value direction.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. For vertical sliders, the minimum is at the top when inverted.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Slider.Appearance)]
+        public bool Inverted { get; set; }
 
         /// <summary>
         /// Displays tick marks along the track.
@@ -340,6 +361,10 @@ namespace Vek
             var max = Convert.ToDouble(Max);
             var value = Convert.ToDouble(_valueState.Value);
             var result = 100.0 * (value - min) / (max - min);
+            if (Inverted)
+            {
+                result = 100 - result;
+            }
 
             result = Math.Min(Math.Max(0, result), 100);
 
@@ -402,7 +427,13 @@ namespace Vek
 
         private string Width => CalculatePosition().ToString(CultureInfo.InvariantCulture);
 
-        private string ValueLabelPositionStyle => RightToLeft ? $"right:{Width}%;" : $"left:{Width}%;";
+        private string? RootStyle => Vertical && !string.IsNullOrWhiteSpace(Height)
+            ? new StyleBuilder().AddStyle(Style).AddStyle("--vek-slider-height", Height).Build()
+            : Style;
+
+        private string ValueLabelPositionStyle => Vertical
+            ? $"top:{CalculatePosition().ToString(CultureInfo.InvariantCulture)}%;"
+            : RightToLeft ? $"right:{Width}%;" : $"left:{Width}%;";
 
         /// <summary>
         /// Displays content in right-to-left order.
