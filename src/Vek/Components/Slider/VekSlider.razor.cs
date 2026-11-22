@@ -427,10 +427,9 @@ namespace Vek
 
         private string Width => CalculatePosition().ToString(CultureInfo.InvariantCulture);
 
-        private string RootStyle => new StyleBuilder()
-            .AddStyle(Style)
-            .AddStyle("--vek-slider-height", Height, Vertical)
-            .Build();
+        private string? RootStyle => Vertical && !string.IsNullOrWhiteSpace(Height)
+            ? new StyleBuilder().AddStyle(Style).AddStyle("--vek-slider-height", Height).Build()
+            : Style;
 
         private string ValueLabelPositionStyle => Vertical
             ? $"top:{CalculatePosition().ToString(CultureInfo.InvariantCulture)}%;"
