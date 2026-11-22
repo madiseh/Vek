@@ -176,10 +176,10 @@ namespace Vek
         public string? Accept { get; set; }
 
         /// <summary>
-        /// Hides the internal <see cref="InputFile"/> element.
+        /// Hides the internal <see cref="InputFile"/> element when full-surface drag and drop is disabled.
         /// </summary>
         /// <remarks>
-        /// Defaults to <c>true</c>.  When <c>false</c>, the input is visible.
+        /// Defaults to <c>true</c>. When <see cref="DragAndDrop"/> is <c>true</c>, the input remains present for full-surface dropping.
         /// </remarks>
         [Parameter]
         [Category(CategoryTypes.FileUpload.Appearance)]

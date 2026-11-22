@@ -31,6 +31,13 @@
     z-index: 0;
   }
 
+  &:has(> .vek-input-control-input-container > input.vek-file-upload-dragover:focus-visible) {
+    .vek-file-upload-dragarea {
+      outline: 2px solid var(--vek-palette-primary);
+      outline-offset: 2px;
+    }
+  }
+
   &:has(> .vek-input-control-input-container > input.vek-file-upload-dragover) {
     position: relative;
   }
@@ -38,6 +45,7 @@
   .vek-file-upload-dragarea {
     background-color: var(--vek-palette-surface);
     position: relative;
+    z-index: 2;
     display: flex;
     flex-direction: column;
 
@@ -45,6 +53,7 @@
       outline: 2px solid var(--vek-palette-primary);
       outline-offset: 2px;
     }
+
     justify-content: center;
     align-items: center;
     width: 100%;
