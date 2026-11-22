@@ -75,7 +75,7 @@
 
 @media (max-width: 720px) {
     .expense-dashboard {
-        padding: 1rem;
+        padding: 0.75rem;
     }
 
     .expense-dashboard ::deep button,
@@ -89,10 +89,31 @@
         flex-direction: column;
         align-items: stretch;
         justify-content: flex-start;
+        width: 100%;
+    }
+
+    .expense-dashboard ::deep .dashboard-title-group {
+        min-width: 0;
     }
 
     .expense-dashboard ::deep .account-balance,
     .expense-dashboard ::deep .period-select {
         min-width: 100%;
+    }
+
+    .expense-dashboard ::deep .summary-grid > * {
+        flex-basis: 50%;
+        max-width: 50%;
+    }
+
+    .expense-dashboard ::deep .category-heading {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 0.25rem 0.75rem;
+    }
+
+    .expense-dashboard ::deep .transaction-grid {
+        min-width: 0;
+        max-width: 100%;
     }
 }

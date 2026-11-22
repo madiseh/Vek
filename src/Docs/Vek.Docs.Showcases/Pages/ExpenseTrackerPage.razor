@@ -1,13 +1,14 @@
 @page "/showcases/expense-tracker"
+@layout DocsLayout
 @using System.Globalization
 @inject IJSRuntime JSRuntime
 
 <VekStack Spacing="5" Class="expense-dashboard" vek-showcase-expense-tracker="">
     <VekStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="dashboard-heading">
         <VekStack Spacing="1" Class="dashboard-title-group">
-                    <VekText Typo="Typo.overline">PERSONAL FINANCE</VekText>
+            <VekText Typo="Typo.overline">PERSONAL FINANCE</VekText>
             <VekText Typo="Typo.h3">Expense Tracker</VekText>
-                    <VekText Typo="Typo.body1">A practical view of your spending, trends, and recent activity.</VekText>
+            <VekText Typo="Typo.body1">A practical view of your spending, trends, and recent activity.</VekText>
             <VekChip T="string" Color="Color.Success" Size="Size.Small" Variant="Variant.Filled">Demo data · saved in this browser</VekChip>
         </VekStack>
 
@@ -131,6 +132,15 @@
         </VekItem>
         <VekItem xs="12" md="5">
             <VekCard Outlined="true" Class="dashboard-panel category-panel">
+                <VekCardContent>
+                    <VekStack Spacing="2" AlignItems="AlignItems.Center">
+                        <VekStack Spacing="1" Class="chart-heading"><VekText Typo="Typo.h5">Spending mix</VekText><VekText Typo="Typo.body2">How your expenses are distributed</VekText></VekStack>
+                        @if (CategorySummaries.Count > 0)
+                        {
+                            <VekChart T="double" ChartType="ChartType.Pie" ChartSeries="@CategoryChartSeries" ChartLabels="@CategoryChartLabels" Width="100%" Height="260px" />
+                        }
+                    </VekStack>
+                </VekCardContent>
                 <VekCardContent>
                     <VekStack Spacing="4">
                         <VekStack Spacing="1"><VekText Typo="Typo.h5">Spending categories</VekText><VekText Typo="Typo.body2">Select a category to filter transactions</VekText></VekStack>

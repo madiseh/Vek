@@ -107,6 +107,9 @@ public partial class ExpenseTrackerPage : ComponentBase
         }
     }
 
+    private List<ChartSeries<double>> CategoryChartSeries => CategorySummaries.Select(category => (double)category.Amount).ToArray().AsChartDataSet();
+    private string[] CategoryChartLabels => CategorySummaries.Select(category => category.Name).ToArray();
+
     private List<CategorySummary> CategorySummaries
     {
         get
