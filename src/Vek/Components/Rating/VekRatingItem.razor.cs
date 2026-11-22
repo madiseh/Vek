@@ -136,6 +136,18 @@ namespace Vek
         [Category(CategoryTypes.Rating.Data)]
         public EventCallback<double?> PreciseItemHovered { get; set; }
 
+        [Parameter]
+        public RenderFragment<int>? ItemTemplate { get; set; }
+
+        [Parameter]
+        public Color? ItemHoverColor { get; set; }
+
+        [Parameter]
+        public Color? ItemActiveColor { get; set; }
+
+        [Parameter]
+        public bool Clearable { get; set; } = true;
+
         internal Color ItemColor { get; set; }
 
         internal string? ItemIcon { get; set; }
@@ -190,6 +202,16 @@ namespace Vek
                 return Color.Inherit;
             }
 
+            if (Rating.HoveredValue.HasValue && Rating.HoveredValue.Value >= CurrentItemValue && Rating.ItemHoverColor.HasValue)
+            {
+                return Rating.ItemHoverColor.Value;
+            }
+
+            if (Rating.CurrentValue >= CurrentItemValue && Rating.ItemActiveColor.HasValue && (!Rating.HoveredValue.HasValue || Rating.HoveredValue.Value >= CurrentItemValue))
+            {
+                return Rating.ItemActiveColor.Value;
+            }
+
             if (Rating.FullIconColor is null || Rating.EmptyIconColor is null)
             {
                 return Color.Inherit;
@@ -197,7 +219,6 @@ namespace Vek
 
             if (Rating.HoveredValue.HasValue && Rating.HoveredValue.Value >= CurrentItemValue)
             {
-                // full icon color when RatingItem hovered
                 return Rating.FullIconColor.Value;
             }
 
@@ -210,8 +231,7 @@ namespace Vek
                     return Rating.EmptyIconColor.Value;
                 }
 
-                // full icon color when equal or higher RatingItem value clicked
-                return Rating.FullIconColor.Value;
+                return Rating.ItemActiveColor ?? Rating.FullIconColor.Value;
             }
 
             // empty icon color when this or higher RatingItem is not clicked and not hovered
@@ -259,10 +279,10 @@ namespace Vek
 
             if (PreciseItemClicked.HasDelegate)
             {
-                return PreciseItemClicked.InvokeAsync(ratingSelectedValue == CurrentItemValue ? 0 : CurrentItemValue);
+                return PreciseItemClicked.InvokeAsync(Clearable && ratingSelectedValue == CurrentItemValue ? 0 : CurrentItemValue);
             }
 
-            return ItemClicked.InvokeAsync(ratingSelectedValue == ItemValue ? 0 : ItemValue);
+            return ItemClicked.InvokeAsync(Clearable && ratingSelectedValue == ItemValue ? 0 : ItemValue);
         }
     }
 }
