@@ -37,7 +37,71 @@ namespace Vek.UnitTests.Components
             slider.Size.Should().Be(Size.Small);
             slider.Culture.Should().Be(CultureInfo.InvariantCulture);
             slider.ValueLabelFormat.Should().BeNull();
+            slider.ValueLabelDisplay.Should().BeNull();
             slider.ValueLabelContent.Should().BeNull();
+        }
+
+        /// <summary>
+        /// Applies display mode precedence and composite formatting to slider value labels.
+        /// </summary>
+        [Test]
+        public void ValueLabelDisplay_ControlsVisibilityAndCompositeFormat()
+        {
+            var hidden = Context.Render<VekSlider<decimal>>(x =>
+            {
+                x.Add(p => p.ValueLabelDisplay, SliderValueLabelDisplay.Never);
+                x.Add(p => p.ValueLabel, true);
+            });
+            hidden.FindAll(".vek-slider-value-label").Should().BeEmpty();
+
+            var fallbackOff = Context.Render<VekSlider<decimal>>(x => x
+                .Add(p => p.ValueLabelDisplay, (SliderValueLabelDisplay?)null)
+                .Add(p => p.ValueLabel, false));
+            fallbackOff.FindAll(".vek-slider-value-label").Should().BeEmpty();
+
+            var legacy = Context.Render<VekSlider<decimal>>(x =>
+            {
+                x.Add(p => p.ValueLabel, true);
+                x.Add(p => p.Value, 25m);
+            });
+            legacy.Find(".vek-slider-value-label").TextContent.Should().Be("25");
+
+            var defaultFormat = Context.Render<VekSlider<decimal>>(x =>
+            {
+                x.Add(p => p.ValueLabelDisplay, SliderValueLabelDisplay.Always);
+                x.Add(p => p.Value, 25m);
+            });
+            defaultFormat.Find(".vek-slider-value-label").TextContent.Should().Be("25");
+
+            var hover = Context.Render<VekSlider<decimal>>(x =>
+            {
+                x.Add(p => p.ValueLabelDisplay, SliderValueLabelDisplay.OnHover);
+                x.Add(p => p.Value, 12.5m);
+                x.Add(p => p.ValueLabelFormat, "{0}%");
+            });
+            hover.Find(".vek-slider-value-label").TextContent.Should().Be("12.5%");
+            hover.Find(".vek-slider-value-label").ClassList.Should().NotContain("vek-slider-value-label-always");
+
+            var always = Context.Render<VekSlider<decimal>>(x =>
+            {
+                x.Add(p => p.ValueLabelDisplay, SliderValueLabelDisplay.Always);
+                x.Add(p => p.Value, 25m);
+                x.Add(p => p.NullableValue, 25m);
+                x.Add(p => p.ValueLabelFormat, "{0:C}");
+                x.Add(p => p.Culture, CultureInfo.GetCultureInfo("en-US"));
+            });
+            always.Find(".vek-slider-value-label").TextContent.Should().Be("$25.00");
+            always.Find(".vek-slider-value-label").ClassList.Should().Contain("vek-slider-value-label-always");
+
+            var range = Context.Render<VekRangeSlider<decimal>>(x =>
+            {
+                x.Add(p => p.ValueStart, 10m);
+                x.Add(p => p.ValueEnd, 40m);
+                x.Add(p => p.ValueLabelDisplay, SliderValueLabelDisplay.Always);
+                x.Add(p => p.ValueLabelFormat, "{0:C}");
+                x.Add(p => p.Culture, CultureInfo.GetCultureInfo("en-US"));
+            });
+            range.FindAll(".vek-slider-value-label").Select(label => label.TextContent).Should().ContainInOrder("$10.00", "$40.00");
         }
 
         [Test]

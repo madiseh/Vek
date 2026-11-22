@@ -1,0 +1,9 @@
+@using System.Globalization
+@namespace Vek.Docs.Examples
+
+<VekSlider T="decimal" @bind-Value="_value" ValueLabelDisplay="SliderValueLabelDisplay.OnHover" ValueLabelFormat="{0:C}" Culture="@EnglishCulture" Min="0m" Max="100m" Step="5m" />
+
+@code {
+    private decimal _value = 25m;
+    private static CultureInfo EnglishCulture => CultureInfo.GetCultureInfo("en-US");
+}

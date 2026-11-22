@@ -981,9 +981,12 @@
       "title": "Slider Floating Value Tooltip with Custom String and Currency Formatter",
       "module": "Slider",
       "priority": 80,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/080-slider-tooltip-value-formatting.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-22T11:44:45Z",
+      "completed_at": "2026-11-22T14:01:47Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/109"
     },
     {
       "id": "081",

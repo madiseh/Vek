@@ -36,10 +36,44 @@ namespace Vek.UnitTests.Components
             slider.Size.Should().Be(Size.Small);
             slider.Culture.Should().Be(CultureInfo.InvariantCulture);
             slider.ValueLabel.Should().BeFalse();
+            slider.ValueLabelDisplay.Should().BeNull();
             slider.ValueLabelFormat.Should().BeNull();
             slider.ValueLabelContent.Should().BeNull();
             slider.AriaLabelStart.Should().Be("Start value");
             slider.AriaLabelEnd.Should().Be("End value");
+        }
+
+        /// <summary>
+        /// Preserves legacy label fallback and formats both range values with the selected culture.
+        /// </summary>
+        [Test]
+        public void ValueLabels_FallbackAndFormatBothRangeValues()
+        {
+            var hidden = Context.Render<VekRangeSlider<decimal>>(x => x
+                .Add(p => p.ValueLabelDisplay, (SliderValueLabelDisplay?)null)
+                .Add(p => p.ValueStart, 10m)
+                .Add(p => p.ValueEnd, 40m));
+            hidden.FindAll(".vek-slider-value-label").Should().BeEmpty();
+
+            var legacy = Context.Render<VekRangeSlider<decimal>>(x => x
+                .Add(p => p.ValueLabel, true)
+                .Add(p => p.ValueStart, 10m)
+                .Add(p => p.ValueEnd, 40m));
+            legacy.FindAll(".vek-slider-value-label").Select(label => label.TextContent).Should().ContainInOrder("10", "40");
+
+            var currency = Context.Render<VekRangeSlider<decimal>>(x => x
+                .Add(p => p.ValueStart, 10m)
+                .Add(p => p.ValueEnd, 40m)
+                .Add(p => p.ValueLabelDisplay, SliderValueLabelDisplay.Always)
+                .Add(p => p.ValueLabelFormat, "{0:C}")
+                .Add(p => p.Culture, CultureInfo.GetCultureInfo("en-US")));
+            currency.FindAll(".vek-slider-value-label").Select(label => label.TextContent).Should().ContainInOrder("$10.00", "$40.00");
+
+            var defaultFormat = Context.Render<VekRangeSlider<decimal>>(x => x
+                .Add(p => p.ValueStart, 10m)
+                .Add(p => p.ValueEnd, 40m)
+                .Add(p => p.ValueLabelDisplay, SliderValueLabelDisplay.Always));
+            defaultFormat.FindAll(".vek-slider-value-label").Select(label => label.TextContent).Should().ContainInOrder("10", "40");
         }
 
         [Test]

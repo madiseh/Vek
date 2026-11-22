@@ -260,6 +260,16 @@ namespace Vek
         public bool ValueLabel { get; set; }
 
         /// <summary>
+        /// Controls when value labels are visible.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="SliderValueLabelDisplay.Never"/>. When unset, the legacy <see cref="ValueLabel"/> setting is used. Disabled sliders do not reveal labels on hover.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Slider.Appearance)]
+        public SliderValueLabelDisplay? ValueLabelDisplay { get; set; }
+
+        /// <summary>
         /// The culture used to format value labels.
         /// </summary>
         /// <remarks>
@@ -272,6 +282,9 @@ namespace Vek
         /// <summary>
         /// The format string of the value labels.
         /// </summary>
+        /// <remarks>
+        /// Supports standard numeric format strings and composite formats such as <c>{0:C}</c>.
+        /// </remarks>
         [Parameter]
         [Category(CategoryTypes.Slider.Appearance)]
         public string? ValueLabelFormat { get; set; }
@@ -621,6 +634,12 @@ namespace Vek
             }
         }
 
+        private bool ShouldDisplayValueLabel => ValueLabelDisplay.HasValue
+            ? ValueLabelDisplay.Value != SliderValueLabelDisplay.Never
+            : ValueLabel;
+
+        private string ValueLabelDisplayClass => ValueLabelDisplay == SliderValueLabelDisplay.Always ? "vek-slider-value-label-always" : "";
+
         private string ValueLabelStartPositionStyle
         {
             get
@@ -643,7 +662,9 @@ namespace Vek
         {
             if (ValueLabelFormat is not null)
             {
-                return value.ToString(ValueLabelFormat, Culture);
+                return ValueLabelFormat.Contains('{')
+                    ? string.Format(Culture, ValueLabelFormat, value)
+                    : value.ToString(ValueLabelFormat, Culture);
             }
 
             return value.ToString(null, Culture);
