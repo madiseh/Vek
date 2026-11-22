@@ -254,10 +254,20 @@ namespace Vek
         public bool ValueLabel { get; set; }
 
         /// <summary>
+        /// Controls when the value label is visible.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="SliderValueLabelDisplay.Never"/>. When unset, the legacy <see cref="ValueLabel"/> setting is used. Disabled sliders do not reveal labels on hover.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Slider.Appearance)]
+        public SliderValueLabelDisplay? ValueLabelDisplay { get; set; }
+
+        /// <summary>
         /// The culture used to format the value label.
         /// </summary>
         /// <remarks>
-        /// Defaults to <see cref="CultureInfo.InvariantCulture"/>.  Only applied when <see cref="ValueLabel"/> is <c>true</c>.
+        /// Defaults to <see cref="CultureInfo.InvariantCulture"/>. Applies to formatted value labels.
         /// </remarks>
         [Parameter]
         [Category(CategoryTypes.Button.Appearance)]
@@ -268,7 +278,7 @@ namespace Vek
         /// </summary>
         /// <remarks>
         /// Defaults to <c>null</c>.  
-        /// Only applies when <see cref="ValueLabelContent"/> is not set.<br />
+        /// Supports standard numeric format strings or composite formats such as <c>{0:C}</c> when <see cref="ValueLabelContent"/> is not set.<br />
         /// See: <see href="https://learn.microsoft.com/dotnet/standard/base-types/standard-numeric-format-strings">Standard Numeric Format Strings</see>.
         /// </remarks>
         [Parameter]
@@ -430,6 +440,24 @@ namespace Vek
         private string? RootStyle => Vertical && !string.IsNullOrWhiteSpace(Height)
             ? new StyleBuilder().AddStyle(Style).AddStyle("--vek-slider-height", Height).Build()
             : Style;
+
+        private string FormatValueLabel(T value)
+        {
+            if (ValueLabelFormat is null)
+            {
+                return value.ToString(null, Culture);
+            }
+
+            return ValueLabelFormat.Contains('{')
+                ? string.Format(Culture, ValueLabelFormat, value)
+                : value.ToString(ValueLabelFormat, Culture);
+        }
+
+        private bool ShouldDisplayValueLabel => ValueLabelDisplay.HasValue
+            ? ValueLabelDisplay.Value != SliderValueLabelDisplay.Never
+            : ValueLabel;
+
+        private string ValueLabelDisplayClass => ValueLabelDisplay == SliderValueLabelDisplay.Always ? "vek-slider-value-label-always" : "";
 
         private string ValueLabelPositionStyle => Vertical
             ? $"top:{CalculatePosition().ToString(CultureInfo.InvariantCulture)}%;"

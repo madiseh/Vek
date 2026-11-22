@@ -88,7 +88,7 @@
         <DocsPageSection>
             <SectionHeader Title="Value Label">
                 <Description>
-                    Use the slider below to see the value label, this can be used by setting <CodeInline>@nameof(VekSlider<double>.ValueLabel)</CodeInline> property to true.
+                    Use <CodeInline>@nameof(VekSlider<double>.ValueLabelDisplay)</CodeInline> to keep the label hidden, show it on hover or keyboard focus, or always display it. The legacy <CodeInline>@nameof(VekSlider<double>.ValueLabel)</CodeInline> flag remains supported.
                     <br />
                     Use <CodeInline>@nameof(VekSlider<double>.ValueLabelFormat)</CodeInline> and <CodeInline>@nameof(VekSlider<double>.Culture)</CodeInline> to change the formatting.
                     <br />
@@ -97,6 +97,15 @@
             </SectionHeader>
             <SectionContent Code="@nameof(SliderValueLabelExample)">
                 <SliderValueLabelExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Formatted Tooltip">
+                <Description>Value labels can use a composite format such as <CodeInline>{0:C}</CodeInline>. Keyboard focus also reveals an on-hover label, and the label tracks the thumb in either orientation.</Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(SliderTooltipExample)">
+                <SliderTooltipExample />
             </SectionContent>
         </DocsPageSection>
 

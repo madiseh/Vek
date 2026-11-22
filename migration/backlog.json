@@ -972,9 +972,10 @@
       "title": "Slider Floating Value Tooltip with Custom String and Currency Formatter",
       "module": "Slider",
       "priority": 80,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/080-slider-tooltip-value-formatting.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-22T11:44:45Z"
     },
     {
       "id": "081",

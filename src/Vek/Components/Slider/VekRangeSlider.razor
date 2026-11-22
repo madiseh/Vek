@@ -65,9 +65,9 @@
                @bind-value:event="@(Immediate ? "oninput" : "onchange")"
                @onfocus="@(() => _activeThumb = ActiveThumb.End)" />
 
-        @if (ValueLabel)
+        @if (ShouldDisplayValueLabel)
         {
-            <div class="vek-slider-value-label vek-slider-value-label-start" style="@ValueLabelStartPositionStyle">
+            <div class="vek-slider-value-label vek-slider-value-label-start @ValueLabelDisplayClass" style="@ValueLabelStartPositionStyle">
                 @if (ValueLabelContent is null)
                 {
                     @FormatValueLabel(_valueStartState.Value)
@@ -77,7 +77,7 @@
                     @ValueLabelContent(_valueStartState.Value)
                 }
             </div>
-            <div class="vek-slider-value-label vek-slider-value-label-end" style="@ValueLabelEndPositionStyle">
+            <div class="vek-slider-value-label vek-slider-value-label-end @ValueLabelDisplayClass" style="@ValueLabelEndPositionStyle">
                 @if (ValueLabelContent is null)
                 {
                     @FormatValueLabel(_valueEndState.Value)
