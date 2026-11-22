@@ -54,12 +54,21 @@ namespace Vek
         public string DisplayFormat { get; set; } = "{value}";
 
         /// <summary>
-        /// The custom function used to calculate aggregate values.
+        /// The custom function used to calculate aggregate values as formatted text.
         /// </summary>
         /// <remarks>
-        /// This function is used when <see cref="Type"/> is <see cref="AggregateType.Custom"/>.
+        /// This legacy function is used when <see cref="Type"/> is <see cref="AggregateType.Custom"/> and <see cref="CustomSummaryCalculator"/> is not set.
+        /// Its string result is returned without applying <see cref="DisplayFormat"/>.
         /// </remarks>
         public Func<IEnumerable<T>, string>? CustomAggregate { get; set; }
+
+        /// <summary>
+        /// Calculates a custom aggregate value for the supplied items.
+        /// </summary>
+        /// <remarks>
+        /// When set, this function takes precedence over <see cref="CustomAggregate"/> for <see cref="AggregateType.Custom"/> and its result is formatted by <see cref="DisplayFormat"/>.
+        /// </remarks>
+        public Func<IEnumerable<T>, object?>? CustomSummaryCalculator { get; set; }
 
         /// <summary>
         /// Calculates the aggregate value to display.
@@ -72,25 +81,24 @@ namespace Vek
             //avoid multiple enumeration
             var itemsArray = items as T[] ?? items?.ToArray() ?? Array.Empty<T>();
 
-            if (itemsArray.Length == 0)
+            if (Type == AggregateType.Custom && (CustomSummaryCalculator is not null || CustomAggregate is not null))
             {
-                return DisplayFormat.Replace("{value}", "0");
+                if (CustomSummaryCalculator is not null)
+                {
+                    return FormatValue(CustomSummaryCalculator.Invoke(itemsArray), useCompositeFormat: true);
+                }
+
+                return CustomAggregate!.Invoke(itemsArray);
             }
 
-            if (Type == AggregateType.Custom && CustomAggregate is not null)
+            if (itemsArray.Length == 0 || propertyExpression is null)
             {
-                return CustomAggregate.Invoke(itemsArray);
-            }
-
-            if (propertyExpression is null)
-            {
-                return DisplayFormat.Replace("{value}", "0");
+                return FormatValue(0, useCompositeFormat: DisplayFormat.Contains("{0", StringComparison.Ordinal));
             }
 
             if (Type == AggregateType.Count)
             {
-                var value = itemsArray.Length;
-                return DisplayFormat.Replace("{value}", value.ToString(NumberFormat, Culture));
+                return FormatValue(itemsArray.Length, useCompositeFormat: DisplayFormat.Contains("{0", StringComparison.Ordinal));
             }
 
             var expression = propertyExpression.ChangeExpressionReturnType<T, decimal?>();
@@ -98,29 +106,39 @@ namespace Vek
 
             if (Type == AggregateType.Avg)
             {
-                var value = itemsArray.Average(compiledExpression);
-                return DisplayFormat.Replace("{value}", value != null ? value.Value.ToString(NumberFormat, Culture) : value.ToString());
+                return FormatValue(itemsArray.Average(compiledExpression), useCompositeFormat: DisplayFormat.Contains("{0", StringComparison.Ordinal));
             }
 
             if (Type == AggregateType.Max)
             {
-                var value = itemsArray.Max(compiledExpression);
-                return DisplayFormat.Replace("{value}", value != null ? value.Value.ToString(NumberFormat, Culture) : value.ToString());
+                return FormatValue(itemsArray.Max(compiledExpression), useCompositeFormat: DisplayFormat.Contains("{0", StringComparison.Ordinal));
             }
 
             if (Type == AggregateType.Min)
             {
-                var value = itemsArray.Min(compiledExpression);
-                return DisplayFormat.Replace("{value}", value != null ? value.Value.ToString(NumberFormat, Culture) : value.ToString());
+                return FormatValue(itemsArray.Min(compiledExpression), useCompositeFormat: DisplayFormat.Contains("{0", StringComparison.Ordinal));
             }
 
             if (Type == AggregateType.Sum)
             {
-                var value = itemsArray.Sum(compiledExpression);
-                return DisplayFormat.Replace("{value}", value != null ? value.Value.ToString(NumberFormat, Culture) : value.ToString());
+                return FormatValue(itemsArray.Sum(compiledExpression), useCompositeFormat: DisplayFormat.Contains("{0", StringComparison.Ordinal));
             }
 
-            return DisplayFormat.Replace("{value}", "0");
+            return FormatValue(0, useCompositeFormat: false);
+        }
+
+        private string FormatValue(object? value, bool useCompositeFormat)
+        {
+            var formattedValue = value is IFormattable formattable
+                ? formattable.ToString(NumberFormat, Culture)
+                : value?.ToString() ?? string.Empty;
+            if (!useCompositeFormat)
+            {
+                return DisplayFormat.Replace("{value}", formattedValue, StringComparison.Ordinal);
+            }
+
+            var format = DisplayFormat.Replace("{value}", "{1}", StringComparison.Ordinal);
+            return string.Format(Culture ?? CultureInfo.CurrentCulture, format, value, formattedValue);
         }
 
         /// <summary>

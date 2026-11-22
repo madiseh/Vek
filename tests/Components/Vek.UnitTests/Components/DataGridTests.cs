@@ -6283,6 +6283,8 @@ namespace Vek.UnitTests.Components
 
             dataGrid.FindAll("td.footer-cell")[1].TrimmedText().Should().Be("Average age is 56");
             dataGrid.FindAll("tfoot td.footer-cell")[1].TrimmedText().Should().Be("Average age is 43");
+            dataGrid.FindAll("tfoot td.footer-cell")[3].TrimmedText().Should().Be("Revenue: $795,000");
+            dataGrid.Markup.Should().Contain("Revenue:");
         }
 
         [Test]
