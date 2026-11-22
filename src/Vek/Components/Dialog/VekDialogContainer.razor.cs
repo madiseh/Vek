@@ -435,6 +435,8 @@ namespace Vek
         }
 
         /// <inheritdoc />
+        bool IVekDialogInstanceInternal.IsTopmost => Parent.IsTopmost(Id);
+
         string IVekDialogInstance.ElementId => ElementId;
 
         /// <inheritdoc />
