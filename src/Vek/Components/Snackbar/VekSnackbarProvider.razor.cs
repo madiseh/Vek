@@ -24,6 +24,15 @@ namespace Vek
         [Category(CategoryTypes.General.Behavior)]
         public int? MaxDisplayedSnackbars { get; set; }
 
+        protected override void OnParametersSet()
+        {
+            base.OnParametersSet();
+            if (MaxDisplayedSnackbars < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(MaxDisplayedSnackbars), MaxDisplayedSnackbars, "The maximum number of displayed snackbars cannot be negative.");
+            }
+        }
+
         /// <summary>
         /// Displays snackbar positions right-to-left.
         /// </summary>

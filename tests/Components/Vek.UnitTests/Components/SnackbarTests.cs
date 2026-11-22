@@ -422,6 +422,57 @@ namespace Vek.UnitTests.Components
             _provider.FindAll(".vek-snackbar-progress").Count.Should().Be(1);
         }
 
+        /// <summary>
+        /// Rejects a negative provider display limit.
+        /// </summary>
+        [Test]
+        public void NegativeProviderLimitIsRejected()
+        {
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
+                Context.Render<VekSnackbarProvider>(parameters => parameters.Add(p => p.MaxDisplayedSnackbars, -1)));
+            exception!.ParamName.Should().Be("MaxDisplayedSnackbars");
+        }
+
+        /// <summary>
+        /// Announces snackbar notifications through a polite status live region.
+        /// </summary>
+        [Test]
+        public async Task SnackbarUsesPoliteStatusSemantics()
+        {
+            await _provider.InvokeAsync(() => _service.Add("Status message"));
+
+            var snackbar = _provider.Find(".vek-snackbar");
+            snackbar.GetAttribute("role").Should().Be("status");
+            snackbar.GetAttribute("aria-live").Should().Be("polite");
+        }
+
+        /// <summary>
+        /// Promotes the queued notification after a displayed notification closes.
+        /// </summary>
+        [Test]
+        public async Task QueuedNotificationIsPromotedWithinProviderLimit()
+        {
+            _service.Configuration.MaxDisplayedSnackbars = 1;
+            var provider = Context.Render<VekSnackbarProvider>();
+            Action<SnackbarOptions> allowDuplicates = options => options.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow;
+
+            await provider.InvokeAsync(() =>
+            {
+                _service.Add("First", configure: allowDuplicates);
+                _service.Add("Second", configure: allowDuplicates);
+            });
+
+            provider.FindAll(".vek-snackbar").Count.Should().Be(1);
+            provider.Find(".vek-snackbar-content-message").TrimmedText().Should().Be("First");
+
+            await provider.Find(".vek-snackbar-close-button").ClickAsync();
+            await provider.WaitForAssertionAsync(() =>
+            {
+                provider.FindAll(".vek-snackbar").Count.Should().Be(1);
+                provider.Find(".vek-snackbar-content-message").TrimmedText().Should().Be("Second");
+            });
+        }
+
         [Test]
         public async Task MaxDisplayedSnackbarsLimitsWhatIsShown()
         {
