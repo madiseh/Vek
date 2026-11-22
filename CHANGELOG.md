@@ -29,7 +29,7 @@ For GitHub Releases and downloadable packages, see the [Releases page](https://g
 - `Vek.UnitTests.Analyzers`: 391 total — 391 passed, 0 failed, 0 skipped.
 - `Vek.UnitTests.Docs`: 1,534 total — 1,534 passed, 0 failed, 0 skipped.
 - Format check passed; build-only projects passed: `src/Docs/Vek.Docs.Server` and `src/Docs/Vek.Docs.WasmHost`.
-- Source commit: `a6f7b8ca4acba874eea0b4a980d8e10965d5d4cc`; [CI run 45017258015](https://github.com/madiseh/Vek/actions/runs/45017258015).
+- Release commit: `d781cde962be093d5b0f70a482319704f21ab646`; [CI run 45018330772](https://github.com/madiseh/Vek/actions/runs/45018330772).
 - [Download JUnit reports](https://github.com/madiseh/Vek/releases/download/v1.3.3/test-results-v1.3.3.zip).
 
 [Feature screenshots](https://github.com/madiseh/Vek/releases/download/v1.3.3/release-slideshow.gif): TreeView search (#90), Tabs reordering (#91), DatePicker navigation (#95), TreeView renaming (#96), Dialog stacking (#97), Tabs headers (#98), vertical Slider (#99), Rating templates (#100), and Card aspect ratio (#101).
