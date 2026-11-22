@@ -136,16 +136,32 @@ namespace Vek
         [Category(CategoryTypes.Rating.Data)]
         public EventCallback<double?> PreciseItemHovered { get; set; }
 
+        /// <summary>
+        /// Custom template to render rating item content.
+        /// </summary>
         [Parameter]
+        [Category(CategoryTypes.Rating.Appearance)]
         public RenderFragment<int>? ItemTemplate { get; set; }
 
+        /// <summary>
+        /// Color applied to rating items on hover.
+        /// </summary>
         [Parameter]
+        [Category(CategoryTypes.Rating.Appearance)]
         public Color? ItemHoverColor { get; set; }
 
+        /// <summary>
+        /// Color applied to active rating items.
+        /// </summary>
         [Parameter]
+        [Category(CategoryTypes.Rating.Appearance)]
         public Color? ItemActiveColor { get; set; }
 
+        /// <summary>
+        /// Enables clicking an already selected item to reset value.
+        /// </summary>
         [Parameter]
+        [Category(CategoryTypes.Rating.Behavior)]
         public bool Clearable { get; set; } = true;
 
         internal Color ItemColor { get; set; }
