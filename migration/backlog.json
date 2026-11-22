@@ -798,10 +798,12 @@
       "title": "TreeView Custom Node Templates, Action Buttons, and Status Badges",
       "module": "TreeView",
       "priority": 64,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/064-treeview-custom-node-templates-and-badges.md",
       "dependencies": [],
-      "started_at": "2026-11-22T11:46:56Z"
+      "started_at": "2026-11-22T11:46:56Z",
+      "completed_at": "2026-11-22T13:07:45Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/105"
     },
     {
       "id": "065",

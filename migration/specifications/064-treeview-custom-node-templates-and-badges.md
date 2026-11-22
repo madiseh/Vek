@@ -4,10 +4,12 @@
 - **Feature ID**: 064
 - **Feature Slug**: treeview-custom-node-templates-and-badges
 - **Module**: TreeView
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 64
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/105
 - **Started At**: 2026-11-22T11:46:56Z
+- **Completed At**: 2026-11-22T13:07:45Z
 
 ---
 
