@@ -10,11 +10,11 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NUnit.Framework;
 using Vek.Extensions;
 using Vek.UnitTests.Dummy;
 using Vek.UnitTests.Mocks;
 using Vek.UnitTests.TestComponents.FileUpload;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {
@@ -421,6 +421,20 @@ namespace Vek.UnitTests.Components
 
             comp.Instance.FilesChangedCount.Should().Be(2);
             comp.Instance.OnFilesChangedCount.Should().Be(2);
+        }
+
+        /// <summary>
+        /// Ensures the native file input fills the drag-and-drop surface without hiding the browse button.
+        /// </summary>
+        [Test]
+        public void FileUpload_DragAndDrop_CoversFullSurface()
+        {
+            var comp = Context.Render<VekFileUpload<IReadOnlyList<IBrowserFile>>>(parameters => parameters
+                .Add(x => x.DragAndDrop, true));
+
+            comp.Find("input[type=file]").ClassList.Should().Contain("vek-file-upload-dragover");
+            comp.Find("button.vek-file-upload-dragarea").Should().NotBeNull();
+            comp.Find("input[type=file]").HasAttribute("multiple").Should().BeTrue();
         }
 
         /// <summary>

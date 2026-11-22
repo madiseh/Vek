@@ -34,6 +34,17 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Full-Surface Drag and Drop">
+                <Description>
+                    Enable <CodeInline>DragAndDrop</CodeInline> to accept files across the full component surface. The highlighted dashed area provides feedback while files are dragged over it, and the browse control remains available for keyboard and pointer users. Use <CodeInline>T="IReadOnlyList&lt;IBrowserFile&gt;"</CodeInline> to accept multiple files and <CodeInline>AppendMultipleFiles</CodeInline> to retain earlier selections.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" ShowCode="false" Code="@nameof(FileUploadFullSurfaceExample)">
+                <FileUploadFullSurfaceExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Custom Content">
                 <Description>
                     Use a <CodeInline>VekButton</CodeInline>, <CodeInline>VekIconButton</CodeInline>, <CodeInline>VekFab</CodeInline>, or any custom markup with the
