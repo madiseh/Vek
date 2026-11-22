@@ -4,9 +4,11 @@
 - **Feature ID**: 058
 - **Feature Slug**: datepicker-multi-view-decade-century-navigation
 - **Module**: DatePicker
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 58
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/95
+- **Completed At**: 2026-11-22T10:00:33Z
 
 ---
 
