@@ -84,6 +84,10 @@
   padding: 4px 8px;
   align-items: center;
   transition: background-color 150ms cubic-bezier(.4,0,.2,1) 0ms;
+
+  &.vek-treeview-item-editing {
+    cursor: default;
+  }
 }
 
 @media(hover: hover) and (pointer: fine) {
@@ -127,6 +131,27 @@
   flex-grow: 1;
   padding-left: 4px;
   padding-right: 4px;
+}
+
+.vek-treeview-item-input {
+  flex-grow: 1;
+  margin: 0 4px;
+  padding: 2px 6px;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: var(--vek-palette-text-primary);
+  background-color: var(--vek-palette-background);
+  border: 1px solid var(--vek-palette-primary);
+  border-radius: var(--vek-default-borderradius);
+  outline: none;
+  box-shadow: 0 0 0 1px var(--vek-palette-primary);
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: var(--vek-palette-primary);
+    box-shadow: 0 0 0 2px var(--vek-palette-primary-hover);
+  }
 }
 
 .vek-treeview-dense {

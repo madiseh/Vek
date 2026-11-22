@@ -227,6 +227,18 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Renaming Nodes">
+                <Description>
+                    <p>Enable <CodeInline>AllowNodeRenaming</CodeInline> to rename labels in place. Focus a node and press F2, or double-click its label; Enter saves and Escape cancels. Empty names are rejected and <CodeInline>CanRenameFunc</CodeInline> can apply domain-specific validation.</p>
+                    <p><CodeInline>OnNodeRenamed</CodeInline> receives the node, old text, and proposed new text. Update your source data in the callback when using an externally controlled tree.</p>
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TreeViewRenamingExample)">
+                <TreeViewRenamingExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Drag and Drop Reordering">
                 <Description>
                     <p>

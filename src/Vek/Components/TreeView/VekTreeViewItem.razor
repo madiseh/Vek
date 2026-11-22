@@ -13,7 +13,13 @@
         @ondragleave="HandleDragLeave"
         @ondrop="HandleDropAsync"
         @ondrop:preventDefault="GetAllowDrop()">
-        <div class="@ContentClassname" @onclick="OnItemClickedAsync" @onclick:stopPropagation="true" @ondblclick="OnItemDoubleClickedAsync" @ondblclick:stopPropagation="true">
+        <div class="@ContentClassname"
+             tabindex="@GetTabIndex()"
+             @onclick="OnItemClickedAsync"
+             @onclick:stopPropagation="true"
+             @ondblclick="OnContentDoubleClickedAsync"
+             @ondblclick:stopPropagation="true"
+             @onkeydown="OnKeyDownAsync">
             @if (Content != null)
             {
                 @Content
@@ -42,7 +48,21 @@
                     </div>
                 }
 
-                @if (BodyContent != null)
+                @if (_isEditing)
+                {
+                    <input class="vek-treeview-item-input"
+                           type="text"
+                           value="@_editingText"
+                           @oninput="OnEditInput"
+                           @onkeydown="OnEditKeyDownAsync"
+                           @onkeydown:stopPropagation="true"
+                           @onblur="OnEditBlurAsync"
+                           @onclick:stopPropagation="true"
+                           @ondblclick:stopPropagation="true"
+                           aria-label="@(GetText() ?? "Rename node")"
+                           autofocus />
+                }
+                else if (BodyContent != null)
                 {
                     @BodyContent(this)
                 }
