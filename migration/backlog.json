@@ -1021,11 +1021,12 @@
       "title": "SplitPanel Nested Multi-Directional Layout Panes (Horizontal in Vertical)",
       "module": "SplitPanel",
       "priority": 84,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/084-splitpanel-nested-horizontal-vertical-splits.md",
       "dependencies": [
         "083"
-      ]
+      ],
+      "started_at": "2026-11-22T13:08:25Z"
     },
     {
       "id": "085",

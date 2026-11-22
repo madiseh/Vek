@@ -4,9 +4,10 @@
 - **Feature ID**: 084
 - **Feature Slug**: splitpanel-nested-horizontal-vertical-splits
 - **Module**: SplitPanel
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 84
 - **Dependencies**: ["083"]
+- **Started At**: 2026-11-22T13:08:25Z
 
 ---
 
@@ -47,3 +48,6 @@
 - **Formatting**: Passes `dotnet format` validation.
 - **Clean-Room Anonymity**: Absolute zero mention of proprietary vendor names or commercial brand identifiers in code, commits, or documentation.
 - **Pull Request**: Fully documented pull request with verification summary and example usage.
+
+## 5. UI Evidence
+- Nested horizontal split inside the vertical parent at 1440px viewport: [Screenshot](../artifacts/ui-screenshots/084-splitpanel-nested-layout.png).
