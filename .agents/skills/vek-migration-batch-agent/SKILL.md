@@ -9,6 +9,34 @@ Prepare and execute one approved batch of up to three feature migrations from th
 
 This is an explicit batch-level exception to the repository's one-feature-per-task guidance: the coordinator may manage up to three tasks, while every worker, worktree, branch, and PR remains scoped to one feature.
 
+## Model and agent workflow
+
+Use the configured OpenCode agents so each kind of work goes to the intended 9router combo:
+
+- **`planner` (`9router/Amin-Planner`)**: one read-only planning pass per batch. It helps inspect READY candidates and summarize each candidate's behavior, likely paths, dependencies, risks, and unknowns before user approval. It must not claim features, edit files, or implement code. The coordinator remains responsible for checking the backlog, claims, PRs, and final proposal.
+- **`coder` (`9router/Amin-Coding`)**: one isolated worker per approved feature. It receives only that feature's specification, concise planning notes, repository rules, worktree, branch, and claim details; it verifies the notes against the actual code before editing and owns implementation, tests, docs, screenshots, and required verification.
+- **`inspector` (`9router/Amin-Inspector`)**: read-only review after a coder reports completion. Give it the changed-file diff and verification results, and ask it to look for correctness, scope, missing tests/docs/evidence, and format risks. Do not ask it to repeat builds/tests that have already passed. The coordinator decides whether feedback is valid; the coder makes any required fixes in its worktree, followed by the relevant verification.
+
+Keep planning to one pass per batch, not one planner per feature. Pass concise notes forward instead of asking each agent to reread the entire backlog or repeat prior analysis. Before starting a role, verify that its configured agent exists and is available. If `planner`, `coder`, or `inspector` cannot be found or invoked, stop before substituting another agent or model and ask the user: “I can’t find the `<agent>` agent. Would you like me to continue without it?” Continue with that role handled by the coordinator only after the user explicitly agrees; otherwise pause the workflow.
+
+```text
+Coordinator
+   │
+   ├─ planner (read-only, once per batch) ──> candidate notes
+   │                                         │
+   ├─ validate backlog/claims/PRs + propose batch to user
+   │                                         │ user approval
+   ├─ claim + create isolated worktrees ─────┘
+   │
+   ├─ coder per approved feature (parallel, up to 3)
+   │       └─ implementation + tests + docs + screenshots + gates
+   │
+   ├─ inspector per completed feature (read-only diff review)
+   │       └─ findings ──> coder fixes if needed ──> rerun relevant gates
+   │
+   └─ coordinator verifies evidence, opens/completes PR, releases claim
+```
+
 ## 1. Build a read-only batch proposal
 
 1. Read the repository instructions, `migration/AGENTS.md`, and the relevant governance docs. Fetch the latest `origin/master` and inspect its backlog without running a command that claims or changes a feature.
