@@ -4,9 +4,10 @@
 - **Feature ID**: 063
 - **Feature Slug**: treeview-node-inline-editing-and-renaming
 - **Module**: TreeView
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 63
 - **Dependencies**: []
+- **Started At**: 2026-11-22T07:28:49Z
 
 ---
 

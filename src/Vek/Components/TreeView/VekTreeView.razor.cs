@@ -77,6 +77,8 @@ namespace Vek
                 .WithParameter(() => FilterText)
                 .WithEventCallback(() => FilterTextChanged)
                 .WithChangeHandler(OnFilterTextChangedAsync);
+            _allowNodeRenamingState = registerScope.RegisterParameter<bool>(nameof(AllowNodeRenaming))
+                .WithParameter(() => AllowNodeRenaming);
             _selection = new();
         }
 
@@ -88,11 +90,14 @@ namespace Vek
         private readonly ParameterState<Func<TreeItemData<T>, bool>?> _hasChildrenState;
         private readonly ParameterState<ITreeNodeProvider<T>?> _nodeProviderState;
         private readonly ParameterState<string> _filterTextState;
+        private readonly ParameterState<bool> _allowNodeRenamingState;
 
         internal string GetFilterText() => _filterTextState.Value;
         internal bool HasSearchText => !string.IsNullOrWhiteSpace(_filterTextState.Value);
         internal bool GetAllowDragDrop() => _allowDragDropState.Value;
         internal bool GetAllowReparenting() => _allowReparentingState.Value;
+        internal bool GetAllowNodeRenaming() => _allowNodeRenamingState.Value;
+        internal VekTreeViewItem<T>? ActiveEditingItem { get; set; }
         internal Func<TreeItemData<T>, Task<IEnumerable<TreeItemData<T>>>>? GetLoadChildrenAsync() => _loadChildrenAsyncState.Value;
         internal Func<TreeItemData<T>, bool>? GetHasChildren() => _hasChildrenState.Value;
         internal ITreeNodeProvider<T>? GetNodeProvider() => _nodeProviderState.Value;
@@ -269,6 +274,16 @@ namespace Vek
         public bool Disabled { get; set; }
 
         /// <summary>
+        /// Allows tree nodes to be renamed with F2 or by double-clicking their label.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.TreeView.Behavior)]
+        public bool AllowNodeRenaming { get; set; }
+
+        /// <summary>
         /// Enables drag-and-drop node reordering and reparenting.
         /// </summary>
         /// <remarks>
@@ -332,6 +347,54 @@ namespace Vek
 
             await OnNodeDrop.InvokeAsync(args);
             return !args.Cancel;
+        }
+
+        /// <summary>
+        /// Occurs when a tree node is renamed.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.TreeView.Behavior)]
+        public EventCallback<TreeNodeRenameEventArgs<T>> OnNodeRenamed { get; set; }
+
+        /// <summary>
+        /// Occurs when tree node editing is canceled without saving changes.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.TreeView.Behavior)]
+        public EventCallback<TreeNodeRenameEventArgs<T>> OnNodeRenameCanceled { get; set; }
+
+        /// <summary>
+        /// An optional predicate function to validate whether a node can be renamed.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.TreeView.Behavior)]
+        public Func<TreeNodeRenameEventArgs<T>, bool>? CanRenameFunc { get; set; }
+
+        /// <summary>
+        /// Puts the specified item into inline editing mode.
+        /// </summary>
+        /// <param name="item">The tree item to edit.</param>
+        public Task BeginEditAsync(VekTreeViewItem<T> item)
+        {
+            return item.BeginEditAsync();
+        }
+
+        /// <summary>
+        /// Commits the inline edit for the specified item.
+        /// </summary>
+        /// <param name="item">The tree item being edited.</param>
+        public Task<bool> CommitEditAsync(VekTreeViewItem<T> item)
+        {
+            return item.CommitEditAsync();
+        }
+
+        /// <summary>
+        /// Cancels the inline edit for the specified item without saving changes.
+        /// </summary>
+        /// <param name="item">The tree item being edited.</param>
+        public Task CancelEditAsync(VekTreeViewItem<T> item)
+        {
+            return item.CancelEditAsync();
         }
 
         /// <summary>

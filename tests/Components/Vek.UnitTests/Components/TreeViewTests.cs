@@ -90,6 +90,54 @@ namespace Vek.UnitTests.Components
             tree.Find("mark.vek-tree-highlight").TextContent.Should().Be("Report");
         }
 
+        /// <summary>
+        /// F2 edits a node label and Enter commits the new text through the rename callback.
+        /// </summary>
+        [Test]
+        public async Task NodeRenaming_F2AndEnter_UpdatesTextAndRaisesCallback()
+        {
+            Context.AddFakeTimeProvider();
+            var renamed = string.Empty;
+            var tree = Context.Render<VekTreeView<string>>(parameters => parameters
+                .Add(p => p.AllowNodeRenaming, true)
+                .Add(p => p.OnNodeRenamed, args => renamed = args.NewText!)
+                .AddChildContent<VekTreeViewItem<string>>(item => item
+                    .Add(x => x.Value, "folder")
+                    .Add(x => x.Text, "Folder")));
+
+            await tree.Find(".vek-treeview-item-content").KeyDownAsync(new KeyboardEventArgs { Key = "F2" });
+            var input = tree.Find("input.vek-treeview-item-input");
+            await input.InputAsync("Renamed folder");
+            await input.KeyDownAsync(new KeyboardEventArgs { Key = "Enter" });
+
+            tree.Find(".vek-treeview-item-label").TextContent.Should().Be("Renamed folder");
+            renamed.Should().Be("Renamed folder");
+        }
+
+        /// <summary>
+        /// Escape cancels a pending node rename without changing the displayed label.
+        /// </summary>
+        [Test]
+        public async Task NodeRenaming_Escape_CancelsChanges()
+        {
+            Context.AddFakeTimeProvider();
+            var canceled = false;
+            var tree = Context.Render<VekTreeView<string>>(parameters => parameters
+                .Add(p => p.AllowNodeRenaming, true)
+                .Add(p => p.OnNodeRenameCanceled, _ => canceled = true)
+                .AddChildContent<VekTreeViewItem<string>>(item => item
+                    .Add(x => x.Value, "folder")
+                    .Add(x => x.Text, "Folder")));
+
+            await tree.Find(".vek-treeview-item-content").KeyDownAsync(new KeyboardEventArgs { Key = "F2" });
+            var input = tree.Find("input.vek-treeview-item-input");
+            await input.InputAsync("Draft");
+            await input.KeyDownAsync(new KeyboardEventArgs { Key = "Escape" });
+
+            tree.Find(".vek-treeview-item-label").TextContent.Should().Be("Folder");
+            canceled.Should().BeTrue();
+        }
+
         [Test]
         public async Task TreeView_ClickWhileDisabled_DoesNotChangeSelection()
         {

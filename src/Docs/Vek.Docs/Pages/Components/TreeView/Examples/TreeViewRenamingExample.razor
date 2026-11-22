@@ -1,0 +1,27 @@
+@namespace Vek.Docs.Examples
+
+<VekStack Spacing="3">
+    <VekTreeView T="string" AllowNodeRenaming OnNodeRenamed="HandleRenamed" CanRenameFunc="CanRename">
+        <VekTreeViewItem Value='@( "Documents" )' Text="Documents" Expanded>
+            <VekTreeViewItem Value='@( "Annual-report.docx" )' Text="Annual report.docx" />
+            <VekTreeViewItem Value='@( "Budget.xlsx" )' Text="Budget.xlsx" />
+        </VekTreeViewItem>
+        <VekTreeViewItem Value='@( "Projects" )' Text="Projects" />
+    </VekTreeView>
+    <VekText Typo="Typo.caption">Select a node and press F2, or double-click its label. Enter saves; Escape cancels. Names cannot be blank.</VekText>
+    @if (!string.IsNullOrEmpty(LastRename))
+    {
+        <VekAlert Severity="Severity.Success" Dense="true">@LastRename</VekAlert>
+    }
+</VekStack>
+
+@code {
+    private string LastRename { get; set; } = string.Empty;
+
+    private static bool CanRename(TreeNodeRenameEventArgs<string> args) => !string.IsNullOrWhiteSpace(args.NewText);
+
+    private void HandleRenamed(TreeNodeRenameEventArgs<string> args)
+    {
+        LastRename = $"Renamed '{args.OldText}' to '{args.NewText}'.";
+    }
+}

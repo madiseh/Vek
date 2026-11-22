@@ -20,6 +20,9 @@ namespace Vek
     {
         private bool _isServerLoaded;
         private bool _isDragging;
+        private bool _isEditing;
+        private string _editingText = string.Empty;
+        private string? _renamedText;
         private TreeItemDropPosition? _currentDropPosition;
         private readonly ParameterState<bool> _selectedState;
         private readonly ParameterState<bool> _expandedState;
@@ -473,7 +476,139 @@ namespace Vek
             return Value;
         }
 
-        private string? GetText() => CurrentItemData?.Text ?? (string.IsNullOrEmpty(Text) ? _converter.Convert(Value) : Text);
+        private string? GetText() => _renamedText ?? CurrentItemData?.Text ?? (string.IsNullOrEmpty(Text) ? _converter.Convert(Value) : Text);
+
+        internal async Task BeginEditAsync()
+        {
+            if (VekTreeRoot?.GetAllowNodeRenaming() != true || GetDisabled() || GetReadOnly() || Content is not null || BodyContent is not null)
+            {
+                return;
+            }
+
+            if (VekTreeRoot.ActiveEditingItem is { } active && active != this)
+            {
+                await active.CancelEditAsync();
+            }
+
+            VekTreeRoot.ActiveEditingItem = this;
+            _editingText = GetText() ?? string.Empty;
+            _isEditing = true;
+            StateHasChanged();
+        }
+
+        internal async Task<bool> CommitEditAsync()
+        {
+            if (!_isEditing || VekTreeRoot is null)
+            {
+                return false;
+            }
+
+            var original = GetText();
+            var args = new TreeNodeRenameEventArgs<T> { Item = this, Value = GetValue(), OldText = original, NewText = _editingText };
+            if (string.IsNullOrWhiteSpace(args.NewText))
+            {
+                args.Cancel = true;
+                args.KeepEditing = true;
+                args.ErrorMessage = "A name is required.";
+            }
+            if (!args.Cancel && VekTreeRoot.CanRenameFunc is not null && !VekTreeRoot.CanRenameFunc(args))
+            {
+                args.Cancel = true;
+                args.KeepEditing = true;
+                args.ErrorMessage ??= "This name is not allowed.";
+            }
+            if (!args.Cancel)
+            {
+                await VekTreeRoot.OnNodeRenamed.InvokeAsync(args);
+            }
+            if (args.Cancel)
+            {
+                if (!args.KeepEditing)
+                {
+                    await CancelEditAsync();
+                }
+                else
+                {
+                    _editingText = args.NewText ?? string.Empty;
+                    StateHasChanged();
+                }
+                return false;
+            }
+
+            _renamedText = args.NewText;
+            if (CurrentItemData is not null)
+            {
+                CurrentItemData.Text = args.NewText;
+            }
+            _isEditing = false;
+            VekTreeRoot.ActiveEditingItem = null;
+            StateHasChanged();
+            return true;
+        }
+
+        internal async Task CancelEditAsync()
+        {
+            if (!_isEditing)
+            {
+                return;
+            }
+            var args = new TreeNodeRenameEventArgs<T> { Item = this, Value = GetValue(), OldText = GetText(), NewText = _editingText };
+            _isEditing = false;
+            if (VekTreeRoot?.ActiveEditingItem == this)
+            {
+                VekTreeRoot.ActiveEditingItem = null;
+            }
+            if (VekTreeRoot is not null)
+            {
+                await VekTreeRoot.OnNodeRenameCanceled.InvokeAsync(args);
+            }
+            StateHasChanged();
+        }
+
+        private async Task OnContentDoubleClickedAsync(MouseEventArgs args)
+        {
+            if (VekTreeRoot?.GetAllowNodeRenaming() == true)
+            {
+                await BeginEditAsync();
+            }
+            else
+            {
+                await OnItemDoubleClickedAsync(args);
+            }
+        }
+
+        private int GetTabIndex() => _isEditing ? -1 : 0;
+
+        private void OnEditInput(ChangeEventArgs args)
+        {
+            _editingText = args.Value?.ToString() ?? string.Empty;
+        }
+
+        private async Task OnEditBlurAsync(FocusEventArgs args)
+        {
+            if (_isEditing)
+            {
+                await CommitEditAsync();
+            }
+        }
+
+        private async Task OnKeyDownAsync(KeyboardEventArgs args)
+        {
+            if (args.Key == "F2")
+            {
+                await BeginEditAsync();
+            }
+        }
+
+        private Task OnEditKeyDownAsync(KeyboardEventArgs args)
+        {
+            return args.Key switch
+            {
+                "Enter" => CommitEditAsync(),
+                "Escape" => CancelEditAsync(),
+                _ => Task.CompletedTask
+            };
+        }
 
         private bool GetDisabled() => Disabled || VekTreeRoot?.Disabled == true;
 
