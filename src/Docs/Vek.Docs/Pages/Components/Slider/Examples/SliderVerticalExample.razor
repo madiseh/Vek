@@ -1,9 +1,10 @@
 ﻿@namespace Vek.Docs.Examples
 
-<VekSlider Value="@value" Vertical="true">Vertical</VekSlider>
-<VekSlider Value="@value" Vertical="true"/>
+<VekSlider @bind-Value="value" Vertical="true" Height="16rem" ValueLabel>Volume</VekSlider>
+<VekSlider @bind-Value="invertedValue" Vertical="true" Height="16rem" Inverted ValueLabel>Inverted</VekSlider>
 
 
 @code {
     double value = 50.0;
+    double invertedValue = 50.0;
 }

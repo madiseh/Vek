@@ -52,6 +52,26 @@ namespace Vek.UnitTests.Components
             Slider().ClassList.Should().ContainInOrder(new[] { "vek-slider", $"vek-slider-{expectedSizeClass}" });
         }
 
+        /// <summary>
+        /// Exposes vertical orientation, height, and inversion in the rendered control.
+        /// </summary>
+        [Test]
+        public void Vertical_UsesHeightAndInversion()
+        {
+            var comp = Context.Render<VekSlider<int>>(x =>
+            {
+                x.Add(p => p.Vertical, true);
+                x.Add(p => p.Height, "18rem");
+                x.Add(p => p.Inverted, true);
+                x.Add(p => p.Value, 25);
+                x.Add(p => p.ValueLabel, true);
+            });
+
+            comp.Find(".vek-slider").GetAttribute("style").Should().Contain("--vek-slider-height:18rem");
+            comp.Find(".vek-slider").ClassList.Should().Contain("vek-slider-inverted");
+            comp.Find(".vek-slider-value-label").GetAttribute("style").Should().Be("top:75%;");
+        }
+
         [Test]
         public void CheckVerticalClass()
         {
