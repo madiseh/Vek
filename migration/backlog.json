@@ -195,10 +195,12 @@
       "title": "DataGrid Summary and Aggregate Formatting with Custom Expressions",
       "module": "DataGrid",
       "priority": 15,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/015-datagrid-summary-formatting.md",
       "dependencies": [],
-      "started_at": "2026-11-22T11:42:18Z"
+      "started_at": "2026-11-22T11:42:18Z",
+      "completed_at": "2026-11-22T12:48:44Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/104"
     },
     {
       "id": "016",
@@ -335,7 +337,7 @@
       "title": "DataGrid Multi-Level Group Footer and Total Footer Summaries",
       "module": "DataGrid",
       "priority": 28,
-      "status": "backlog",
+      "status": "ready",
       "specification": "specifications/028-datagrid-multi-level-footer-aggregates.md",
       "dependencies": [
         "015"
