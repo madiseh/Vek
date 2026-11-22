@@ -631,11 +631,11 @@ public partial class VekCalendar : VekComponentBase
         StateHasChanged();
     }
 
-    private int GetDecadeStart() => (_displayYear / 10) * 10;
+    private int GetDecadeStart() => _displayYear / 10 * 10;
 
     private IEnumerable<int> GetDisplayedYears()
     {
-        var start = _viewMode == CalendarViewMode.Decades ? (_displayYear / 100) * 100 : GetDecadeStart() - 1;
+        var start = _viewMode == CalendarViewMode.Decades ? _displayYear / 100 * 100 : GetDecadeStart() - 1;
         var count = _viewMode == CalendarViewMode.Decades ? 100 : 12;
         return Enumerable.Range(start, count);
     }
