@@ -116,26 +116,29 @@
                     @TabPanelHeader(panel)
                 </div>
             }
-            @if (panel.TabContent is not null)
+            @if (panel.HeaderTemplate is not null)
+            {
+                @panel.HeaderTemplate
+            }
+            else if (panel.TabContent is not null)
             {
                 @panel.TabContent
             }
-            else if (!string.IsNullOrEmpty(panel.Text) && string.IsNullOrEmpty(panel.Icon))
+            else
             {
+                @if (panel.IconPosition == TabIconPosition.Start)
+                {
+                    @RenderPanelIcon(panel)
+                }
                 @panel.Text
+                @if (panel.IconPosition == TabIconPosition.End)
+                {
+                    @RenderPanelIcon(panel)
+                }
             }
-            else if (string.IsNullOrEmpty(panel.Text) && !string.IsNullOrEmpty(panel.Icon))
+            @if (panel.EffectiveBadgeContent is not null || panel.BadgeIcon is not null || panel.BadgeDot)
             {
-                <VekIcon Icon="@panel.Icon" Color="@GetPanelIconColor(panel)" />
-            }
-            else if (!string.IsNullOrEmpty(panel.Text) && !string.IsNullOrEmpty(panel.Icon))
-            {
-                <VekIcon Icon="@panel.Icon" Color="@GetPanelIconColor(panel)" Class="vek-tab-icon-text" />
-                @panel.Text
-            }
-            @if (panel.BadgeData is not null || panel.BadgeIcon is not null || panel.BadgeDot)
-            {
-                <VekBadge Dot="@panel.BadgeDot" Content="@panel.BadgeData" Icon="@panel.BadgeIcon" Max="@panel.BadgeMax" Color="@panel.BadgeColor" Class="vek-tab-badge" />
+                <VekBadge Dot="@panel.BadgeDot" Content="@panel.EffectiveBadgeContent" Icon="@panel.BadgeIcon" Max="@panel.BadgeMax" Color="@panel.BadgeColor" Class="vek-tab-badge" />
             }
             @if (TabPanelHeaderPosition == TabHeaderPosition.After && TabPanelHeader is not null)
             {
@@ -148,6 +151,14 @@
                 @RenderCloseButton(panel)
             }
         </div>;
+
+    private RenderFragment RenderPanelIcon(VekTabPanel panel) =>
+        @<text>
+            @if (!string.IsNullOrEmpty(panel.Icon))
+            {
+                <VekIcon Icon="@panel.Icon" Color="@GetPanelIconColor(panel)" Class="@(panel.Text is null ? null : $"vek-tab-icon-text vek-tab-icon-{panel.IconPosition.ToString().ToLowerInvariant()}")" />
+            }
+        </text>;
 
     private RenderFragment RenderCloseButton(VekTabPanel panel) =>
         @<span class="vek-tab-close-wrapper" @onclick:stopPropagation="true" @onkeydown:stopPropagation="true">

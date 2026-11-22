@@ -76,6 +76,23 @@ public partial class VekTabPanel : VekComponentBase
     public string? Text { get; set; }
 
     /// <summary>
+    /// The custom header content for this tab, replacing its text and icon.
+    /// </summary>
+    [Parameter]
+    [Category(CategoryTypes.Tabs.Behavior)]
+    public RenderFragment? HeaderTemplate { get; set; }
+
+    /// <summary>
+    /// The position of the tab icon relative to its text.
+    /// </summary>
+    /// <remarks>
+    /// Defaults to <see cref="TabIconPosition.Start"/>.
+    /// </remarks>
+    [Parameter]
+    [Category(CategoryTypes.Tabs.Appearance)]
+    public TabIconPosition IconPosition { get; set; } = TabIconPosition.Start;
+
+    /// <summary>
     /// The icon for this tab.
     /// </summary>
     /// <remarks>
@@ -181,6 +198,18 @@ public partial class VekTabPanel : VekComponentBase
     [Parameter]
     [Category(CategoryTypes.Tabs.Behavior)]
     public EventCallback<TabClosingEventArgs> OnClose { get; set; }
+
+    /// <summary>
+    /// The badge content shown for this tab.
+    /// </summary>
+    /// <remarks>
+    /// Defaults to <c>null</c>. Typically a string such as <c>"3"</c> or an integer count.
+    /// </remarks>
+    [Parameter]
+    [Category(CategoryTypes.Tabs.Behavior)]
+    public object? BadgeContent { get; set; }
+
+    internal object? EffectiveBadgeContent => BadgeContent ?? BadgeData;
 
     /// <summary>
     /// The badge shown for this tab.

@@ -604,9 +604,12 @@
       "title": "Tabs Custom Header Template, Status Badges, and Icon Slots",
       "module": "Tabs",
       "priority": 49,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/049-tabs-badge-and-custom-header-template.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-22T07:28:42Z",
+      "completed_at": "2026-11-22T10:13:01Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/98"
     },
     {
       "id": "050",

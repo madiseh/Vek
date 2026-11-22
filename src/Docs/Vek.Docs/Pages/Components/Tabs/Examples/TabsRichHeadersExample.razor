@@ -1,0 +1,20 @@
+@namespace Vek.Docs.Examples
+
+<VekTabs>
+    <VekTabPanel Text="Inbox" Icon="@Icons.Material.Filled.Mail" BadgeContent='"3"' BadgeColor="Color.Error">
+        Inbox messages
+    </VekTabPanel>
+    <VekTabPanel Text="Sent" Icon="@Icons.Material.Filled.Send" IconPosition="TabIconPosition.End" BadgeContent='@(12)' BadgeColor="Color.Info">
+        Sent messages
+    </VekTabPanel>
+    <VekTabPanel BadgeContent='"New"' BadgeColor="Color.Success">
+        <HeaderTemplate>
+            <span class="d-inline-flex align-center gap-2">
+                <VekIcon Icon="@Icons.Material.Filled.Folder" />
+                <span>Projects</span>
+                <VekBadge Content='"A"' Color="Color.Primary" />
+            </span>
+        </HeaderTemplate>
+        <ChildContent>Project messages</ChildContent>
+    </VekTabPanel>
+</VekTabs>

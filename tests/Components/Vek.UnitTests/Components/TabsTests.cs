@@ -267,6 +267,32 @@ namespace Vek.UnitTests.Components
             comp.Find(".vek-tabs-tabbar").ClassList.Should().Contain(new[] { "testA", "testB" });
         }
 
+        /// <summary>
+        /// A header template replaces the default title, icon position is honored, and the notification badge uses BadgeContent.
+        /// </summary>
+        [Test]
+        public void RichTabHeadersRenderTemplateIconPositionAndBadgeContent()
+        {
+            var comp = Context.Render<VekTabs>(parameters => parameters
+                .AddChildContent<VekTabPanel>(panel => panel
+                    .Add(x => x.BadgeContent, "New")
+                    .Add(x => x.HeaderTemplate, (RenderFragment)(builder => builder.AddContent(0, "Custom header"))))
+                .AddChildContent<VekTabPanel>(panel => panel
+                    .Add(x => x.Text, "Sent")
+                    .Add(x => x.Icon, "send")
+                    .Add(x => x.IconPosition, TabIconPosition.End)
+                    .Add(x => x.BadgeContent, "3")
+                    .Add(x => x.BadgeColor, Color.Success)));
+
+            var tabs = comp.FindAll(".vek-tab");
+            tabs[0].TextContent.Should().Contain("Custom header");
+            tabs[0].TextContent.Should().NotContain("Sent");
+            tabs[1].InnerHtml.IndexOf("Sent", StringComparison.Ordinal).Should().BeLessThan(tabs[1].InnerHtml.IndexOf("vek-icon-root", StringComparison.Ordinal));
+            comp.FindAll(".vek-badge")[0].TextContent.Should().Be("New");
+            comp.FindAll(".vek-badge")[1].TextContent.Should().Be("3");
+            comp.FindAll(".vek-badge")[1].ClassList.Should().Contain("vek-theme-success");
+        }
+
         [TestCase(128, 99, "99+")]
         [TestCase(128, 999, "128")]
         public void TabPanelBadgeMaxControlsIntegerBadgeData(int badgeData, int badgeMax, string expectedBadgeText)
