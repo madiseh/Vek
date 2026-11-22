@@ -4,9 +4,11 @@
 - **Feature ID**: 092
 - **Feature Slug**: progress-circular-and-linear-indeterminate-modes
 - **Module**: Progress
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 92
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/103
+- **Completed At**: 2026-11-22T12:27:10Z
 
 ---
 
