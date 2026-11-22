@@ -1,24 +1,77 @@
 @namespace Vek.Docs.Examples
 
 <VekPaper Width="400px" Elevation="2">
-    <VekTreeView Items="@TreeItems" Hover="true">
+    <div style="display: flex; gap: 16px; padding: 8px;">
+        <VekCheckBox @bind-Value="Disabled" Label="Disabled" />
+        <VekCheckBox @bind-Value="ReadOnly" Label="Read only" />
+    </div>
+    @if (LastAction.Length > 0)
+    {
+        <VekText Class="pa-2">@LastAction</VekText>
+    }
+    <VekTreeView Items="@TreeItems" Hover="true" Disabled="@Disabled" ReadOnly="@ReadOnly">
         <ItemTemplate Context="item">
-            <VekTreeViewItem Items="@item.Children" Icon="@item.Icon">
-                <BodyContent>
-                    <div style="display: grid; grid-template-columns: 1fr auto; align-items: center; width: 100%">
-                        <VekText Style="justify-self: start;">@item.Text</VekText>
-                        <div style="justify-self: end;">
-                            <VekIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Medium" Color="Color.Inherit" />
-                            <VekIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Medium" Color="Color.Inherit" />
-                        </div>
-                    </div>
-                </BodyContent>
-            </VekTreeViewItem>
+            <VekTreeViewItem Value="@(item.Value?.ToString())" Text="@item.Text" Icon="@item.Icon" EndText="@((item as TreeItemData)?.EndText)" EndIcon="@((item as TreeItemData)?.EndIcon)" Items="@item.Children" Disabled="@Disabled" ReadOnly="@ReadOnly" />
         </ItemTemplate>
+        <BodyContent Context="node">
+            <div style="display: grid; grid-template-columns: auto 1fr auto auto auto; align-items: center; width: 100%">
+                @if (!string.IsNullOrEmpty(node.Icon))
+                {
+                    <VekIcon Icon="@node.Icon" Class="me-2" />
+                }
+                <VekText Style="justify-self: start;">@node.Text</VekText>
+                @if (!string.IsNullOrEmpty(node.EndText))
+                {
+                    <VekText Typo="Typo.caption" Class="mx-2">@node.EndText</VekText>
+                }
+                @if (!string.IsNullOrEmpty(node.EndIcon))
+                {
+                    <VekIcon Icon="@node.EndIcon" Class="me-2" />
+                }
+                <span class="mx-2">
+                    @if (GetCount(node) is var count && count > 0)
+                    {
+                        <VekBadge Content="@count" Color="Color.Primary" BadgeAriaLabel="@(count.ToString() + " child nodes")" />
+                    }
+                </span>
+                <div class="vek-treeview-node-actions" style="justify-self: end;">
+                    <button type="button" disabled="@(Disabled || ReadOnly)" aria-label="Edit node" @onclick="() => EditNode(node)" @onclick:stopPropagation="true">
+                        <VekIcon Icon="@Icons.Material.Filled.Edit" />
+                    </button>
+                    <button type="button" disabled="@(Disabled || ReadOnly)" aria-label="Delete node" @onclick="() => DeleteNode(node)" @onclick:stopPropagation="true">
+                        <VekIcon Icon="@Icons.Material.Filled.Delete" />
+                    </button>
+                </div>
+            </div>
+        </BodyContent>
     </VekTreeView>
 </VekPaper>
 
 @code {
+
+    private bool Disabled { get; set; }
+
+    private bool ReadOnly { get; set; }
+
+    private string LastAction { get; set; } = string.Empty;
+
+    private static int GetCount(VekTreeViewItem<string> item) => item.GetState(x => x.Items)?.Count ?? 0;
+
+    private void EditNode(VekTreeViewItem<string> item)
+    {
+        if (!Disabled && !ReadOnly)
+        {
+            LastAction = $"Editing {item.Text}";
+        }
+    }
+
+    private void DeleteNode(VekTreeViewItem<string> item)
+    {
+        if (!Disabled && !ReadOnly)
+        {
+            LastAction = $"Delete requested for {item.Text}";
+        }
+    }
 
     private List<TreeItemData<string>> TreeItems { get; set; } = [];
 
@@ -29,6 +82,10 @@
             Text = text;
             Icon = icon;
         }
+
+        public string EndText { get; set; } = string.Empty;
+
+        public string EndIcon { get; set; } = string.Empty;
     }
 
     protected override void OnInitialized()
@@ -56,6 +113,6 @@
                     new TreeItemData("Vek.sln", Icons.Custom.Brands.MicrosoftVisualStudio)
                 ]
         });
-        TreeItems.Add(new TreeItemData("History", Icons.Material.Filled.Folder));
+        TreeItems.Add(new TreeItemData("History", Icons.Material.Filled.Folder) { EndText = "Archived", EndIcon = Icons.Material.Filled.Lock });
     }
 }

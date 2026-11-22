@@ -217,8 +217,7 @@
         <DocsPageSection>
             <SectionHeader Title="Custom Body Content">
                 <Description>
-                     Use the <CodeInline>BodyContent</CodeInline> render fragment when you want to customize the main content area of a tree item but retain the built-in icons, indentation, and expansion buttons.
-                     This provides a balance between customization and leveraging the default item structure.
+                     Use the tree-level <CodeInline>BodyContent</CodeInline> render fragment to customize generated nodes while retaining built-in icons, indentation, and expansion controls. Each fragment receives its owning <CodeInline>VekTreeViewItem</CodeInline>, and a node-level <CodeInline>BodyContent</CodeInline> takes precedence. Reuse each item's existing <CodeInline>Icon</CodeInline>, <CodeInline>EndText</CodeInline>, and <CodeInline>EndIcon</CodeInline> parameters for leading and trailing adornments. Use CSS hover and focus-within styles for optional actions so keyboard users can reveal them too; stop propagation on click and double-click actions to prevent selection, expansion, or rename, and disable actions when their node is disabled or read-only. The example demonstrates action buttons, count badges, and nested nodes.
                 </Description>
             </SectionHeader>
             <SectionContent Outlined="true" Code="@nameof(TreeViewBodyContentExample)" ShowCode="false">

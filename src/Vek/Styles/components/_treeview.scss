@@ -76,6 +76,21 @@
     background-color: var(--vek-palette-primary-hover);
     outline: 1px dashed var(--vek-palette-primary);
   }
+
+  .vek-treeview-node-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 150ms ease;
+  }
+
+  &:hover .vek-treeview-node-actions,
+  &:focus-within .vek-treeview-node-actions {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 .vek-treeview-item-content {
@@ -125,6 +140,10 @@
   margin-inline-end: 4px;
   margin-inline-start: unset;
   justify-content: center;
+}
+
+.vek-treeview-item-custom-body {
+  display: contents;
 }
 
 .vek-treeview-item-label {
