@@ -22,6 +22,20 @@ namespace Vek.UnitTests.Components
             circular.StrokeWidth.Should().Be(3);
         }
 
+        /// <summary>
+        /// A zero-width value range produces a stable empty circle instead of a non-finite SVG offset.
+        /// </summary>
+        [Test]
+        public void EqualBoundsProduceZeroProgress()
+        {
+            var comp = Context.Render<VekProgressCircular>(parameters => parameters
+                .Add(component => component.Min, 10)
+                .Add(component => component.Max, 10)
+                .Add(component => component.Value, 10));
+
+            comp.Find("circle").GetAttribute("style").Should().Be("stroke-dasharray: 126; stroke-dashoffset: 126;");
+        }
+
         [Test]
         [TestCase(true)]
         [TestCase(false)]

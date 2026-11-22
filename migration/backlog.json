@@ -1123,9 +1123,11 @@
       "title": "Progress Circular and Linear Percentage Indicators with Animated Buffer Bar",
       "module": "Progress",
       "priority": 92,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/092-progress-circular-and-linear-indeterminate-modes.md",
-      "dependencies": []
+      "dependencies": [],
+      "completed_at": "2026-11-22T12:27:10Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/103"
     },
     {
       "id": "093",

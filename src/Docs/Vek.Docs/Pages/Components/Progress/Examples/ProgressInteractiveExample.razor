@@ -1,0 +1,14 @@
+@namespace Vek.Docs.Examples
+
+<div class="d-flex flex-column gap-4" style="max-width: 36rem">
+    <label for="progress-value">Progress: @Value%</label>
+    <input id="progress-value" aria-label="Progress percentage" type="range" min="0" max="100" @bind="Value" />
+    <span>@Value%</span>
+    <VekProgressCircular Value="@Value" Color="Color.Primary" />
+    <VekProgressLinear Value="@Value" Buffer="true" BufferValue="@Math.Min(100, Value + 15)" Color="Color.Primary" />
+    <VekProgressLinear Indeterminate="true" Color="Color.Secondary" />
+</div>
+
+@code {
+    private double Value { get; set; } = 42;
+}
