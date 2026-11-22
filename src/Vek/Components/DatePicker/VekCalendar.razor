@@ -32,25 +32,40 @@
         <div class="vek-picker-content">
             <div class="vek-picker-calendar-content vek-picker-calendar-content-1" @onmousedown:preventDefault="true">
                 <div class="vek-picker-calendar-container">
-                    @if (CurrentView == OpenTo.Year)
+                    @if (_viewMode == CalendarViewMode.Years || _viewMode == CalendarViewMode.Decades)
                     {
-                        <div id="pickerYears" class="vek-picker-year-container">
-                            @for (int i = GetMinYear(); i <= GetMaxYear(); i++)
-                            {
-                                var year = i;
-                                <div class="vek-picker-year" id="@(_componentId + year)" @onclick="@(async () => await OnYearClickedAsync(year))" @onclick:stopPropagation="true">
-                                    @VekText.RenderText(GetYearTypo(year), GetYearClasses(year), year.ToString(System.Globalization.CultureInfo.InvariantCulture))
-                                </div>
-                            }
-                        </div>
+                        @if (_viewMode == CalendarViewMode.Decades)
+                        {
+                            <div class="vek-picker-calendar-header">
+                                <button type="button" class="vek-picker-calendar-header-transition" @onclick="OnYearGridClick">@GetDecadeStart()s</button>
+                            </div>
+                            <div class="vek-picker-year-container" role="grid" aria-label="Choose decade">
+                                @foreach (var decade in GetDisplayedYears().Where(y => y % 10 == 0))
+                                {
+                                    <button type="button" class="vek-picker-year" aria-label="@($"{decade}s")" @onclick="() => SelectYearAsync(decade)" @onclick:stopPropagation="true">@($"{decade}s")</button>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div id="pickerYears" class="vek-picker-year-container" role="grid" aria-label="Choose year">
+                                <button type="button" class="vek-picker-calendar-header-transition" @onclick="OnDecadeClick">@GetDecadeStart()–@(GetDecadeStart() + 9)</button>
+                                @foreach (var year in GetDisplayedYears())
+                                {
+                                    <button type="button" class="vek-picker-year" aria-label="@year" disabled="@(year < GetMinYear() || year > GetMaxYear())" @onclick="() => SelectYearAsync(year)" @onclick:stopPropagation="true">
+                                        @VekText.RenderText(GetYearTypo(year), GetYearClasses(year), year.ToString(System.Globalization.CultureInfo.InvariantCulture))
+                                    </button>
+                                }
+                            </div>
+                        }
                     }
-                    else if (CurrentView == OpenTo.Month)
+                    else if (_viewMode == CalendarViewMode.Months)
                     {
                         var calendarYear = GetCalendarYear(GetMonthStart());
                         <div class="vek-picker-calendar-header">
                             <div class="vek-picker-calendar-header-switch">
                                 <VekIconButton aria-label="@Localizer[LanguageResource.VekBaseDatePicker_PrevYear, $"({calendarYear - 1})"]" Icon="@PreviousIcon" OnClick="OnPreviousYearClickAsync" Class="vek-flip-x-rtl" />
-                                <button type="button" class="vek-picker-slide-transition vek-picker-calendar-header-transition" @onclick="OnYearClick" @onclick:stopPropagation="true">
+                                <button type="button" class="vek-picker-slide-transition vek-picker-calendar-header-transition" @onclick="OnDecadeClick" @onclick:stopPropagation="true">
                                     <VekText Typo="Typo.body1" Align="Align.Center">@calendarYear</VekText>
                                 </button>
                                 <VekIconButton aria-label="@Localizer[LanguageResource.VekBaseDatePicker_NextYear, $"({calendarYear + 1})"]" Icon="@NextIcon" OnClick="OnNextYearClickAsync" Class="vek-flip-x-rtl" />
