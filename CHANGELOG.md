@@ -3,6 +3,39 @@
 All notable changes to Vek will be documented in this file.
 For GitHub Releases and downloadable packages, see the [Releases page](https://github.com/madiseh/Vek/releases).
 
+## [v1.3.3] - 2026-11-22
+
+> Vek v1.3.3 adds seven component features: multi-level DatePicker calendar navigation, inline TreeView node renaming, modal stacking and focus isolation, richer Tabs headers and badges, vertical Slider orientation and touch scrubbing, customizable and clearable Rating items, and Card media aspect ratios. The release also includes TreeView live search, Tabs drag-and-drop reordering, and documentation improvements.
+
+### Component Features
+- **DatePicker:** Navigate between month, decade, and century views. ([PR #95](https://github.com/madiseh/Vek/pull/95))
+- **TreeView:** Rename nodes inline ([PR #96](https://github.com/madiseh/Vek/pull/96)); filter labels with matching ancestors expanded ([PR #90](https://github.com/madiseh/Vek/pull/90)); load child nodes on demand ([PR #88](https://github.com/madiseh/Vek/pull/88)).
+- **Dialog:** Stack modal dialogs and isolate focus in the active modal. ([PR #97](https://github.com/madiseh/Vek/pull/97))
+- **Tabs:** Add badge and custom header templates ([PR #98](https://github.com/madiseh/Vek/pull/98)); reorder tabs by dragging and dropping ([PR #91](https://github.com/madiseh/Vek/pull/91)).
+- **Slider:** Add vertical orientation, configurable height, inversion, and touch scrubbing. ([PR #99](https://github.com/madiseh/Vek/pull/99))
+- **Rating:** Add item templates, hover and active colors, and a clearable value. ([PR #100](https://github.com/madiseh/Vek/pull/100))
+- **Card:** Support aspect-ratio sizing for card media. ([PR #101](https://github.com/madiseh/Vek/pull/101))
+
+### Documentation and Showcase
+- Refine the interactive Expense Tracker showcase. ([PR #92](https://github.com/madiseh/Vek/pull/92))
+- Improve DataGrid API sitemap coverage. ([PR #86](https://github.com/madiseh/Vek/pull/86))
+
+### Contributors
+- [@madiseh](https://github.com/madiseh) — [PR #86](https://github.com/madiseh/Vek/pull/86), [#88](https://github.com/madiseh/Vek/pull/88), [#90](https://github.com/madiseh/Vek/pull/90), [#91](https://github.com/madiseh/Vek/pull/91), [#92](https://github.com/madiseh/Vek/pull/92), [#93](https://github.com/madiseh/Vek/pull/93), [#94](https://github.com/madiseh/Vek/pull/94), [#95](https://github.com/madiseh/Vek/pull/95), [#96](https://github.com/madiseh/Vek/pull/96), [#97](https://github.com/madiseh/Vek/pull/97), [#98](https://github.com/madiseh/Vek/pull/98), [#99](https://github.com/madiseh/Vek/pull/99), [#100](https://github.com/madiseh/Vek/pull/100), [#101](https://github.com/madiseh/Vek/pull/101)
+
+### Test Results
+- Total: 8,658 — 8,656 passed, 0 failed, 2 skipped.
+- `Vek.UnitTests`: 6,733 total — 6,731 passed, 0 failed, 2 skipped.
+- `Vek.UnitTests.Analyzers`: 391 total — 391 passed, 0 failed, 0 skipped.
+- `Vek.UnitTests.Docs`: 1,534 total — 1,534 passed, 0 failed, 0 skipped.
+- Format check passed; build-only projects passed: `src/Docs/Vek.Docs.Server` and `src/Docs/Vek.Docs.WasmHost`.
+- Source commit: `a6f7b8ca4acba874eea0b4a980d8e10965d5d4cc`; [CI run 45017258015](https://github.com/madiseh/Vek/actions/runs/45017258015).
+- [Download JUnit reports](https://github.com/madiseh/Vek/releases/download/v1.3.3/test-results-v1.3.3.zip).
+
+[Feature screenshots](https://github.com/madiseh/Vek/releases/download/v1.3.3/release-slideshow.gif): TreeView search (#90), Tabs reordering (#91), DatePicker navigation (#95), TreeView renaming (#96), Dialog stacking (#97), Tabs headers (#98), vertical Slider (#99), Rating templates (#100), and Card aspect ratio (#101).
+
+**Full Changelog**: https://github.com/madiseh/Vek/compare/v1.3.2...v1.3.3
+
 ## [v1.3.2] - 2026-11-21
 
 > Vek v1.3.2 delivers 13 new component features across DataGrid, TreeView, TimePicker, DatePicker, Tabs, Button, Dialog, Slider, TextField, and MaskedInput, alongside an interactive Expense Tracker showcase and documentation enhancements.
