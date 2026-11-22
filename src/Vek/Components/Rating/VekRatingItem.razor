@@ -16,5 +16,12 @@
            disabled="@Disabled"
            checked="@Checked" />
 
-    <VekIcon Icon="@ItemIcon" Color="@ItemColor" Size="@Size" />
+    @if (ItemTemplate is not null)
+    {
+        @ItemTemplate(ItemValue)
+    }
+    else
+    {
+        <VekIcon Icon="@ItemIcon" Color="@ItemColor" Size="@Size" />
+    }
 </span>

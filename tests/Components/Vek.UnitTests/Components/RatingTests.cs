@@ -366,6 +366,22 @@ namespace Vek.UnitTests.Components
         }
 
         /// <summary>
+        /// Templates render per-item values and Clearable can prevent resetting.
+        /// </summary>
+        [Test]
+        public async Task Rating_CustomTemplateAndNonClearableSelection()
+        {
+            var comp = Context.Render<VekRating>(parameters => parameters
+                .Add(p => p.SelectedValue, 2)
+                .Add(p => p.Clearable, false)
+                .Add(p => p.ItemTemplate, (RenderFragment<int>)(value => builder => builder.AddContent(0, $"item-{value}"))));
+
+            comp.FindAll(".vek-rating-item").Select(item => item.TextContent).Should().Contain(new[] { "item-1", "item-2", "item-3", "item-4", "item-5" });
+            await comp.FindAll("span.vek-rating-item")[1].ClickAsync();
+            comp.Instance.GetState(x => x.SelectedValue).Should().Be(2);
+        }
+
+        /// <summary>
         /// Half-star precision moves keyboard selection by half steps.
         /// </summary>
         [Test]

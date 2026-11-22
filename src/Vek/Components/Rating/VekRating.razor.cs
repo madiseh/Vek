@@ -130,6 +130,27 @@ namespace Vek
         [Category(CategoryTypes.Rating.Appearance)]
         public string EmptyIcon { get; set; } = Icons.Material.Filled.StarBorder;
 
+        /// <summary>Renders custom content for each rating item using its one-based value.</summary>
+        [Parameter]
+        [Category(CategoryTypes.Rating.Appearance)]
+        public RenderFragment<int>? ItemTemplate { get; set; }
+
+        /// <summary>Sets the color used while an item is hovered.</summary>
+        [Parameter]
+        [Category(CategoryTypes.Rating.Appearance)]
+        public Color? ItemHoverColor { get; set; }
+
+        /// <summary>Sets the color used for selected items.</summary>
+        [Parameter]
+        [Category(CategoryTypes.Rating.Appearance)]
+        public Color? ItemActiveColor { get; set; }
+
+        /// <summary>Allows clicking the selected item to clear the rating.</summary>
+        /// <remarks>Defaults to <c>true</c>.</remarks>
+        [Parameter]
+        [Category(CategoryTypes.Rating.Behavior)]
+        public bool Clearable { get; set; } = true;
+
         /// <summary>
         /// The color of the <see cref="FullIcon"/> for selected items.
         /// </summary>
@@ -260,6 +281,11 @@ namespace Vek
 
         private async Task HandleItemClickedAsync(double itemValue)
         {
+            if (Clearable && itemValue == CurrentValue)
+            {
+                itemValue = 0;
+            }
+
             if (UsesDoubleValue)
             {
                 await _valueState.SetValueAsync(itemValue);

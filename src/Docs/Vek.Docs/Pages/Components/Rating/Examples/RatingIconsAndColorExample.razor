@@ -1,7 +1,15 @@
 ﻿@namespace Vek.Docs.Examples
 
-<div class="d-flex flex-column align-center">
+<div class="d-flex flex-column align-center gap-4">
+    <VekRating @bind-SelectedValue="_heartRating" FullIcon="@Icons.Material.Filled.Favorite" EmptyIcon="@Icons.Material.Filled.FavoriteBorder" ItemActiveColor="Color.Error" ItemHoverColor="Color.Warning" />
+    <VekRating @bind-SelectedValue="_sentimentRating" MaxValue="5" Clearable="false" ItemTemplate="RenderSentiment" />
     <VekRating SelectedValue="2" FullIcon="@Icons.Material.Filled.Visibility" EmptyIcon="@Icons.Material.Filled.VisibilityOff" />
-    <VekRating SelectedValue="2" FullIcon="@Icons.Material.Filled.Favorite" EmptyIcon="@Icons.Material.Filled.FavoriteBorder" Color="Color.Secondary" />
     <VekRating SelectedValue="2" FullIcon="@Icons.Material.Filled.Square" EmptyIcon="@Icons.Material.Filled.Square" FullIconColor="Color.Primary" EmptyIconColor="Color.Tertiary" />
 </div>
+
+@code {
+    private int _heartRating = 2;
+    private int _sentimentRating = 3;
+
+    private RenderFragment<int> RenderSentiment => value => @<span style="font-size: 1.5rem" aria-hidden="true">@(value switch { 1 => "😠", 2 => "🙁", 3 => "😐", 4 => "🙂", _ => "😄" })</span>;
+}
