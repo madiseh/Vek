@@ -1092,12 +1092,14 @@
       "title": "Snackbar Multi-Toast Queue Stacking, Visual Progress Countdown, and Pause on Hover",
       "module": "Snackbar",
       "priority": 90,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/090-snackbar-queue-stacking-and-auto-dismiss-timer.md",
       "dependencies": [
         "089"
       ],
-      "started_at": "2026-11-22T11:24:03Z"
+      "started_at": "2026-11-22T11:24:03Z",
+      "completed_at": "2026-11-22T12:27:28Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/102"
     },
     {
       "id": "091",
