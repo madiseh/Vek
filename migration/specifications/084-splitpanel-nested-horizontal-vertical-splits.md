@@ -4,9 +4,12 @@
 - **Feature ID**: 084
 - **Feature Slug**: splitpanel-nested-horizontal-vertical-splits
 - **Module**: SplitPanel
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 84
 - **Dependencies**: ["083"]
+- **Pull Request**: https://github.com/madiseh/Vek/pull/107
+- **Started At**: 2026-11-22T13:08:25Z
+- **Completed At**: 2026-11-22T13:33:19Z
 
 ---
 
