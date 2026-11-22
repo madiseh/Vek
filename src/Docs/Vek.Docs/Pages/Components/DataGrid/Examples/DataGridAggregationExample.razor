@@ -55,11 +55,8 @@
     AggregateDefinition<Model> _salaryAggregation = new AggregateDefinition<Model>
     {
         Type = AggregateType.Custom,
-        CustomAggregate = x =>
-        {
-            var highestSalary = x.Max(z => z.Salary);
-            var countOver100Grand = x.Count(z => z.Salary > 100_000);
-            return $"Highest: {highestSalary:C0} | {countOver100Grand} Over {100000:C0}";
-        }
+        DisplayFormat = "Revenue: {0:C0}",
+        Culture = System.Globalization.CultureInfo.GetCultureInfo("en-US"),
+        CustomSummaryCalculator = x => x.Sum(z => z.Salary)
     };
 }

@@ -313,6 +313,88 @@ namespace Vek.UnitTests.Components
         }
 
         [Test]
+        public void AggregateDefinition_CompositeDisplayFormat_FormatsCustomResult()
+        {
+            var definition = new AggregateDefinition<AccountingModel>
+            {
+                Type = AggregateType.Custom,
+                DisplayFormat = "Sum: {0:C}",
+                Culture = CultureInfo.GetCultureInfo("da-DK"),
+                CustomSummaryCalculator = items => items.Sum(item => item.Salary)
+            };
+
+            definition.GetValue(null, _accountingModels).Should().Be("Sum: 2.104.100,00 kr.");
+        }
+
+        [Test]
+        public void AggregateDefinition_MixedDisplayFormat_FormatsBothPlaceholders()
+        {
+            var definition = new AggregateDefinition<AccountingModel>
+            {
+                Type = AggregateType.Custom,
+                DisplayFormat = "Total {value} ({0:N2}) {value}",
+                Culture = CultureInfo.GetCultureInfo("en-US"),
+                CustomSummaryCalculator = items => items.Sum(item => item.Salary)
+            };
+
+            definition.GetValue(null, _accountingModels).Should().Be("Total 2104100.00 (2,104,100.00) 2104100.00");
+        }
+
+        [Test]
+        public void AggregateDefinition_EmptyItems_FormatsZero()
+        {
+            var definition = new AggregateDefinition<AccountingModel>
+            {
+                DisplayFormat = "Sum: {0:C}",
+                Culture = CultureInfo.GetCultureInfo("en-US")
+            };
+
+            definition.GetValue(null, Array.Empty<AccountingModel>()).Should().Be("Sum: $0.00");
+        }
+
+        [Test]
+        public void AggregateDefinition_InvalidCompositeDisplayFormat_ThrowsFormatException()
+        {
+            var definition = new AggregateDefinition<AccountingModel>
+            {
+                Type = AggregateType.Custom,
+                DisplayFormat = "Sum: {2:C}",
+                CustomSummaryCalculator = items => items.Sum(item => item.Salary)
+            };
+
+            var action = () => definition.GetValue(null, _accountingModels);
+
+            action.Should().Throw<FormatException>();
+        }
+
+        [Test]
+        public void AggregateDefinition_CustomNullResult_FormatsEmptyValue()
+        {
+            var definition = new AggregateDefinition<AccountingModel>
+            {
+                Type = AggregateType.Custom,
+                DisplayFormat = "Value: {value}",
+                CustomSummaryCalculator = _ => null
+            };
+
+            definition.GetValue(null, _accountingModels).Should().Be("Value: ");
+        }
+
+        [Test]
+        public void AggregateDefinition_CustomSummaryCalculator_TakesPrecedence()
+        {
+            var definition = new AggregateDefinition<AccountingModel>
+            {
+                Type = AggregateType.Custom,
+                DisplayFormat = "Value: {0}",
+                CustomAggregate = _ => "legacy",
+                CustomSummaryCalculator = _ => 42
+            };
+
+            definition.GetValue(null, _accountingModels).Should().Be("Value: 42");
+        }
+
+        [Test]
         public void AggregateDefinition_Custom()
         {
             var aggregateDefinitionAverage = new AggregateDefinition<AccountingModel>

@@ -76,9 +76,12 @@
                     footer of the grid for the most part. By setting an <CodeInline>AggregateDefinition</CodeInline>, you can easily add a quick built-in aggregate
                     or choose to tailor the display to your needs. There are 6 different <CodeInline>AggregateTypes</CodeInline> that can be used with the
                     <CodeInline>AggregateDefinition</CodeInline>: Avg, Count, Custom, Max, Min and Sum. For more control over the data aggregation, you can choose the
-                    <CodeInline>AggregationType.Custom</CodeInline> and supply your own function which will return a formatted string to display. Lastly, for
-                    complete control over the data aggregation including the look and feel, you use <CodeInline>&lt;FooterTemplate></CodeInline> which has its
-                    context set to the <CodeInline>CurrentPageItems</CodeInline>.
+                    <CodeInline>AggregateType.Custom</CodeInline> and supply a <CodeInline>CustomSummaryCalculator</CodeInline> returning an object value. Its result is
+                    formatted by <CodeInline>DisplayFormat</CodeInline> using a .NET composite format string such as <CodeInline>"Revenue: &#123;0:C0&#125;"</CodeInline>.
+                    The legacy <CodeInline>CustomAggregate</CodeInline> string function remains supported and takes precedence only when no custom summary calculator is set.
+                    Both <CodeInline>&#123;value&#125;</CodeInline> and composite placeholders can be combined. The same aggregate definition applies to total and group footers.
+                    For complete control over the data aggregation and its appearance, use <CodeInline>&lt;FooterTemplate></CodeInline>, whose context includes the
+                    current page items.
                     <br><br>
                     Aggregation is automatically applied to groups when the data grid is grouped by a column. Try it out by grouping the Status column!
                 </Description>
