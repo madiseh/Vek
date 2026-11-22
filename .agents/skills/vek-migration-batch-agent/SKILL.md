@@ -64,4 +64,14 @@ For an already-open PR, do not create a duplicate; report or update that PR as a
 
 Continue until three new PRs are ready for review or no more eligible, low-conflict READY features remain. A blocked feature does not stop other workers. If the queue runs out, finish with fewer than three PRs and report that clearly. Do not wait for the backlog discovery agent or run discovery yourself.
 
+### Batch timing report
+
+For each batch, record UTC start and end timestamps per feature for these phases: claim and worktree setup; implementation; tests and builds; documentation and screenshot; formatting and review; commit and push; PR opening and completion metadata; CI wait. Workers should include phase timestamps in each progress/completion report; the coordinator records claim/worktree and PR/CI timestamps. Do not infer elapsed time from message order when timestamps are unavailable; mark it unknown or approximate and state why.
+
+The final report includes:
+- **Calendar batch duration**: earliest batch claim/setup start through the latest terminal CI result (or current time if checks remain pending), with pending CI clearly identified.
+- **Sum of feature elapsed durations**: sum of each feature's start-to-terminal time, including CI wait; this may exceed calendar duration when workers run in parallel.
+- **Agent active time**: sum of the seven non-CI phase durations across features, separately from CI waiting time.
+- One table per agent/feature with the eight requested phase durations, total elapsed duration, and any unknown/approximate values.
+
 Report the proposed and approved batch, each resulting feature ID and PR URL, verification outcomes, and every blocked or skipped feature with the reason and its current claim/lease state. Distinguish ready PRs from tasks that still need work. Leave all PRs open for the user; do not merge them.
