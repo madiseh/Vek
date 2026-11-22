@@ -395,6 +395,21 @@ namespace Vek.UnitTests.Components
         }
 
         [Test]
+        public void AggregateDefinition_LegacyDisplayFormat_PreservesCompositePlaceholders()
+        {
+            var definition = new AggregateDefinition<AccountingModel>
+            {
+                Type = AggregateType.Sum,
+                DisplayFormat = "Total: {value:N0}",
+                NumberFormat = "N0",
+                Culture = CultureInfo.GetCultureInfo("en-US")
+            };
+            Expression<Func<AccountingModel, decimal>> propertyExpression = item => item.Salary;
+
+            definition.GetValue(propertyExpression, _accountingModels).Should().Be("Total: {value:N0}");
+        }
+
+        [Test]
         public void AggregateDefinition_Custom()
         {
             var aggregateDefinitionAverage = new AggregateDefinition<AccountingModel>

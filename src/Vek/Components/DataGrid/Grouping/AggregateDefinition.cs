@@ -85,7 +85,7 @@ namespace Vek
             {
                 if (CustomSummaryCalculator is not null)
                 {
-                    return FormatValue(CustomSummaryCalculator.Invoke(itemsArray));
+                    return FormatValue(CustomSummaryCalculator.Invoke(itemsArray), useCompositeFormat: true);
                 }
 
                 return CustomAggregate!.Invoke(itemsArray);
@@ -93,12 +93,12 @@ namespace Vek
 
             if (itemsArray.Length == 0 || propertyExpression is null)
             {
-                return FormatValue(0);
+                return FormatValue(0, useCompositeFormat: DisplayFormat.Contains("{0", StringComparison.Ordinal));
             }
 
             if (Type == AggregateType.Count)
             {
-                return FormatValue(itemsArray.Length);
+                return FormatValue(itemsArray.Length, useCompositeFormat: DisplayFormat.Contains("{0", StringComparison.Ordinal));
             }
 
             var expression = propertyExpression.ChangeExpressionReturnType<T, decimal?>();
@@ -106,35 +106,39 @@ namespace Vek
 
             if (Type == AggregateType.Avg)
             {
-                return FormatValue(itemsArray.Average(compiledExpression));
+                return FormatValue(itemsArray.Average(compiledExpression), useCompositeFormat: DisplayFormat.Contains("{0", StringComparison.Ordinal));
             }
 
             if (Type == AggregateType.Max)
             {
-                return FormatValue(itemsArray.Max(compiledExpression));
+                return FormatValue(itemsArray.Max(compiledExpression), useCompositeFormat: DisplayFormat.Contains("{0", StringComparison.Ordinal));
             }
 
             if (Type == AggregateType.Min)
             {
-                return FormatValue(itemsArray.Min(compiledExpression));
+                return FormatValue(itemsArray.Min(compiledExpression), useCompositeFormat: DisplayFormat.Contains("{0", StringComparison.Ordinal));
             }
 
             if (Type == AggregateType.Sum)
             {
-                return FormatValue(itemsArray.Sum(compiledExpression));
+                return FormatValue(itemsArray.Sum(compiledExpression), useCompositeFormat: DisplayFormat.Contains("{0", StringComparison.Ordinal));
             }
 
-            return FormatValue(0);
+            return FormatValue(0, useCompositeFormat: false);
         }
 
-        private string FormatValue(object? value)
+        private string FormatValue(object? value, bool useCompositeFormat)
         {
             var formattedValue = value is IFormattable formattable
                 ? formattable.ToString(NumberFormat, Culture)
                 : value?.ToString() ?? string.Empty;
+            if (!useCompositeFormat)
+            {
+                return DisplayFormat.Replace("{value}", formattedValue, StringComparison.Ordinal);
+            }
+
             var format = DisplayFormat.Replace("{value}", "{1}", StringComparison.Ordinal);
-            var formattedResult = string.Format(Culture ?? CultureInfo.CurrentCulture, format, value, formattedValue);
-            return formattedResult.Replace("{value}", formattedValue, StringComparison.Ordinal);
+            return string.Format(Culture ?? CultureInfo.CurrentCulture, format, value, formattedValue);
         }
 
         /// <summary>
