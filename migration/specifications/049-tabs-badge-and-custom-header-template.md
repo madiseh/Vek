@@ -4,10 +4,12 @@
 - **Feature ID**: 049
 - **Feature Slug**: tabs-badge-and-custom-header-template
 - **Module**: Tabs
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 49
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/98
 - **Started At**: 2026-11-22T07:28:42Z
+- **Completed At**: 2026-11-22T10:13:01Z
 
 ---
 
