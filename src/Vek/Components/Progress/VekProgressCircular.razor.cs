@@ -164,6 +164,11 @@ namespace Vek
 
         private int ToSvgValue(double value)
         {
+            if (DoubleEpsilonEqualityComparer.Default.Equals(Min, Max))
+            {
+                return MagicNumber;
+            }
+
             var minValue = Math.Min(Math.Max(Min, value), Max);
             // calculate fraction, which is a value between 0 and 1
             var fraction = (minValue - Min) / (Max - Min);
