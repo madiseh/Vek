@@ -47,8 +47,17 @@ namespace Vek.UnitTests.Components
         [Test]
         public void ValueLabelDisplay_ControlsVisibilityAndCompositeFormat()
         {
-            var hidden = Context.Render<VekSlider<decimal>>(x => x.Add(p => p.ValueLabelDisplay, SliderValueLabelDisplay.Never));
+            var hidden = Context.Render<VekSlider<decimal>>(x =>
+            {
+                x.Add(p => p.ValueLabelDisplay, SliderValueLabelDisplay.Never);
+                x.Add(p => p.ValueLabel, true);
+            });
             hidden.FindAll(".vek-slider-value-label").Should().BeEmpty();
+
+            var fallbackOff = Context.Render<VekSlider<decimal>>(x => x
+                .Add(p => p.ValueLabelDisplay, (SliderValueLabelDisplay?)null)
+                .Add(p => p.ValueLabel, false));
+            fallbackOff.FindAll(".vek-slider-value-label").Should().BeEmpty();
 
             var legacy = Context.Render<VekSlider<decimal>>(x =>
             {
