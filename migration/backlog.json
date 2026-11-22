@@ -1032,9 +1032,12 @@
       "title": "Card Aspect-Ratio Media Box, Header Context Menu, and Action Button Toolbar",
       "module": "Card",
       "priority": 86,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/086-card-header-actions-and-media-ratio.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-22T09:39:59Z",
+      "completed_at": "2026-11-22T10:25:16Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/101"
     },
     {
       "id": "087",

@@ -12,7 +12,8 @@ namespace Vek
     /// <seealso cref="VekCardHeader" />
     public partial class VekCardMedia : VekComponentBase
     {
-        protected string StyleString => StyleBuilder.Default($"background-image:url(\"{Image}\");height: {Height}px;")
+        protected string StyleString => StyleBuilder.Default($"background-image:url(\"{Image}\");")
+            .AddStyle(AspectRatio is null ? $"height: {Height}px;" : $"aspect-ratio: {AspectRatio};")
             .AddStyle(Style)
             .Build();
 
@@ -36,6 +37,16 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.Card.Behavior)]
         public string? Image { get; set; }
+
+        /// <summary>
+        /// The aspect ratio of the media box, such as <c>16 / 9</c> or <c>1 / 1</c>.
+        /// </summary>
+        /// <remarks>
+        /// When set, the aspect ratio determines the box height and takes precedence over <see cref="Height"/>. Defaults to <c>null</c>, which uses <see cref="Height"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Card.Behavior)]
+        public string? AspectRatio { get; set; }
 
         /// <summary>
         /// The height, in pixels, of the <see cref="Image"/>.

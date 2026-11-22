@@ -4,9 +4,12 @@
 - **Feature ID**: 086
 - **Feature Slug**: card-header-actions-and-media-ratio
 - **Module**: Card
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 86
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/101
+- **Started At**: 2026-11-22T09:39:59Z
+- **Completed At**: 2026-11-22T10:25:16Z
 
 ---
 
