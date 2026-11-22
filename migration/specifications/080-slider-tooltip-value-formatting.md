@@ -4,10 +4,12 @@
 - **Feature ID**: 080
 - **Feature Slug**: slider-tooltip-value-formatting
 - **Module**: Slider
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 80
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/109
 - **Started At**: 2026-11-22T11:44:45Z
+- **Completed At**: 2026-11-22T14:01:47Z
 
 ---
 
