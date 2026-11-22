@@ -4,10 +4,12 @@
 - **Feature ID**: 063
 - **Feature Slug**: treeview-node-inline-editing-and-renaming
 - **Module**: TreeView
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 63
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/96
 - **Started At**: 2026-11-22T07:28:49Z
+- **Completed At**: 2026-11-22T10:12:02Z
 
 ---
 

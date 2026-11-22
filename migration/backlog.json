@@ -780,10 +780,12 @@
       "title": "TreeView In-Place Node Text Editing and Keyboard Renaming (F2/Enter)",
       "module": "TreeView",
       "priority": 63,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/063-treeview-node-inline-editing-and-renaming.md",
       "dependencies": [],
-      "started_at": "2026-11-22T07:28:49Z"
+      "started_at": "2026-11-22T07:28:49Z",
+      "completed_at": "2026-11-22T10:12:02Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/96"
     },
     {
       "id": "064",
