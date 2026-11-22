@@ -823,9 +823,11 @@
       "title": "Dialog Multi-Modal Cascading Stacking and Focus Isolation",
       "module": "Dialog",
       "priority": 67,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/067-dialog-modal-stacking-and-z-index-manager.md",
-      "dependencies": []
+      "dependencies": [],
+      "completed_at": "2026-11-22T10:12:22Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/97"
     },
     {
       "id": "068",
