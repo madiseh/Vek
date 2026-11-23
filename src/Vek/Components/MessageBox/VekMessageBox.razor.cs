@@ -18,6 +18,7 @@ namespace Vek
         private readonly ParameterState<bool> _visibleState;
         private IDialogReference? _reference;
         private ActivatableCallback? _yesCallback, _cancelCallback, _noCallback;
+        private string _promptValue = string.Empty;
 
         protected string Classname =>
             new CssBuilder("vek-message-box")
@@ -142,6 +143,30 @@ namespace Vek
         public string YesText { get; set; } = "OK";
 
         /// <summary>
+        /// Shows a text field in the message content and returns its value when accepted.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.MessageBox.Behavior)]
+        public bool Prompt { get; set; }
+
+        /// <summary>
+        /// The initial value shown in the prompt text field.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.MessageBox.Behavior)]
+        public string? PromptDefaultValue { get; set; }
+
+        /// <summary>
+        /// The custom actions displayed instead of the standard Yes, No, and Cancel buttons.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.MessageBox.Behavior)]
+        public IReadOnlyList<MessageBoxButtonOptions>? CustomButtons { get; set; }
+
+        /// <summary>
         /// The custom content for the Yes button.
         /// </summary>
         /// <remarks>
@@ -235,6 +260,7 @@ namespace Vek
         protected override void OnInitialized()
         {
             base.OnInitialized();
+            _promptValue = PromptDefaultValue ?? string.Empty;
             if (YesButton is not null)
             {
                 _yesCallback = new ActivatableCallback { ActivateCallback = OnYesActivated };
@@ -272,10 +298,24 @@ namespace Vek
 
         private void OnCancelActivated(object arg1, MouseEventArgs arg2) => OnCancelClicked();
 
-        private void OnYesClicked() => DialogInstance?.Close(DialogResult.Ok(true));
+        private void OnYesClicked()
+        {
+            if (Prompt)
+            {
+                DialogInstance?.Close(DialogResult.Ok(_promptValue));
+                return;
+            }
+
+            DialogInstance?.Close(DialogResult.Ok(true));
+        }
 
         private void OnNoClicked() => DialogInstance?.Close(DialogResult.Ok(false));
 
         private void OnCancelClicked() => DialogInstance?.Close(DialogResult.Cancel());
+
+        private void OnCustomButtonClicked(MessageBoxButtonOptions button)
+        {
+            DialogInstance?.Close(DialogResult.Ok(button.Value));
+        }
     }
 }

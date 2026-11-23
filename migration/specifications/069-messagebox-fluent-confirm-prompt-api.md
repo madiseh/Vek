@@ -4,9 +4,10 @@
 - **Feature ID**: 069
 - **Feature Slug**: messagebox-fluent-confirm-prompt-api
 - **Module**: MessageBox
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 69
 - **Dependencies**: []
+- **Started At**: 2026-11-23T11:58:05Z
 
 ---
 
@@ -26,9 +27,9 @@
 
 ## 3. Architectural Mapping (Vek Standards)
 - **Target Files**:
-  - `src/Vek/Components/MessageBox/VekMessageBox.razor`
-  - `src/Vek/Components/MessageBox/MessageBoxService.cs`
-  - `src/Vek/Components/MessageBox/MessageBoxOptions.cs`
+  - `src/Vek/Components/MessageBox/VekMessageBox.razor` and `VekMessageBox.razor.cs`
+  - `src/Vek/Services/Dialog/IDialogService.cs` and `DialogService.cs`
+  - `src/Vek/Services/Dialog/MessageBoxOptions.cs` and `MessageBoxButtonOptions.cs`
 - **State Management**:
   - Parameters declared as auto-properties annotated with `[Parameter, ParameterState]`.
   - Registered in constructor scope using `CreateRegisterScope()` and managed via `ParameterState<T>`.

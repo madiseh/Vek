@@ -180,6 +180,35 @@ namespace Vek
         Task<bool?> ShowMessageBoxAsync(MessageBoxOptions messageBoxOptions, DialogOptions? options = null);
 
         /// <summary>
+        /// Shows a confirmation dialog and returns whether the user accepted it.
+        /// </summary>
+        /// <param name="title">The text at the top of the dialog.</param>
+        /// <param name="message">The message displayed under the title.</param>
+        /// <param name="options">The custom display options for the dialog.</param>
+        /// <returns><c>true</c> when the user confirms; otherwise, <c>false</c>.</returns>
+        Task<bool> ShowConfirmAsync(string? title, string message, DialogOptions? options = null);
+
+        /// <summary>
+        /// Shows a text prompt and returns the entered value.
+        /// </summary>
+        /// <param name="title">The text at the top of the dialog.</param>
+        /// <param name="message">The message displayed under the title.</param>
+        /// <param name="defaultValue">The initial value in the text field.</param>
+        /// <param name="options">The custom display options for the dialog.</param>
+        /// <returns>The entered value, or <see langword="null"/> when the prompt is canceled.</returns>
+        Task<string?> ShowPromptAsync(string? title, string message, string? defaultValue = null, DialogOptions? options = null);
+
+        /// <summary>
+        /// Shows a message box with caller-defined actions and returns the selected action value.
+        /// </summary>
+        /// <param name="title">The text at the top of the dialog.</param>
+        /// <param name="message">The message displayed under the title.</param>
+        /// <param name="buttons">The actions shown in the dialog.</param>
+        /// <param name="options">The custom display options for the dialog.</param>
+        /// <returns>The selected action value, or <see langword="null"/> when the dialog is canceled.</returns>
+        Task<string?> ShowCustomMessageBoxAsync(string? title, string message, IReadOnlyList<MessageBoxButtonOptions> buttons, DialogOptions? options = null);
+
+        /// <summary>
         /// Hides an existing dialog.
         /// </summary>
         /// <param name="dialog">The reference of the dialog to hide.</param>

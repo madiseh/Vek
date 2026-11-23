@@ -1,0 +1,58 @@
+@namespace Vek.Docs.Examples
+
+<div class="d-flex flex-column align-start gap-3">
+    <div class="d-flex flex-wrap gap-2">
+        <VekButton OnClick="ConfirmDeleteAsync" Color="Color.Error">Confirm action</VekButton>
+        <VekButton OnClick="PromptForNameAsync">Prompt for a name</VekButton>
+        <VekButton OnClick="ChooseActionAsync" Color="Color.Primary">Choose an action</VekButton>
+    </div>
+    <VekAlert Severity="Severity.Info">@_status</VekAlert>
+</div>
+
+@code
+{
+    [Inject]
+    private IDialogService DialogService { get; set; } = null!;
+
+    private string _status = "Choose a message box action.";
+
+    private readonly MessageBoxButtonOptions[] _actions =
+    [
+        new()
+        {
+            Text = "Archive",
+            Value = "archive",
+            StartIcon = Icons.Material.Filled.Archive,
+        },
+        new()
+        {
+            Text = "Delete",
+            Value = "delete",
+            IsDestructive = true,
+            StartIcon = Icons.Material.Filled.DeleteForever,
+        },
+    ];
+
+    private async Task ConfirmDeleteAsync()
+    {
+        var confirmed = await DialogService.ShowConfirmAsync("Delete draft?", "This action cannot be undone.");
+        _status = confirmed ? "The draft was deleted." : "The draft was kept.";
+    }
+
+    private async Task PromptForNameAsync()
+    {
+        var name = await DialogService.ShowPromptAsync("Rename draft", "Enter a name for the draft", "Quarterly report");
+        _status = name is null ? "The name was unchanged." : $"The draft is now named {name}.";
+    }
+
+    private async Task ChooseActionAsync()
+    {
+        var action = await DialogService.ShowCustomMessageBoxAsync("Draft actions", "Choose what to do with this draft", _actions);
+        _status = action switch
+        {
+            "archive" => "The draft was archived.",
+            "delete" => "The draft was deleted.",
+            _ => "No action was selected.",
+        };
+    }
+}

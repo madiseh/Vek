@@ -33,6 +33,20 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Fluent Confirm, Prompt, and Custom Actions">
+                <Description>
+                    Use <CodeInline>IDialogService.ShowConfirmAsync</CodeInline> when an action needs a clear yes-or-no decision,
+                    <CodeInline>IDialogService.ShowPromptAsync</CodeInline> to collect a text value, or
+                    <CodeInline>IDialogService.ShowCustomMessageBoxAsync</CodeInline> to return a value from caller-defined actions.
+                    Custom actions can include a start icon and destructive styling. Closing the dialog restores focus to the element that opened it.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(MessageBoxFluentApiExample)">
+                <MessageBoxFluentApiExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Multiline Message">
                 <Description>
                     Use <CodeInline>MarkupString</CodeInline> for the message content to support multiline text or basic HTML styling. This is useful for highlighting parts of the message or displaying longer content without creating a custom dialog.

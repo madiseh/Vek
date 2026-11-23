@@ -238,6 +238,53 @@ namespace Vek
         }
 
         /// <inheritdoc />
+        public async Task<bool> ShowConfirmAsync(string? title, string message, DialogOptions? options = null)
+        {
+            var result = await ShowMessageBoxAsync(title, message, yesText: "Confirm", cancelText: "Cancel", options: options);
+            return result is true;
+        }
+
+        /// <inheritdoc />
+        public async Task<string?> ShowPromptAsync(string? title, string message, string? defaultValue = null, DialogOptions? options = null)
+        {
+            var parameters = new DialogParameters
+            {
+                [nameof(VekMessageBox.Message)] = message,
+                [nameof(VekMessageBox.Prompt)] = true,
+                [nameof(VekMessageBox.PromptDefaultValue)] = defaultValue,
+                [nameof(VekMessageBox.YesText)] = "OK",
+                [nameof(VekMessageBox.CancelText)] = "Cancel",
+            };
+            var reference = await ShowAsync<VekMessageBox>(title, parameters, options);
+            var result = await reference.Result;
+            return result is { Canceled: false, Data: string value } ? value : null;
+        }
+
+        /// <inheritdoc />
+        public async Task<string?> ShowCustomMessageBoxAsync(string? title, string message, IReadOnlyList<MessageBoxButtonOptions> buttons, DialogOptions? options = null)
+        {
+            ArgumentNullException.ThrowIfNull(buttons);
+            if (buttons.Count == 0)
+            {
+                throw new ArgumentException("At least one action button is required.", nameof(buttons));
+            }
+
+            if (buttons.Any(button => button is null || string.IsNullOrWhiteSpace(button.Text)))
+            {
+                throw new ArgumentException("Each action button must have display text.", nameof(buttons));
+            }
+
+            var parameters = new DialogParameters
+            {
+                [nameof(VekMessageBox.Message)] = message,
+                [nameof(VekMessageBox.CustomButtons)] = buttons,
+            };
+            var reference = await ShowAsync<VekMessageBox>(title, parameters, options);
+            var result = await reference.Result;
+            return result is { Canceled: false, Data: string value } ? value : null;
+        }
+
+        /// <inheritdoc />
         public void Close(IDialogReference dialog)
         {
             Close(dialog, DialogResult.Ok<object?>(null));

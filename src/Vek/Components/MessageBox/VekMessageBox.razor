@@ -25,23 +25,23 @@
             @MarkupMessage
             @Message
         }
+        @if (Prompt)
+        {
+            <VekTextField @bind-Value="_promptValue" Label="Response" />
+        }
     </DialogContent>
     <DialogActions>
         <div tabindex="-1" class="d-contents">
             @if (IsButtonOrderReversed)
             {
                 <VekFocusTrap DefaultFocus="DefaultFocus.FirstChild">
-                    @YesButtonFragment
-                    @NoButtonFragment
-                    @CancelButtonFragment
+                    @ActionButtonsFragment
                 </VekFocusTrap>
             }
             else
             {
                 <VekFocusTrap DefaultFocus="DefaultFocus.LastChild">
-                    @CancelButtonFragment
-                    @NoButtonFragment
-                    @YesButtonFragment
+                    @ActionButtonsFragment
                 </VekFocusTrap>
             }
         </div>
@@ -49,6 +49,35 @@
 </VekDialog>
 
 @code {
+    private RenderFragment ActionButtonsFragment =>
+    @<text>
+        @if (CustomButtons is { Count: > 0 })
+        {
+            @foreach (var button in CustomButtons)
+            {
+                <VekButton Class="vek-message-box__custom-button"
+                           Variant="@(button.IsDestructive ? Variant.Filled : Variant.Text)"
+                           Color="@(button.IsDestructive ? Color.Error : Color.Primary)"
+                           StartIcon="@button.StartIcon"
+                           OnClick="@(() => OnCustomButtonClicked(button))">
+                    @button.Text
+                </VekButton>
+            }
+        }
+        else if (IsButtonOrderReversed)
+        {
+            @YesButtonFragment
+            @NoButtonFragment
+            @CancelButtonFragment
+        }
+        else
+        {
+            @CancelButtonFragment
+            @NoButtonFragment
+            @YesButtonFragment
+        }
+    </text>;
+
     private RenderFragment CancelButtonFragment => 
     @<text>
         @if (CancelButton is not null)

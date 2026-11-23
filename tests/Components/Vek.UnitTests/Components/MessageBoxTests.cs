@@ -428,5 +428,116 @@ namespace Vek.UnitTests.Components
             await provider.Find(".vek-message-box__yes-button").ClickAsync();
             (await messageBoxTask).Should().BeTrue();
         }
+
+        /// <summary>
+        /// Returns true when the confirmation is accepted.
+        /// </summary>
+        [Test]
+        public async Task ConfirmAsync_ReturnsTrueWhenAccepted()
+        {
+            var provider = Context.Render<VekDialogProvider>();
+            var service = Context.Services.GetService<IDialogService>()!;
+            Task<bool> confirmation = null!;
+
+            await provider.InvokeAsync(() =>
+            {
+                confirmation = service.ShowConfirmAsync("Delete item", "Remove this item?");
+            });
+
+            provider.Find(".vek-message-box__yes-button").TrimmedText().Should().Be("Confirm");
+            await provider.Find(".vek-message-box__yes-button").ClickAsync();
+
+            (await confirmation).Should().BeTrue();
+        }
+
+        /// <summary>
+        /// Returns false when the confirmation is canceled.
+        /// </summary>
+        [Test]
+        public async Task ConfirmAsync_ReturnsFalseWhenCanceled()
+        {
+            var provider = Context.Render<VekDialogProvider>();
+            var service = Context.Services.GetService<IDialogService>()!;
+            Task<bool> confirmation = null!;
+
+            await provider.InvokeAsync(() =>
+            {
+                confirmation = service.ShowConfirmAsync("Delete item", "Remove this item?");
+            });
+
+            await provider.Find(".vek-message-box__cancel-button").ClickAsync();
+
+            (await confirmation).Should().BeFalse();
+        }
+
+        /// <summary>
+        /// Returns the value entered into a prompt after it is accepted.
+        /// </summary>
+        [Test]
+        public async Task PromptAsync_ReturnsEnteredValue()
+        {
+            var provider = Context.Render<VekDialogProvider>();
+            var service = Context.Services.GetService<IDialogService>()!;
+            Task<string> prompt = null!;
+
+            await provider.InvokeAsync(() =>
+            {
+                prompt = service.ShowPromptAsync("Rename", "Enter a new name", "Draft");
+            });
+
+            var input = provider.Find(".vek-message-box input");
+            input.GetAttribute("value").Should().Be("Draft");
+            await input.ChangeAsync(new ChangeEventArgs { Value = "Final" });
+            await provider.Find(".vek-message-box__yes-button").ClickAsync();
+
+            (await prompt).Should().Be("Final");
+        }
+
+        /// <summary>
+        /// Returns the selected value from a custom destructive action.
+        /// </summary>
+        [Test]
+        public async Task CustomMessageBox_ReturnsSelectedActionValue()
+        {
+            var provider = Context.Render<VekDialogProvider>();
+            var service = Context.Services.GetService<IDialogService>()!;
+            var buttons = new[]
+            {
+                new MessageBoxButtonOptions
+                {
+                    Text = "Delete",
+                    Value = "delete",
+                    IsDestructive = true,
+                    StartIcon = "delete_forever",
+                },
+            };
+            Task<string> result = null!;
+
+            await provider.InvokeAsync(() =>
+            {
+                result = service.ShowCustomMessageBoxAsync("Delete item", "Remove this item?", buttons);
+            });
+
+            var button = provider.Find(".vek-message-box__custom-button");
+            button.TrimmedText().Should().Be("Delete");
+            provider.Markup.Should().Contain("delete_forever");
+            button.ClassList.Should().Contain("vek-button-filled-error");
+            await button.ClickAsync();
+
+            (await result).Should().Be("delete");
+        }
+
+        /// <summary>
+        /// Requires at least one custom action.
+        /// </summary>
+        [Test]
+        public async Task CustomMessageBox_RejectsEmptyButtons()
+        {
+            var service = Context.Services.GetService<IDialogService>()!;
+
+            Func<Task> action = () => service.ShowCustomMessageBoxAsync("Title", "Message", Array.Empty<MessageBoxButtonOptions>());
+
+            await action.Should().ThrowAsync<ArgumentException>();
+        }
     }
 }
