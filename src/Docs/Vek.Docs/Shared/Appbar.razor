@@ -3,7 +3,7 @@
 <VekHotkey Key="JsKey.KeyK" KeyModifiers="CtrlLeftKeyModifiers" OnHotkeyPressed="HandleSearchHotkeyAsync" />
 <VekHotkey Key="JsKey.KeyK" KeyModifiers="CtrlRightKeyModifiers" OnHotkeyPressed="HandleSearchHotkeyAsync" />
 
-<div class="d-flex align-center flex-grow-1 d-md-none">
+<div class="d-flex align-center flex-grow-1 d-lg-none">
     <VekIconButton OnClick="DrawerToggleCallback" Icon="@Icons.Material.Rounded.Notes" Color="Color.Inherit" Edge="Edge.Start" aria-label="Toggle drawer" />
     <VekSpacer />
     <NavLink ActiveClass="d-flex align-center" href="/">
@@ -15,22 +15,22 @@
         <VekIconButton Icon="@Icons.Material.Rounded.Search" Color="Color.Inherit" Edge="Edge.End" OnClick="@(() => OpenSearchDialog())" aria-label="Open search dialog" aria-keyshortcuts="Control+K" />
     </VekTooltip>
 </div>
-<div class="d-none d-md-flex align-center flex-grow-1">
+<div class="d-none d-lg-flex align-center flex-grow-1">
     <NavLink ActiveClass="d-flex align-center me-4" href="/">
         <VekLogo Class="docs-vek-logo" />
         <VekText Color="Color.Primary" Typo="Typo.h5" Class="docs-brand-text">Vek</VekText>
-        <span class="vek-chip vek-chip-outlined vek-chip-size-small ms-2 py-0 px-2" style="font-size: 0.72rem; font-weight: 600; border-radius: 9999px; border-color: var(--vek-palette-primary); color: var(--vek-palette-primary);">v@(Metadata.Version)</span>
+        <span class="vek-chip vek-chip-outlined vek-chip-size-small ms-2 py-0 px-2" style="font-size: 0.75rem; font-weight: 600; border-radius: 9999px; border-color: var(--vek-palette-primary); color: var(--vek-palette-primary);">v@(Metadata.Version)</span>
     </NavLink>
     <VekButton Href="/getting-started/installation" Color="Color.Inherit" Variant="Variant.Text" Class="@GetActiveClass(DocsBasePage.GettingStarted)">Get Started</VekButton>
     <VekButton Href="/docs/overview" Color="Color.Inherit" Variant="Variant.Text" Class="@GetActiveClass(DocsBasePage.Docs)">Components</VekButton>
     <VekButton Href="/api" Color="Color.Inherit" Variant="Variant.Text" Class="mx-1 px-3">API</VekButton>
-    <VekButton Href="/features/break-points" Color="Color.Inherit" Variant="Variant.Text" Class="mx-1 px-3">Features</VekButton>
-    <VekMenu Color="Color.Inherit" Variant="Variant.Text" Class="mx-1 px-3" PopoverClass="docs-layout-menu-shadow" Label="Showcases" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+    <VekButton Href="/features/break-points" Color="Color.Inherit" Variant="Variant.Text" Class="mx-1 px-2">Features</VekButton>
+    <VekMenu Color="Color.Inherit" Variant="Variant.Text" Class="docs-appbar-menu-trigger mx-1 px-1" PopoverClass="docs-layout-menu-shadow" Label="Showcases" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
         <VekList T="string">
             <VekListItem Href="/showcases/expense-tracker">Expense Tracker</VekListItem>
         </VekList>
     </VekMenu>
-    <VekMenu Color="Color.Inherit" Variant="Variant.Text" Class="mx-1 px-3" PopoverClass="docs-layout-menu-shadow" ListClass="d-flex px-4 pb-2 docs-appbar-special-menu" LockScroll="true" Label="Resources" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+    <VekMenu Color="Color.Inherit" Variant="Variant.Text" Class="docs-appbar-menu-trigger mx-1 px-1" PopoverClass="docs-layout-menu-shadow" ListClass="d-flex px-4 pb-2 docs-appbar-special-menu" LockScroll="true" Label="Resources" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
         <VekList T="string">
             <VekListItem Href="/vek/introduction">
                 <div class="d-flex">

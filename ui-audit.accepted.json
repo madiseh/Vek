@@ -1,0 +1,128 @@
+[
+  {
+    "signature": "text-spill|/|default|div.vek-menu.docs-appbar-menu-trigger:nth-of-type(1) > button.vek-button-root.vek-button > span.vek-button-label",
+    "check": "text-spill",
+    "route": "/",
+    "reason": "Visual inspection of the 1280px and 1920px captures shows the Showcases and Resources labels fully contained in their menu triggers; the 4px measurement is a label-box false positive.",
+    "date": "2026-11-23"
+  },
+  {
+    "signature": "text-spill|/|default|div.vek-menu.docs-appbar-menu-trigger:nth-of-type(2) > button.vek-button-root.vek-button > span.vek-button-label",
+    "check": "text-spill",
+    "route": "/",
+    "reason": "Visual inspection of the 1280px and 1920px captures shows the Showcases and Resources labels fully contained in their menu triggers; the 4px measurement is a label-box false positive.",
+    "date": "2026-11-23"
+  },
+  {
+    "signature": "text-spill|/|expand-latest-vek-releases|#vekinput3wkdqdsa > button.vek-button-root.vek-button > span.vek-button-label",
+    "check": "text-spill",
+    "route": "/",
+    "reason": "Visual inspection of the 1280px and 1920px captures shows the Showcases and Resources labels fully contained in their menu triggers; the 4px measurement is a label-box false positive.",
+    "date": "2026-11-23"
+  },
+  {
+    "signature": "text-spill|/|expand-latest-vek-releases|#vekinputqiteyk6o > button.vek-button-root.vek-button > span.vek-button-label",
+    "check": "text-spill",
+    "route": "/",
+    "reason": "Visual inspection of the 1280px and 1920px captures shows the Showcases and Resources labels fully contained in their menu triggers; the 4px measurement is a label-box false positive.",
+    "date": "2026-11-23"
+  },
+  {
+    "signature": "text-spill|/|default|#vekinputfhlmm476 > button.vek-button-root.vek-button > span.vek-button-label",
+    "check": "text-spill",
+    "route": "/",
+    "reason": "Visual inspection of the 1280px and 1920px captures shows the Showcases and Resources labels fully contained in their menu triggers; the 4px measurement is a label-box false positive.",
+    "date": "2026-11-23"
+  },
+  {
+    "signature": "text-spill|/|default|#vekinputzudgu9xm > button.vek-button-root.vek-button > span.vek-button-label",
+    "check": "text-spill",
+    "route": "/",
+    "reason": "Visual inspection of the 1280px and 1920px captures shows the Showcases and Resources labels fully contained in their menu triggers; the 4px measurement is a label-box false positive.",
+    "date": "2026-11-23"
+  },
+  {
+    "signature": "text-spill|/|expand-resources|div.vek-menu.docs-appbar-menu-trigger:nth-of-type(1) > button.vek-button-root.vek-button > span.vek-button-label",
+    "check": "text-spill",
+    "route": "/",
+    "reason": "Visual inspection of the 1280px and 1920px captures shows the Showcases and Resources labels fully contained in their menu triggers; the 4px measurement is a label-box false positive.",
+    "date": "2026-11-23"
+  },
+  {
+    "signature": "text-spill|/|expand-resources|div.vek-menu.docs-appbar-menu-trigger:nth-of-type(2) > button.vek-button-root.vek-button > span.vek-button-label",
+    "check": "text-spill",
+    "route": "/",
+    "reason": "Visual inspection of the 1280px and 1920px captures shows the Showcases and Resources labels fully contained in their menu triggers; the 4px measurement is a label-box false positive.",
+    "date": "2026-11-23"
+  },
+  {
+    "signature": "text-spill|/|expand-showcases|div.vek-menu.docs-appbar-menu-trigger:nth-of-type(1) > button.vek-button-root.vek-button > span.vek-button-label",
+    "check": "text-spill",
+    "route": "/",
+    "reason": "Visual inspection of the 1280px and 1920px captures shows the Showcases and Resources labels fully contained in their menu triggers; the 4px measurement is a label-box false positive.",
+    "date": "2026-11-23"
+  },
+  {
+    "signature": "text-spill|/|expand-showcases|div.vek-menu.docs-appbar-menu-trigger:nth-of-type(2) > button.vek-button-root.vek-button > span.vek-button-label",
+    "check": "text-spill",
+    "route": "/",
+    "reason": "Visual inspection of the 1280px and 1920px captures shows the Showcases and Resources labels fully contained in their menu triggers; the 4px measurement is a label-box false positive.",
+    "date": "2026-11-23"
+  },
+  {
+    "signature": "text-spill|/|default|#vekinputoto9kqbf > button.vek-button-root.vek-button > span.vek-button-label",
+    "check": "text-spill",
+    "route": "/",
+    "reason": "Visual inspection of the 1280px and 1920px captures shows the Showcases and Resources labels fully contained in their menu triggers; the 4px measurement is a label-box false positive.",
+    "date": "2026-11-23"
+  },
+  {
+    "signature": "text-spill|/|default|#vekinputwgn4crsv > button.vek-button-root.vek-button > span.vek-button-label",
+    "check": "text-spill",
+    "route": "/",
+    "reason": "Visual inspection of the 1280px and 1920px captures shows the Showcases and Resources labels fully contained in their menu triggers; the 4px measurement is a label-box false positive.",
+    "date": "2026-11-23"
+  },
+  {
+    "signature": "text-spill|/|expand-latest-vek-releases|#vekinputeskdjdll > button.vek-button-root.vek-button > span.vek-button-label",
+    "check": "text-spill",
+    "route": "/",
+    "reason": "Visual inspection of the 1280px and 1920px captures shows the Showcases and Resources labels fully contained in their menu triggers; the 4px measurement is a label-box false positive.",
+    "date": "2026-11-23"
+  },
+  {
+    "signature": "text-spill|/|expand-latest-vek-releases|#vekinputy3lrnakc > button.vek-button-root.vek-button > span.vek-button-label",
+    "check": "text-spill",
+    "route": "/",
+    "reason": "Visual inspection of the 1280px and 1920px captures shows the Showcases and Resources labels fully contained in their menu triggers; the 4px measurement is a label-box false positive.",
+    "date": "2026-11-23"
+  },
+  {
+    "signature": "text-spill|/|expand-resources|#vekinputwhe3xzjd > button.vek-button-root.vek-button > span.vek-button-label",
+    "check": "text-spill",
+    "route": "/",
+    "reason": "Visual inspection of the 1280px and 1920px captures shows the Showcases and Resources labels fully contained in their menu triggers; the 4px measurement is a label-box false positive.",
+    "date": "2026-11-23"
+  },
+  {
+    "signature": "text-spill|/|expand-showcases|#vekinputung92pln > button.vek-button-root.vek-button > span.vek-button-label",
+    "check": "text-spill",
+    "route": "/",
+    "reason": "Visual inspection of the 1280px and 1920px captures shows the Showcases and Resources labels fully contained in their menu triggers; the 4px measurement is a label-box false positive.",
+    "date": "2026-11-23"
+  },
+  {
+    "signature": "text-spill|/|default|#vekinputgwgqslw7 > button.vek-button-root.vek-button > span.vek-button-label",
+    "check": "text-spill",
+    "route": "/",
+    "reason": "Visual inspection of the 1280px and 1920px captures shows the Showcases and Resources labels fully contained in their menu triggers; the 4px measurement is a label-box false positive.",
+    "date": "2026-11-23"
+  },
+  {
+    "signature": "text-spill|/|expand-resources|#vekinputi7kzixxg > button.vek-button-root.vek-button > span.vek-button-label",
+    "check": "text-spill",
+    "route": "/",
+    "reason": "Visual inspection of the 1280px and 1920px captures shows the Showcases and Resources labels fully contained in their menu triggers; the 4px measurement is a label-box false positive.",
+    "date": "2026-11-23"
+  }
+]
