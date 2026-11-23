@@ -3,6 +3,44 @@
 All notable changes to Vek will be documented in this file.
 For GitHub Releases and downloadable packages, see the [Releases page](https://github.com/madiseh/Vek/releases).
 
+## [v1.3.4] - 2026-11-23
+
+> Vek v1.3.4 adds six component improvements across notifications, progress, data grids, tree views, file uploads, and sliders. It also improves the Expense Tracker showcase, adds a nested SplitPanel example, refreshes the component catalog, and fixes responsive layout issues in the documentation site.
+
+### Component Features and Fixes
+- **Snackbar:** Queue notifications with pause-aware auto-dismiss countdowns and polite status announcements. ([PR #102](https://github.com/madiseh/Vek/pull/102))
+- **Progress:** Add indeterminate circular and linear indicators, buffered progress examples, and guard circular progress against equal bounds. ([PR #103](https://github.com/madiseh/Vek/pull/103))
+- **DataGrid:** Calculate custom summaries as objects and format them with culture-aware composite formats while retaining the existing custom aggregate API. ([PR #104](https://github.com/madiseh/Vek/pull/104))
+- **TreeView:** Add inherited node body templates for badges and actions, with keyboard-visible controls and item-level template precedence. ([PR #105](https://github.com/madiseh/Vek/pull/105))
+- **FileUpload:** Accept file drops across the full component surface and keep the drop area accessible to keyboard users. ([PR #108](https://github.com/madiseh/Vek/pull/108))
+- **Slider:** Add configurable value-label display modes and formatted tooltips for standard and range sliders. ([PR #109](https://github.com/madiseh/Vek/pull/109))
+
+### Documentation and Showcase
+- Improve the Expense Tracker dashboard with navigation, edit actions, and a spending mix chart. ([PR #106](https://github.com/madiseh/Vek/pull/106))
+- Demonstrate nested horizontal and vertical SplitPanel layouts. ([PR #107](https://github.com/madiseh/Vek/pull/107))
+- Redesign the landing page component catalog as a responsive Bento grid. ([PR #110](https://github.com/madiseh/Vek/pull/110))
+- Fix responsive spacing and overflow in the docs navigation and landing page, and allow same-origin images through the docs hosts' content security policy. ([PR #113](https://github.com/madiseh/Vek/pull/113))
+
+### Feature Screenshots
+![Vek v1.3.4 feature screenshots](https://github.com/madiseh/Vek/releases/download/v1.3.4/release-slideshow.gif)
+
+1. Snackbar notification queue — [PR #102](https://github.com/madiseh/Vek/pull/102)
+2. Indeterminate progress indicators — [PR #103](https://github.com/madiseh/Vek/pull/103)
+3. DataGrid custom summary formatting — [PR #104](https://github.com/madiseh/Vek/pull/104)
+4. TreeView custom node content and actions — [PR #105](https://github.com/madiseh/Vek/pull/105)
+5. Nested SplitPanel layout — [PR #107](https://github.com/madiseh/Vek/pull/107)
+6. FileUpload full-surface drag and drop — [PR #108](https://github.com/madiseh/Vek/pull/108)
+7. FileUpload keyboard focus state — [PR #108](https://github.com/madiseh/Vek/pull/108)
+8. Formatted Slider value labels — [PR #109](https://github.com/madiseh/Vek/pull/109)
+
+### Contributors
+- [@madiseh](https://github.com/madiseh) — [PR #102](https://github.com/madiseh/Vek/pull/102), [#103](https://github.com/madiseh/Vek/pull/103), [#104](https://github.com/madiseh/Vek/pull/104), [#105](https://github.com/madiseh/Vek/pull/105), [#106](https://github.com/madiseh/Vek/pull/106), [#107](https://github.com/madiseh/Vek/pull/107), [#108](https://github.com/madiseh/Vek/pull/108), [#109](https://github.com/madiseh/Vek/pull/109), [#110](https://github.com/madiseh/Vek/pull/110), [#111](https://github.com/madiseh/Vek/pull/111), [#112](https://github.com/madiseh/Vek/pull/112), [#113](https://github.com/madiseh/Vek/pull/113)
+
+### Test Results
+- To be populated from the verified CI run for the final release commit.
+
+**Full Changelog**: https://github.com/madiseh/Vek/compare/v1.3.3...v1.3.4
+
 ## [v1.3.3] - 2026-11-22
 
 > Vek v1.3.3 adds seven component features: multi-level DatePicker calendar navigation, inline TreeView node renaming, modal stacking and focus isolation, richer Tabs headers and badges, vertical Slider orientation and touch scrubbing, customizable and clearable Rating items, and Card media aspect ratios. The release also includes TreeView live search, Tabs drag-and-drop reordering, and documentation improvements.
