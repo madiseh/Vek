@@ -81,7 +81,7 @@ jobs:
           persist-credentials: false
 
       - name: Record deployment source
-        run: git log -1 --format='Source commit: %H%nSource subject: %s'
+        run: git rev-parse HEAD
 
       - name: Set up .NET SDK
         uses: actions/setup-dotnet@v6
