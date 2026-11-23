@@ -5,8 +5,8 @@
 using System.Reflection;
 using AwesomeAssertions;
 using Microsoft.Extensions.Time.Testing;
-using Vek.Utilities.Debounce;
 using NUnit.Framework;
+using Vek.Utilities.Debounce;
 
 namespace Vek.UnitTests.Utilities.Debounce;
 
