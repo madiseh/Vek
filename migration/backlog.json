@@ -902,10 +902,12 @@
       "title": "FileUpload Client-Side Chunking for Large Files and Progress Tracking",
       "module": "FileUpload",
       "priority": 73,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/073-fileupload-chunked-and-resumable-upload.md",
       "dependencies": [],
-      "started_at": "2026-11-23T11:58:14Z"
+      "started_at": "2026-11-23T11:58:14Z",
+      "completed_at": "2026-11-23T13:12:06Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/115"
     },
     {
       "id": "074",
