@@ -22,6 +22,8 @@ namespace Vek
     {
         private readonly ParameterState<T?> _filesState;
         private readonly ParameterState<bool> _draggingState;
+        private readonly CancellationTokenSource _lifetimeCancellation = new();
+        private readonly CancellationToken _lifetimeToken;
 
         [Inject]
         private IJSRuntime JsRuntime { get; set; } = null!;
@@ -34,6 +36,8 @@ namespace Vek
         /// </summary>
         public VekFileUpload()
         {
+            _lifetimeToken = _lifetimeCancellation.Token;
+
             using var registerScope = CreateRegisterScope();
             _filesState = registerScope.RegisterParameter<T?>(nameof(Files))
                 .WithParameter(() => Files)
@@ -96,6 +100,33 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.FileUpload.Behavior)]
         public EventCallback<InputFileChangeEventArgs> OnFilesChanged { get; set; }
+
+        /// <summary>
+        /// The maximum number of bytes read for each upload chunk.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to 2 MB.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FileUpload.Behavior)]
+        public int ChunkSizeInBytes { get; set; } = 2 * 1024 * 1024;
+
+        /// <summary>
+        /// The number of retries for a chunk when its upload handler reports a transient failure.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to 3 retries. Set to 0 to disable retries.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FileUpload.Behavior)]
+        public int MaxChunkRetries { get; set; } = 3;
+
+        /// <summary>
+        /// Occurs after an upload chunk succeeds and progress advances.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FileUpload.Behavior)]
+        public EventCallback<FileUploadProgressEventArgs> OnUploadProgress { get; set; }
 
         /// <summary>
         /// Occurs when a drag operation enters this component.
@@ -483,10 +514,57 @@ namespace Vek
         }
 
         /// <summary>
+        /// Uploads the currently selected files one chunk at a time through the supplied handler.
+        /// </summary>
+        /// <param name="uploadChunk">Uploads one chunk to the consumer's chosen destination.</param>
+        /// <param name="cancellationToken">Cancels the upload operation.</param>
+        /// <remarks>
+        /// Statusless HTTP connection failures, HTTP 408, 425, 429, 500, 502, 503, 504, I/O failures, and timeouts retry the current chunk up to <see cref="MaxChunkRetries"/> times.
+        /// Other HTTP status codes and cancellation exceptions are not retried.
+        /// Handlers should use the file name and chunk index to make retries idempotent.
+        /// The component cancels the token when disposed, so handlers should pass it to their I/O operations.
+        /// </remarks>
+        public async Task UploadFilesAsync(
+            Func<FileUploadChunkEventArgs, CancellationToken, Task> uploadChunk,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(uploadChunk);
+
+            if (ChunkSizeInBytes <= 0)
+                throw new InvalidOperationException($"{nameof(ChunkSizeInBytes)} must be greater than zero.");
+
+            if (MaxChunkRetries < 0)
+                throw new InvalidOperationException($"{nameof(MaxChunkRetries)} cannot be negative.");
+
+            using var linkedCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _lifetimeToken);
+            var files = GetSelectedFiles();
+
+            foreach (var file in files)
+            {
+                linkedCancellation.Token.ThrowIfCancellationRequested();
+
+                await FileUploadChunkManager.UploadAsync(
+                    file,
+                    ChunkSizeInBytes,
+                    MaxChunkRetries,
+                    uploadChunk,
+                    progress => OnUploadProgress.InvokeAsync(progress),
+                    linkedCancellation.Token);
+            }
+        }
+
+        /// <summary>
         /// Opens the native file picker for the active input.
         /// </summary>
         public async Task OpenFilePickerAsync()
             => await JsRuntime.InvokeVoidAsyncWithErrorHandling("vekFileUpload.openFilePicker", GetActiveInputId());
+
+        protected override ValueTask DisposeAsyncCore()
+        {
+            _lifetimeCancellation.Cancel();
+            _lifetimeCancellation.Dispose();
+            return base.DisposeAsyncCore();
+        }
 
         private async Task OnChangeAsync(InputFileChangeEventArgs args)
         {
@@ -527,6 +605,17 @@ namespace Vek
 
             if (!ErrorState.Value || !SuppressOnChangeWhenInvalid)
                 await OnFilesChanged.InvokeAsync(args);
+        }
+
+        private IReadOnlyList<IBrowserFile> GetSelectedFiles()
+        {
+            return _filesState.Value switch
+            {
+                IBrowserFile file => [file],
+                IReadOnlyList<IBrowserFile> files => files,
+                null => [],
+                _ => throw new InvalidOperationException("File upload supports IBrowserFile or IReadOnlyList<IBrowserFile> values.")
+            };
         }
 
         private IReadOnlyList<IBrowserFile> ProcessMultipleFiles(IReadOnlyCollection<IBrowserFile> files)

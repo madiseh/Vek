@@ -4,9 +4,12 @@
 - **Feature ID**: 073
 - **Feature Slug**: fileupload-chunked-and-resumable-upload
 - **Module**: FileUpload
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 73
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/115
+- **Started At**: 2026-11-23T11:58:14Z
+- **Completed At**: 2026-11-23T13:12:06Z
 
 ---
 
