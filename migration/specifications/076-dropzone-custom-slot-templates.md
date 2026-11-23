@@ -4,9 +4,12 @@
 - **Feature ID**: 076
 - **Feature Slug**: dropzone-custom-slot-templates
 - **Module**: DropZone
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 76
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/116
+- **Started At**: 2026-11-23T12:31:49Z
+- **Completed At**: 2026-11-23T13:26:41Z
 
 ---
 

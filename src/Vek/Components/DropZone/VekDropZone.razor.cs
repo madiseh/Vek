@@ -24,6 +24,7 @@ namespace Vek
         private bool _containerIsInitialized = false;
         private bool _canDrop = false;
         private bool _dragInProgress = false;
+        private bool _hasFocus;
         private bool _disposedValue = false;
         private readonly string _id = Vek.Identifier.Create();
 
@@ -65,6 +66,40 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.DropZone.Items)]
         public RenderFragment<T>? ItemRenderer { get; set; }
+
+        /// <summary>
+        /// Renders each item inside this drop zone.
+        /// </summary>
+        /// <remarks>
+        /// When set, takes precedence over <see cref="ItemRenderer"/> and the container item renderer.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.DropZone.Items)]
+        public RenderFragment<T>? ItemTemplate { get; set; }
+
+        /// <summary>
+        /// Renders content when this drop zone has no visible items.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.DropZone.Appearance)]
+        public RenderFragment? EmptyTemplate { get; set; }
+
+        /// <summary>
+        /// Renders content while an item is dragged over this drop zone.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.DropZone.Appearance)]
+        public RenderFragment? DragOverTemplate { get; set; }
+
+        /// <summary>
+        /// Invokes when the drop zone receives the Enter key.
+        /// </summary>
+        /// <remarks>
+        /// Use this callback to provide a keyboard action for the drop zone.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.DropZone.Behavior)]
+        public EventCallback OnActivate { get; set; }
 
         /// <summary>
         /// The function which determines whether an item is within this <see cref="VekDropZone{T}"/> .
@@ -208,7 +243,16 @@ namespace Vek
             return items;
         }
 
-        private RenderFragment<T>? GetItemTemplate() => ItemRenderer ?? Container?.ItemRenderer;
+        private RenderFragment<T>? GetItemTemplate() => ItemTemplate ?? ItemRenderer ?? Container?.ItemRenderer;
+
+        private Task HandleKeyDownAsync(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args)
+        {
+            return _hasFocus && args.Key == "Enter" ? OnActivate.InvokeAsync() : Task.CompletedTask;
+        }
+
+        private void HandleFocus(Microsoft.AspNetCore.Components.Web.FocusEventArgs args) => _hasFocus = true;
+
+        private void HandleBlur(Microsoft.AspNetCore.Components.Web.FocusEventArgs args) => _hasFocus = false;
 
         private string GetDraggingClass()
         {

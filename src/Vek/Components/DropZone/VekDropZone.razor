@@ -6,7 +6,13 @@
 <div class="@Classname" style="@Style"
      id="@_id"
      identifier="@Identifier"
+     role="region"
+     aria-label="Drop zone"
+     tabindex="0"
      @ondrop="HandleDrop"
+     @onfocus="HandleFocus"
+     @onblur="HandleBlur"
+     @onkeydown="HandleKeyDownAsync"
      @ondragenter="HandleDragEnter"
      @ondragleave="HandleDragLeave"
      @ondragover:preventDefault
@@ -22,11 +28,24 @@
 
     @ChildContent
 
+    @{
+        var items = GetItems();
+        var isEmpty = OnlyZone || items.Length == 0;
+    }
+
+    @if (_dragCounter > 0 && DragOverTemplate is not null)
+    {
+        @DragOverTemplate
+    }
+    else if (isEmpty && EmptyTemplate is not null)
+    {
+        @EmptyTemplate
+    }
+
     @if (!OnlyZone)
     {
         int index = 0;
         var transactionIndex = Container?.GetTransactionIndex() ?? -1;
-        var items = GetItems();
 
         @if (AllowReorder)
         {

@@ -1,0 +1,69 @@
+@namespace Vek.Docs.Examples
+
+<VekDropContainer T="TemplateTask" Items="_items" ItemsSelector="@((item, zone) => item.Zone == zone)" ItemDropped="OnItemDropped" Class="d-flex flex-wrap gap-4">
+    <ChildContent>
+        <VekDropZone T="TemplateTask" Identifier="backlog" aria-label="Backlog tasks" Class="rounded vek-background-gray pa-4 flex-grow-1">
+            <ChildContent>
+                <VekText Typo="Typo.h6" Class="mb-3">Backlog</VekText>
+                <VekText Typo="Typo.caption" aria-live="polite">@_keyboardMessage</VekText>
+            </ChildContent>
+            <EmptyTemplate>
+                <VekText Typo="Typo.body2">No tasks yet. Drag one here.</VekText>
+            </EmptyTemplate>
+            <DragOverTemplate>
+                <VekText Typo="Typo.subtitle2" Class="vek-text-primary">Release to add to backlog</VekText>
+            </DragOverTemplate>
+            <ItemTemplate Context="task">
+                <VekPaper Elevation="1" Class="pa-3 my-2">
+                    <VekText Typo="Typo.body1">@task.Title</VekText>
+                </VekPaper>
+            </ItemTemplate>
+        </VekDropZone>
+        <VekDropZone T="TemplateTask" Identifier="in-progress" aria-label="In progress tasks" OnActivate="OnZoneActivated" Class="rounded vek-background-gray pa-4 flex-grow-1">
+            <ChildContent>
+                <VekText Typo="Typo.h6" Class="mb-3">In progress</VekText>
+            </ChildContent>
+            <EmptyTemplate>
+                <VekText Typo="Typo.body2">Move a task here when you start it.</VekText>
+            </EmptyTemplate>
+            <ItemTemplate Context="task">
+                <VekPaper Elevation="1" Class="pa-3 my-2">
+                    <VekText Typo="Typo.body1">@task.Title</VekText>
+                    <VekText Typo="Typo.caption">Custom item template</VekText>
+                </VekPaper>
+            </ItemTemplate>
+        </VekDropZone>
+    </ChildContent>
+    <ItemRenderer Context="task">
+        <VekPaper Elevation="1" Class="pa-3 my-2">
+            <VekText Typo="Typo.body1">@task.Title</VekText>
+        </VekPaper>
+    </ItemRenderer>
+</VekDropContainer>
+
+@code {
+    private string _keyboardMessage = string.Empty;
+
+    private readonly List<TemplateTask> _items =
+    [
+        new() { Title = "Review pull request", Zone = "backlog" },
+        new() { Title = "Write release notes", Zone = "backlog" }
+    ];
+
+    private void OnItemDropped(VekItemDropInfo<TemplateTask> dropInfo)
+    {
+        dropInfo.Item.Zone = dropInfo.DropzoneIdentifier;
+    }
+
+    private void OnZoneActivated()
+    {
+        _keyboardMessage = "In progress zone activated with Enter.";
+    }
+
+    private sealed class TemplateTask
+    {
+        public required string Title { get; init; }
+
+        public required string Zone { get; set; }
+    }
+}

@@ -938,9 +938,12 @@
       "title": "DropZone Customizable Empty State, Active Dragging, and Uploading Templates",
       "module": "DropZone",
       "priority": 76,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/076-dropzone-custom-slot-templates.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-23T12:31:49Z",
+      "completed_at": "2026-11-23T13:26:41Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/116"
     },
     {
       "id": "077",

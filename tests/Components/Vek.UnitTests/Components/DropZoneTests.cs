@@ -1,12 +1,13 @@
 ﻿using AwesomeAssertions;
 using Bunit;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using Microsoft.JSInterop.Infrastructure;
 using Moq;
-using Vek.UnitTests.TestComponents.DropZone;
 using NUnit.Framework;
+using Vek.UnitTests.TestComponents.DropZone;
 
 namespace Vek.UnitTests.Components
 {
@@ -46,6 +47,90 @@ namespace Vek.UnitTests.Components
             zone.NoDropClass.Should().BeNullOrEmpty();
             zone.OnlyZone.Should().BeFalse();
             zone.AllowReorder.Should().BeFalse();
+        }
+
+        /// <summary>
+        /// Empty and drag-over templates follow the drop zone state, and Enter invokes its activation callback.
+        /// </summary>
+        [Test]
+        public async Task DropZone_CustomStateTemplatesAndEnterActivation()
+        {
+            var activated = false;
+            var component = Context.Render<VekDropZone<string>>(parameters => parameters
+                .Add(zone => zone.EmptyTemplate, builder => builder.AddContent(0, "Drop an item here"))
+                .Add(zone => zone.DragOverTemplate, builder => builder.AddContent(0, "Release to drop"))
+                .Add(zone => zone.OnActivate, EventCallback.Factory.Create(this, () => activated = true))
+                .AddUnmatched("aria-label", "Backlog drop zone"));
+
+            var zoneElement = component.Find(".vek-drop-zone");
+            zoneElement.GetAttribute("role").Should().Be("region");
+            zoneElement.GetAttribute("aria-label").Should().Be("Backlog drop zone");
+            zoneElement.GetAttribute("tabindex").Should().Be("0");
+            zoneElement.TextContent.Should().Contain("Drop an item here");
+
+            await zoneElement.TriggerEventAsync("onfocus", new Microsoft.AspNetCore.Components.Web.FocusEventArgs());
+            await zoneElement.TriggerEventAsync("onkeydown", new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Key = "Enter" });
+            activated.Should().BeTrue();
+
+            await zoneElement.TriggerEventAsync("ondragenter", new Microsoft.AspNetCore.Components.Web.DragEventArgs());
+            component.Find(".vek-drop-zone").TextContent.Should().Contain("Release to drop");
+            component.Find(".vek-drop-zone").TextContent.Should().NotContain("Drop an item here");
+        }
+
+        /// <summary>
+        /// Enter from a focused child control does not activate the drop zone.
+        /// </summary>
+        [Test]
+        public async Task DropZone_ChildControlEnterDoesNotActivateZone()
+        {
+            var activated = false;
+            var childActivated = false;
+            var component = Context.Render<VekDropZone<string>>(parameters => parameters
+                .Add(zone => zone.ChildContent, builder =>
+                {
+                    builder.OpenElement(0, "button");
+                    builder.AddAttribute(1, "onkeydown", EventCallback.Factory.Create<KeyboardEventArgs>(this, _ => childActivated = true));
+                    builder.AddContent(2, "Save");
+                    builder.CloseElement();
+                })
+                .Add(zone => zone.OnActivate, EventCallback.Factory.Create(this, () => activated = true)));
+
+            var zoneElement = component.Find(".vek-drop-zone");
+            await zoneElement.TriggerEventAsync("onfocus", new Microsoft.AspNetCore.Components.Web.FocusEventArgs());
+            await zoneElement.TriggerEventAsync("onblur", new Microsoft.AspNetCore.Components.Web.FocusEventArgs());
+            await component.Find("button").TriggerEventAsync("onkeydown", new KeyboardEventArgs { Key = "Enter" });
+            await zoneElement.TriggerEventAsync("onkeydown", new KeyboardEventArgs { Key = "Enter" });
+
+            childActivated.Should().BeTrue();
+            activated.Should().BeFalse();
+        }
+
+        /// <summary>
+        /// A zone item template takes precedence over the legacy item renderers.
+        /// </summary>
+        [Test]
+        public void DropZone_ItemTemplateOverridesExistingRenderers()
+        {
+            RenderFragment<string> containerRenderer = item => builder => builder.AddContent(0, $"Container: {item}");
+            RenderFragment<string> itemTemplate = item => builder => builder.AddContent(0, $"Zone: {item}");
+            RenderFragment<string> legacyItemRenderer = item => builder => builder.AddContent(0, $"Legacy: {item}");
+
+            var component = Context.Render<VekDropContainer<string>>(parameters => parameters
+                .Add(container => container.Items, new[] { "Task A" })
+                .Add(container => container.ItemsSelector, (_, _) => true)
+                .Add(container => container.ItemRenderer, containerRenderer)
+                .Add(container => container.ChildContent, builder =>
+                {
+                    builder.OpenComponent<VekDropZone<string>>(0);
+                    builder.AddAttribute(1, nameof(VekDropZone<string>.Identifier), "work");
+                    builder.AddAttribute(2, nameof(VekDropZone<string>.ItemRenderer), legacyItemRenderer);
+                    builder.AddAttribute(3, nameof(VekDropZone<string>.ItemTemplate), itemTemplate);
+                    builder.CloseComponent();
+                }));
+
+            component.Find(".vek-drop-zone").TextContent.Should().Contain("Zone: Task A");
+            component.Find(".vek-drop-zone").TextContent.Should().NotContain("Container: Task A");
+            component.Find(".vek-drop-zone").TextContent.Should().NotContain("Legacy: Task A");
         }
 
         [Test]
