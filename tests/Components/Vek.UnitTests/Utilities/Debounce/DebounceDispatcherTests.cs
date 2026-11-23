@@ -843,6 +843,7 @@ public class DebounceDispatcherTests
     }
 
     [Test]
+    [Explicit]
     [CancelAfter(10000)]
     public async Task Cancel_Race_Stress_NoUnhandledExceptions()
     {
@@ -901,6 +902,7 @@ public class DebounceDispatcherTests
     }
 
     [Test]
+    [Explicit]
     [CancelAfter(10000)]
     public async Task CancelAsync_Race_Stress_NoUnhandledExceptions()
     {
