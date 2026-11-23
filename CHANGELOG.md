@@ -37,7 +37,12 @@ For GitHub Releases and downloadable packages, see the [Releases page](https://g
 - [@madiseh](https://github.com/madiseh) — [PR #102](https://github.com/madiseh/Vek/pull/102), [#103](https://github.com/madiseh/Vek/pull/103), [#104](https://github.com/madiseh/Vek/pull/104), [#105](https://github.com/madiseh/Vek/pull/105), [#106](https://github.com/madiseh/Vek/pull/106), [#107](https://github.com/madiseh/Vek/pull/107), [#108](https://github.com/madiseh/Vek/pull/108), [#109](https://github.com/madiseh/Vek/pull/109), [#110](https://github.com/madiseh/Vek/pull/110), [#111](https://github.com/madiseh/Vek/pull/111), [#112](https://github.com/madiseh/Vek/pull/112), [#113](https://github.com/madiseh/Vek/pull/113)
 
 ### Test Results
-- To be populated from the verified CI run for the final release commit.
+- Total: 8,686 — 8,684 passed, 0 failed, 2 skipped.
+- `Vek.UnitTests`: 6,756 total — 6,754 passed, 0 failed, 2 skipped.
+- `Vek.UnitTests.Analyzers`: 391 total — 391 passed, 0 failed, 0 skipped.
+- `Vek.UnitTests.Docs`: 1,539 total — 1,539 passed, 0 failed, 0 skipped.
+- Format check passed; build-only projects passed: `src/Docs/Vek.Docs.Server` and `src/Docs/Vek.Docs.WasmHost`.
+- The exact release commit and CI run are listed in the GitHub Release.
 
 **Full Changelog**: https://github.com/madiseh/Vek/compare/v1.3.3...v1.3.4
 
