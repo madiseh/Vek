@@ -24,6 +24,7 @@ namespace Vek
         private bool _containerIsInitialized = false;
         private bool _canDrop = false;
         private bool _dragInProgress = false;
+        private bool _hasFocus;
         private bool _disposedValue = false;
         private readonly string _id = Vek.Identifier.Create();
 
@@ -246,8 +247,12 @@ namespace Vek
 
         private Task HandleKeyDownAsync(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args)
         {
-            return args.Key == "Enter" ? OnActivate.InvokeAsync() : Task.CompletedTask;
+            return _hasFocus && args.Key == "Enter" ? OnActivate.InvokeAsync() : Task.CompletedTask;
         }
+
+        private void HandleFocus(Microsoft.AspNetCore.Components.Web.FocusEventArgs args) => _hasFocus = true;
+
+        private void HandleBlur(Microsoft.AspNetCore.Components.Web.FocusEventArgs args) => _hasFocus = false;
 
         private string GetDraggingClass()
         {

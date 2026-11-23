@@ -68,12 +68,41 @@ namespace Vek.UnitTests.Components
             zoneElement.GetAttribute("tabindex").Should().Be("0");
             zoneElement.TextContent.Should().Contain("Drop an item here");
 
+            await zoneElement.TriggerEventAsync("onfocus", new Microsoft.AspNetCore.Components.Web.FocusEventArgs());
             await zoneElement.TriggerEventAsync("onkeydown", new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Key = "Enter" });
             activated.Should().BeTrue();
 
             await zoneElement.TriggerEventAsync("ondragenter", new Microsoft.AspNetCore.Components.Web.DragEventArgs());
             component.Find(".vek-drop-zone").TextContent.Should().Contain("Release to drop");
             component.Find(".vek-drop-zone").TextContent.Should().NotContain("Drop an item here");
+        }
+
+        /// <summary>
+        /// Enter from a focused child control does not activate the drop zone.
+        /// </summary>
+        [Test]
+        public async Task DropZone_ChildControlEnterDoesNotActivateZone()
+        {
+            var activated = false;
+            var childActivated = false;
+            var component = Context.Render<VekDropZone<string>>(parameters => parameters
+                .Add(zone => zone.ChildContent, builder =>
+                {
+                    builder.OpenElement(0, "button");
+                    builder.AddAttribute(1, "onkeydown", EventCallback.Factory.Create<KeyboardEventArgs>(this, _ => childActivated = true));
+                    builder.AddContent(2, "Save");
+                    builder.CloseElement();
+                })
+                .Add(zone => zone.OnActivate, EventCallback.Factory.Create(this, () => activated = true)));
+
+            var zoneElement = component.Find(".vek-drop-zone");
+            await zoneElement.TriggerEventAsync("onfocus", new Microsoft.AspNetCore.Components.Web.FocusEventArgs());
+            await zoneElement.TriggerEventAsync("onblur", new Microsoft.AspNetCore.Components.Web.FocusEventArgs());
+            await component.Find("button").TriggerEventAsync("onkeydown", new KeyboardEventArgs { Key = "Enter" });
+            await zoneElement.TriggerEventAsync("onkeydown", new KeyboardEventArgs { Key = "Enter" });
+
+            childActivated.Should().BeTrue();
+            activated.Should().BeFalse();
         }
 
         /// <summary>
