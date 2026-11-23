@@ -15,6 +15,14 @@
     z-index: 1;
   }
 
+  .docs-appbar-menu-trigger {
+    flex-shrink: 0;
+
+    > .vek-button {
+      min-width: max-content;
+    }
+  }
+
   // Hero Section
   .hero-section {
     position: relative;
@@ -29,7 +37,7 @@
       top: -160px;
       left: 50%;
       transform: translateX(-50%);
-      width: 1000px;
+      width: min(1000px, 100%);
       height: 600px;
       background: radial-gradient(circle, rgba(37, 99, 235, 0.16) 0%, rgba(14, 165, 233, 0.08) 40%, rgba(0, 0, 0, 0) 70%);
       pointer-events: none;
@@ -177,6 +185,7 @@
           font-family: 'JetBrains Mono', Consolas, monospace;
           font-size: 0.8rem;
           padding: 4px 12px;
+            white-space: nowrap;
           border-radius: 6px;
           cursor: pointer;
           border: none;
@@ -242,6 +251,29 @@
     }
   }
 
+  @media (max-width: 767px) {
+    .hero-preview-container {
+      .preview-header {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 8px 12px;
+        padding: 12px;
+      }
+
+      .preview-tabs {
+        flex: 1 1 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+      }
+
+      .preview-chip {
+        display: none;
+      }
+    }
+  }
+
   // Metrics Section
   .metrics-section {
     padding: 60px 0;
@@ -265,11 +297,11 @@
       }
 
       .metric-label {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         font-weight: 600;
         color: var(--vek-palette-text-secondary);
         text-transform: uppercase;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.02em;
       }
     }
   }
