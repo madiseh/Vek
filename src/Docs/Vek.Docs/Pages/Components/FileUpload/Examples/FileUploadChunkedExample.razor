@@ -1,0 +1,69 @@
+@using Microsoft.AspNetCore.Components.Forms
+@namespace Vek.Docs.Examples
+
+<div class="d-flex flex-column gap-3" style="max-width: 32rem;">
+    <VekFileUpload T="IBrowserFile"
+                   @ref="_fileUpload"
+                   @bind-Files="_file"
+                   ChunkSizeInBytes="2048"
+                   OnUploadProgress="OnUploadProgress" />
+
+    <VekButton Variant="Variant.Filled"
+               Disabled="@(_file is null || _isUploading)"
+               OnClick="UploadFileAsync">
+        @(_isUploading ? "Uploading chunks" : "Upload in chunks")
+    </VekButton>
+
+    @if (_hasProgress)
+    {
+        <label for="file-upload-progress">
+            @_progress.File.Name: @_progress.PercentComplete.ToString("0")% uploaded
+        </label>
+        <progress id="file-upload-progress" max="100" value="@_progress.PercentComplete"></progress>
+        <VekText Typo="Typo.body2">
+            @_progress.BytesUploaded.ToString("N0") of @_progress.File.Size.ToString("N0") bytes · @_progress.BytesPerSecond.ToString("N0") bytes per second
+        </VekText>
+    }
+
+    <VekText Typo="Typo.caption">
+        This example accepts each chunk locally. Replace the handler with a request to your upload endpoint.
+    </VekText>
+</div>
+
+@code {
+    private VekFileUpload<IBrowserFile> _fileUpload = default!;
+    private IBrowserFile _file = default!;
+    private FileUploadProgressEventArgs _progress = default!;
+    private bool _isUploading;
+    private bool _hasProgress;
+
+    private async Task UploadFileAsync()
+    {
+        if (_fileUpload is null)
+            return;
+
+        _isUploading = true;
+        _hasProgress = false;
+
+        try
+        {
+            await _fileUpload.UploadFilesAsync(AcceptChunkAsync);
+        }
+        finally
+        {
+            _isUploading = false;
+        }
+    }
+
+    private Task AcceptChunkAsync(FileUploadChunkEventArgs chunk, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.CompletedTask;
+    }
+
+    private void OnUploadProgress(FileUploadProgressEventArgs progress)
+    {
+        _progress = progress;
+        _hasProgress = true;
+    }
+}

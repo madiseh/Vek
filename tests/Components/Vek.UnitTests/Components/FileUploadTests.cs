@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Globalization;
+using System.Net.Http;
 using AwesomeAssertions;
 using Bunit;
 using Microsoft.AspNetCore.Components;
@@ -926,6 +927,73 @@ namespace Vek.UnitTests.Components
             input.HasAttribute("aria-invalid").Should().BeFalse();
             input.GetAttribute("aria-describedby").Should().Be("upload-error");
             comp.Find("#upload-error").TextContent.Trim().Should().Be("File required");
+        }
+
+        /// <summary>
+        /// Chunks are retried after transient handler failures and successful chunks advance progress.
+        /// </summary>
+        [Test]
+        public async Task FileUpload_ChunksSelectedFileAndReportsProgress()
+        {
+            var file = new DummyBrowserFile("chunked.txt", DateTimeOffset.UnixEpoch, 5, "text/plain", [1, 2, 3, 4, 5]);
+            var chunks = new List<FileUploadChunkEventArgs>();
+            var progress = new List<FileUploadProgressEventArgs>();
+            var comp = Context.Render<VekFileUpload<IBrowserFile>>(parameters => parameters
+                .Add(p => p.Files, file)
+                .Add(p => p.ChunkSizeInBytes, 2)
+                .Add(p => p.MaxChunkRetries, 1)
+                .Add(p => p.OnUploadProgress, EventCallback.Factory.Create<FileUploadProgressEventArgs>(this, args => progress.Add(args))));
+
+            await comp.InvokeAsync(() => comp.Instance.UploadFilesAsync((chunk, _) =>
+            {
+                chunks.Add(chunk);
+                if (chunk.ChunkIndex == 0 && chunk.Attempt == 1)
+                    throw new HttpRequestException("Temporary network failure.");
+
+                return Task.CompletedTask;
+            }));
+
+            chunks.Select(chunk => chunk.ChunkIndex).Should().Equal(0, 0, 1, 2);
+            chunks[0].Attempt.Should().Be(1);
+            chunks[1].Attempt.Should().Be(2);
+            chunks[0].Data.ToArray().Should().Equal(1, 2);
+            chunks[1].Data.ToArray().Should().Equal(1, 2);
+            chunks[2].Data.ToArray().Should().Equal(3, 4);
+            chunks[3].Data.ToArray().Should().Equal(5);
+            chunks.Select(chunk => chunk.Offset).Should().Equal(0, 0, 2, 4);
+            chunks.Select(chunk => chunk.TotalChunks).Should().OnlyContain(count => count == 3);
+            chunks.Select(chunk => chunk.IsLastChunk).Should().Equal(false, false, false, true);
+
+            progress.Select(item => item.BytesUploaded).Should().Equal(2, 4, 5);
+            progress.Select(item => item.PercentComplete).Should().Equal(40, 80, 100);
+            progress.Last().BytesPerSecond.Should().BeGreaterThanOrEqualTo(0);
+        }
+
+        /// <summary>
+        /// Disposing FileUpload cancels an in-flight chunk handler.
+        /// </summary>
+        [Test]
+        public async Task FileUpload_DisposalCancelsChunkUpload()
+        {
+            var file = new DummyBrowserFile("chunked.txt", DateTimeOffset.UnixEpoch, 1, "text/plain", [1]);
+            var callbackStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var comp = Context.Render<VekFileUpload<IBrowserFile>>(parameters => parameters
+                .Add(p => p.Files, file)
+                .Add(p => p.ChunkSizeInBytes, 1));
+
+            var uploadTask = comp.InvokeAsync(() => comp.Instance.UploadFilesAsync(async (_, cancellationToken) =>
+            {
+                callbackStarted.TrySetResult();
+                var cancellationObserved = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+                using var registration = cancellationToken.Register(() => cancellationObserved.TrySetResult());
+                await cancellationObserved.Task.WaitAsync(NUnit.Framework.TestContext.CurrentContext.CancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
+            }));
+
+            await callbackStarted.Task.WaitAsync(NUnit.Framework.TestContext.CurrentContext.CancellationToken);
+            await comp.InvokeAsync(() => comp.Instance.DisposeAsync().AsTask());
+
+            Assert.ThrowsAsync<OperationCanceledException>(async () => await uploadTask);
         }
     }
 }

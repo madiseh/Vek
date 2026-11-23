@@ -902,9 +902,10 @@
       "title": "FileUpload Client-Side Chunking for Large Files and Progress Tracking",
       "module": "FileUpload",
       "priority": 73,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/073-fileupload-chunked-and-resumable-upload.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-23T11:58:14Z"
     },
     {
       "id": "074",
