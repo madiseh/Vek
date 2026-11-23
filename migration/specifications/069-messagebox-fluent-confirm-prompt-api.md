@@ -4,10 +4,12 @@
 - **Feature ID**: 069
 - **Feature Slug**: messagebox-fluent-confirm-prompt-api
 - **Module**: MessageBox
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 69
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/114
 - **Started At**: 2026-11-23T11:58:05Z
+- **Completed At**: 2026-11-23T12:51:16Z
 
 ---
 

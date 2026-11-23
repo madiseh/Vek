@@ -859,10 +859,12 @@
       "title": "MessageBox Fluent Async ShowConfirmAsync, ShowPromptAsync, and Custom Buttons",
       "module": "MessageBox",
       "priority": 69,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/069-messagebox-fluent-confirm-prompt-api.md",
       "dependencies": [],
-      "started_at": "2026-11-23T11:58:05Z"
+      "started_at": "2026-11-23T11:58:05Z",
+      "completed_at": "2026-11-23T12:51:16Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/114"
     },
     {
       "id": "070",
