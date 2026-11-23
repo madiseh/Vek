@@ -519,7 +519,8 @@ namespace Vek
         /// <param name="uploadChunk">Uploads one chunk to the consumer's chosen destination.</param>
         /// <param name="cancellationToken">Cancels the upload operation.</param>
         /// <remarks>
-        /// Transient I/O failures from the handler retry the current chunk up to <see cref="MaxChunkRetries"/> times.
+        /// Statusless HTTP connection failures, HTTP 408, 425, 429, 500, 502, 503, 504, I/O failures, and timeouts retry the current chunk up to <see cref="MaxChunkRetries"/> times.
+        /// Other HTTP status codes and cancellation exceptions are not retried.
         /// Handlers should use the file name and chunk index to make retries idempotent.
         /// The component cancels the token when disposed, so handlers should pass it to their I/O operations.
         /// </remarks>

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 using Microsoft.AspNetCore.Components.Forms;
 
@@ -86,13 +87,21 @@ namespace Vek
             if (cancellationToken.IsCancellationRequested)
                 return false;
 
-            if (exception is TaskCanceledException)
-                return true;
-
             if (exception is OperationCanceledException)
                 return false;
 
-            return exception is HttpRequestException or IOException or TimeoutException;
+            return exception switch
+            {
+                HttpRequestException { StatusCode: null } => true,
+                HttpRequestException { StatusCode: not null } requestException => IsTransientStatusCode(requestException.StatusCode.Value),
+                IOException or TimeoutException => true,
+                _ => false
+            };
+        }
+
+        private static bool IsTransientStatusCode(HttpStatusCode statusCode)
+        {
+            return (int)statusCode is 408 or 425 or 429 or 500 or 502 or 503 or 504;
         }
 
         private static TimeSpan GetRetryDelay(int attempt)
