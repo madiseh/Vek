@@ -7,6 +7,16 @@ on:
         description: Stable release version without the v prefix
         required: true
         type: string
+      source_ref:
+        description: Git ref to deploy; defaults to the matching stable tag
+        required: false
+        type: string
+        default: ''
+      deployment_id:
+        description: Unique VPS release directory; defaults to the stable version
+        required: false
+        type: string
+        default: ''
     secrets:
       VPS_HOST:
         required: true
@@ -22,6 +32,14 @@ on:
         description: Stable release version without the v prefix
         required: true
         type: string
+      source_ref:
+        description: Git branch, tag, or commit to deploy
+        required: true
+        default: master
+      deployment_id:
+        description: Unique VPS release directory (defaults to the stable version)
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -36,6 +54,7 @@ jobs:
       VPS_DEPLOY_PATH: ${{ vars.VPS_DEPLOY_PATH }}
       VPS_SERVICE_NAME: ${{ vars.VPS_SERVICE_NAME }}
       VERSION: ${{ inputs.version }}
+      DEPLOYMENT_ID: ${{ inputs.deployment_id || inputs.version }}
     steps:
       - name: Validate deployment settings
         shell: bash
@@ -47,6 +66,7 @@ jobs:
         run: |
           set -euo pipefail
           [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Invalid stable version: $VERSION" >&2; exit 1; }
+          [[ "$DEPLOYMENT_ID" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.-]+)?$ ]] || { echo "Invalid deployment ID: $DEPLOYMENT_ID" >&2; exit 1; }
           [[ -n "$VPS_HOST" && -n "$VPS_USER" && -n "$VPS_SSH_PRIVATE_KEY" && -n "$VPS_KNOWN_HOSTS" ]] || { echo "Set all required VPS SSH secrets before deploying." >&2; exit 1; }
           [[ "$VPS_HOST" =~ ^[A-Za-z0-9.-]+$ ]] || { echo "VPS_HOST must be a hostname or IPv4 address." >&2; exit 1; }
           [[ "$VPS_USER" =~ ^[A-Za-z_][A-Za-z0-9_-]*$ ]] || { echo "VPS_USER must be a Linux account name." >&2; exit 1; }
@@ -57,8 +77,11 @@ jobs:
       - name: Check out the released source
         uses: actions/checkout@v7
         with:
-          ref: v${{ inputs.version }}
+          ref: ${{ inputs.source_ref || format('v{0}', inputs.version) }}
           persist-credentials: false
+
+      - name: Record deployment source
+        run: git log -1 --format='Source commit: %H%nSource subject: %s'
 
       - name: Set up .NET SDK
         uses: actions/setup-dotnet@v6
@@ -92,7 +115,7 @@ jobs:
           chmod 600 "$HOME/.ssh/id_ed25519" "$HOME/.ssh/known_hosts"
           {
             echo "SSH_DESTINATION=$VPS_USER@$VPS_HOST"
-            echo "REMOTE_RELEASE_PATH=${VPS_DEPLOY_PATH%/}/releases/$VERSION"
+            echo "REMOTE_RELEASE_PATH=${VPS_DEPLOY_PATH%/}/releases/$DEPLOYMENT_ID"
           } >> "$GITHUB_ENV"
 
       - name: Copy release to the VPS
@@ -110,7 +133,7 @@ jobs:
         run: |
           set -euo pipefail
           ssh -i "$HOME/.ssh/id_ed25519" -p "$VPS_SSH_PORT" -o BatchMode=yes "$SSH_DESTINATION" \
-            "bash -s -- '$VPS_DEPLOY_PATH' '$VPS_SERVICE_NAME' '$VERSION'" <<'REMOTE'
+            "bash -s -- '$VPS_DEPLOY_PATH' '$VPS_SERVICE_NAME' '$DEPLOYMENT_ID'" <<'REMOTE'
           set -euo pipefail
           deploy_root="$1"
           service_name="$2"
