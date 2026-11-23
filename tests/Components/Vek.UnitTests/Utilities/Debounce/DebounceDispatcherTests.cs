@@ -5,8 +5,8 @@
 using System.Reflection;
 using AwesomeAssertions;
 using Microsoft.Extensions.Time.Testing;
-using Vek.Utilities.Debounce;
 using NUnit.Framework;
+using Vek.Utilities.Debounce;
 
 namespace Vek.UnitTests.Utilities.Debounce;
 
@@ -843,7 +843,6 @@ public class DebounceDispatcherTests
     }
 
     [Test]
-    [Explicit]
     [CancelAfter(10000)]
     public async Task Cancel_Race_Stress_NoUnhandledExceptions()
     {
@@ -902,7 +901,6 @@ public class DebounceDispatcherTests
     }
 
     [Test]
-    [Explicit]
     [CancelAfter(10000)]
     public async Task CancelAsync_Race_Stress_NoUnhandledExceptions()
     {
