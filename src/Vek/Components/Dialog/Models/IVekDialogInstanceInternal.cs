@@ -16,4 +16,6 @@ internal interface IVekDialogInstanceInternal : IVekDialogInstance
     /// This method is used internally when displaying a new dialog.
     /// </remarks>
     void Register(VekDialog dialog);
+
+    Task SetMaximizedAsync(bool maximized);
 }

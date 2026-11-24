@@ -25,6 +25,8 @@ namespace Vek
     {
         private IDialogReference? _reference;
         private readonly ParameterState<bool> _visibleState;
+        private readonly ParameterState<bool?> _showMaximizeButtonState;
+        private readonly ParameterState<bool> _maximizedState;
         private readonly SemaphoreSlim _showLock = new SemaphoreSlim(1, 1);
 
         /// <summary>
@@ -36,6 +38,13 @@ namespace Vek
             _visibleState = registerScope.RegisterParameter<bool>(nameof(Visible))
                 .WithParameter(() => Visible)
                 .WithEventCallback(() => VisibleChanged);
+            _showMaximizeButtonState = registerScope.RegisterParameter<bool?>(nameof(ShowMaximizeButton))
+                .WithParameter(() => ShowMaximizeButton)
+                .WithChangeHandler(OnShowMaximizeButtonChangedAsync);
+            _maximizedState = registerScope.RegisterParameter<bool>(nameof(Maximized))
+                .WithParameter(() => Maximized)
+                .WithEventCallback(() => MaximizedChanged)
+                .WithChangeHandler(OnMaximizedChangedAsync);
         }
 
         protected string ContentClassname => new CssBuilder("vek-dialog-content")
@@ -183,6 +192,66 @@ namespace Vek
         public EventCallback<bool> VisibleChanged { get; set; }
 
         /// <summary>
+        /// Shows a maximize/restore button in the dialog header.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>, which falls back to <see cref="DialogOptions.ShowMaximizeButton"/> or <see cref="VekDialogProvider.ShowMaximizeButton"/>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.Dialog.Behavior)]
+        public bool? ShowMaximizeButton { get; set; }
+
+        /// <summary>
+        /// Expands this dialog to fill the viewport.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. Can be bound via <c>@bind-Maximized</c> or toggled from the dialog header.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.Dialog.Behavior)]
+        public bool Maximized { get; set; }
+
+        /// <summary>
+        /// Occurs when <see cref="Maximized"/> has changed.
+        /// </summary>
+        [Parameter]
+        public EventCallback<bool> MaximizedChanged { get; set; }
+
+        internal bool? ShowMaximizeButtonValue => _showMaximizeButtonState.Value;
+
+        internal bool MaximizedValue => _maximizedState.Value;
+
+        internal Task UpdateMaximizedAsync(bool maximized) => _maximizedState.SetValueAsync(maximized);
+
+        internal Task UpdateShowMaximizeButtonFromParentAsync(bool? showMaximizeButton)
+        {
+            var result = _showMaximizeButtonState.SetValueAsync(showMaximizeButton);
+            DialogInstance?.StateHasChanged();
+            return result;
+        }
+
+        private Task OnShowMaximizeButtonChangedAsync(ParameterChangedEventArgs<bool?> args)
+        {
+            if (IsInline && _reference?.Dialog is VekDialog innerDialog)
+            {
+                return innerDialog.UpdateShowMaximizeButtonFromParentAsync(args.Value);
+            }
+
+            DialogInstance?.StateHasChanged();
+            return Task.CompletedTask;
+        }
+
+        private Task OnMaximizedChangedAsync(ParameterChangedEventArgs<bool> args)
+        {
+            if (IsInline && _reference?.Dialog is VekDialog { DialogInstance: not null } innerDialog)
+            {
+                return innerDialog.DialogInstance.SetMaximizedAsync(args.Value);
+            }
+
+            return DialogInstance?.SetMaximizedAsync(args.Value) ?? Task.CompletedTask;
+        }
+
+        /// <summary>
         /// The element which will receive focus when this dialog is shown.
         /// </summary>
         /// <remarks>
@@ -252,6 +321,9 @@ namespace Vek
                     [nameof(DefaultFocus)] = DefaultFocus,
                     [nameof(AriaLabel)] = AriaLabel,
                     [nameof(AriaLabelledBy)] = AriaLabelledBy,
+                    [nameof(ShowMaximizeButton)] = _showMaximizeButtonState.Value,
+                    [nameof(Maximized)] = _maximizedState.Value,
+                    [nameof(MaximizedChanged)] = EventCallback.Factory.Create<bool>(this, value => _maximizedState.SetValueAsync(value)),
                 };
 #pragma warning restore CS0618 // Type or member is obsolete
 

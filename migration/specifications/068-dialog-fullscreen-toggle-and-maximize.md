@@ -4,9 +4,12 @@
 - **Feature ID**: 068
 - **Feature Slug**: dialog-fullscreen-toggle-and-maximize
 - **Module**: Dialog
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 68
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/128
+- **Started At**: 2026-11-24T17:34:50Z
+- **Completed At**: 2026-11-24T18:01:18Z
 
 ---
 

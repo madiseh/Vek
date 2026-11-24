@@ -77,6 +77,14 @@ namespace Vek
         public bool? CloseButton { get; init; }
 
         /// <summary>
+        /// Shows a maximize/restore button in the top-right corner of the dialog header.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        public bool? ShowMaximizeButton { get; init; }
+
+        /// <summary>
         /// Sets the size of the dialog to the entire screen.
         /// </summary>
         /// <remarks>

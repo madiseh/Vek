@@ -11,7 +11,7 @@
     <div @ref="_dialogContainerReference" id="_@Id.ToString("N")" role="dialog" aria-modal="@(Parent is null || Parent.IsTopmost(Id) ? "true" : null)" aria-labelledby="@GetAriaLabelledBy()" aria-label="@GetAriaLabel()" class="@Classname" style="@DialogStyle" tabindex="-1">
         @if (!GetHideHeader())
         {
-            <div id="@($"_{Id:N}_title")" class="@TitleClassname" role="@(GetDraggable() ? "group" : null)" tabindex="@(GetDraggable() ? "0" : null)" aria-label="@(GetDraggable() ? "Move dialog with arrow keys" : null)" data-vek-dialog-drag-handle="@(GetDraggable() ? "true" : null)">
+            <div id="@($"_{Id:N}_title")" class="@TitleClassname" role="@(GetEffectiveDraggable() ? "group" : null)" tabindex="@(GetEffectiveDraggable() ? "0" : null)" aria-label="@(GetEffectiveDraggable() ? "Move dialog with arrow keys" : null)" data-vek-dialog-drag-handle="@(GetEffectiveDraggable() ? "true" : null)" @ondblclick="HandleTitleDoubleClickAsync">
                 @if (TitleContent is null)
                 {
                     <VekText Typo="Typo.h6">@_titleState.Value</VekText>
@@ -20,16 +20,33 @@
                 {
                     @TitleContent
                 }
-                @if (GetCloseButton())
+                @if (GetShowMaximizeButton() || GetCloseButton())
                 {
-                    <VekIconButton aria-label="@Localizer[LanguageResource.VekDialog_Close]" Icon="@CloseIcon" @onclick="((IVekDialogInstance)this).Cancel" Class="vek-button-close" />
+                    <div class="vek-dialog-title-actions">
+                        @if (GetShowMaximizeButton())
+                        {
+                            <VekIconButton aria-label="@(IsMaximized ? Localizer[LanguageResource.VekDialog_Restore] : Localizer[LanguageResource.VekDialog_Maximize])"
+                                           Icon="@(IsMaximized ? RestoreIcon : MaximizeIcon)"
+                                           @onclick="ToggleMaximizeAsync"
+                                           @ondblclick:stopPropagation="true"
+                                           Class="vek-button-maximize" />
+                        }
+                        @if (GetCloseButton())
+                        {
+                            <VekIconButton aria-label="@Localizer[LanguageResource.VekDialog_Close]"
+                                           Icon="@CloseIcon"
+                                           @onclick="((IVekDialogInstance)this).Cancel"
+                                           @ondblclick:stopPropagation="true"
+                                           Class="vek-button-close" />
+                        }
+                    </div>
                 }
             </div>
          }
         <CascadingValue Value="(IVekDialogInstanceInternal)this" IsFixed="true">
             @Content
         </CascadingValue>
-        @if (GetResizable())
+        @if (GetEffectiveResizable())
         {
             <button type="button" class="vek-dialog-resize-handle vek-dialog-resize-n" aria-label="Resize dialog from top edge" data-vek-dialog-resize="n"></button>
             <button type="button" class="vek-dialog-resize-handle vek-dialog-resize-ne" aria-label="Resize dialog from top right corner" data-vek-dialog-resize="ne"></button>

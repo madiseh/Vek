@@ -1,0 +1,29 @@
+@namespace Vek.Docs.Examples
+
+<VekDialog ShowMaximizeButton="true" @bind-Maximized="_maximized">
+    <DialogContent>
+        <VekStack Spacing="3">
+            <VekAlert Severity="@(_maximized ? Severity.Info : Severity.Normal)" Dense="true">
+                Current state: @(_maximized ? "Maximized (100vw × 100vh)" : "Restored")
+            </VekAlert>
+            <VekText>
+                Click the maximize button in the header or double-click the title bar to expand this dialog to full viewport dimensions.
+            </VekText>
+            <VekText Typo="Typo.body2">
+                Move or resize the dialog before maximizing; restoring returns it to its previous width, height, and position.
+            </VekText>
+        </VekStack>
+    </DialogContent>
+    <DialogActions>
+        <VekButton OnClick="Close">Close</VekButton>
+    </DialogActions>
+</VekDialog>
+
+@code {
+    private bool _maximized;
+
+    [CascadingParameter]
+    private IVekDialogInstance VekDialog { get; set; } = null!;
+
+    private void Close() => VekDialog.Close();
+}

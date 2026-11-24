@@ -80,6 +80,17 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Maximize and Fullscreen Toggle">
+                <Description>
+                    Set <CodeInline>ShowMaximizeButton</CodeInline> on <CodeInline>VekDialog</CodeInline>, <CodeInline>DialogOptions</CodeInline>, or <CodeInline>VekDialogProvider</CodeInline> to render a maximize/restore button in the dialog header. Clicking the button or double-clicking the header toggles full-viewport layout and restores prior dimensions and coordinates on restore.
+                </Description>
+            </SectionHeader>
+            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogMaximizeExample)), new CodeFile("Dialog.razor", nameof(DialogMaximizeExample_Dialog))})">
+                <DialogMaximizeExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Templating and Passing Simple Data">
                 <Description>Build a reusable dialog and pass simple data to it for different scenarios.</Description>
             </SectionHeader>

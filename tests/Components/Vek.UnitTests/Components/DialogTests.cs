@@ -1996,6 +1996,189 @@ namespace Vek.UnitTests.Components
             });
         }
 
+        [Test]
+        public async Task MaximizeButton_ShouldNotRenderByDefault()
+        {
+            var comp = Context.Render<VekDialogProvider>();
+            var service = Context.Services.GetRequiredService<IDialogService>();
+
+            await comp.InvokeAsync(() => service.ShowAsync<DialogOkCancel>("Standard dialog"));
+
+            comp.FindAll("button.vek-button-maximize").Should().BeEmpty();
+            comp.Find("div.vek-dialog").ClassList.Should().NotContain("vek-dialog-fullscreen");
+        }
+
+        [Test]
+        public async Task MaximizeButton_ClickShouldToggleFullscreenAndRestore()
+        {
+            var comp = Context.Render<VekDialogProvider>();
+            var service = Context.Services.GetRequiredService<IDialogService>();
+            var options = new DialogOptions
+            {
+                ShowMaximizeButton = true,
+                CloseButton = true,
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = true
+            };
+
+            await comp.InvokeAsync(() => service.ShowAsync<DialogOkCancel>("Resizable window", options));
+
+            var dialog = comp.Find("div.vek-dialog");
+            dialog.ClassList.Should().Contain("vek-dialog-width-md");
+            dialog.ClassList.Should().Contain("vek-dialog-width-full");
+            dialog.ClassList.Should().NotContain("vek-dialog-fullscreen");
+
+            var maxButton = comp.Find("button.vek-button-maximize");
+            maxButton.GetAttribute("aria-label").Should().Be("Maximize");
+
+            await maxButton.ClickAsync();
+
+            dialog = comp.Find("div.vek-dialog");
+            dialog.ClassList.Should().Contain("vek-dialog-fullscreen");
+            dialog.ClassList.Should().NotContain("vek-dialog-width-md");
+            dialog.ClassList.Should().NotContain("vek-dialog-width-full");
+            comp.Find("button.vek-button-maximize").GetAttribute("aria-label").Should().Be("Restore");
+
+            await comp.Find("button.vek-button-maximize").ClickAsync();
+
+            dialog = comp.Find("div.vek-dialog");
+            dialog.ClassList.Should().NotContain("vek-dialog-fullscreen");
+            dialog.ClassList.Should().Contain("vek-dialog-width-md");
+            dialog.ClassList.Should().Contain("vek-dialog-width-full");
+            comp.Find("button.vek-button-maximize").GetAttribute("aria-label").Should().Be("Maximize");
+        }
+
+        [Test]
+        public async Task HeaderDoubleClick_ShouldToggleMaximizeOnlyWhenShowMaximizeButtonEnabled()
+        {
+            var comp = Context.Render<VekDialogProvider>();
+            var service = Context.Services.GetRequiredService<IDialogService>();
+
+            await comp.InvokeAsync(() => service.ShowAsync<DialogOkCancel>("No maximize"));
+            await comp.Find("div.vek-dialog-title").DoubleClickAsync();
+            comp.Find("div.vek-dialog").ClassList.Should().NotContain("vek-dialog-fullscreen");
+
+            await comp.InvokeAsync(() => comp.Instance.DismissAll());
+
+            await comp.InvokeAsync(() => service.ShowAsync<DialogOkCancel>("With maximize", new DialogOptions { ShowMaximizeButton = true }));
+            await comp.Find("div.vek-dialog-title").DoubleClickAsync();
+            comp.Find("div.vek-dialog").ClassList.Should().Contain("vek-dialog-fullscreen");
+
+            await comp.Find("div.vek-dialog-title").DoubleClickAsync();
+            comp.Find("div.vek-dialog").ClassList.Should().NotContain("vek-dialog-fullscreen");
+        }
+
+        [Test]
+        public async Task MaximizeAndRestore_ShouldPreservePreviousBoundsAndToggleInteractionHandles()
+        {
+            var comp = Context.Render<VekDialogProvider>();
+            var service = Context.Services.GetRequiredService<IDialogService>();
+            var options = new DialogOptions
+            {
+                ShowMaximizeButton = true,
+                Draggable = true,
+                Resizable = true
+            };
+
+            var reference = await comp.InvokeAsync(() => service.ShowAsync<DialogOkCancel>("Bounded dialog", options));
+            var container = comp.FindComponent<VekDialogContainer>();
+
+            await comp.InvokeAsync(() => container.Instance.SetDialogBoundsAsync(120, 80, 420, 300));
+
+            var dialog = comp.Find("div.vek-dialog");
+            var style = dialog.GetAttribute("style");
+            style.Should().Contain("left:120px");
+            style.Should().Contain("top:80px");
+            style.Should().Contain("width:420px");
+            style.Should().Contain("height:300px");
+            comp.FindAll(".vek-dialog-resize-handle").Count.Should().Be(8);
+
+            await comp.Find("button.vek-button-maximize").ClickAsync();
+
+            dialog = comp.Find("div.vek-dialog");
+            dialog.ClassList.Should().Contain("vek-dialog-fullscreen");
+            dialog.ClassList.Should().NotContain("vek-dialog-draggable");
+            dialog.ClassList.Should().NotContain("vek-dialog-resizable");
+            (dialog.GetAttribute("style") ?? string.Empty).Should().NotContain("left:120px");
+            (dialog.GetAttribute("style") ?? string.Empty).Should().NotContain("width:420px");
+            comp.FindAll(".vek-dialog-resize-handle").Should().BeEmpty();
+            reference.Options!.FullScreen.Should().BeTrue();
+
+            await comp.Find("button.vek-button-maximize").ClickAsync();
+
+            dialog = comp.Find("div.vek-dialog");
+            dialog.ClassList.Should().NotContain("vek-dialog-fullscreen");
+            dialog.ClassList.Should().Contain("vek-dialog-draggable");
+            dialog.ClassList.Should().Contain("vek-dialog-resizable");
+            style = dialog.GetAttribute("style");
+            style.Should().Contain("left:120px");
+            style.Should().Contain("top:80px");
+            style.Should().Contain("width:420px");
+            style.Should().Contain("height:300px");
+            comp.FindAll(".vek-dialog-resize-handle").Count.Should().Be(8);
+            reference.Options!.FullScreen.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task VekDialogParameters_ShouldControlShowMaximizeButtonAndMaximizedState()
+        {
+            var comp = Context.Render<VekDialogProvider>();
+            var service = Context.Services.GetRequiredService<IDialogService>();
+            var parameters = new DialogParameters<DialogMaximizeTest>
+            {
+                { x => x.ShowMaximizeButton, true },
+                { x => x.Maximized, true }
+            };
+
+            await comp.InvokeAsync(() => service.ShowAsync<DialogMaximizeTest>("Parameter dialog", parameters));
+
+            comp.Find("div.vek-dialog").ClassList.Should().Contain("vek-dialog-fullscreen");
+            comp.Find("button.vek-button-maximize").GetAttribute("aria-label").Should().Be("Restore");
+            comp.Find(".maximized-state").TrimmedText().Should().Be("True");
+
+            await comp.Find("button.vek-button-maximize").ClickAsync();
+
+            comp.Find("div.vek-dialog").ClassList.Should().NotContain("vek-dialog-fullscreen");
+            comp.Find("button.vek-button-maximize").GetAttribute("aria-label").Should().Be("Maximize");
+            comp.Find(".maximized-state").TrimmedText().Should().Be("False");
+        }
+
+        [Test]
+        public async Task VekDialogProvider_GlobalShowMaximizeButton_ShouldApplyToDialogs()
+        {
+            var comp = Context.Render<VekDialogProvider>(parameters => parameters.Add(p => p.ShowMaximizeButton, true));
+            var service = Context.Services.GetRequiredService<IDialogService>();
+
+            await comp.InvokeAsync(() => service.ShowAsync<DialogOkCancel>("Global maximize"));
+
+            comp.FindAll("button.vek-button-maximize").Count.Should().Be(1);
+
+            await comp.InvokeAsync(() => comp.Instance.DismissAll());
+            await comp.InvokeAsync(() => service.ShowAsync<DialogOkCancel>("Hidden header", new DialogOptions { NoHeader = true }));
+
+            comp.FindAll("button.vek-button-maximize").Should().BeEmpty();
+        }
+
+        [Test]
+        public async Task InlineDialog_ShowMaximizeButtonAndBindMaximized_ShouldSync()
+        {
+            var provider = Context.Render<VekDialogProvider>();
+            var comp = Context.Render<InlineDialogMaximizeTest>();
+
+            await comp.Find(".open-inline-maximize-btn").ClickAsync();
+            await provider.WaitForAssertionAsync(() => provider.Find("button.vek-button-maximize").Should().NotBeNull());
+
+            await provider.Find("button.vek-button-maximize").ClickAsync();
+
+            provider.Find("div.vek-dialog").ClassList.Should().Contain("vek-dialog-fullscreen");
+            comp.Find(".inline-maximized-value").TrimmedText().Should().Be("True");
+
+            await provider.Find("button.vek-button-maximize").ClickAsync();
+
+            provider.Find("div.vek-dialog").ClassList.Should().NotContain("vek-dialog-fullscreen");
+            comp.Find(".inline-maximized-value").TrimmedText().Should().Be("False");
+        }
+
     }
     internal class CustomDialogService : DialogService
     {

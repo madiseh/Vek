@@ -366,6 +366,12 @@
   <data name="VekDialog_Close" xml:space="preserve">
     <value>Close</value>
   </data>
+  <data name="VekDialog_Maximize" xml:space="preserve">
+    <value>Maximize</value>
+  </data>
+  <data name="VekDialog_Restore" xml:space="preserve">
+    <value>Restore</value>
+  </data>
   <data name="VekInput_Clear" xml:space="preserve">
     <value>Clear</value>
   </data>
