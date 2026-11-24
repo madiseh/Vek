@@ -1,0 +1,13 @@
+@namespace Vek.Docs.Examples
+
+<VekDatePicker @bind-Date="_selectedDate"
+               PickerVariant="PickerVariant.Static"
+               StartMonth="new DateTime(2026, 12, 1)" />
+
+<VekText Typo="Typo.caption" Class="mt-2">
+    Selected date: @(_selectedDate?.ToString("D") ?? "none")
+</VekText>
+
+@code {
+    private DateTime? _selectedDate = new DateTime(2026, 12, 8);
+}
