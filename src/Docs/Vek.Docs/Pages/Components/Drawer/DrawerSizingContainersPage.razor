@@ -1,0 +1,43 @@
+@page "/components/drawer/sizing-containers"
+
+<DocsPage>
+    <DocsPageHeader Title="Drawer - Sizing & In-Container Placement" Component="@nameof(VekDrawer)">
+        <Description>Configure custom widths, heights, overlays, and embed drawers inside isolated container elements.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Hide overlay">
+                <Description>
+                    With <CodeInline>Overlay="false"</CodeInline> the overlay can be turned off for Responsive and Temporary Drawers.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(DrawerOverlayExample)" ShowCode="false">
+                <DrawerOverlayExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Size and Position Inside a Container">
+                <Description>
+                    A Drawer can be constrained to an inner container rather than the full screen, letting you build multi-pane split layouts with ease.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(DrawerSizeContainerExample)" ShowCode="false">
+                <DrawerSizeContainerExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Temporary Drawer Sizing">
+                <Description>
+                    Control custom widths and heights when opening temporary drawer overlays.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(DrawerSizeTemporaryExample)" ShowCode="false">
+                <DrawerSizeTemporaryExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>
