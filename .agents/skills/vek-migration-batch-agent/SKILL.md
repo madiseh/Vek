@@ -23,6 +23,10 @@ Approval authorizes a batch of up to three next eligible features, not only a fr
 
 Use `migration/scripts/claim_ledger.py` for every claim-ledger operation; do not edit the ledger or create its commits manually. It manages one remote `claims` branch with a machine-readable `claims/<feature_id>.json` file per feature. The current record at the branch tip is authoritative, and branch commits preserve the audit history.
 
+The claim ledger has exactly one shared branch: `claims`. Never create or push per-feature claim branches such as `migration-claims/016` or `claims/016`; `claims/<feature_id>.json` is a file path inside the shared branch, not a branch name. Feature implementation still uses its own `feature/migration-...` branch.
+
+If fetching the shared branch fails because a local `refs/remotes/origin/claims/<feature_id>` ref conflicts with `refs/remotes/origin/claims`, first verify that the matching remote `claims/<feature_id>` branch no longer exists. Remove or prune only the stale local remote-tracking ref, then retry `claim_ledger.py`. Never work around a ref conflict by creating a per-feature claim branch.
+
 The script is responsible for:
 
 - `inspect`: read backlog status and dependencies, check the latest claim lease, query GitHub for an open PR, and report whether the feature is eligible.
