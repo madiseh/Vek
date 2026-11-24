@@ -31,6 +31,15 @@ For GitHub Releases and downloadable packages, see the [Releases page](https://g
 5. DataGrid row reordering — [PR #122](https://github.com/madiseh/Vek/pull/122)
 6. FileUpload image previews — [PR #123](https://github.com/madiseh/Vek/pull/123)
 
+### Test Results
+- Total: 8,723 — 8,721 passed, 0 failed, 2 skipped.
+- `Vek.UnitTests`: 6,781 total — 6,779 passed, 0 failed, 2 skipped.
+- `Vek.UnitTests.Docs`: 1,551 total — 1,551 passed, 0 failed, 0 skipped.
+- `Vek.UnitTests.Analyzers`: 391 total — 391 passed, 0 failed, 0 skipped.
+- Format check passed; build-only projects passed: `src/Docs/Vek.Docs.Server` and `src/Docs/Vek.Docs.WasmHost`.
+- [CI run 45389895777](https://github.com/madiseh/Vek/actions/runs/45389895777).
+- [Download JUnit reports](https://github.com/madiseh/Vek/releases/download/v1.4.0/test-results-v1.4.0.zip).
+
 **Full Changelog**: https://github.com/madiseh/Vek/compare/v1.3.4...v1.4.0
 
 ## [v1.3.4] - 2026-11-23
