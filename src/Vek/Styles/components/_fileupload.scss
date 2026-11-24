@@ -107,4 +107,237 @@
       vertical-align: middle;
     }
   }
+
+  .vek-file-upload-queue {
+    margin-top: 12px;
+    border: 1px solid var(--vek-palette-lines-default);
+    border-radius: var(--vek-default-borderradius);
+    background-color: var(--vek-palette-surface);
+    overflow-x: auto;
+  }
+
+  .vek-file-upload-queue-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--vek-palette-lines-default);
+    background-color: var(--vek-palette-background-gray);
+  }
+
+  .vek-file-upload-queue-summary {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--vek-palette-text-secondary);
+  }
+
+  .vek-file-upload-queue-clear {
+    appearance: none;
+    border: 1px solid var(--vek-palette-lines-default);
+    border-radius: var(--vek-default-borderradius);
+    background-color: var(--vek-palette-surface);
+    color: var(--vek-palette-primary);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), border-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover:not(:disabled) {
+        background-color: var(--vek-palette-action-default-hover);
+        border-color: var(--vek-palette-primary);
+      }
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--vek-palette-primary);
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      cursor: default;
+      color: var(--vek-palette-text-disabled);
+      border-color: var(--vek-palette-lines-default);
+      opacity: 0.65;
+    }
+  }
+
+  .vek-file-upload-queue-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    text-align: start;
+
+    th {
+      padding: 8px 14px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-align: start;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--vek-palette-text-secondary);
+      border-bottom: 1px solid var(--vek-palette-lines-default);
+      white-space: nowrap;
+
+      &:last-child {
+        text-align: end;
+      }
+    }
+
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--vek-palette-lines-default);
+      vertical-align: middle;
+      color: var(--vek-palette-text-primary);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+  }
+
+  .vek-file-upload-queue-name {
+    min-width: 160px;
+
+    .vek-file-upload-queue-name-inner {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .vek-file-upload-preview {
+      width: 32px;
+      height: 32px;
+      margin-inline-end: 0;
+      flex-shrink: 0;
+    }
+  }
+
+  .vek-file-upload-queue-filename {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 240px;
+  }
+
+  .vek-file-upload-queue-size {
+    color: var(--vek-palette-text-secondary);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .vek-file-upload-queue-progress-cell {
+    min-width: 130px;
+  }
+
+  .vek-file-upload-queue-progress {
+    position: relative;
+    width: 100%;
+    height: 6px;
+    border-radius: var(--vek-default-borderradius);
+    background-color: var(--vek-palette-action-default-hover);
+    overflow: hidden;
+  }
+
+  .vek-file-upload-queue-progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: var(--vek-default-borderradius);
+    background-color: var(--vek-palette-primary);
+    transition: width 150ms linear, background-color 150ms ease;
+  }
+
+  .vek-file-upload-queue-progress-success .vek-file-upload-queue-progress-fill {
+    background-color: var(--vek-palette-success);
+  }
+
+  .vek-file-upload-queue-progress-error .vek-file-upload-queue-progress-fill {
+    background-color: var(--vek-palette-error);
+  }
+
+  .vek-file-upload-queue-status {
+    white-space: nowrap;
+  }
+
+  .vek-file-upload-queue-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: var(--vek-default-borderradius);
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: var(--vek-palette-dark-hover);
+    color: var(--vek-palette-text-primary);
+  }
+
+  .vek-file-upload-queue-status-uploading {
+    background-color: var(--vek-palette-info-hover);
+    color: var(--vek-palette-info-darken);
+  }
+
+  .vek-file-upload-queue-status-success {
+    background-color: var(--vek-palette-success-hover);
+    color: var(--vek-palette-success-darken);
+  }
+
+  .vek-file-upload-queue-status-error {
+    background-color: var(--vek-palette-error-hover);
+    color: var(--vek-palette-error-darken);
+  }
+
+  .vek-file-upload-queue-error-text {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.75rem;
+    color: var(--vek-palette-error);
+    white-space: normal;
+  }
+
+  .vek-file-upload-queue-actions {
+    white-space: nowrap;
+    text-align: end;
+  }
+
+  .vek-file-upload-queue-action {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--vek-default-borderradius);
+    background-color: transparent;
+    color: var(--vek-palette-text-secondary);
+    cursor: pointer;
+    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover:not(:disabled) {
+        background-color: var(--vek-palette-action-default-hover);
+        color: var(--vek-palette-text-primary);
+      }
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--vek-palette-primary);
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      cursor: default;
+      color: var(--vek-palette-action-disabled);
+    }
+  }
+
+  .vek-file-upload-queue-cancel:hover:not(:disabled) {
+    color: var(--vek-palette-error);
+  }
+
+  .vek-file-upload-queue-retry:hover:not(:disabled) {
+    color: var(--vek-palette-primary);
+  }
 }

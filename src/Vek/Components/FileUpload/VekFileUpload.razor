@@ -68,6 +68,103 @@
                 @SelectedTemplate(_filesState.Value)
             </div>
         }
+        else if (_showQueueState.Value)
+        {
+            <div class="vek-file-upload-files vek-file-upload-files-default-template">
+                @if (_queueItems.Count > 0)
+                {
+                    <div class="vek-file-upload-queue" role="region" aria-label="@Localizer[Resources.LanguageResource.VekFileUpload_QueueLabel]">
+                        <div class="vek-file-upload-queue-header">
+                            <span class="vek-file-upload-queue-summary" aria-live="polite">
+                                @GetQueueSummaryText()
+                            </span>
+                            <button type="button"
+                                    class="vek-file-upload-queue-clear"
+                                    disabled="@(GetDisabledState() || !HasCompletedItems())"
+                                    @onclick="OnClearCompletedClickAsync">
+                                @Localizer[Resources.LanguageResource.VekFileUpload_ClearCompleted]
+                            </button>
+                        </div>
+                        <table class="vek-file-upload-queue-table" aria-label="@Localizer[Resources.LanguageResource.VekFileUpload_QueueTableLabel]">
+                            <thead>
+                                <tr>
+                                    <th scope="col">@Localizer[Resources.LanguageResource.VekFileUpload_ColumnFile]</th>
+                                    <th scope="col">@Localizer[Resources.LanguageResource.VekFileUpload_ColumnSize]</th>
+                                    <th scope="col">@Localizer[Resources.LanguageResource.VekFileUpload_ColumnProgress]</th>
+                                    <th scope="col">@Localizer[Resources.LanguageResource.VekFileUpload_ColumnStatus]</th>
+                                    <th scope="col">@Localizer[Resources.LanguageResource.VekFileUpload_ColumnActions]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in _queueItems)
+                                {
+                                    <tr @key="item.Id" class="@GetQueueRowClass(item)" data-file-id="@item.Id">
+                                        <td class="vek-file-upload-queue-name">
+                                            <div class="vek-file-upload-queue-name-inner">
+                                                @if (GetImagePreviewUrl(item.File) is { } previewUrl)
+                                                {
+                                                    <img class="vek-file-upload-preview" src="@previewUrl" alt="" aria-hidden="true" />
+                                                }
+                                                <span class="vek-file-upload-queue-filename" title="@item.Name">@item.Name</span>
+                                            </div>
+                                        </td>
+                                        <td class="vek-file-upload-queue-size">
+                                            @FormatFileSize(item.Size)
+                                        </td>
+                                        <td class="vek-file-upload-queue-progress-cell">
+                                            <div class="@GetProgressBarClass(item)"
+                                                 role="progressbar"
+                                                 aria-label="@GetProgressAriaLabel(item)"
+                                                 aria-valuemin="0"
+                                                 aria-valuemax="100"
+                                                 aria-valuenow="@GetRoundedProgress(item)"
+                                                 aria-valuetext="@GetProgressAriaText(item)">
+                                                <div class="vek-file-upload-queue-progress-fill" style="@GetProgressBarFillStyle(item)"></div>
+                                            </div>
+                                        </td>
+                                        <td class="vek-file-upload-queue-status">
+                                            <span class="@GetStatusBadgeClass(item)">@GetStatusText(item)</span>
+                                            @if (item.Status == FileUploadStatus.Error && !string.IsNullOrWhiteSpace(item.ErrorMessage))
+                                            {
+                                                <span class="vek-file-upload-queue-error-text" role="alert">@item.ErrorMessage</span>
+                                            }
+                                        </td>
+                                        <td class="vek-file-upload-queue-actions">
+                                            @if (item.Status is FileUploadStatus.Queued or FileUploadStatus.Uploading)
+                                            {
+                                                <button type="button"
+                                                        class="vek-file-upload-queue-action vek-file-upload-queue-cancel"
+                                                        disabled="@GetDisabledState()"
+                                                        aria-label="@GetCancelAriaLabel(item)"
+                                                        title="@Localizer[Resources.LanguageResource.VekFileUpload_Cancel]"
+                                                        @onclick="@(() => OnCancelUploadClickAsync(item.Id))">
+                                                    <svg class="vek-icon-root vek-svg-icon vek-icon-size-small" focusable="false" viewBox="0 0 24 24" aria-hidden="true">
+                                                        @((MarkupString)Icons.Material.Outlined.Close)
+                                                    </svg>
+                                                </button>
+                                            }
+                                            else if (item.Status == FileUploadStatus.Error)
+                                            {
+                                                <button type="button"
+                                                        class="vek-file-upload-queue-action vek-file-upload-queue-retry"
+                                                        disabled="@GetDisabledState()"
+                                                        aria-label="@GetRetryAriaLabel(item)"
+                                                        title="@Localizer[Resources.LanguageResource.VekFileUpload_Retry]"
+                                                        @onclick="@(() => OnRetryUploadClickAsync(item.Id))">
+                                                    <svg class="vek-icon-root vek-svg-icon vek-icon-size-small" focusable="false" viewBox="0 0 24 24" aria-hidden="true">
+                                                        @((MarkupString)Icons.Material.Outlined.Refresh)
+                                                    </svg>
+                                                </button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        }
         else
         {
             <div class="vek-file-upload-files vek-file-upload-files-default-template">

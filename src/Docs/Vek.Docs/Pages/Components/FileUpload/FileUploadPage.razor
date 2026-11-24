@@ -133,6 +133,18 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Multi-File Queue with Cancel and Retry">
+                <Description>
+                    Set <CodeInline>ShowQueue</CodeInline> to <CodeInline>true</CodeInline> to render an interactive queue table showing file names, sizes, individual progress bars, and status badges.
+                    Use <CodeInline>CancelUpload</CodeInline> to abort an active or queued item, <CodeInline>RetryUpload</CodeInline> to re-upload a failed item, and <CodeInline>ClearCompleted</CodeInline> to remove finished entries.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" ShowCode="false" Code="@nameof(FileUploadQueueExample)">
+                <FileUploadQueueExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Event Options">
                 <Description>
                     <CodeInline>VekFileUpload</CodeInline> offers two approaches for handling file changes. For <CodeInline>VekForm</CodeInline> integration, use
