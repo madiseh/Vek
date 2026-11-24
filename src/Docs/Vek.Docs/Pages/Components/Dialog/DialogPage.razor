@@ -29,6 +29,15 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Passing Data">
+                <Description>Pass data to a dialog and use it for operations, such as confirming a delete action.</Description>
+            </SectionHeader>
+            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogPassingDataExample)), new CodeFile("Dialog.razor", nameof(DialogPassingDataExample_Dialog))})">
+                <DialogPassingDataExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Configuration">
                 <Description>
                     You can change dialog behavior globally by setting parameters on <CodeInline>&lt;VekDialogProvider/&gt;</CodeInline>, or per dialog by passing a <CodeInline>DialogOptions</CodeInline> instance when opening a dialog.
@@ -69,129 +78,47 @@
         </DocsPageSection>
 
         <DocsPageSection>
-            <SectionHeader Title="Move and Resize">
-                <Description>
-                    Enable <CodeInline>Draggable</CodeInline> to move a dialog by its header. Focus the header and use the arrow keys for precise movement. Enable <CodeInline>Resizable</CodeInline> to add eight edge and corner handles; the handles also work with the arrow keys. Movement and resizing stay within the viewport.
-                </Description>
+            <SectionHeader Title="Explore Features">
+                <Description>Browse specific features and usage patterns in detail:</Description>
             </SectionHeader>
-            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogInteractionExample)), new CodeFile("Dialog.razor", nameof(DialogInteractionExample_Dialog))})">
-                <DialogInteractionExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Maximize and Fullscreen Toggle">
-                <Description>
-                    Set <CodeInline>ShowMaximizeButton</CodeInline> on <CodeInline>VekDialog</CodeInline>, <CodeInline>DialogOptions</CodeInline>, or <CodeInline>VekDialogProvider</CodeInline> to render a maximize/restore button in the dialog header. Clicking the button or double-clicking the header toggles full-viewport layout and restores prior dimensions and coordinates on restore.
-                </Description>
-            </SectionHeader>
-            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogMaximizeExample)), new CodeFile("Dialog.razor", nameof(DialogMaximizeExample_Dialog))})">
-                <DialogMaximizeExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Templating and Passing Simple Data">
-                <Description>Build a reusable dialog and pass simple data to it for different scenarios.</Description>
-            </SectionHeader>
-            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogTemplateExample)), new CodeFile("Dialog.razor", nameof(DialogTemplateExample_Dialog))})">
-                <DialogTemplateExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Passing Data">
-                <Description>Pass data to a dialog and use it for operations, such as confirming a delete action.</Description>
-            </SectionHeader>
-            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogPassingDataExample)), new CodeFile("Dialog.razor", nameof(DialogPassingDataExample_Dialog))})">
-                <DialogPassingDataExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Scrollable Dialog">
-                <Description>Dialogs automatically become scrollable if their content exceeds the available height.</Description>
-            </SectionHeader>
-            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogScrollableExample)), new CodeFile("Dialog.razor", nameof(DialogScrollableExample_Dialog))})">
-                <DialogScrollableExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Blurry Dialog">
-                <Description>Customize the dialog background using the <CodeInline>BackgroundClass</CodeInline> option.</Description>
-            </SectionHeader>
-            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogBlurryExample)), new CodeFile("Dialog.razor", nameof(DialogBlurryExample_Dialog))})">
-                <DialogBlurryExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Inlining Dialog">
-                <Description>
-                    You can place a <CodeInline>VekDialog</CodeInline> directly in another component. This is useful for small, non-reusable dialogs and allows easy sharing of data and code. You can also override the dialog title with a render fragment.
-                </Description>
-            </SectionHeader>
-            <SectionContent Code="@nameof(DialogInlineExample)">
-                <DialogInlineExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Nested Inline Dialogs">
-                <Description>
-                    Inline dialogs can be nested within each other. This example demonstrates both single and multiple levels of nesting.
-                </Description>
-            </SectionHeader>
-            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogNestedInlineExample)), new CodeFile("Dialog.razor", nameof(DialogNestedInlineExample_Dialog))})">
-                <DialogNestedInlineExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Stacked Dialogs and Cancel All">
-                <Description>
-                    Concurrent dialogs stack in opening order, share one backdrop, and bring the clicked or focused dialog to the front. Escape closes only the topmost dialog when enabled. The example also shows how to close all dialogs simultaneously.
-                </Description>
-            </SectionHeader>
-            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogNestedExample)), new CodeFile("Dialog.razor", nameof(DialogNestedExample_Dialog)), new CodeFile("Dialog2.razor", nameof(DialogNestedExample_Dialog2))})">
-                <DialogNestedExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Keyboard Accessibility">
-                <Description>
-                    <VekText>VekDialog supports closing with the <CodeInline>Escape</CodeInline> key if <CodeInline>@(nameof(DialogOptions.CloseOnEscapeKey))</CodeInline> is enabled.</VekText>
-                    <VekAlert Class="my-3" Severity="Severity.Info">When closed with Escape, the dialog returns <CodeInline>DialogResult.Cancel()</CodeInline>.</VekAlert>
-                    <VekText>For custom keyboard handling, use <CodeInline>OnKeyDown</CodeInline> and <CodeInline>OnKeyUp</CodeInline> event handlers. The example below returns a value on Enter only if a selection is made.</VekText>
-                </Description>
-            </SectionHeader>
-            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogKeyboardNavigationExample)), new CodeFile("Dialog.razor", nameof(DialogKeyboardNavigationExample_Dialog))})">
-                <DialogKeyboardNavigationExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Focus Trap">
-                <Description>
-                    Dialogs use a focus trap to keep keyboard focus inside. By default, the first element is focused, but you can change this with the <CodeInline>DefaultFocus</CodeInline> option.
-                </Description>
-            </SectionHeader>
-            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogFocusExample)), new CodeFile("Dialog.razor",nameof(DialogFocusExample_Dialog))})">
-                <DialogFocusExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Custom Styling">
-                <Description>
-                    You can apply custom classes to the dialog's title, content, actions, or the dialog itself for advanced styling.
-                </Description>
-            </SectionHeader>
-            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogStylingExample)), new CodeFile("Dialog.razor", nameof(DialogStylingExample_Dialog))})">
-                <DialogStylingExample />
-            </SectionContent>
+            <div class="docs-explore-grid">
+                <DocsExploreCard Title="Movement & Resizing" Category="Dialog" Link="/components/dialog/movement-resizing" Description="Move dialogs by header dragging and resize with viewport-constrained 8-direction handles.">
+                    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <VekIcon Icon="@Icons.Material.Filled.OpenWith" Color="Color.Primary" Size="Size.Large" />
+                        <VekText Typo="Typo.body2">Draggable · Resizable · Constrained</VekText>
+                    </VekStack>
+                </DocsExploreCard>
+                <DocsExploreCard Title="Stacking & Management" Category="Dialog" Link="/components/dialog/stacking" Description="Manage multiple concurrent dialogs, single-shared backdrop, active z-index focus, and close-all operations.">
+                    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <VekIcon Icon="@Icons.Material.Filled.Layers" Color="Color.Info" Size="Size.Large" />
+                        <VekText Typo="Typo.body2">Stacked · Z-Index · Close All</VekText>
+                    </VekStack>
+                </DocsExploreCard>
+                <DocsExploreCard Title="Inline & Embedded" Category="Dialog" Link="/components/dialog/inline" Description="Embed inline dialogs directly inside Razor markups without external component files.">
+                    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <VekIcon Icon="@Icons.Material.Filled.ViewInAr" Color="Color.Success" Size="Size.Large" />
+                        <VekText Typo="Typo.body2">Inline Markup · Direct Scope</VekText>
+                    </VekStack>
+                </DocsExploreCard>
+                <DocsExploreCard Title="Appearance & Layout" Category="Dialog" Link="/components/dialog/appearance" Description="Configure backdrop blur, scrollable body containers, custom class overrides, and fullscreen layouts.">
+                    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <VekIcon Icon="@Icons.Material.Filled.AutoAwesome" Color="Color.Warning" Size="Size.Large" />
+                        <VekText Typo="Typo.body2">Blur · Scrollable · Fullscreen</VekText>
+                    </VekStack>
+                </DocsExploreCard>
+                <DocsExploreCard Title="Keyboard & Focus Trap" Category="Dialog" Link="/components/dialog/keyboard-accessibility" Description="W3C Modal pattern: automatic focus trap, default focus element, Escape handling, and arrow moving.">
+                    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <VekIcon Icon="@Icons.Material.Filled.Keyboard" Color="Color.Primary" Size="Size.Large" />
+                        <VekText Typo="Typo.body2">Focus Trap · Escape · W3C Modal</VekText>
+                    </VekStack>
+                </DocsExploreCard>
+                <DocsExploreCard Title="Message Box" Category="Dialog" Link="/components/messagebox" Description="Fluent confirmation prompts, yes/no dialogs, and alert boxes with one-line async calls.">
+                    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <VekIcon Icon="@Icons.Material.Filled.QuestionAnswer" Color="Color.Secondary" Size="Size.Large" />
+                        <VekText Typo="Typo.body2">Confirm · Prompt · Quick Alert</VekText>
+                    </VekStack>
+                </DocsExploreCard>
+            </div>
         </DocsPageSection>
 
     </DocsPageContent>

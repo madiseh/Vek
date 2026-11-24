@@ -1,0 +1,48 @@
+@page "/components/dialog/appearance"
+
+<DocsPage>
+    <DocsPageHeader Title="Dialog - Appearance & Layout" Component="@nameof(VekDialog)">
+        <Description>Customize dialog styling, backdrop blur, scrollable body containers, and templated layouts.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Templating and Passing Simple Data">
+                <Description>Build a reusable dialog and pass simple data to it for different scenarios.</Description>
+            </SectionHeader>
+            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogTemplateExample)), new CodeFile("Dialog.razor", nameof(DialogTemplateExample_Dialog))})">
+                <DialogTemplateExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Scrollable Dialog">
+                <Description>Dialogs automatically become scrollable if their content exceeds the available height.</Description>
+            </SectionHeader>
+            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogScrollableExample)), new CodeFile("Dialog.razor", nameof(DialogScrollableExample_Dialog))})">
+                <DialogScrollableExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Blurry Dialog">
+                <Description>Customize the dialog background using the <CodeInline>BackgroundClass</CodeInline> option.</Description>
+            </SectionHeader>
+            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogBlurryExample)), new CodeFile("Dialog.razor", nameof(DialogBlurryExample_Dialog))})">
+                <DialogBlurryExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Custom Styling">
+                <Description>
+                    You can apply custom classes to the dialog's title, content, actions, or the dialog itself for advanced styling.
+                </Description>
+            </SectionHeader>
+            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogStylingExample)), new CodeFile("Dialog.razor", nameof(DialogStylingExample_Dialog))})">
+                <DialogStylingExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

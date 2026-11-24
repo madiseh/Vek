@@ -1,0 +1,21 @@
+@page "/components/dialog/movement-resizing"
+
+<DocsPage>
+    <DocsPageHeader Title="Dialog - Movement & Resizing" Component="@nameof(VekDialog)">
+        <Description>Move dialogs across the viewport by dragging the header, and resize with eight boundary-constrained handles.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Move and Resize">
+                <Description>
+                    Enable <CodeInline>Draggable</CodeInline> to move a dialog by its header. Focus the header and use the arrow keys for precise movement. Enable <CodeInline>Resizable</CodeInline> to add eight edge and corner handles; the handles also work with the arrow keys. Movement and resizing stay within the viewport.
+                </Description>
+            </SectionHeader>
+            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogInteractionExample)), new CodeFile("Dialog.razor", nameof(DialogInteractionExample_Dialog))})">
+                <DialogInteractionExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

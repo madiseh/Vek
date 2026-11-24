@@ -1,0 +1,34 @@
+@page "/components/dialog/keyboard-accessibility"
+
+<DocsPage>
+    <DocsPageHeader Title="Dialog - Keyboard & Focus Trap" Component="@nameof(VekDialog)">
+        <Description>W3C APG modal dialog pattern: automatic focus trap, default focus element, and keyboard dismissal.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Keyboard Accessibility">
+                <Description>
+                    <VekText>VekDialog supports closing with the <CodeInline>Escape</CodeInline> key if <CodeInline>@(nameof(DialogOptions.CloseOnEscapeKey))</CodeInline> is enabled.</VekText>
+                    <VekAlert Class="my-3" Severity="Severity.Info">When closed with Escape, the dialog returns <CodeInline>DialogResult.Cancel()</CodeInline>.</VekAlert>
+                    <VekText>For custom keyboard handling, use <CodeInline>OnKeyDown</CodeInline> and <CodeInline>OnKeyUp</CodeInline> event handlers. The example below returns a value on Enter only if a selection is made.</VekText>
+                </Description>
+            </SectionHeader>
+            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogKeyboardNavigationExample)), new CodeFile("Dialog.razor", nameof(DialogKeyboardNavigationExample_Dialog))})">
+                <DialogKeyboardNavigationExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Focus Trap">
+                <Description>
+                    Dialogs use a focus trap to keep keyboard focus inside. By default, the first element is focused, but you can change this with the <CodeInline>DefaultFocus</CodeInline> option.
+                </Description>
+            </SectionHeader>
+            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogFocusExample)), new CodeFile("Dialog.razor", nameof(DialogFocusExample_Dialog))})">
+                <DialogFocusExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>
