@@ -16,7 +16,7 @@ For GitHub Releases and downloadable packages, see the [Releases page](https://g
 - **FileUpload:** Add image previews and client-side extension and MIME type validation. ([PR #123](https://github.com/madiseh/Vek/pull/123))
 
 ### Documentation
-- Improve the DatePicker and DataGrid feature guides, navigation, and overview layouts. ([PR #126](https://github.com/madiseh/Vek/pull/126))
+- Fix the DatePicker go-to-current-date example after navigating, and improve the DatePicker and DataGrid feature guides, navigation, and overview layouts. ([PR #125](https://github.com/madiseh/Vek/pull/125), [PR #126](https://github.com/madiseh/Vek/pull/126))
 
 ### Contributors
 - [@madiseh](https://github.com/madiseh) — [PR #114](https://github.com/madiseh/Vek/pull/114), [#115](https://github.com/madiseh/Vek/pull/115), [#116](https://github.com/madiseh/Vek/pull/116), [#117](https://github.com/madiseh/Vek/pull/117), [#118](https://github.com/madiseh/Vek/pull/118), [#119](https://github.com/madiseh/Vek/pull/119), [#120](https://github.com/madiseh/Vek/pull/120), [#121](https://github.com/madiseh/Vek/pull/121), [#122](https://github.com/madiseh/Vek/pull/122), [#123](https://github.com/madiseh/Vek/pull/123), [#124](https://github.com/madiseh/Vek/pull/124), [#125](https://github.com/madiseh/Vek/pull/125), [#126](https://github.com/madiseh/Vek/pull/126)
