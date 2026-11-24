@@ -1,0 +1,51 @@
+@page "/components/autocomplete/async-search-virtualization"
+
+<DocsPage>
+    <DocsPageHeader Title="Autocomplete - Async Search & Virtualization" Component="@nameof(VekAutocomplete<T>)">
+        <Description>Search remote datasets with cancellation tokens, progress indicators, and virtualized high-volume lists.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Progress">
+                <Description>
+                    <VekText>When fetching data from a remote data source VekAutocomplete can visually indicate that it is awaiting results. The following settings are available:</VekText>
+                    <br />
+                    <VekText><CodeInline>ShowProgressIndicator</CodeInline>: show circular progress indicator.</VekText>
+                    <VekText><CodeInline>ProgressIndicatorTemplate</CodeInline>: replace the default circular progress indicator with a custom one.</VekText>
+                    <VekText><CodeInline>ProgressIndicatorInPopoverTemplate</CodeInline>: show a progress indicator inside the popover.</VekText>
+                    <VekText><CodeInline>ProgressIndicatorColor</CodeInline>: customize the color of the circular progress indicator.</VekText>
+                </Description>
+            </SectionHeader>
+            <SectionContent ShowCode="false" Code="@nameof(AutocompleteProgressExample)">
+                <AutocompleteProgressExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Cancellation Token">
+                <Description>
+                    <VekText>Autocomplete can cancel the request if the user types new input, preventing out-of-order race conditions.</VekText>
+                </Description>
+            </SectionHeader>
+            <SectionContent ShowCode="false" Code="@nameof(AutocompleteCancellationTokenExample)">
+                <AutocompleteCancellationTokenExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Large result lists and custom values">
+                <Description>
+                    <VekText>Use <CodeInline>Virtualize</CodeInline> to render only the visible results in a long list. Set <CodeInline>MaxItems</CodeInline> to <CodeInline>null</CodeInline> when the search should return all matching results.</VekText>
+                    <VekText>By default, matching tokens are highlighted in result text. A custom <CodeInline>ItemTemplate</CodeInline> can provide its own presentation.</VekText>
+                    <VekText>Enable <CodeInline>AllowCustomValues</CodeInline> to let Enter commit the typed text through the configured converter when no result is selected.</VekText>
+                    <VekText>This example filters each search token across a large customer list and permits a new customer name.</VekText>
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(AutocompleteVirtualizedValuesExample)">
+                <AutocompleteVirtualizedValuesExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

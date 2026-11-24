@@ -1,0 +1,34 @@
+@page "/components/autocomplete/keyboard-accessibility"
+
+<DocsPage>
+    <DocsPageHeader Title="Autocomplete - Keyboard & Accessibility" Component="@nameof(VekAutocomplete<T>)">
+        <Description>Navigate dropdown suggestions, select options, and dismiss popovers using APG combobox keyboard patterns.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Keyboard Shortcuts">
+                <Description>
+                    VekAutocomplete implements the W3C APG combobox pattern with the following keyboard navigation keys:
+                </Description>
+            </SectionHeader>
+            <SectionContent>
+                <VekSimpleTable Outlined="true" Hover="true">
+                    <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr><td><CodeInline>ArrowDown</CodeInline> / <CodeInline>Enter</CodeInline></td><td>Opens the dropdown suggestions or moves focus to the next item.</td></tr>
+                    <tr><td><CodeInline>ArrowUp</CodeInline></td><td>Moves focus to the previous suggestion item.</td></tr>
+                    <tr><td><CodeInline>Enter</CodeInline> / <CodeInline>NumpadEnter</CodeInline></td><td>Selects the focused suggestion item into the input.</td></tr>
+                    <tr><td><CodeInline>Escape</CodeInline> / <CodeInline>Alt + ArrowUp</CodeInline></td><td>Closes the dropdown popover.</td></tr>
+                    </tbody>
+                </VekSimpleTable>
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

@@ -1,0 +1,40 @@
+@page "/components/autocomplete/validation-coercion"
+
+<DocsPage>
+    <DocsPageHeader Title="Autocomplete - Validation & Coercion" Component="@nameof(VekAutocomplete<T>)">
+        <Description>Configure strict matching, CoerceText, CoerceValue, and integration with VekForm validation models.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Validation">
+                <Description>
+                    Below are different validation examples for the VekAutocomplete control. They use an EditForm or a VekForm, and the result and display vary if the
+                    <CodeInline Tag="true">CoerceValue</CodeInline> option is set to <CodeInline Tag="true">true</CodeInline> or if characters are typed into the control instead of choosing from the dropdown list.<br />
+                    For more info on form validation, check out <VekLink Href="/components/form">Form</VekLink>.
+                </Description>
+            </SectionHeader>
+            <SectionContent ShowCode="false" Code="@nameof(AutocompleteValidationExample)">
+                <AutocompleteValidationExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Strict Mode">
+                <Description>
+                    <VekText>
+                        After selecting an option from a VekAutocomplete, it may be desired to change the selection. By default, clicking a VekAutocomplete while a value is selected will pass the <CodeInline>Text</CodeInline> string to the <CodeInline>SearchFunc</CodeInline>.
+                        Setting the <CodeInline>Strict</CodeInline> option to false modifies this behavior and passes an empty string to the <CodeInline>SearchFunc</CodeInline> instead.
+                    </VekText>
+                    <VekAlert Severity="Severity.Info" Class="mt-2">
+                        You must either use records or define <CodeInline>GetHashCode</CodeInline> and <CodeInline>Equals</CodeInline> for <CodeInline>T</CodeInline>.
+                    </VekAlert>
+                </Description>
+            </SectionHeader>
+            <SectionContent ShowCode="false" Code="@nameof(AutocompleteStrictFalseExample)">
+                <AutocompleteStrictFalseExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

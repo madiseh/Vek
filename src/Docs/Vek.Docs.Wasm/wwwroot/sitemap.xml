@@ -136,6 +136,18 @@
     <loc>https://vekui.dev/components/autocomplete</loc>
   </url>
   <url>
+    <loc>https://vekui.dev/components/autocomplete/templates-presentation</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/autocomplete/async-search-virtualization</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/autocomplete/validation-coercion</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/autocomplete/keyboard-accessibility</loc>
+  </url>
+  <url>
     <loc>https://vekui.dev/components/avatar</loc>
   </url>
   <url>
