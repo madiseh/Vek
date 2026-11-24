@@ -100,92 +100,58 @@
 
         <DocsPageSection>
             <SectionHeader Title="Explore Features">
-                <Description>
-                    Browse specific features and usage patterns in detail:
-                    <VekGrid Class="mt-4" Spacing="3">
-                        <VekItem xs="12" sm="6" md="4">
-                            <VekCard Outlined="true" Class="pa-4 h-100">
-                                <VekText Typo="Typo.h6">
-                                    <VekLink Href="/components/datagrid/sorting">Sorting</VekLink>
-                                </VekText>
-                                <VekText Typo="Typo.body2" Class="mt-1">
-                                    Single-column and multi-column sorting, keyboard modifiers, and custom comparer algorithms.
-                                </VekText>
-                            </VekCard>
-                        </VekItem>
-                        <VekItem xs="12" sm="6" md="4">
-                            <VekCard Outlined="true" Class="pa-4 h-100">
-                                <VekText Typo="Typo.h6">
-                                    <VekLink Href="/components/datagrid/filtering">Filtering</VekLink>
-                                </VekText>
-                                <VekText Typo="Typo.body2" Class="mt-1">
-                                    Simple mode, column filter menus, filter rows, case-sensitivity, and custom filter templates.
-                                </VekText>
-                            </VekCard>
-                        </VekItem>
-                        <VekItem xs="12" sm="6" md="4">
-                            <VekCard Outlined="true" Class="pa-4 h-100">
-                                <VekText Typo="Typo.h6">
-                                    <VekLink Href="/components/datagrid/grouping">Grouping & Aggregation</VekLink>
-                                </VekText>
-                                <VekText Typo="Typo.body2" Class="mt-1">
-                                    Single and multi-level row grouping, group templates, expandable sections, and footer aggregation calculations.
-                                </VekText>
-                            </VekCard>
-                        </VekItem>
-                        <VekItem xs="12" sm="6" md="4">
-                            <VekCard Outlined="true" Class="pa-4 h-100">
-                                <VekText Typo="Typo.h6">
-                                    <VekLink Href="/components/datagrid/editing">Editing</VekLink>
-                                </VekText>
-                                <VekText Typo="Typo.body2" Class="mt-1">
-                                    Dialog form editing, inline row editing, custom edit templates, edit lifecycle events, and validation.
-                                </VekText>
-                            </VekCard>
-                        </VekItem>
-                        <VekItem xs="12" sm="6" md="4">
-                            <VekCard Outlined="true" Class="pa-4 h-100">
-                                <VekText Typo="Typo.h6">
-                                    <VekLink Href="/components/datagrid/selection">Selection</VekLink>
-                                </VekText>
-                                <VekText Typo="Typo.body2" Class="mt-1">
-                                    Single and multi-row selection, click selection, checkbox selection columns, and disabled rows.
-                                </VekText>
-                            </VekCard>
-                        </VekItem>
-                        <VekItem xs="12" sm="6" md="4">
-                            <VekCard Outlined="true" Class="pa-4 h-100">
-                                <VekText Typo="Typo.h6">
-                                    <VekLink Href="/components/datagrid/detail-row">Detail Rows</VekLink>
-                                </VekText>
-                                <VekText Typo="Typo.body2" Class="mt-1">
-                                    Hierarchical master-detail displays, custom expand toggles, and detail row renderers.
-                                </VekText>
-                            </VekCard>
-                        </VekItem>
-                        <VekItem xs="12" sm="6" md="4">
-                            <VekCard Outlined="true" Class="pa-4 h-100">
-                                <VekText Typo="Typo.h6">
-                                    <VekLink Href="/components/datagrid/columns">Columns & Layout</VekLink>
-                                </VekText>
-                                <VekText Typo="Typo.body2" Class="mt-1">
-                                    Column sizing, resizing, drag-and-drop reordering, columns panel, sticky columns, styling, and context menus.
-                                </VekText>
-                            </VekCard>
-                        </VekItem>
-                        <VekItem xs="12" sm="6" md="4">
-                            <VekCard Outlined="true" Class="pa-4 h-100">
-                                <VekLink Href="/components/datagrid/virtualization">
-                                    <VekText Typo="Typo.h6">Virtualization & Server Data</VekText>
-                                </VekLink>
-                                <VekText Typo="Typo.body2" Class="mt-1">
-                                    Backend server-side paging/filtering/sorting, UI virtualization, observable collections, culture, and accessibility.
-                                </VekText>
-                            </VekCard>
-                        </VekItem>
-                    </VekGrid>
-                </Description>
+                <Description>Browse specific features and usage patterns in detail:</Description>
             </SectionHeader>
+            <div class="vek-bento-grid mt-4">
+                <DocsExploreCard Title="Sorting" Category="Data Grid" Link="/components/datagrid/sorting" Description="Compare single-column and multi-column sorting, keyboard modifiers, and custom comparer algorithms.">
+                    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <VekIcon Icon="@Icons.Material.Filled.Sort" Color="Color.Primary" Size="Size.Large" />
+                        <VekText Typo="Typo.body2">Single · Multi-column</VekText>
+                    </VekStack>
+                </DocsExploreCard>
+                <DocsExploreCard Title="Filtering" Category="Data Grid" Link="/components/datagrid/filtering" Description="Use quick filters, column menus, filter rows, and custom filter templates.">
+                    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <VekIcon Icon="@Icons.Material.Filled.FilterList" Color="Color.Primary" Size="Size.Large" />
+                        <VekText Typo="Typo.body2">Search · Filter rows</VekText>
+                    </VekStack>
+                </DocsExploreCard>
+                <DocsExploreCard Title="Grouping & Aggregation" Category="Data Grid" Link="/components/datagrid/grouping" Description="Group rows at multiple levels, customize group content, and calculate footer totals.">
+                    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <VekIcon Icon="@Icons.Material.Filled.GroupWork" Color="Color.Primary" Size="Size.Large" />
+                        <VekText Typo="Typo.body2">Groups · Totals</VekText>
+                    </VekStack>
+                </DocsExploreCard>
+                <DocsExploreCard Title="Editing" Category="Data Grid" Link="/components/datagrid/editing" Description="Edit cells or rows with dialog forms, inline templates, lifecycle events, and validation.">
+                    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <VekIcon Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Large" />
+                        <VekText Typo="Typo.body2">Inline · Dialog</VekText>
+                    </VekStack>
+                </DocsExploreCard>
+                <DocsExploreCard Title="Selection" Category="Data Grid" Link="/components/datagrid/selection" Description="Configure single or multiple row selection, checkbox columns, focused rows, and cell ranges.">
+                    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <VekIcon Icon="@Icons.Material.Filled.CheckBox" Color="Color.Primary" Size="Size.Large" />
+                        <VekText Typo="Typo.body2">Rows · Cells</VekText>
+                    </VekStack>
+                </DocsExploreCard>
+                <DocsExploreCard Title="Detail Rows" Category="Data Grid" Link="/components/datagrid/detail-row" Description="Build hierarchical master-detail displays with custom toggles and detail renderers.">
+                    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <VekIcon Icon="@Icons.Material.Filled.UnfoldMore" Color="Color.Primary" Size="Size.Large" />
+                        <VekText Typo="Typo.body2">Master · Detail</VekText>
+                    </VekStack>
+                </DocsExploreCard>
+                <DocsExploreCard Title="Columns & Layout" Category="Data Grid" Link="/components/datagrid/columns" Description="Size, resize, reorder, pin, style, and customize columns and context menus.">
+                    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <VekIcon Icon="@Icons.Material.Filled.ViewColumn" Color="Color.Primary" Size="Size.Large" />
+                        <VekText Typo="Typo.body2">Resize · Reorder · Pin</VekText>
+                    </VekStack>
+                </DocsExploreCard>
+                <DocsExploreCard Title="Virtualization & Server Data" Category="Data Grid" Link="/components/datagrid/virtualization" Description="Load and render large datasets with server operations, virtualization, and observable collections.">
+                    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <VekIcon Icon="@Icons.Material.Filled.Storage" Color="Color.Primary" Size="Size.Large" />
+                        <VekText Typo="Typo.body2">Large datasets</VekText>
+                    </VekStack>
+                </DocsExploreCard>
+            </div>
         </DocsPageSection>
 
     </DocsPageContent>
