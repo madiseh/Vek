@@ -1,6 +1,6 @@
 ---
 name: vek-component-audit
-description: Find and fix Vek component behavior bugs by reproducing the UI issue, adding a focused failing regression test, correcting the cause, and verifying the fix in tests and the UI.
+description: Audit and fix Vek component behavior bugs, including exact multi-step interactions in docs examples. Reproduce the UI issue, add a focused failing regression test, correct the cause, and verify the fix in tests and the UI.
 ---
 
 # Vek Component Audit
@@ -13,7 +13,9 @@ Use this skill for any Vek component when the user wants to check, diagnose, or 
 
 - Read repository instructions and the relevant project documentation before editing.
 - Restate the reported user-visible behavior as an observable contract: starting state, action or action sequence, expected result, and actual result.
+- Preserve the user's exact action sequence, including repeated clicks and intervening transitions. Before exploring alternate paths, replay that sequence unchanged and record the visible state after every action; do not substitute a nearby scenario that exercises the same API.
 - Establish expected behavior independently from the implementation using the user's intent, public API docs, existing tests, and established examples. If these conflict or leave a material ambiguity, ask the user before making a behavior-changing fix.
+- For a docs or showcase interaction, inspect the button label, callback wiring, and API overload together. A component method can be correct while the example wires it to behavior that does not match the control's visible intent.
 - If the user names a component without a specific behavior, derive a bounded audit from its primary documented flows and state transitions. Do not attempt exhaustive testing of every parameter combination.
 - Keep published site observations separate from the current checkout. Record the site/version tested; use the local app or Test Viewer to verify the code being changed.
 
@@ -32,12 +34,13 @@ Use this skill for any Vek component when the user wants to check, diagnose, or 
 - Trace the failing action from the component's public boundary to the state update or render that produces the observed result. Compare it with a working path through the same component when useful.
 - Derive the regression case from the reproduced failure. Include the preceding state transition when it is necessary to trigger the bug. Add relevant boundary cases only when the component contract or root cause makes them meaningful; do not generate a generic edge-case checklist for every component.
 - Check existing tests first. Add a test only when it protects a distinct observable behavior and can fail on the reproduced bug.
-- Choose the cheapest test seam that faithfully catches the defect. For Vek component behavior, prefer a focused bUnit test. If the defect depends on browser layout, JavaScript, focus, or another behavior bUnit cannot observe, use the appropriate Viewer/Playwright test and explain why a unit test alone is insufficient.
+- Choose the cheapest test seam that faithfully catches the defect. For Vek component behavior, prefer a focused bUnit test; when the defect is in an example's callback wiring, render and exercise that example rather than testing only the underlying component API. If the defect depends on browser layout, JavaScript, focus, or another behavior bUnit cannot observe, use the appropriate Viewer/Playwright test and explain why a unit test alone is insufficient.
 
 ### 4. Test first, then fix
 
 - Write one focused regression test for the minimized failure before changing production code.
 - Run the narrowest scoped project test command from repository guidance. Confirm it fails at the intended assertion for the reported behavior. If it passes, errors, or fails for an unrelated reason, correct the test or find the proper seam before editing implementation code.
+- When a bUnit sequence exercises debounced behavior faster than a real user could, advance the registered fake time between actions so the test checks the intended sequence instead of the debounce window. Do not use real sleeps.
 - Apply the smallest change that fixes the root cause. Avoid unrelated refactoring or speculative behavior changes.
 - Rerun the same test and confirm it passes. Then run the relevant nearby tests or scoped build required by repository guidance.
 - Replay the original UI sequence against the changed checkout and verify the user-visible result. Keep the UI check and test result as separate evidence; one does not replace the other.
