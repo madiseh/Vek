@@ -110,7 +110,7 @@ namespace Vek.Docs.Services
                 .AddItem("Field", typeof(VekField))
                 .AddItem("File Upload", typeof(VekFileUpload<T>))
                 .AddItem("Toggle Group", typeof(VekToggleGroup<T>), typeof(VekToggleItem<T>))
-            )
+            , icon: Icons.Material.Filled.TextFields)
 
             // Pickers
             .AddNavGroup("Date Picker", false, new DocsComponents()
@@ -136,7 +136,7 @@ namespace Vek.Docs.Services
                 .AddItem("Toggle Icon Button", typeof(VekToggleIconButton))
                 .AddItem("Button FAB", typeof(VekFab))
                 .AddItem("Button FAB Menu", typeof(VekFabMenu))
-            )
+            , icon: Icons.Material.Filled.TouchApp)
 
             //Charts
             .AddNavGroup("Charts", false, new DocsComponents()
@@ -152,7 +152,7 @@ namespace Vek.Docs.Services
                 .AddItem("Sankey Chart", typeof(Sankey<T>), typeof(SankeyChartOptions), typeof(Legend<T>))
                 .AddItem("Scatter Plot Chart", typeof(ScatterPlot<T>), typeof(ScatterPlotChartOptions), typeof(Legend<T>))
                 .AddItem("Universal Chart", typeof(VekChart<T>), typeof(VekAxisChartBase<,>), typeof(ChartOptions))
-            )
+            , icon: Icons.Material.Filled.InsertChart)
 
             // this must be last!
             .GetComponentsSortedByName();
