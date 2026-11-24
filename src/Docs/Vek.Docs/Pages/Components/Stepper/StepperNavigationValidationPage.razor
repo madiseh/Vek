@@ -1,0 +1,37 @@
+@page "/components/stepper/navigation-validation"
+
+<DocsPage>
+    <DocsPageHeader Title="Stepper - Navigation & Validation" Component="@nameof(VekStepper)">
+        <Description>Control step navigation flow, handle async step validation, and prevent navigation with cancellable event guards.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Controlling navigation">
+                <Description>
+                    If you want to restrict navigation depending on certain conditions, i.e. completion of a form etc. you can do this using the <CodeInline>@nameof(VekStepper.OnPreviewInteraction)</CodeInline> event.<br />
+                    <br />
+                    When the user clicks the Next-button, the stepper will try to set the current step completed when the user clicks previous or any other step header, the stepper will try to activate that step. Depending on the user action
+                    the <CodeInline>@nameof(StepperInteractionEventArgs).@nameof(StepperInteractionEventArgs.Action)</CodeInline> will be either
+                    <CodeInline>@nameof(StepAction.Complete)</CodeInline> or <CodeInline>@nameof(StepAction.Activate)</CodeInline>. The <CodeInline>@nameof(StepperInteractionEventArgs).@nameof(StepperInteractionEventArgs.StepIndex)</CodeInline>
+                    indicates which step the user wants to complete or activate (navigate to). By setting the
+                    <CodeInline>@nameof(StepperInteractionEventArgs).@nameof(StepperInteractionEventArgs.Cancel)</CodeInline> property you can selectively prevent user actions and thus you have total control over which steps can be navigated to and
+                    which can't. In this example we also open a message box to notify the user about the required actions to be able to take the desired action.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(StepperControlledNavigationExample)" ShowCode="false">
+                <StepperControlledNavigationExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Step binding and error states">
+                <Description>Each step can also show an error via <CodeInline>@nameof(VekStep.HasError)</CodeInline>, be disabled via <CodeInline>@nameof(VekStep.Disabled)</CodeInline>, or be marked completed via <CodeInline>@nameof(VekStep.Completed)</CodeInline>.</Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(StepperStepBindingExample)" ShowCode="false">
+                <StepperStepBindingExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

@@ -394,6 +394,15 @@
     <loc>https://vekui.dev/components/stepper</loc>
   </url>
   <url>
+    <loc>https://vekui.dev/components/stepper/navigation-validation</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/stepper/modes-orientation</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/stepper/templates-customization</loc>
+  </url>
+  <url>
     <loc>https://vekui.dev/components/swipearea</loc>
   </url>
   <url>
