@@ -77,8 +77,9 @@ For each successful worker result:
 
 1. Review the worker's diff, test/build results, screenshot evidence, target branch, and claim state. Reject accidental scope changes or missing required evidence.
 2. Ensure implementation, tests, docs, and verified screenshots are committed and pushed to the feature branch before creating a PR.
-3. Follow the Git commit and pull request title conventions in `docs/governance/development-rules.md` for every commit subject and PR title. Use `<type>(<scope>): <imperative summary>`; for example, `feat(button): add loading state with auto-disable`. Put `Migration <feature_id>` and its context in the PR description, not as a `[Migration NNN]` title prefix. Reference related GitHub issues in the description with closing keywords.
-4. Open a draft PR targeting `master`, with a concise summary, verification results, and all screenshot embeds in reading order under `## UI screenshots`.
+3. Follow the Git commit and pull request title conventions in `docs/governance/development-rules.md` for every commit subject and PR title. Use `<type>(<scope>): <imperative summary>`; for example, `feat(button): add loading state with auto-disable`. Put `Migration <feature_id>` and its context in the PR description, not as a `[Migration NNN]` title prefix.
+   - **Close Associated Feature Issue**: Always link the PR to automatically close its milestone feature issue upon merge by including `Closes #<issue_number>` (or `Fixes #<issue_number>`) in the PR description so the milestone progress tracks cleanly.
+4. Open a draft PR targeting `master`, with a concise summary, verification results, closing keywords for the milestone issue, and all screenshot embeds in reading order under `## UI screenshots`.
    - **Attach to Milestone**: Always link the PR to the active GitHub Milestone via `gh pr create --milestone "<milestone_title>"` (e.g. `--milestone "v1.5.0"`).
    - For committed screenshots, use the raw image URL form `https://raw.githubusercontent.com/<owner>/<repo>/<branch>/<path>` as the Markdown image source.
    - Do not embed `https://github.com/<owner>/<repo>/blob/...` URLs. They serve an HTML file preview, so the link can open when clicked while the image remains broken inline.
