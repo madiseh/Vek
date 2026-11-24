@@ -1,0 +1,22 @@
+<VekButton Class="open-inline-maximize-btn" OnClick="OpenAsync">Open Inline</VekButton>
+<span class="inline-maximized-value">@_maximized</span>
+
+<VekDialog @bind-Visible="_visible" ShowMaximizeButton="@_showMaximizeButton" @bind-Maximized="_maximized" Options="_options">
+    <DialogContent>
+        <VekText>Inline maximize dialog</VekText>
+    </DialogContent>
+    <DialogActions>
+        <VekButton Class="close-inline-maximize-btn" OnClick="CloseAsync">Done</VekButton>
+    </DialogActions>
+</VekDialog>
+
+@code {
+    private bool _visible;
+    private bool _showMaximizeButton = true;
+    private bool _maximized;
+    private readonly DialogOptions _options = new() { CloseButton = true };
+
+    private void OpenAsync() => _visible = true;
+
+    private void CloseAsync() => _visible = false;
+}

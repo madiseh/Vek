@@ -1,0 +1,22 @@
+<VekDialog ShowMaximizeButton="@ShowMaximizeButton" @bind-Maximized="Maximized">
+    <DialogContent>
+        <VekText>Maximize test dialog</VekText>
+        <span class="maximized-state">@Maximized</span>
+    </DialogContent>
+    <DialogActions>
+        <VekButton OnClick="Close">Close</VekButton>
+    </DialogActions>
+</VekDialog>
+
+@code {
+    [CascadingParameter]
+    private IVekDialogInstance VekDialog { get; set; } = null!;
+
+    [Parameter]
+    public bool ShowMaximizeButton { get; set; } = true;
+
+    [Parameter]
+    public bool Maximized { get; set; }
+
+    private void Close() => VekDialog.Close();
+}

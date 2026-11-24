@@ -115,6 +115,26 @@ namespace Vek
         [Category(CategoryTypes.Dialog.Appearance)]
         public string CloseIcon { get; set; } = Icons.Material.Filled.Close;
 
+        /// <summary>
+        /// The custom icon displayed in the upper-right corner for maximizing this dialog.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Icons.Material.Filled.Fullscreen"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Dialog.Appearance)]
+        public string MaximizeIcon { get; set; } = Icons.Material.Filled.Fullscreen;
+
+        /// <summary>
+        /// The custom icon displayed in the upper-right corner for restoring a maximized dialog.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="Icons.Material.Filled.FullscreenExit"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Dialog.Appearance)]
+        public string RestoreIcon { get; set; } = Icons.Material.Filled.FullscreenExit;
+
         protected string TitleClassname =>
             new CssBuilder("vek-dialog-title")
                 .AddClass(_dialog?.TitleClass)
@@ -122,12 +142,12 @@ namespace Vek
 
         protected string Classname =>
             new CssBuilder("vek-dialog")
-                .AddClass(GetMaxWidth(), !GetFullScreen())
-                .AddClass("vek-dialog-width-full", GetFullWidth() && !GetFullScreen())
-                .AddClass("vek-dialog-fullscreen", GetFullScreen())
+                .AddClass(GetMaxWidth(), !IsMaximized)
+                .AddClass("vek-dialog-width-full", GetFullWidth() && !IsMaximized)
+                .AddClass("vek-dialog-fullscreen", IsMaximized)
                 .AddClass("vek-dialog-rtl", RightToLeft)
-                .AddClass("vek-dialog-draggable", GetDraggable())
-                .AddClass("vek-dialog-resizable", GetResizable())
+                .AddClass("vek-dialog-draggable", GetEffectiveDraggable())
+                .AddClass("vek-dialog-resizable", GetEffectiveResizable())
                 .AddClass(_dialog?.Class)
                 .Build();
 
@@ -136,7 +156,7 @@ namespace Vek
             get
             {
                 var builder = StyleBuilder.Default(Style);
-                if (_dialogBounds is { } bounds)
+                if (!IsMaximized && _dialogBounds is { } bounds)
                 {
                     builder
                         .AddStyle("position:absolute")
@@ -161,8 +181,8 @@ namespace Vek
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            var draggable = GetDraggable();
-            var resizable = GetResizable();
+            var draggable = GetEffectiveDraggable();
+            var resizable = GetEffectiveResizable();
             if ((firstRender || draggable != _lastDraggable || resizable != _lastResizable) && IsJSRuntimeAvailable)
             {
                 _lastDraggable = draggable;
@@ -378,6 +398,8 @@ namespace Vek
             return $"vek-dialog-width-{maxWidth.ToStringFast(true)}";
         }
 
+        private bool IsMaximized => GetFullScreen();
+
         private bool GetFullWidth() => GetDialogOptionsOrDefault.FullWidth ?? GlobalDialogOptions.FullWidth ?? false;
 
         private bool GetFullScreen() => GetDialogOptionsOrDefault.FullScreen ?? GlobalDialogOptions.FullScreen ?? false;
@@ -386,9 +408,50 @@ namespace Vek
 
         private bool GetResizable() => GetDialogOptionsOrDefault.Resizable ?? GlobalDialogOptions.Resizable ?? false;
 
+        private bool GetEffectiveDraggable() => GetDraggable() && !IsMaximized;
+
+        private bool GetEffectiveResizable() => GetResizable() && !IsMaximized;
+
+        private bool GetShowMaximizeButton() => _dialog?.ShowMaximizeButtonValue ?? GetDialogOptionsOrDefault.ShowMaximizeButton ?? GlobalDialogOptions.ShowMaximizeButton ?? false;
+
         private string? GetBackgroundClass() => GetDialogOptionsOrDefault.BackgroundClass ?? GlobalDialogOptions.BackgroundClass;
 
         private DialogOptions GetDialogOptionsOrDefault => _dialogOptionsState.Value ?? DialogOptions.Default;
+
+        private Task ToggleMaximizeAsync() => SetMaximizedAsync(!IsMaximized);
+
+        private Task HandleTitleDoubleClickAsync()
+        {
+            if (!GetShowMaximizeButton())
+            {
+                return Task.CompletedTask;
+            }
+
+            return ToggleMaximizeAsync();
+        }
+
+        internal async Task SetMaximizedAsync(bool maximized)
+        {
+            if (IsMaximized == maximized)
+            {
+                return;
+            }
+
+            var options = GetDialogOptionsOrDefault with
+            {
+                FullScreen = maximized
+            };
+
+            await _dialogOptionsState.SetValueAsync(options);
+            Parent?.SetOptions(Id, options);
+
+            if (_dialog is not null)
+            {
+                await _dialog.UpdateMaximizedAsync(maximized);
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
 
         protected virtual async ValueTask DisposeAsyncCore()
         {
@@ -410,8 +473,13 @@ namespace Vek
             _dialogInteractionReference?.Dispose();
         }
 
-        private Task SetDialogBoundsAsync(double left, double top, double width, double height)
+        internal Task SetDialogBoundsAsync(double left, double top, double width, double height)
         {
+            if (IsMaximized)
+            {
+                return Task.CompletedTask;
+            }
+
             _dialogBounds = new DialogBounds(left, top, width, height);
             return InvokeAsync(StateHasChanged);
         }
@@ -449,7 +517,11 @@ namespace Vek
         async Task IVekDialogInstance.SetOptionsAsync(DialogOptions options)
         {
             await _dialogOptionsState.SetValueAsync(options);
-            Parent.SetOptions(Id, options);
+            Parent?.SetOptions(Id, options);
+            if (_dialog is not null)
+            {
+                await _dialog.UpdateMaximizedAsync(IsMaximized);
+            }
             await InvokeAsync(StateHasChanged);
         }
 
@@ -489,8 +561,20 @@ namespace Vek
             Class = dialog.Class;
             Style = dialog.Style;
             TitleContent = dialog.TitleContent;
+            if (dialog.MaximizedValue && !IsMaximized)
+            {
+                var options = GetDialogOptionsOrDefault with { FullScreen = true };
+                _ = _dialogOptionsState.SetValueAsync(options);
+                Parent?.SetOptions(Id, options);
+            }
+            else if (IsMaximized && !dialog.MaximizedValue)
+            {
+                _ = dialog.UpdateMaximizedAsync(true);
+            }
             StateHasChanged();
         }
+
+        Task IVekDialogInstanceInternal.SetMaximizedAsync(bool maximized) => SetMaximizedAsync(maximized);
 
         /// <inheritdoc />
         void IVekDialogInstance.StateHasChanged() => StateHasChanged();

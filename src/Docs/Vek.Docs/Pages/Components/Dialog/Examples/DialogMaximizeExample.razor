@@ -1,0 +1,29 @@
+@namespace Vek.Docs.Examples
+
+@inject IDialogService Dialog
+
+<VekStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+    <VekButton OnClick="@(() => OpenDialogAsync(false))" Variant="Variant.Filled" Color="Color.Primary">
+        Open Maximizable Dialog
+    </VekButton>
+    <VekButton OnClick="@(() => OpenDialogAsync(true))" Variant="Variant.Outlined" Color="Color.Secondary">
+        Open Initially Maximized
+    </VekButton>
+</VekStack>
+
+@code {
+    private Task OpenDialogAsync(bool fullScreen)
+    {
+        var options = new DialogOptions
+        {
+            ShowMaximizeButton = true,
+            CloseButton = true,
+            Draggable = true,
+            Resizable = true,
+            FullScreen = fullScreen,
+            MaxWidth = MaxWidth.Medium
+        };
+
+        return Dialog.ShowAsync<DialogMaximizeExample_Dialog>("Workspace Inspector", options);
+    }
+}

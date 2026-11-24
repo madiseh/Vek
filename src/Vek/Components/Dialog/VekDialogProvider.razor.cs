@@ -54,6 +54,16 @@ namespace Vek
         public bool? CloseButton { get; set; }
 
         /// <summary>
+        /// Shows a maximize/restore button in the top-right corner of the header for all dialogs by default.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Dialog.Behavior)]
+        public bool? ShowMaximizeButton { get; set; }
+
+        /// <summary>
         /// Allows dialogs to be closed by clicking outside of them by default.
         /// </summary>
         /// <remarks>
@@ -142,6 +152,7 @@ namespace Vek
                 BackdropClick = BackdropClick,
                 CloseOnEscapeKey = CloseOnEscapeKey,
                 CloseButton = CloseButton,
+                ShowMaximizeButton = ShowMaximizeButton,
                 NoHeader = NoHeader,
                 Position = Position,
                 FullWidth = FullWidth,
