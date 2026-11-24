@@ -21,7 +21,7 @@ Approval authorizes a batch of up to three next eligible features, not only a fr
 
 ## 2. Claim each feature across agents
 
-Use `migration/scripts/claim_ledger.py` for every claim-ledger operation; do not edit the ledger or create its commits manually. It manages one remote `migration-claims` branch with a machine-readable `claims/<feature_id>.json` file per feature. The current record at the branch tip is authoritative, and branch commits preserve the audit history.
+Use `migration/scripts/claim_ledger.py` for every claim-ledger operation; do not edit the ledger or create its commits manually. It manages one remote `claims` branch with a machine-readable `claims/<feature_id>.json` file per feature. The current record at the branch tip is authoritative, and branch commits preserve the audit history.
 
 The script is responsible for:
 

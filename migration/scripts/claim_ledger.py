@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Manage feature claims in the shared migration-claims Git branch."""
+"""Manage feature claims in the shared claims Git branch."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 BACKLOG_PATH = ROOT / "migration" / "backlog.json"
-LEDGER_BRANCH = "migration-claims"
+LEDGER_BRANCH = "claims"
 LEDGER_REF = f"refs/heads/{LEDGER_BRANCH}"
 TRACKING_REF = f"refs/remotes/origin/{LEDGER_BRANCH}"
 LEASE_HOURS = 48
@@ -306,7 +306,7 @@ def print_record(record: dict[str, Any]) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Manage migration feature claims in the shared migration-claims branch."
+        description="Manage migration feature claims in the shared claims branch."
     )
     subparsers = parser.add_subparsers(dest="action", required=True)
 
