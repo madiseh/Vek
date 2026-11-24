@@ -1,0 +1,64 @@
+@page "/components/treeview/data-loading"
+
+<DocsPage>
+    <DocsPageHeader Title="Tree View - Data & Lazy Loading" Component="@nameof(VekTreeView<T>)">
+        <Description>Load deep or high-volume hierarchies on demand using async ServerData, child node fetching, and automatic branch expansion.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Server-Side Data">
+                <Description>
+                    <p>
+                        For large datasets, you can load data on-demand using <CodeInline>ServerData</CodeInline>.
+                        This function is invoked when a user expands a node, allowing efficient lazy-loading of child items.
+                    </p>
+                    <br/>
+                    <p>
+                        The loading indicator's icon and color can be customized with <CodeInline>LoadingIcon</CodeInline> and <CodeInline>LoadingIconColor</CodeInline>.
+                        If you know a specific item has no children and should not trigger a server call, you can prevent the loading behavior by setting its <CodeInline>CanExpand</CodeInline> property to <c>false</c>.
+                    </p>
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TreeViewServerExample)" ShowCode="false">
+                <TreeViewServerExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Asynchronous Child Node Fetching on Expand">
+                <Description>
+                    <p>
+                        For deeply nested or high-volume hierarchies, <CodeInline>LoadChildrenAsync</CodeInline> allows child nodes to be loaded on demand when the parent node's chevron is clicked.
+                    </p>
+                    <p>
+                        An inline animated loading spinner appears while children are being fetched. Once loaded, the nodes are cached so subsequent collapse and expand operations do not refetch.
+                        The <CodeInline>HasChildren</CodeInline> predicate determines whether an expand chevron should be rendered before children are fetched. Use <CodeInline>ReloadNodeAsync</CodeInline> on the tree view or <CodeInline>ReloadAsync</CodeInline> on an item to invalidate the cache and fetch fresh child nodes.
+                    </p>
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TreeViewLazyLoadExample)">
+                <TreeViewLazyLoadExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Auto-Expand">
+                <Description>
+                    <p>
+                        When <CodeInline>AutoExpand</CodeInline> is set to <c>true</c>, any collapsed parent node that contains a selected item will automatically expand to reveal it.
+                        This is useful for ensuring the context of a programmatically selected item is visible to the user.
+                    </p>
+                    <br/>
+                    <p>
+                        To expand or collapse all nodes at once, you can call the public <CodeInline>ExpandAll()</CodeInline> and <CodeInline>CollapseAll()</CodeInline> methods on the TreeView instance.
+                    </p>
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TreeViewAutoExpandExample)" ShowCode="false">
+                <TreeViewAutoExpandExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

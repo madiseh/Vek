@@ -1,0 +1,40 @@
+@page "/components/treeview/keyboard-accessibility"
+
+<DocsPage>
+    <DocsPageHeader Title="Tree View - Keyboard & Accessibility" Component="@nameof(VekTreeView<T>)">
+        <Description>Navigate, select, expand, and rename tree nodes without a mouse using standard W3C APG keyboard patterns.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="W3C APG Keyboard Navigation">
+                <Description>
+                    The Tree View implements standard APG tree pattern keyboard navigation. Focus a node in the tree and use the following keys:
+                </Description>
+            </SectionHeader>
+            <SectionContent>
+                <VekSimpleTable Outlined="true" Hover="true">
+                    <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr><td><CodeInline>ArrowDown</CodeInline></td><td>Moves focus to the next visible node.</td></tr>
+                    <tr><td><CodeInline>ArrowUp</CodeInline></td><td>Moves focus to the previous visible node.</td></tr>
+                    <tr><td><CodeInline>ArrowRight</CodeInline></td><td>When focused on a collapsed node, expands it. When already expanded, moves focus to the first child.</td></tr>
+                    <tr><td><CodeInline>ArrowLeft</CodeInline></td><td>When focused on an open node, collapses it. When collapsed or a leaf, moves focus to the parent node.</td></tr>
+                    <tr><td><CodeInline>Home</CodeInline></td><td>Moves focus to the first node in the tree.</td></tr>
+                    <tr><td><CodeInline>End</CodeInline></td><td>Moves focus to the last visible node in the tree.</td></tr>
+                    <tr><td><CodeInline>Enter</CodeInline> / <CodeInline>Space</CodeInline></td><td>Selects the focused node or toggles its selection state.</td></tr>
+                    <tr><td><CodeInline>*</CodeInline> (Asterisk)</td><td>Expands all sibling nodes at the current level.</td></tr>
+                    <tr><td><CodeInline>F2</CodeInline></td><td>Enables in-place renaming when <CodeInline>AllowNodeRenaming</CodeInline> is active.</td></tr>
+                    <tr><td><CodeInline>Escape</CodeInline></td><td>Cancels active in-place renaming without saving changes.</td></tr>
+                    </tbody>
+                </VekSimpleTable>
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

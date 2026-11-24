@@ -433,6 +433,21 @@
     <loc>https://vekui.dev/components/treeview</loc>
   </url>
   <url>
+    <loc>https://vekui.dev/components/treeview/selection</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/treeview/data-loading</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/treeview/editing-reordering</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/treeview/templates</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/treeview/keyboard-accessibility</loc>
+  </url>
+  <url>
     <loc>https://vekui.dev/components/typography</loc>
   </url>
   <url>
