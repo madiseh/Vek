@@ -1,6 +1,6 @@
 ---
 name: vek-migration-batch-agent
-description: Prepare and execute an approved batch of up to three independent feature migrations from Vek's READY backlog, with one pull request per feature. Use for parallel, cross-module migration work; this skill does not discover new features.
+description: Prepare and execute an approved batch of up to three independent feature migrations from Vek's READY backlog that belong to an active GitHub Milestone, with one pull request per feature linked to the milestone. Use for parallel, cross-module migration work; this skill does not discover new features.
 ---
 
 # Vek Migration Batch Agent
@@ -9,15 +9,24 @@ Prepare and execute one approved batch of up to three feature migrations from th
 
 This is an explicit batch-level exception to the repository's one-feature-per-task guidance: the coordinator may manage up to three tasks, while every worker, worktree, branch, and PR remains scoped to one feature.
 
+## 0. Milestone Alignment and Gate (Mandatory)
+
+Every feature in the migration pipeline must belong to an active GitHub Milestone before any work begins:
+
+1. **Active Milestone Required**: Inspect existing GitHub milestones using `gh api repos/:owner/:repo/milestones`. Ensure an open milestone exists for the upcoming release or phase (e.g. `v1.5.0`). If no open milestone exists, stop immediately: **do not proceed** until a milestone is created.
+2. **Milestone Scope Enforcement**: Only features explicitly listed in the description or scope of the upcoming active milestone may be selected for a batch. If a candidate feature in the backlog is not included in the milestone, **do not execute it** — it must first be added to an active milestone by the user or an authorized milestone definition before work can start.
+3. **Link PRs to Milestone**: When opening a pull request, always attach it to the active milestone using `gh pr create --milestone "<milestone_title>"` (or update with `gh pr edit <pr_url> --milestone "<milestone_title>"`).
+
 ## 1. Build a read-only batch proposal
 
 1. Read the repository instructions, `migration/AGENTS.md`, and the relevant governance docs. Fetch the latest `origin/master` and inspect its backlog without running a command that claims or changes a feature.
-2. Select only existing `READY` features whose dependencies are completed. Do not run `orchestrator.py --discover`; backlog discovery belongs to a separate skill/agent.
-3. Exclude features with an open PR or an active unexpired claim. Inspect each candidate specification and likely code, test, documentation, and asset paths. Prefer candidates with disjoint files and components; keep the backlog priority order among similarly isolated candidates.
-4. Select up to three eligible candidates. If fewer than three low-conflict candidates are available, propose the available count; do not invent work or relax the isolation requirement to fill the batch.
-5. Derive each target branch from the current orchestrator convention and backlog pipeline settings without running `--pick`. Present each candidate's feature ID, title, module, specification, target branch, and likely touched paths. State the batch size and any priority items skipped due to open PRs, claims, dependencies, or path overlap. Wait for the user's explicit approval before creating claims, worktrees, branches, or editing files.
+2. Query GitHub for the upcoming open milestone (`gh api repos/:owner/:repo/milestones`) and identify all features covered in its scope.
+3. Select only existing `READY` features whose dependencies are completed **AND that belong to the active milestone**. Do not run `orchestrator.py --discover`; backlog discovery belongs to a separate skill/agent.
+4. Exclude features with an open PR or an active unexpired claim. Inspect each candidate specification and likely code, test, documentation, and asset paths. Prefer candidates with disjoint files and components; keep the backlog priority order among similarly isolated candidates.
+5. Select up to three eligible candidates. If fewer than three low-conflict candidates belonging to the milestone are available, propose the available count; do not invent work or relax the isolation requirement to fill the batch.
+6. Derive each target branch from the current orchestrator convention and backlog pipeline settings without running `--pick`. Present each candidate's feature ID, title, module, specification, target branch, associated milestone, and likely touched paths. State the batch size and any priority items skipped due to open PRs, claims, dependencies, path overlap, or not being in the active milestone. Wait for the user's explicit approval before creating claims, worktrees, branches, or editing files.
 
-Approval authorizes a batch of up to three next eligible features, not only a frozen set of IDs. If a candidate is claimed by another agent after approval, skip it and substitute the next eligible low-conflict candidate without asking again. If the source backlog changes, do not add newly discovered work to the approved batch unless it is needed as such a substitution.
+Approval authorizes a batch of up to three next eligible features within the active milestone, not only a frozen set of IDs. If a candidate is claimed by another agent after approval, skip it and substitute the next eligible low-conflict candidate within the milestone without asking again. If the source backlog changes, do not add newly discovered work to the approved batch unless it is needed as such a substitution.
 
 ## 2. Claim each feature across agents
 
@@ -70,9 +79,10 @@ For each successful worker result:
 2. Ensure implementation, tests, docs, and verified screenshots are committed and pushed to the feature branch before creating a PR.
 3. Follow the Git commit and pull request title conventions in `docs/governance/development-rules.md` for every commit subject and PR title. Use `<type>(<scope>): <imperative summary>`; for example, `feat(button): add loading state with auto-disable`. Put `Migration <feature_id>` and its context in the PR description, not as a `[Migration NNN]` title prefix. Reference related GitHub issues in the description with closing keywords.
 4. Open a draft PR targeting `master`, with a concise summary, verification results, and all screenshot embeds in reading order under `## UI screenshots`.
+   - **Attach to Milestone**: Always link the PR to the active GitHub Milestone via `gh pr create --milestone "<milestone_title>"` (e.g. `--milestone "v1.5.0"`).
    - For committed screenshots, use the raw image URL form `https://raw.githubusercontent.com/<owner>/<repo>/<branch>/<path>` as the Markdown image source.
    - Do not embed `https://github.com/<owner>/<repo>/blob/...` URLs. They serve an HTML file preview, so the link can open when clicked while the image remains broken inline.
-   - Check for an existing PR immediately before creation; update an existing open PR instead of creating a duplicate.
+   - Check for an existing PR immediately before creation; update an existing open PR instead of creating a duplicate. Make sure any existing PR is also linked to the milestone.
 5. In that feature worktree, run `python migration/scripts/orchestrator.py --complete <feature_id> --pr <pr_url>`. This records `Completed` and the PR URL in the feature specification and backlog. Commit and push that status update to the same PR.
 6. After the PR is opened or updated, inspect its `format-check` result. If it fails, read the complete diagnostics, repair all cited changed `src/**` files, rerun the CI-equivalent verification across the full changed-file set, push the fix, and confirm the new format check passes before marking the PR ready.
 7. Verify the PR body, screenshots, base branch, title, and completion commit. Mark the PR ready for review only after the completion update is pushed and `format-check` passes. Then run `python migration/scripts/claim_ledger.py release <feature_id> --run-id <run_id>`.
