@@ -1,0 +1,43 @@
+@page "/components/fileupload/drag-and-drop"
+
+<DocsPage>
+    <DocsPageHeader Title="File Upload - Drag & Drop" Component="@nameof(VekFileUpload<T>)">
+        <Description>Enable interactive full-surface drag zones, drop styling, and custom drop areas with pointer and keyboard support.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Full-Surface Drag and Drop">
+                <Description>
+                    Enable <CodeInline>DragAndDrop</CodeInline> to accept files across the full component surface. The highlighted dashed area provides feedback while files are dragged over it, and the browse control remains available for keyboard and pointer users. Use <CodeInline>T="IReadOnlyList&lt;IBrowserFile&gt;"</CodeInline> to accept multiple files and <CodeInline>AppendMultipleFiles</CodeInline> to retain earlier selections.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" ShowCode="false" Code="@nameof(FileUploadFullSurfaceExample)">
+                <FileUploadFullSurfaceExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Custom Drop Zone">
+                <Description>
+                    The component provides properties to manage drag-and-drop behavior and drop-zone visibility. You can customize the drop zone inside
+                    <CodeInline>CustomContent</CodeInline> and use an <CodeInline>OnDragEnter</CodeInline> callback to set <CodeInline>Dragging</CodeInline>. When the drag ends,
+                    the control resets <CodeInline>Dragging</CodeInline> to <CodeInline>false</CodeInline>.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" ShowCode="false" Code="@nameof(FileUploadCustomExample)">
+                <FileUploadCustomExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Custom Drag Scenario">
+                <Description>Alternatively, you can create your own custom solution by directly managing drag events and controlling the visibility of the input drop zone.</Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" ShowCode="false" Code="@nameof(FileUploadDragAndDropCustomScenarioExample)">
+                <FileUploadDragAndDropCustomScenarioExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>
