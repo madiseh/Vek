@@ -1,0 +1,32 @@
+@page "/components/dialog/inline"
+
+<DocsPage>
+    <DocsPageHeader Title="Dialog - Inline & Embedded" Component="@nameof(VekDialog)">
+        <Description>Embed dialogs directly inside existing Razor markup without creating separate component files.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Inlining Dialog">
+                <Description>
+                    You can place a <CodeInline>VekDialog</CodeInline> directly in another component. This is useful for small, non-reusable dialogs and allows easy sharing of data and code. You can also override the dialog title with a render fragment.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(DialogInlineExample)">
+                <DialogInlineExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Nested Inline Dialogs">
+                <Description>
+                    Inline dialogs can be nested within each other. This example demonstrates both single and multiple levels of nesting.
+                </Description>
+            </SectionHeader>
+            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogNestedInlineExample)), new CodeFile("Dialog.razor", nameof(DialogNestedInlineExample_Dialog))})">
+                <DialogNestedInlineExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

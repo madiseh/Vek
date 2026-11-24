@@ -1,0 +1,21 @@
+@page "/components/dialog/stacking"
+
+<DocsPage>
+    <DocsPageHeader Title="Dialog - Stacking & Management" Component="@nameof(VekDialog)">
+        <Description>Manage multiple concurrent open dialogs, single-shared backdrop, active z-index focus, and batch dismiss operations.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Stacked Dialogs and Cancel All">
+                <Description>
+                    Concurrent dialogs stack in opening order, share one backdrop, and bring the clicked or focused dialog to the front. Escape closes only the topmost dialog when enabled. The example also shows how to close all dialogs simultaneously.
+                </Description>
+            </SectionHeader>
+            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogNestedExample)), new CodeFile("Dialog.razor", nameof(DialogNestedExample_Dialog)), new CodeFile("Dialog2.razor", nameof(DialogNestedExample_Dialog2))})">
+                <DialogNestedExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

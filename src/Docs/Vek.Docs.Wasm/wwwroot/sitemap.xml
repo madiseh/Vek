@@ -256,6 +256,21 @@
     <loc>https://vekui.dev/components/dialog</loc>
   </url>
   <url>
+    <loc>https://vekui.dev/components/dialog/movement-resizing</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/dialog/stacking</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/dialog/inline</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/dialog/appearance</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/dialog/keyboard-accessibility</loc>
+  </url>
+  <url>
     <loc>https://vekui.dev/components/divider</loc>
   </url>
   <url>
