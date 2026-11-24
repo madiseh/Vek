@@ -40,6 +40,8 @@
                 .AddClass(DataGrid.RowClassFunc?.Invoke(itemBag.Item, itemBag.Index))
                 .AddClass("vek-table-row-stripe", DataGrid.Striped && itemBag.Index % 2 == 0)
                 .AddClass("vek-table-row-focused", isFocused)
+                      .AddClass("vek-table-row-reorder-target", DataGrid.IsRowReorderTarget(itemBag.Item))
+                      .AddClass("vek-table-row-reorder-target-after", DataGrid.IsRowReorderTarget(itemBag.Item) && DataGrid.IsRowReorderAfterTarget)
                 .Build();
             var rowStyle = new StyleBuilder().AddStyle(DataGrid.RowStyle).AddStyle(DataGrid.RowStyleFunc?.Invoke(itemBag.Item, itemBag.Index)).Build();
             int? rowTabIndex = !DataGrid.IsKeyboardNavigationEnabled && DataGrid.HasFocusedRow ? (isFocused ? 0 : -1) : null;
@@ -51,7 +53,13 @@
             @attributes="GetRowAttributes(itemBag.Item)"
             @onclick="this.AsNonRenderingEventHandler<MouseEventArgs>(args => RowClick.InvokeAsync((args, itemBag.Item, itemBag.Index)))"
             @oncontextmenu="@GetContextMenuCallback(itemBag)"
-            @oncontextmenu:preventDefault="@(DataGrid.RowContextMenuClick.HasDelegate || DataGrid.HasRowContextMenu)">
+              @oncontextmenu:preventDefault="@(DataGrid.RowContextMenuClick.HasDelegate || DataGrid.HasRowContextMenu)"
+              @ondragover="@(args => DataGrid.UpdateRowReorderTarget(itemBag.Item, args.OffsetY))"
+              @ondragover:preventDefault="DataGrid.IsRowReorderingEnabled"
+              @ondragover:stopPropagation="DataGrid.IsRowReorderingEnabled"
+              @ondrop="@(args => DataGrid.CompleteRowReorderAsync(itemBag.Item, args))"
+              @ondrop:preventDefault="DataGrid.IsRowReorderingEnabled"
+              @ondrop:stopPropagation="DataGrid.IsRowReorderingEnabled">
             <CascadingValue Value="@DataGrid.Validator" IsFixed="true">
                 @{
                     var colIdx = 0;
