@@ -1,0 +1,40 @@
+@page "/components/treeview/selection"
+
+<DocsPage>
+    <DocsPageHeader Title="Tree View - Selection Modes" Component="@nameof(VekTreeView<T>)">
+        <Description>Configure single selection, toggle selection, or tri-state hierarchical checkbox selection across the tree.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Hierarchical Checkbox Selection">
+                <Description>
+                    Set <CodeInline>SelectionMode</CodeInline> to <CodeInline>SelectionMode.MultiSelection</CodeInline> to show a checkbox for every selectable node. Selecting a parent checks its descendants, and <CodeInline>@@bind-SelectedValues</CodeInline> keeps the selected values in sync.
+                    With <CodeInline>TriState</CodeInline> enabled, a parent shows an indeterminate checkbox while its descendants have a mixed selection. <CodeInline>AutoSelectParent</CodeInline> adds a parent value only after all selectable descendants are checked.
+                    The example binds the same values to chips and lets you toggle read-only mode, indeterminate display, and parent synchronization.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TreeViewMultiSelectionExample)" ShowCode="false">
+                <TreeViewMultiSelectionExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Binding Items Directly">
+                <Description>
+                    <p>
+                        You can directly bind the <CodeInline>Selected</CodeInline> and <CodeInline>Expanded</CodeInline> parameters on individual <CodeInline>VekTreeViewItem</CodeInline> components.
+                    </p>
+                    <br/>
+                    <p>
+                        While managing selection is typically done on the parent <CodeInline>VekTreeView</CodeInline> via <CodeInline>@@bind-SelectedValue</CodeInline> or <CodeInline>@@bind-SelectedValues</CodeInline>, direct item binding is particularly useful when creating custom interactions within an item template.
+                    </p>
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TreeViewBindItemsExample)" ShowCode="false">
+                <TreeViewBindItemsExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

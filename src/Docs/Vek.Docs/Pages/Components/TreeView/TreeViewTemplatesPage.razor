@@ -1,0 +1,70 @@
+@page "/components/treeview/templates"
+
+<DocsPage>
+    <DocsPageHeader Title="Tree View - Custom Templates" Component="@nameof(VekTreeView<T>)">
+        <Description>Customize tree node structures, item templates from data, leading/trailing icons, and body content with action buttons.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Icons">
+                <Description>
+                    <p>
+                        Enhance the visual presentation of TreeView items by assigning icons. The <CodeInline>Icon</CodeInline> and <CodeInline>IconColor</CodeInline> properties can be set for each <CodeInline>VekTreeViewItem</CodeInline>.
+                    </p>
+                    <br/>
+                    <p>
+                        This example defines a custom <CodeInline>ExpandButtonIcon</CodeInline> for parent nodes and provide an alternative icon for the expanded state via the <CodeInline>IconExpanded</CodeInline> property.
+                    </p>
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TreeViewIconExample)" ShowCode="false">
+                <TreeViewIconExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Item Template">
+                <Description>
+                    Use the <CodeInline>ItemTemplate</CodeInline> to dynamically generate TreeView items from a hierarchical data source.
+                    This approach simplifies rendering complex or data-driven trees by defining a template for each item's structure and its children.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TreeViewItemTemplateExample)" ShowCode="false">
+                <TreeViewItemTemplateExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Custom Look and Behavior">
+                <Description>
+                    <p>
+                        For full control over rendering and behavior, use the <CodeInline>Content</CodeInline> render fragment.
+                        This replaces the default <CodeInline>VekTreeViewItem</CodeInline> markup with your own custom implementation.
+                    </p>
+                    <br/>
+                    <p>
+                        This example demonstrates creating a non-standard multi-selection behavior where selecting a parent node does not affect its children.
+                        It also shows how to make only specific items selectable.
+                        To enable scrolling, as seen in this sample, constrain the container's <CodeInline>height</CodeInline> or <CodeInline>max-height</CodeInline> and set <CodeInline>overflow-y</CodeInline> to <c>auto</c> or <c>scroll</c>.
+                    </p>
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TreeViewCustomExample)" ShowCode="false">
+                <TreeViewCustomExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Custom Body Content">
+                <Description>
+                     Use the tree-level <CodeInline>BodyContent</CodeInline> render fragment to customize generated nodes while retaining built-in icons, indentation, and expansion controls. Each fragment receives its owning <CodeInline>VekTreeViewItem</CodeInline>, and a node-level <CodeInline>BodyContent</CodeInline> takes precedence. Reuse each item's existing <CodeInline>Icon</CodeInline>, <CodeInline>EndText</CodeInline>, and <CodeInline>EndIcon</CodeInline> parameters for leading and trailing adornments. Use CSS hover and focus-within styles for optional actions so keyboard users can reveal them too; stop propagation on click and double-click actions to prevent selection, expansion, or rename, and disable actions when their node is disabled or read-only. The example demonstrates action buttons, count badges, and nested nodes.
+                </Description>
+            </SectionHeader>
+            <SectionContent Outlined="true" Code="@nameof(TreeViewBodyContentExample)" ShowCode="false">
+                <TreeViewBodyContentExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>
