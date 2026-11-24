@@ -253,6 +253,15 @@
     <loc>https://vekui.dev/components/drawer</loc>
   </url>
   <url>
+    <loc>https://vekui.dev/components/drawer/responsive-mini</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/drawer/positioning-anchoring</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/drawer/sizing-containers</loc>
+  </url>
+  <url>
     <loc>https://vekui.dev/components/dropzone</loc>
   </url>
   <url>

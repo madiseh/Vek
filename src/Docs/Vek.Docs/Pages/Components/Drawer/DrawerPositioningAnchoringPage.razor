@@ -1,0 +1,48 @@
+@page "/components/drawer/positioning-anchoring"
+
+<DocsPage>
+    <DocsPageHeader Title="Drawer - Positioning & Anchoring" Component="@nameof(VekDrawer)">
+        <Description>Control drawer anchor sides, absolute left/right placement, and AppBar clipping behavior.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Anchor Drawer">
+                <Description>
+                    With the <CodeInline>Anchor</CodeInline> property, you can set the Drawer to left or right. The default mode is left.
+                    This example uses Persistent Drawers.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(DrawerAnchorExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DrawerAnchorExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Left/Right Drawer">
+                <Description>
+                    <CodeInline>Anchor.Left</CodeInline> and <CodeInline>Anchor.Right</CodeInline> makes Drawer's position absolute, they will not follow RTL-LTR changes.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(DrawerLeftRightExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DrawerLeftRightExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Clipping">
+                <Description>
+                    A Drawer with <CodeInline>ClipMode="Docked"</CodeInline> or <CodeInline>ClipMode="Always"</CodeInline> will not push the AppBar to the side when opening.
+                    This parameter is evaluated only when Drawers are used inside a <CodeInline>VekLayout</CodeInline> directly.
+                    This example shows how different options work with a Responsive Drawer. Change the size of the window to test all possibilities.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DrawerClippingExample)" ShowCode="false">
+                <iframe src="/iframe/docs/examples/drawer/clipped" class="docs-iframe">
+                    <DrawerClippingExample />
+                </iframe>
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

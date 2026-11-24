@@ -1,0 +1,65 @@
+@page "/components/drawer/responsive-mini"
+
+<DocsPage>
+    <DocsPageHeader Title="Drawer - Responsive & Mini Variants" Component="@nameof(VekDrawer)">
+        <Description>Configure breakpoint transitions, mini icon strips with hover expansion, and viewport responsiveness.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Responsive">
+                <Description>
+                    Responsive Drawers behave persistently on wider screens and responsively on smaller ones.
+                    Opened Responsive Drawers close automatically when the window size becomes small, and open after the original state has been restored according to its breakpoint configuration.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DrawerResponsiveExample)" ShowCode="false">
+                <iframe src="/iframe/docs/examples/drawer/persistent" class="docs-iframe">
+                    <DrawerResponsiveExample />
+                </iframe>
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Mini">
+                <Description>
+                    The Mini variant is a streamlined version of the Responsive Drawer. On screens at or above its configured <CodeInline>Breakpoint</CodeInline> it shrinks to a narrow strip (default width: 56px) that can expand on hover when <CodeInline>OpenMiniOnHover</CodeInline> is enabled.
+                    Below the breakpoint it behaves like a <CodeInline>DrawerVariant.Temporary</CodeInline> drawer: hidden when closed, shown over the content with an overlay when open, and closed automatically on navigation.
+                    <br />Currently, Mini Drawers have built-in style support only for <CodeInline>VekNavLink</CodeInline> components.
+                    To control whether the Mini Drawer is open or closed, use the <CodeInline>Open</CodeInline> parameter.
+                    <br />To disable automatic responsiveness and manage the open state manually, set <CodeInline>Breakpoint="Breakpoint.None"</CodeInline>.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(DrawerMiniExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DrawerMiniExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Custom Breakpoint">
+                <Description>
+                    The switching point for Responsive Drawers (<CodeInline>DrawerVariant.Mini</CodeInline> and <CodeInline>DrawerVariant.Responsive</CodeInline>) can be changed using the <CodeInline>Breakpoint</CodeInline> parameter. The default is <CodeInline>Breakpoint.Md</CodeInline>.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DrawerBreakpointExample)" ShowCode="false">
+                <iframe src="/iframe/docs/examples/drawer/breakpoint" class="docs-iframe">
+                    <DrawerBreakpointExample />
+                </iframe>
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Mini Drawer Customization">
+                <Description>
+                    This example demonstrates how the combination of several parameters will affect the behaviour of a Mini Drawer.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DrawerMiniCustomExample)" ShowCode="false">
+                <iframe src="/iframe/docs/examples/drawer/mini" class="docs-iframe">
+                    <DrawerMiniCustomExample />
+                </iframe>
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>
