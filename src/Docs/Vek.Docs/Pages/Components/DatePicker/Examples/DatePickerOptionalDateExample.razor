@@ -1,0 +1,11 @@
+@namespace Vek.Docs.Examples
+
+<VekDatePicker Label="Optional reminder date" @bind-Date="_reminderDate" />
+
+<VekText Typo="Typo.body2" Class="mt-2">
+    @(_reminderDate is null ? "No reminder date selected." : $"Reminder date: {_reminderDate.Value:d}")
+</VekText>
+
+@code {
+    private DateTime? _reminderDate;
+}

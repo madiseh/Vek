@@ -1,0 +1,40 @@
+@page "/components/datepicker/culture-formatting"
+
+<DocsPage>
+    <DocsPageHeader Title="Date Picker - Culture and Formatting" Component="@nameof(VekDatePicker)">
+        <Description>Show dates in the language, calendar, and format your app's users expect.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Use a culture-specific calendar">
+                <Description>
+                    The <CodeInline>Culture</CodeInline> parameter controls month names, weekday names, and calendar system. Pass the culture your page already uses so the picker stays consistent with surrounding content.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DatePickerInternationalizationExample)" ShowCode="false" Block="true">
+                <DatePickerInternationalizationExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Choose a date format">
+                <Description>
+                    Set <CodeInline>DateFormat</CodeInline> for the picker, or customize the culture's <CodeInline>ShortDatePattern</CodeInline> when the same format should apply across your app.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(DatePickerCultureFormatExample)" ShowCode="false">
+                <DatePickerCultureFormatExample />
+            </SectionContent>
+            <SectionHeader Class="mt-6">
+                <Description>Set the culture at startup when the format should be shared by the whole app.</Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(DatePickerCultureFormatStartup)" />
+            <SectionHeader Class="mt-6">
+                <Description>When request localization is enabled, configure the changed culture in <CodeInline>RequestLocalizationOptions</CodeInline>.</Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(DatePickerCultureFormatRequestLocalization)" />
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

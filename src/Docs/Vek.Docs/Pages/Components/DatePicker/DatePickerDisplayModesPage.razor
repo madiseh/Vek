@@ -1,0 +1,70 @@
+@page "/components/datepicker/display-modes"
+
+<DocsPage>
+    <DocsPageHeader Title="Date Picker - Calendar Display" Component="@nameof(VekDatePicker)">
+        <Description>Choose how the calendar fits into a form or page, then tune its presentation and actions.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Keep a calendar visible in the page">
+                <Description>
+                    Use <CodeInline>VekCalendar</CodeInline> when a permanent calendar belongs in the page layout. It supports single-date selection, multiple dates, week numbers, and keyboard navigation.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DatePickerInlineCalendarExample)" ShowCode="false" Block="true">
+                <DatePickerInlineCalendarExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Show a compact or modal calendar">
+                <Description>Use Static mode for an embedded calendar without a text field, or Dialog mode when date selection needs a focused surface.</Description>
+            </SectionHeader>
+            <SectionSubGroups>
+                <DocsPageSection>
+                    <SectionHeader Title="Static calendar" />
+                    <SectionContent Code="@nameof(DatePickerStaticExample)">
+                        <DatePickerStaticExample />
+                    </SectionContent>
+                </DocsPageSection>
+                <DocsPageSection>
+                    <SectionHeader Title="Dialog calendar" />
+                    <SectionContent Code="@nameof(DatePickerDialogExample)">
+                        <DatePickerDialogExample />
+                    </SectionContent>
+                </DocsPageSection>
+            </SectionSubGroups>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Offer clear actions before a selection is committed">
+                <Description>Use <CodeInline>PickerActions</CodeInline> for explicit actions such as choosing today, clearing a value, or confirming a selection.</Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(DatePickerActionButtonsExample)" ShowCode="false">
+                <DatePickerActionButtonsExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Adjust color and elevation">
+                <Description>Use the component's appearance parameters to match the calendar to the surface around it.</Description>
+            </SectionHeader>
+            <SectionSubGroups>
+                <DocsPageSection>
+                    <SectionHeader Title="Color" />
+                    <SectionContent DarkenBackground="true" Class="demo-datetime-margin" Code="@nameof(DatePickerColorExample)">
+                        <DatePickerColorExample />
+                    </SectionContent>
+                </DocsPageSection>
+                <DocsPageSection>
+                    <SectionHeader Title="Elevation" />
+                    <SectionContent DarkenBackground="true" Code="@nameof(DatePickerElevationExample)">
+                        <DatePickerElevationExample />
+                    </SectionContent>
+                </DocsPageSection>
+            </SectionSubGroups>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

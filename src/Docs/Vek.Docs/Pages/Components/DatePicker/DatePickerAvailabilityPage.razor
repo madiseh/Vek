@@ -1,0 +1,32 @@
+@page "/components/datepicker/availability"
+
+<DocsPage>
+    <DocsPageHeader Title="Date Picker - Available Dates" Component="@nameof(VekDatePicker)">
+        <Description>Guide people toward valid dates and make important days easier to recognize.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Prevent unavailable dates">
+                <Description>
+                    Provide <CodeInline>IsDateDisabledFunc</CodeInline> to keep dates outside your rules from being selected. Use <CodeInline>AdditionalDateClassesFunc</CodeInline> to mark dates without blocking them.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DatePickerDisableCustomizeDaysExample)" ShowCode="false" Block="true">
+                <DatePickerDisableCustomizeDaysExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Show helpful details inside a day cell">
+                <Description>
+                    Use <CodeInline>DayCellTemplate</CodeInline> with <CodeInline>DatePickerDayContext</CodeInline> to add information to each day. Disabled dates remain unavailable, and day buttons keep their accessible full-date name.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DatePickerDayCellTemplateExample)" ShowCode="false" Block="true">
+                <DatePickerDayCellTemplateExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

@@ -1,0 +1,41 @@
+@page "/components/datepicker/typed-input"
+
+<DocsPage>
+    <DocsPageHeader Title="Date Picker - Typed Input" Component="@nameof(VekDatePicker)">
+        <Description>Let people enter a date directly, parse partial text, or keep a selected value read-only.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Enter a date with a mask">
+                <Description>
+                    Set <CodeInline>Editable</CodeInline> and provide a <CodeInline>Mask</CodeInline> suited to the expected date format. A <CodeInline>DateMask</CodeInline> adds date-aware input behavior.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DatePickerMaskExample)" ShowCode="false" Block="true">
+                <DatePickerMaskExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Parse a date as text is entered">
+                <Description>
+                    Turn on <CodeInline>ImmediateText</CodeInline> when a typed value should update the bound date as the user enters it. Keep <CodeInline>DateFormat</CodeInline> aligned with the accepted text.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DatePickerTextParseExample)" ShowCode="false" Block="true">
+                <DatePickerTextParseExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Prevent edits to a displayed date">
+                <Description>Use <CodeInline>ReadOnly</CodeInline> when a date should remain visible but cannot be changed through the picker or its text field.</Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(DatePickerReadOnlyExample)" ShowCode="false">
+                <DatePickerReadOnlyExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

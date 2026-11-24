@@ -112,10 +112,17 @@ namespace Vek.Docs.Services
                 .AddItem("Toggle Group", typeof(VekToggleGroup<T>), typeof(VekToggleItem<T>))
             )
 
-            //Pickers
+            // Pickers
+            .AddNavGroup("Date Picker", false, new DocsComponents()
+                .AddItem("Overview", typeof(VekDatePicker), "datepicker")
+                .AddItem("Type a Date", typeof(VekDatePicker), "datepicker/typed-input")
+                .AddItem("Control Available Dates", typeof(VekDatePicker), "datepicker/availability")
+                .AddItem("Navigate Calendar Views", typeof(VekDatePicker), "datepicker/calendar-navigation")
+                .AddItem("Choose a Calendar Display", typeof(VekDatePicker), "datepicker/display-modes")
+                .AddItem("Format Dates for a Culture", typeof(VekDatePicker), "datepicker/culture-formatting")
+                .AddItem("Select a Date Range", typeof(VekDateRangePicker), "daterangepicker")
+            , sortByName: false)
             .AddNavGroup("Pickers", false, new DocsComponents()
-                .AddItem("Date Picker", typeof(VekDatePicker))
-                .AddItem("Date Range Picker", typeof(VekDateRangePicker))
                 .AddItem("Time Picker", typeof(VekTimePicker))
                 .AddItem("Color Picker", typeof(VekColorPicker))
             )
