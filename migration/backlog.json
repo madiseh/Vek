@@ -208,9 +208,10 @@
       "title": "DataGrid Interactive Row Drag-and-Drop Reordering",
       "module": "DataGrid",
       "priority": 16,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/016-datagrid-row-drag-reorder.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-24T05:37:35Z"
     },
     {
       "id": "017",

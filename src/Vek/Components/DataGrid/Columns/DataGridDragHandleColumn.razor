@@ -1,0 +1,24 @@
+@namespace Vek
+@inherits VekComponentBase
+@typeparam T
+
+<TemplateColumn T="T" Tag="@("row-reorder-column")" Sortable="false" Resizable="false" ShowColumnOptions="false"
+                Filterable="false" Editable="false" Groupable="false" Hideable="false" HeaderStyle="width: 3rem;">
+    <HeaderTemplate>
+        <span>Reorder rows</span>
+    </HeaderTemplate>
+    <CellTemplate>
+        <button class="vek-data-grid-row-drag-handle" type="button" draggable="@context.DataGrid.IsRowReorderingEnabled"
+                aria-label="Reorder row" aria-pressed="@(context.DataGrid.IsRowReorderSource(context.Item) ? "true" : "false")"
+                title="Drag to reorder, or press Space, use arrow keys, then press Enter. Press Escape to cancel."
+                disabled="@(!context.DataGrid.IsRowReorderingEnabled)"
+                @onclick:stopPropagation="true"
+                @ondragstart="@(_ => context.DataGrid.BeginRowReorder(context.Item))"
+                @ondragstart:stopPropagation="true"
+                @ondragend="@(_ => context.DataGrid.CancelRowReorder())"
+                @ondragend:stopPropagation="true"
+                @onkeydown="@(args => context.DataGrid.OnRowReorderHandleKeyDownAsync(args, context.Item))">
+            <VekIcon Icon="@Icons.Material.Filled.DragIndicator" Size="@Size.Small" />
+        </button>
+    </CellTemplate>
+</TemplateColumn>

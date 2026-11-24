@@ -40,6 +40,18 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Row Reordering">
+                <Description>
+                    Add a <CodeInline>&lt;DataGridDragHandleColumn&gt;</CodeInline> and enable <CodeInline>AllowRowReorder</CodeInline> to let people move rows
+                    with a pointer or keyboard. Handle <CodeInline>OnRowReordered</CodeInline> to update your collection using the reported insertion position.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridRowReorderExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridRowReorderExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Advanced Data Grid">
                 <Description>
                     In a more advanced scenario, the data grid offers sorting, filtering, pagination and selection. There are two ways to filter the data

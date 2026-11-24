@@ -86,6 +86,8 @@ namespace Vek
         private readonly ParameterState<DataGridSelectionMode> _selectionModeState;
         private readonly ParameterState<DataGridCellRange?> _selectedCellRangeState;
         private readonly ParameterState<bool> _contextMenuEnabledState;
+        private readonly ParameterState<bool> _allowRowReorderState;
+        private readonly DataGridRowDragManager<T> _rowDragManager = new();
         private VekMenu? _contextMenu;
         private bool _contextMenuOpen;
         private DataGridContextMenuArgs<T>? _currentContextMenuArgs;
@@ -230,6 +232,9 @@ namespace Vek
 
             _contextMenuEnabledState = registerScope.RegisterParameter<bool>(nameof(ContextMenuEnabled))
                 .WithParameter(() => ContextMenuEnabled);
+
+            _allowRowReorderState = registerScope.RegisterParameter<bool>(nameof(AllowRowReorder))
+                .WithParameter(() => AllowRowReorder);
         }
 
         protected string Classname =>
@@ -797,6 +802,23 @@ namespace Vek
         /// </remarks>
         [Parameter]
         public bool DragDropColumnReordering { get; set; } = false;
+
+        /// <summary>
+        /// Allows rows to be reordered with a <see cref="DataGridDragHandleColumn{T}"/>.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public bool AllowRowReorder { get; set; }
+
+        /// <summary>
+        /// Occurs when a row is dropped at a new insertion position.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public EventCallback<DataGridRowReorderedEventArgs<T>> OnRowReordered { get; set; }
 
         /// <summary>
         /// The icon displayed when hovering over a draggable column.
@@ -2713,6 +2735,125 @@ namespace Vek
             return CurrentPageItems.ToList();
         }
 
+        internal bool IsRowReorderingEnabled
+            => _allowRowReorderState.Value && OnRowReordered.HasDelegate && !IsGrouped && HasRowReorderColumn;
+
+        private bool HasRowReorderColumn
+            => RenderedColumns.Any(column => column.Tag?.ToString() == "row-reorder-column");
+
+        internal bool IsRowReorderSource(T item)
+            => _rowDragManager.IsSource(item, GetRowComparer());
+
+        internal bool IsRowReorderTarget(T item)
+            => _rowDragManager.IsTarget(item, GetRowComparer());
+
+        internal bool IsRowReorderAfterTarget => _rowDragManager.InsertAfterTarget;
+
+        internal void BeginRowReorder(T item)
+        {
+            if (!IsRowReorderingEnabled)
+            {
+                return;
+            }
+
+            _rowDragManager.Start(item, GetVisibleRowItems(), GetRowComparer(), keyboard: false);
+            StateHasChanged();
+        }
+
+        internal void CancelRowReorder()
+        {
+            if (!_rowDragManager.IsDragging)
+            {
+                return;
+            }
+
+            _rowDragManager.Cancel();
+            StateHasChanged();
+        }
+
+        internal void UpdateRowReorderTarget(T item, double offsetY)
+        {
+            if (!IsRowReorderingEnabled)
+            {
+                return;
+            }
+
+            var items = GetVisibleRowItems();
+            if (_rowDragManager.MoveTo(item, offsetY >= 24, items, GetRowComparer()))
+            {
+                StateHasChanged();
+            }
+        }
+
+        internal async Task CompleteRowReorderAsync(T item, DragEventArgs args)
+        {
+            if (!IsRowReorderingEnabled)
+            {
+                CancelRowReorder();
+                return;
+            }
+
+            var items = GetVisibleRowItems();
+            _rowDragManager.MoveTo(item, args.OffsetY >= 24, items, GetRowComparer());
+            var reorderArgs = _rowDragManager.Complete(items, GetRowComparer());
+            StateHasChanged();
+            if (reorderArgs is not null)
+            {
+                await OnRowReordered.InvokeAsync(reorderArgs);
+            }
+        }
+
+        internal async Task OnRowReorderHandleKeyDownAsync(KeyboardEventArgs args, T item)
+        {
+            if (!IsRowReorderingEnabled)
+            {
+                return;
+            }
+
+            var items = GetVisibleRowItems();
+            var comparer = GetRowComparer();
+            if ((args.Key is " " or "Space") && !_rowDragManager.IsDragging)
+            {
+                _rowDragManager.Start(item, items, comparer, keyboard: true);
+                StateHasChanged();
+                return;
+            }
+
+            if (!_rowDragManager.IsKeyboardDrag)
+            {
+                return;
+            }
+
+            if (args.Key is "ArrowUp" or "ArrowDown")
+            {
+                if (_rowDragManager.MoveKeyboard(args.Key == "ArrowUp" ? -1 : 1, items))
+                {
+                    StateHasChanged();
+                }
+
+                return;
+            }
+
+            if (args.Key == "Escape")
+            {
+                CancelRowReorder();
+                return;
+            }
+
+            if (args.Key == "Enter")
+            {
+                var reorderArgs = _rowDragManager.Complete(items, comparer);
+                StateHasChanged();
+                if (reorderArgs is not null)
+                {
+                    await OnRowReordered.InvokeAsync(reorderArgs);
+                }
+            }
+        }
+
+        private IEqualityComparer<T> GetRowComparer()
+            => Comparer ?? EqualityComparer<T>.Default;
+
         internal async Task ScrollToFocusedRowAsync(int index)
         {
             if (index < 0 || !_autoScrollToFocusedRowState.Value || (!_focusedRowEnabledState.Value && !_keyboardNavigationEnabledState.Value))
@@ -3091,6 +3232,16 @@ namespace Vek
                     RenderedColumns.Insert(0, column);
                 }
             }
+            else if (column.Tag?.ToString() == "row-reorder-column")
+            {
+                var index = RenderedColumns.Any(x => x.Tag?.ToString() == "hierarchy-column") ? 1 : 0;
+                if (index < RenderedColumns.Count && RenderedColumns[index].Tag?.ToString() == "select-column")
+                {
+                    index++;
+                }
+
+                RenderedColumns.Insert(index, column);
+            }
             else
             {
                 RenderedColumns.Add(column);
@@ -3133,6 +3284,10 @@ namespace Vek
                 _hierarchyColumnVisibilityToggled = default;
                 _initialExpandedFunc = null;
                 _buttonDisabledFunc = null;
+            }
+            else if (column.Tag?.ToString() == "row-reorder-column")
+            {
+                _rowDragManager.Cancel();
             }
         }
 

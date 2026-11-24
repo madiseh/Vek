@@ -16,6 +16,8 @@ namespace Vek
         private readonly HashSet<T> _selection;
         private readonly T _sourceItem;
 
+        internal VekDataGrid<T> DataGrid => _dataGrid;
+
         internal HashSet<T> OpenHierarchies { get; }
 
         /// <summary>

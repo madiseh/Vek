@@ -4,9 +4,10 @@
 - **Feature ID**: 016
 - **Feature Slug**: datagrid-row-drag-reorder
 - **Module**: DataGrid
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 16
 - **Dependencies**: []
+- **Started At**: 2026-11-24T05:37:35Z
 
 ---
 

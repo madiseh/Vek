@@ -1,0 +1,44 @@
+@namespace Vek.Docs.Examples
+
+<VekDataGrid T="WorkItem" Items="_items" AllowRowReorder="true" OnRowReordered="ReorderAsync" Dense="true" Bordered="true">
+    <Columns>
+        <DataGridDragHandleColumn T="WorkItem" />
+        <PropertyColumn Property="item => item.Name" Title="Work item" />
+        <PropertyColumn Property="item => item.Owner" Title="Owner" />
+        <PropertyColumn Property="item => item.Priority" Title="Priority" />
+    </Columns>
+</VekDataGrid>
+
+@if (_status.Length > 0)
+{
+    <VekText Typo="Typo.body2" Class="mt-3" aria-live="polite">@_status</VekText>
+}
+
+@code {
+    private readonly List<WorkItem> _items =
+    [
+        new("Review accessibility checklist", "Alex", "High"),
+        new("Update onboarding guide", "Morgan", "Normal"),
+        new("Prepare release notes", "Riley", "Low"),
+        new("Triage incoming feedback", "Jordan", "Normal")
+    ];
+
+    private string _status = string.Empty;
+
+    private Task ReorderAsync(DataGridRowReorderedEventArgs<WorkItem> args)
+    {
+        var sourceIndex = _items.IndexOf(args.SourceItem);
+        if (sourceIndex < 0)
+        {
+            return Task.CompletedTask;
+        }
+
+        var item = _items[sourceIndex];
+        _items.RemoveAt(sourceIndex);
+        _items.Insert(args.InsertPosition, item);
+        _status = $"Moved ‘{item.Name}’ to position {args.InsertPosition + 1}.";
+        return Task.CompletedTask;
+    }
+
+    private sealed record WorkItem(string Name, string Owner, string Priority);
+}
