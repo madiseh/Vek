@@ -16,7 +16,7 @@
     {
         if (item.IsNavGroup)
         {
-            <VekNavGroup Title="@item.Name" Expanded="true" ExpandIcon="@Icons.Material.Filled.ExpandMore">
+            <VekNavGroup Title="@item.Name" Icon="@item.Icon" IconColor="Color.Primary" Expanded="true" ExpandIcon="@Icons.Material.Filled.ExpandMore">
                 @foreach (var subItem in item.GroupComponents)
                 {
                     var href = $"components/{subItem.Link}";

@@ -9,6 +9,7 @@ namespace Vek.Docs.Models
     {
         public string Name { get; set; }
         public string Link { get; set; }
+        public string Icon { get; set; }
         public bool IsNavGroup { get; set; }
         public bool NavGroupExpanded { get; set; }
 
