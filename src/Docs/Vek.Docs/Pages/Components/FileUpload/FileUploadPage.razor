@@ -94,6 +94,18 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Image Previews and Client Validation">
+                <Description>
+                    Set <CodeInline>AllowedExtensions</CodeInline>, <CodeInline>AllowedMimeTypes</CodeInline>, and <CodeInline>MaxFileSize</CodeInline> to reject unsuitable files as soon as they are selected.
+                    The default file list shows a thumbnail for accepted image files and releases its temporary browser URL when the selection changes or is cleared.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" ShowCode="false" Code="@nameof(FileUploadImagePreviewExample)">
+                <FileUploadImagePreviewExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Form Validation">
                 <Description>
                     Use <CodeInline>For</CodeInline> to validate against your model, and bind with <CodeInline>&#64;bind-Files</CodeInline>. Handle the upload in your

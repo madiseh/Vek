@@ -691,6 +691,80 @@ namespace Vek.UnitTests.Components
             return InputFileContent.CreateFromBinary(file.Content, file.Name, null, file.ContentType);
         }
 
+        /// <summary>
+        /// Rejects files whose extension is not in the configured allowlist.
+        /// </summary>
+        [Test]
+        public void AllowedExtensions_RejectsUnlistedExtension()
+        {
+            var comp = Context.Render<FileUploadSingleFileTest>(parameters => parameters
+                .Add(p => p.AllowedExtensions, new[] { ".png" }));
+
+            comp.FindComponent<InputFile>().UploadFiles(CreateDummyFile("notes.txt", 12));
+
+            comp.Instance.File.Should().BeNull();
+            comp.FindComponent<VekFileUpload<IBrowserFile>>().Instance.GetState(x => x.ErrorText)
+                .Should().Be("File 'notes.txt' does not have an allowed file name extension.");
+        }
+
+        /// <summary>
+        /// Accepts allowed extensions and MIME types without regard to casing.
+        /// </summary>
+        [Test]
+        public void AllowedFileTypes_AcceptsCaseInsensitiveMatches()
+        {
+            var comp = Context.Render<FileUploadSingleFileTest>(parameters => parameters
+                .Add(p => p.AllowedExtensions, new[] { ".png" })
+                .Add(p => p.AllowedMimeTypes, new[] { "IMAGE/PNG" }));
+            var file = InputFileContent.CreateFromBinary([1, 2, 3], "PHOTO.PNG", null, "image/png");
+
+            comp.FindComponent<InputFile>().UploadFiles(file);
+
+            comp.Instance.File.Should().NotBeNull();
+            comp.Instance.File!.Name.Should().Be("PHOTO.PNG");
+        }
+
+        /// <summary>
+        /// Rejects files whose content type is not in the configured allowlist.
+        /// </summary>
+        [Test]
+        public void AllowedMimeTypes_RejectsUnlistedType()
+        {
+            var comp = Context.Render<FileUploadSingleFileTest>(parameters => parameters
+                .Add(p => p.AllowedMimeTypes, new[] { "image/png" }));
+            var file = InputFileContent.CreateFromBinary([1, 2, 3], "photo.jpg", null, "image/jpeg");
+
+            comp.FindComponent<InputFile>().UploadFiles(file);
+
+            comp.Instance.File.Should().BeNull();
+            comp.FindComponent<VekFileUpload<IBrowserFile>>().Instance.GetState(x => x.ErrorText)
+                .Should().Be("File 'photo.jpg' does not have an allowed MIME type.");
+        }
+
+        /// <summary>
+        /// Shows an accepted image preview and releases its URL when the selection is cleared.
+        /// </summary>
+        [Test]
+        public async Task ImageFile_RendersDefaultThumbnail()
+        {
+            Context.JSInterop.Setup<string[]>("vekFileUpload.createImagePreviews", _ => true)
+                .SetResult(["blob:preview"]);
+            var comp = Context.Render<FileUploadDefaultSingleFileTest>();
+            var file = InputFileContent.CreateFromBinary([1, 2, 3], "photo.png", null, "image/png");
+
+            comp.FindComponent<InputFile>().UploadFiles(file);
+
+            Context.JSInterop.Invocations.Should().ContainSingle(invocation => invocation.Identifier == "vekFileUpload.createImagePreviews");
+            comp.Instance.File.Should().NotBeNull();
+            comp.Find("img.vek-file-upload-preview").GetAttribute("src").Should().Be("blob:preview");
+            comp.Find(".vek-file-upload-files").TextContent.Should().Contain("photo.png");
+
+            var fileUpload = comp.FindComponent<VekFileUpload<IBrowserFile>>();
+            await fileUpload.InvokeAsync(() => fileUpload.Instance.ClearAsync());
+
+            Context.JSInterop.Invocations.Should().ContainSingle(invocation => invocation.Identifier == "vekFileUpload.revokeImagePreviews");
+        }
+
         [Test]
         public void MaxFileSize_SingleFile_WithinLimit()
         {

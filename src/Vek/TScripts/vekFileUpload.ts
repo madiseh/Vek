@@ -25,4 +25,32 @@ export default class VekFileUpload {
             element.click();
         }
     }
+
+    /**
+     * Creates preview URLs for selected image files by their indexes in the input.
+     */
+    createImagePreviews(id: string, indexes: number[]) {
+        const element = document.getElementById(id) as HTMLInputElement | null;
+        if (!element?.files || typeof URL.createObjectURL !== "function") {
+            return [];
+        }
+
+        return indexes.map((index) => {
+            const file = element.files?.[index];
+            if (!file || !file.type.toLowerCase().startsWith("image/")) {
+                return "";
+            }
+
+            return URL.createObjectURL(file);
+        });
+    }
+
+    /**
+     * Releases object URLs created for selected image previews.
+     */
+    revokeImagePreviews(urls: string[]) {
+        for (const url of urls) {
+            URL.revokeObjectURL(url);
+        }
+    }
 }

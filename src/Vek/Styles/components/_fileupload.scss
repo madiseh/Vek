@@ -97,5 +97,14 @@
 
   .vek-file-upload-files-default-template {
     margin-top: 4px;
+
+    .vek-file-upload-preview {
+      width: 48px;
+      height: 48px;
+      margin-inline-end: 8px;
+      border-radius: var(--vek-default-borderradius);
+      object-fit: cover;
+      vertical-align: middle;
+    }
   }
 }

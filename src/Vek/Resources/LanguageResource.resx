@@ -588,6 +588,12 @@
   <data name="VekFileUpload_FileSizeError" xml:space="preserve">
     <value>File '{0}' exceeds the maximum allowed size of {1} bytes.</value>
   </data>
+  <data name="VekFileUpload_FileExtensionError" xml:space="preserve">
+    <value>File '{0}' does not have an allowed file name extension.</value>
+  </data>
+  <data name="VekFileUpload_FileTypeError" xml:space="preserve">
+    <value>File '{0}' does not have an allowed MIME type.</value>
+  </data>
   <data name="VekFileUpload_MaximumFileCountExceeded" xml:space="preserve">
     <value>Selected {0} files, which exceeds the maximum of {1}</value>
   </data>

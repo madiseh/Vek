@@ -49,6 +49,7 @@ namespace Vek
 
         private readonly string _id = Identifier.Create();
         private readonly List<string> _validationErrors = [];
+        private readonly Dictionary<IBrowserFile, string> _imagePreviewUrls = new(ReferenceEqualityComparer.Instance);
 
         protected string Classname =>
             new CssBuilder("vek-file-upload")
@@ -278,6 +279,26 @@ namespace Vek
         public long? MaxFileSize { get; set; }
 
         /// <summary>
+        /// The file name extensions accepted by this upload control.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c> (no extension restriction). Values may include or omit the leading period.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FileUpload.Behavior)]
+        public IReadOnlyList<string>? AllowedExtensions { get; set; }
+
+        /// <summary>
+        /// The MIME types accepted by this upload control.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c> (no MIME type restriction).
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FileUpload.Behavior)]
+        public IReadOnlyList<string>? AllowedMimeTypes { get; set; }
+
+        /// <summary>
         /// Prevents the user from interacting with this component.
         /// </summary>
         /// <remarks>
@@ -400,6 +421,7 @@ namespace Vek
                 case IBrowserFile singleFile when singleFile.Name == filename:
                     // Single selection with matching name: clear selection
                     await _filesState.SetValueAsync(default);
+                    await RevokeImagePreviewsForFilesAsync([singleFile]);
                     return true;
 
                 case IReadOnlyList<IBrowserFile> fileList:
@@ -410,6 +432,9 @@ namespace Vek
                             Logger.LogDebug("File '{Filename}' not found in the current selection.", filename);
                             return false;
                         }
+
+                        var removedFiles = fileList.Where(f => f.Name == filename).ToArray();
+                        await RevokeImagePreviewsForFilesAsync(removedFiles);
 
                         if (updatedList.Count == 0)
                         {
@@ -459,6 +484,7 @@ namespace Vek
                 case IBrowserFile singleFile when ReferenceEquals(singleFile, file):
                     // Single selection with the same instance: clear selection
                     await _filesState.SetValueAsync(default);
+                    await RevokeImagePreviewsForFilesAsync([singleFile]);
                     return true;
 
                 case IReadOnlyList<IBrowserFile> fileList:
@@ -470,6 +496,8 @@ namespace Vek
                             Logger.LogDebug("The specified file instance was not found in the current selection.");
                             return false;
                         }
+
+                        await RevokeImagePreviewsForFilesAsync([file]);
 
                         if (updatedList.Count == 0)
                         {
@@ -507,6 +535,7 @@ namespace Vek
             ValidationErrors.RemoveAll(_validationErrors.Contains);
 
             _validationErrors.Clear();
+            await RevokeImagePreviewsAsync();
             _numberOfActiveFileInputs = 1;
 
             await NotifyValueChangedAsync(default);
@@ -559,11 +588,12 @@ namespace Vek
         public async Task OpenFilePickerAsync()
             => await JsRuntime.InvokeVoidAsyncWithErrorHandling("vekFileUpload.openFilePicker", GetActiveInputId());
 
-        protected override ValueTask DisposeAsyncCore()
+        protected override async ValueTask DisposeAsyncCore()
         {
             _lifetimeCancellation.Cancel();
+            await RevokeImagePreviewsAsync();
             _lifetimeCancellation.Dispose();
-            return base.DisposeAsyncCore();
+            await base.DisposeAsyncCore();
         }
 
         private async Task OnChangeAsync(InputFileChangeEventArgs args)
@@ -579,11 +609,14 @@ namespace Vek
         private async Task ProcessFileChangeAsync(InputFileChangeEventArgs args)
         {
             T? value;
+            ValidationErrors.RemoveAll(_validationErrors.Contains);
+            _validationErrors.Clear();
 
             if (args.FileCount > MaximumFileCount)
             {
                 // Notify the consumer about the exceeded file count
                 _validationErrors.Add(Localizer[LanguageResource.VekFileUpload_MaximumFileCountExceeded, args.FileCount, MaximumFileCount]);
+                await RevokeImagePreviewsAsync();
                 await NotifyValueChangedAsync(default); // Reset the value to indicate no valid files were processed
                 return;
             }
@@ -600,6 +633,8 @@ namespace Vek
             {
                 return;
             }
+
+            await UpdateImagePreviewsAsync(args, value);
 
             await NotifyValueChangedAsync(value);
 
@@ -624,11 +659,7 @@ namespace Vek
 
             foreach (var file in files)
             {
-                if (MaxFileSize.HasValue && file.Size > MaxFileSize.Value)
-                {
-                    _validationErrors.Add(Localizer[LanguageResource.VekFileUpload_FileSizeError, file.Name, MaxFileSize.Value.ToString()]);
-                }
-                else
+                if (ValidateFile(file))
                 {
                     validFiles.Add(file);
                 }
@@ -647,13 +678,145 @@ namespace Vek
             if (file == null)
                 return null;
 
-            if (MaxFileSize.HasValue && file.Size > MaxFileSize.Value)
-            {
-                _validationErrors.Add(Localizer[LanguageResource.VekFileUpload_FileSizeError, file.Name, MaxFileSize.Value.ToString()]);
+            if (!ValidateFile(file))
                 return null;
-            }
 
             return file;
+        }
+
+        private bool ValidateFile(IBrowserFile file)
+        {
+            var failure = FileUploadValidator.Validate(file, MaxFileSize, AllowedExtensions, AllowedMimeTypes);
+            if (failure == FileUploadValidationFailure.None)
+                return true;
+
+            var message = failure switch
+            {
+                FileUploadValidationFailure.FileSize => Localizer[LanguageResource.VekFileUpload_FileSizeError, file.Name, MaxFileSize!.Value.ToString()],
+                FileUploadValidationFailure.Extension => Localizer[LanguageResource.VekFileUpload_FileExtensionError, file.Name],
+                FileUploadValidationFailure.MimeType => Localizer[LanguageResource.VekFileUpload_FileTypeError, file.Name],
+                _ => string.Empty
+            };
+            _validationErrors.Add(message);
+            return false;
+        }
+
+        private async Task UpdateImagePreviewsAsync(InputFileChangeEventArgs args, T? value)
+        {
+            if (!AppendMultipleFiles || value is not IReadOnlyList<IBrowserFile>)
+                await RevokeImagePreviewsAsync();
+
+            var selectedFiles = args.GetMultipleFiles(MaximumFileCount);
+            var acceptedFiles = GetFilesFromValue(value);
+            var previewIndexes = selectedFiles
+                .Select((file, index) => (file, index))
+                .Where(item => acceptedFiles.Contains(item.file, ReferenceEqualityComparer.Instance)
+                    && item.file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+                .Select(item => item.index)
+                .ToArray();
+
+            if (previewIndexes.Length == 0)
+                return;
+
+            string[] urls;
+            try
+            {
+                urls = await JsRuntime.InvokeAsync<string[]>(
+                    "vekFileUpload.createImagePreviews",
+                    _lifetimeToken,
+                    GetInputId(_numberOfActiveFileInputs - 1),
+                    previewIndexes);
+            }
+            catch (InvalidOperationException)
+            {
+                return;
+            }
+            catch (JSException)
+            {
+                return;
+            }
+
+            if (urls is null)
+                return;
+
+            for (var index = 0; index < previewIndexes.Length && index < urls.Length; index++)
+            {
+                var fileIndex = previewIndexes[index];
+                if (fileIndex < 0 || fileIndex >= selectedFiles.Count || string.IsNullOrEmpty(urls[index]))
+                    continue;
+                _imagePreviewUrls[selectedFiles[fileIndex]] = urls[index];
+            }
+        }
+
+        private static IReadOnlyList<IBrowserFile> GetFilesFromValue(T? value)
+        {
+            return value switch
+            {
+                IBrowserFile file => [file],
+                IReadOnlyList<IBrowserFile> files => files,
+                _ => []
+            };
+        }
+
+        private async Task RevokeImagePreviewsAsync()
+        {
+            if (_imagePreviewUrls.Count == 0)
+                return;
+
+            var urls = _imagePreviewUrls.Values.ToArray();
+            _imagePreviewUrls.Clear();
+            try
+            {
+                await JsRuntime.InvokeVoidAsync("vekFileUpload.revokeImagePreviews", urls);
+            }
+            catch (InvalidOperationException)
+            {
+                // The component can be disposed during server-side prerendering, before JS interop is available.
+            }
+            catch (JSDisconnectedException)
+            {
+                // A server circuit can disconnect before the component is disposed.
+            }
+            catch (JSException)
+            {
+                // The object URLs are scoped to this browser document and disappear when it is closed.
+            }
+        }
+
+        private string? GetImagePreviewUrl(IBrowserFile file)
+            => _imagePreviewUrls.GetValueOrDefault(file);
+
+        private async Task RevokeImagePreviewsForFilesAsync(IEnumerable<IBrowserFile> files)
+        {
+            var urls = files
+                .Where(_imagePreviewUrls.ContainsKey)
+                .Select(file =>
+                {
+                    var url = _imagePreviewUrls[file];
+                    _imagePreviewUrls.Remove(file);
+                    return url;
+                })
+                .ToArray();
+
+            if (urls.Length == 0)
+                return;
+
+            try
+            {
+                await JsRuntime.InvokeVoidAsync("vekFileUpload.revokeImagePreviews", urls);
+            }
+            catch (InvalidOperationException)
+            {
+                // The component can be disposed during server-side prerendering, before JS interop is available.
+            }
+            catch (JSDisconnectedException)
+            {
+                // A server circuit can disconnect before the file is removed.
+            }
+            catch (JSException)
+            {
+                // The object URLs are scoped to this browser document and disappear when it is closed.
+            }
         }
 
         protected override void OnInitialized()
