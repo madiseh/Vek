@@ -68,7 +68,7 @@ namespace Vek.Docs.Services
                 .AddItem("Detail Row", typeof(VekDataGrid<T>), "datagrid/detail-row")
                 .AddItem("Columns & Layout", typeof(VekDataGrid<T>), "datagrid/columns")
                 .AddItem("Virtualization & Server Data", typeof(VekDataGrid<T>), "datagrid/virtualization")
-            , sortByName: false)
+            , sortByName: false, icon: Icons.Material.Filled.TableView)
             .AddItem("Simple Table", typeof(VekSimpleTable))
             .AddItem("Tooltip", typeof(VekTooltip))
             .AddItem("Typography", typeof(VekText))
@@ -110,12 +110,20 @@ namespace Vek.Docs.Services
                 .AddItem("Field", typeof(VekField))
                 .AddItem("File Upload", typeof(VekFileUpload<T>))
                 .AddItem("Toggle Group", typeof(VekToggleGroup<T>), typeof(VekToggleItem<T>))
-            )
+            , icon: Icons.Material.Filled.TextFields)
 
-            //Pickers
+            // Pickers
+            .AddNavGroup("Date Picker", false, new DocsComponents()
+                .AddItem("Overview", typeof(VekDatePicker), "datepicker")
+                .AddItem("Date Input", typeof(VekDatePicker), "datepicker/typed-input")
+                .AddItem("Selectable Dates", typeof(VekDatePicker), "datepicker/availability")
+                .AddItem("Calendar Navigation", typeof(VekDatePicker), "datepicker/calendar-navigation")
+                .AddItem("Calendar Display", typeof(VekDatePicker), "datepicker/display-modes")
+                .AddItem("Culture & Formatting", typeof(VekDatePicker), "datepicker/culture-formatting")
+                .AddItem("Keyboard & Accessibility", typeof(VekDatePicker), "datepicker/keyboard-accessibility")
+                .AddItem("Date Range", typeof(VekDateRangePicker), "daterangepicker")
+            , sortByName: false, icon: Icons.Material.Filled.CalendarMonth)
             .AddNavGroup("Pickers", false, new DocsComponents()
-                .AddItem("Date Picker", typeof(VekDatePicker))
-                .AddItem("Date Range Picker", typeof(VekDateRangePicker))
                 .AddItem("Time Picker", typeof(VekTimePicker))
                 .AddItem("Color Picker", typeof(VekColorPicker))
             )
@@ -128,7 +136,7 @@ namespace Vek.Docs.Services
                 .AddItem("Toggle Icon Button", typeof(VekToggleIconButton))
                 .AddItem("Button FAB", typeof(VekFab))
                 .AddItem("Button FAB Menu", typeof(VekFabMenu))
-            )
+            , icon: Icons.Material.Filled.TouchApp)
 
             //Charts
             .AddNavGroup("Charts", false, new DocsComponents()
@@ -144,7 +152,7 @@ namespace Vek.Docs.Services
                 .AddItem("Sankey Chart", typeof(Sankey<T>), typeof(SankeyChartOptions), typeof(Legend<T>))
                 .AddItem("Scatter Plot Chart", typeof(ScatterPlot<T>), typeof(ScatterPlotChartOptions), typeof(Legend<T>))
                 .AddItem("Universal Chart", typeof(VekChart<T>), typeof(VekAxisChartBase<,>), typeof(ChartOptions))
-            )
+            , icon: Icons.Material.Filled.InsertChart)
 
             // this must be last!
             .GetComponentsSortedByName();

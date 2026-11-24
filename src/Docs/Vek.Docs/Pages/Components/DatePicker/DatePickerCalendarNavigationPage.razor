@@ -1,0 +1,50 @@
+@page "/components/datepicker/calendar-navigation"
+
+<DocsPage>
+    <DocsPageHeader Title="Date Picker - Calendar Navigation" Component="@nameof(VekDatePicker)">
+        <Description>Open the calendar at a useful view and move quickly to the date or period people need.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Open to a month or year view">
+                <Description>Choose the starting view when people need to select a month or year before choosing a day.</Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(DatePickerViewsExample)" ShowCode="false">
+                <DatePickerViewsExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Move across years and decades">
+                <Description>Use the calendar headers to zoom between days, months, years, decades, and centuries.</Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(DatePickerDecadeNavigationExample)" ShowCode="false">
+                <DatePickerDecadeNavigationExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Jump to a date from code">
+                <Description>
+                    Call <CodeInline>GoToDate</CodeInline> to navigate programmatically, with or without submitting the destination as the selected value.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DatePickerGoToDateExample)" ShowCode="false" Block="true">
+                <DatePickerGoToDateExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Select only the parts of a date you need">
+                <Description>
+                    Combine <CodeInline>FixDay</CodeInline>, <CodeInline>FixMonth</CodeInline>, <CodeInline>FixYear</CodeInline>, and <CodeInline>OpenTo</CodeInline> for month-year or month-day selection.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(DatePickerFixedValuesExample)" ShowCode="false">
+                <DatePickerFixedValuesExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

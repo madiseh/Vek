@@ -28,11 +28,12 @@ namespace Vek.Docs.Models
             return this;
         }
 
-        public DocsComponents AddNavGroup(string name, bool expanded, DocsComponents groupItems, bool sortByName = true)
+        public DocsComponents AddNavGroup(string name, bool expanded, DocsComponents groupItems, bool sortByName = true, string icon = null)
         {
             var componentItem = new VekComponent
             {
                 Name = name,
+                Icon = icon,
                 NavGroupExpanded = expanded,
                 GroupComponents = sortByName ? groupItems.GetComponentsSortedByName() : groupItems.Components,
                 IsNavGroup = true

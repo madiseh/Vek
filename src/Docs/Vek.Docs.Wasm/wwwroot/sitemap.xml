@@ -220,6 +220,24 @@
     <loc>https://vekui.dev/components/datepicker</loc>
   </url>
   <url>
+    <loc>https://vekui.dev/components/datepicker/availability</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/datepicker/calendar-navigation</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/datepicker/culture-formatting</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/datepicker/display-modes</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/datepicker/keyboard-accessibility</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/datepicker/typed-input</loc>
+  </url>
+  <url>
     <loc>https://vekui.dev/components/daterangepicker</loc>
   </url>
   <url>
