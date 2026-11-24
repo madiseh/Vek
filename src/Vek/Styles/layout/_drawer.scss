@@ -332,6 +332,14 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .vek-drawer.vek-drawer-mini,
+  .vek-drawer.vek-drawer-mini ~ div:not(.vek-main-content),
+  .vek-drawer.vek-drawer-mini ~ .vek-main-content {
+    transition-duration: 0ms;
+  }
+}
+
 .vek-drawer-overlay {
   display: none;
 

@@ -4,9 +4,10 @@
 - **Feature ID**: 087
 - **Feature Slug**: drawer-docked-persistent-and-mini-variants
 - **Module**: Drawer
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 87
 - **Dependencies**: []
+- **Started At**: 2026-11-24T05:37:38Z
 
 ---
 
