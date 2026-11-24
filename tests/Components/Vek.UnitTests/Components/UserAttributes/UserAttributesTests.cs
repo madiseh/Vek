@@ -55,7 +55,7 @@ namespace Vek.UnitTests.UserAttributes
             {
                 nameof(VekPopover), nameof(VekStep), nameof(VekContextualActionBar), nameof(VekHotkey), nameof(VekExitPrompt),
                 "Column`1", "FooterCell`1", "HeaderCell`1", "FilterHeaderCell`1", "SelectColumn`1",
-                "HierarchyColumn`1", "PropertyColumn`2", "TemplateColumn`1", "VekToggleItem`1", "VekHeatMapCell`1"
+                "HierarchyColumn`1", "PropertyColumn`2", "TemplateColumn`1", "DataGridDragHandleColumn`1", "VekToggleItem`1", "VekHeatMapCell`1"
             };
 
             foreach (var componentType in vekComponentTypes)
