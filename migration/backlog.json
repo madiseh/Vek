@@ -1083,9 +1083,12 @@
       "title": "Drawer Mini / Rail Variant with Icon-Only Mode and Smooth Width Expansion",
       "module": "Drawer",
       "priority": 87,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/087-drawer-docked-persistent-and-mini-variants.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-24T05:37:38Z",
+      "completed_at": "2026-11-24T06:00:32Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/120"
     },
     {
       "id": "088",

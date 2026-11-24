@@ -4,9 +4,12 @@
 - **Feature ID**: 087
 - **Feature Slug**: drawer-docked-persistent-and-mini-variants
 - **Module**: Drawer
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 87
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/120
+- **Started At**: 2026-11-24T05:37:38Z
+- **Completed At**: 2026-11-24T06:00:32Z
 
 ---
 
