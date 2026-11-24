@@ -1,0 +1,9 @@
+@attribute [ViewerHidden]
+
+<VekFileUpload T="IBrowserFile" @bind-Files="File" />
+
+@code {
+    public static string __description__ = "Tests the default selected file template with an optional preview.";
+
+    public IBrowserFile? File { get; private set; }
+}

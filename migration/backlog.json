@@ -921,9 +921,12 @@
       "title": "FileUpload Instant Image Thumbnail Preview and File Type/Size Client Validation",
       "module": "FileUpload",
       "priority": 74,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/074-fileupload-image-preview-and-client-validation.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-24T05:37:36Z",
+      "completed_at": "2026-11-24T06:32:46Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/123"
     },
     {
       "id": "075",

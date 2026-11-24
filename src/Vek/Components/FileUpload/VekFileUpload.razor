@@ -75,14 +75,18 @@
                 @if (!EqualityComparer<T>.Default.Equals(_filesState.Value, default))
                 {
                     <span class="vek-file-upload-filelist">
-                        @foreach (var file in GetFilenames())
+                        @foreach (var file in GetSelectedFiles())
                         {
+                            @if (GetImagePreviewUrl(file) is { } previewUrl)
+                            {
+                                <img class="vek-file-upload-preview" src="@previewUrl" alt="" aria-hidden="true" />
+                            }
                             <VekChip T="string"
                                      Color="Color.Secondary"
                                      Disabled="GetDisabledState()"
-                                     Text="@file"
+                                     Text="@file.Name"
                                      CloseIcon="@Icons.Material.Outlined.Close"
-                                     OnClose="@(() => OnFileChipCloseAsync(file))" />
+                                     OnClose="@(() => OnFileChipCloseAsync(file.Name))" />
                         }
                     </span>
                 }

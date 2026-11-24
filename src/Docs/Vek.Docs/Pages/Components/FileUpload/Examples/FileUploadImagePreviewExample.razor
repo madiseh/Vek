@@ -1,0 +1,31 @@
+@namespace Vek.Docs.Examples
+
+<VekCard Style="max-width: 560px;">
+    <VekCardContent>
+        <VekStack Spacing="2">
+            <VekText Typo="@Typo.h6">Upload product images</VekText>
+            <VekText Typo="@Typo.body2" Color="Color.Secondary">
+                Choose PNG or JPEG images up to 5 MB. Image thumbnails appear with each selected file.
+            </VekText>
+            <VekFileUpload T="IReadOnlyList<IBrowserFile>"
+                           @bind-Files="_files"
+                           AllowedExtensions="_allowedExtensions"
+                           AllowedMimeTypes="_allowedMimeTypes"
+                           MaxFileSize="5242880"
+                           Accept=".png,.jpg,.jpeg,image/png,image/jpeg" />
+            @if (_files is { Count: > 0 })
+            {
+                <VekText Typo="@Typo.caption" Color="Color.Secondary">
+                    @_files.Count image(s) selected. File type and size are checked before upload.
+                </VekText>
+            }
+        </VekStack>
+    </VekCardContent>
+</VekCard>
+
+@code {
+#nullable enable
+    private readonly IReadOnlyList<string> _allowedExtensions = [".png", ".jpg", ".jpeg"];
+    private readonly IReadOnlyList<string> _allowedMimeTypes = ["image/png", "image/jpeg"];
+    private IReadOnlyList<IBrowserFile>? _files;
+}

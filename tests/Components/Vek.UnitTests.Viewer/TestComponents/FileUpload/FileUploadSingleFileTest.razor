@@ -1,4 +1,8 @@
-﻿<VekFileUpload T="IBrowserFile" MaxFileSize="@MaxFileSize" @bind-Files="File">
+﻿<VekFileUpload T="IBrowserFile"
+               MaxFileSize="@MaxFileSize"
+               AllowedExtensions="@AllowedExtensions"
+               AllowedMimeTypes="@AllowedMimeTypes"
+               @bind-Files="File">
     <SelectedTemplate>
         <div>
             Select Template
@@ -13,4 +17,11 @@
 
     [Parameter]
     public long? MaxFileSize { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<string>? AllowedExtensions { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<string>? AllowedMimeTypes { get; set; }
+
 }

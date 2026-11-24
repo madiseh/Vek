@@ -4,9 +4,12 @@
 - **Feature ID**: 074
 - **Feature Slug**: fileupload-image-preview-and-client-validation
 - **Module**: FileUpload
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 74
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/123
+- **Started At**: 2026-11-24T05:37:36Z
+- **Completed At**: 2026-11-24T06:32:46Z
 
 ---
 
@@ -47,3 +50,9 @@
 - **Formatting**: Passes `dotnet format` validation.
 - **Clean-Room Anonymity**: Absolute zero mention of proprietary vendor names or commercial brand identifiers in code, commits, or documentation.
 - **Pull Request**: Fully documented pull request with verification summary and example usage.
+
+## 5. Browser Evidence
+- **Route**: `/components/fileupload#image-previews-and-client-validation`
+- **Viewport**: 1440 × 900 CSS pixels.
+- **Default State**: `migration/artifacts/ui-screenshots/074-01-default.png`
+- **Selected Image State**: `migration/artifacts/ui-screenshots/074-02-selected.png` (valid PNG selected; thumbnail visible).

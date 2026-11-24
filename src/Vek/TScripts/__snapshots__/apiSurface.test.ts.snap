@@ -60,7 +60,9 @@ exports[`window API surface is unchanged 1`] = `
     "setText": "function(2)",
   },
   "vekFileUpload": {
+    "createImagePreviews": "function(2)",
     "openFilePicker": "function(1)",
+    "revokeImagePreviews": "function(1)",
   },
   "vekGetSvgBBox": "function(1)",
   "vekHotkeyListener": {
