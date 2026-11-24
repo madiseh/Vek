@@ -1,0 +1,260 @@
+@namespace Vek
+@inherits VekComponentBase
+@typeparam T
+@using Microsoft.JSInterop
+@using Vek.Extensions
+@using Vek.Resources
+@inject InternalVekLocalizer Localizer
+@inject IJSRuntime JSRuntime
+
+<CascadingValue Value="this" IsFixed="true">
+    @if (Columns is not null)
+    {
+        @Columns
+    }
+    else if (ChildContent is not null)
+    {
+        @ChildContent
+    }
+</CascadingValue>
+
+@{
+    var visibleColumns = GetVisibleColumns();
+    var primaryColumn = ResolvePrimaryColumn(visibleColumns);
+    var visibleRows = BuildVisibleRows();
+    EnsureFocusedRow(visibleRows);
+}
+
+<div @attributes="UserAttributes" class="@Classname" style="@Stylename">
+    <div class="@ContainerClassname" style="@ContainerStylename">
+        <table class="@TableClassname"
+               style="@TableStylename(visibleColumns)"
+               role="treegrid"
+               aria-label="@GetAriaLabel()"
+               aria-multiselectable="@(_selectionModeState.Value == SelectionMode.MultiSelection ? "true" : null)">
+            @if (visibleColumns.Count > 0)
+            {
+                <colgroup>
+                    @foreach (var column in visibleColumns)
+                    {
+                        <col @key="column" style="@GetColStyle(column)" />
+                    }
+                </colgroup>
+                <thead class="vek-treelist-head">
+                    <tr role="row" class="vek-treelist-header-row">
+                        @foreach (var column in visibleColumns)
+                        {
+                            var isSortable = IsColumnSortable(column);
+                            var isResizable = IsColumnResizable(column);
+                            <th @key="column"
+                                @ref="column.HeaderElement"
+                                scope="col"
+                                role="columnheader"
+                                class="@GetHeaderCellClass(column)"
+                                style="@GetHeaderCellStyle(column)"
+                                aria-sort="@GetAriaSort(column)">
+                                <div class="vek-treelist-header-inner">
+                                    @if (isSortable)
+                                    {
+                                        <button type="button"
+                                                class="vek-treelist-sort-btn"
+                                                disabled="@GetDisabled()"
+                                                aria-label="@GetSortButtonAriaLabel(column)"
+                                                @onclick="@(e => OnHeaderSortClickAsync(e, column))">
+                                            <span class="vek-treelist-header-title">
+                                                @if (column.HeaderTemplate is not null)
+                                                {
+                                                    @column.HeaderTemplate(column)
+                                                }
+                                                else
+                                                {
+                                                    @column.Title
+                                                }
+                                            </span>
+                                            <span class="vek-treelist-sort-indicator" aria-hidden="true">
+                                                <VekIcon Icon="@SortIcon" Size="Size.Small" Class="@GetSortIconClass(column)" />
+                                                @if (_sortModeState.Value == SortMode.Multiple && column.SortOrderIndex >= 0)
+                                                {
+                                                    <span class="vek-treelist-sort-index">@(column.SortOrderIndex + 1)</span>
+                                                }
+                                            </span>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <div class="vek-treelist-header-content">
+                                            <span class="vek-treelist-header-title">
+                                                @if (column.HeaderTemplate is not null)
+                                                {
+                                                    @column.HeaderTemplate(column)
+                                                }
+                                                else
+                                                {
+                                                    @column.Title
+                                                }
+                                            </span>
+                                        </div>
+                                    }
+                                </div>
+                                @if (isResizable)
+                                {
+                                    <div @ref="column.ResizerElement"
+                                         role="separator"
+                                         aria-orientation="vertical"
+                                         tabindex="@(GetDisabled() ? -1 : 0)"
+                                         aria-label="@($"Resize {column.Title ?? "column"} column")"
+                                         aria-valuemin="@column.MinWidth"
+                                         aria-valuenow="@GetResizerAriaValueNow(column)"
+                                         class="@GetResizerClass(column)"
+                                         @onpointerdown="@(e => OnResizerPointerDownAsync(e, column))"
+                                         @onpointerdown:stopPropagation="true"
+                                         @onpointermove="OnResizerPointerMoveAsync"
+                                         @onpointerup="OnResizerPointerUpAsync"
+                                         @ondblclick="@(() => OnResizerDoubleClickAsync(column))"
+                                         @ondblclick:stopPropagation="true"
+                                         @onclick:stopPropagation="true"
+                                         @onkeydown="@(e => OnResizerKeyDownAsync(e, column))"
+                                         @onkeydown:stopPropagation="true">
+                                    </div>
+                                }
+                            </th>
+                        }
+                    </tr>
+                </thead>
+            }
+            <tbody class="vek-treelist-body">
+                @if (visibleRows.Count == 0)
+                {
+                    @if (EmptyContent is not null)
+                    {
+                        <tr class="vek-treelist-empty-row" role="row">
+                            <td class="vek-treelist-empty-cell" role="gridcell" colspan="@Math.Max(1, visibleColumns.Count)">
+                                @EmptyContent
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    @foreach (var row in visibleRows)
+                    {
+                        @RenderTreeRow(row, visibleColumns, primaryColumn, visibleRows)
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    private RenderFragment RenderTreeRow(
+        TreeListRow<T> row,
+        IReadOnlyList<VekTreeListColumn<T>> visibleColumns,
+        VekTreeListColumn<T>? primaryColumn,
+        IReadOnlyList<TreeListRow<T>> visibleRows) => __builder =>
+    {
+        var item = row.Item;
+        var hasChildren = DetermineHasChildren(item);
+        var isLoading = IsNodeLoading(item);
+        var isSelected = IsItemSelected(item);
+        var isFocused = ReferenceEquals(_focusedItem, item);
+        var rowDisabled = GetDisabled();
+
+        <tr @key="item"
+            role="row"
+            class="@GetRowClass(item, isSelected, rowDisabled)"
+            aria-level="@(row.Depth + 1)"
+            aria-posinset="@row.PosInSet"
+            aria-setsize="@row.SetSize"
+            aria-expanded="@(hasChildren ? (item.Expanded ? "true" : "false") : null)"
+            aria-selected="@(Selectable ? (isSelected ? "true" : "false") : null)"
+            aria-disabled="@(rowDisabled ? "true" : null)"
+            tabindex="@(isFocused && !rowDisabled ? 0 : -1)"
+            @onfocus="@(() => OnRowFocus(item))"
+            @onclick="@(e => OnRowClickAsync(e, row))"
+            @ondblclick="@(e => OnRowDoubleClickAsync(e, row))"
+            @onkeydown="@(e => OnRowKeyDownAsync(e, row, visibleRows))">
+            @{
+                // Capture row ElementReference so keyboard navigation can move browser focus smoothly.
+                __builder.AddElementReferenceCapture(1, el => _rowElements[item] = el);
+            }
+            @foreach (var column in visibleColumns)
+            {
+                var isPrimary = ReferenceEquals(column, primaryColumn);
+                <td @key="column"
+                    role="gridcell"
+                    class="@GetBodyCellClass(column, isPrimary)"
+                    style="@GetBodyCellStyle(column)">
+                    @if (isPrimary)
+                    {
+                        <div class="vek-treelist-tree-cell" style="@GetTreeIndentStyle(row.Depth)">
+                            @if (hasChildren)
+                            {
+                                <button type="button"
+                                        class="@GetToggleButtonClass(item, isLoading)"
+                                        tabindex="-1"
+                                        disabled="@rowDisabled"
+                                        aria-label="@(item.Expanded ? Localizer[LanguageResource.VekTreeView_CollapseItem] : Localizer[LanguageResource.VekTreeView_ExpandItem])"
+                                        @onclick="@(() => ToggleNodeAsync(item))"
+                                        @onclick:stopPropagation="true"
+                                        @ondblclick:stopPropagation="true">
+                                    <VekIcon Icon="@(isLoading ? LoadingIcon : ExpandButtonIcon)" Size="Size.Small" />
+                                </button>
+                            }
+                            else
+                            {
+                                <span class="vek-treelist-toggle-spacer" aria-hidden="true"></span>
+                            }
+
+                            @if (_selectionModeState.Value == SelectionMode.MultiSelection && Selectable)
+                            {
+                                var checkState = GetTriStateChecked(item);
+                                <button type="button"
+                                        role="checkbox"
+                                        tabindex="-1"
+                                        class="@GetCheckBoxClass()"
+                                        aria-checked="@GetAriaChecked(checkState)"
+                                        aria-label="@GetItemLabel(item)"
+                                        disabled="@(rowDisabled || GetReadOnly())"
+                                        @onclick="@(() => OnMultiSelectToggleAsync(item))"
+                                        @onclick:stopPropagation="true"
+                                        @ondblclick:stopPropagation="true">
+                                    <VekIcon Icon="@GetCheckBoxIcon(checkState)" Color="@CheckBoxColor" Size="Size.Small" />
+                                </button>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(item.Icon))
+                            {
+                                <span class="vek-treelist-node-icon" aria-hidden="true">
+                                    <VekIcon Icon="@item.Icon" Size="Size.Small" Disabled="@rowDisabled" />
+                                </span>
+                            }
+
+                            <span class="vek-treelist-cell-content">
+                                @RenderColumnValue(column, item, isPrimary)
+                            </span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="vek-treelist-cell-content">
+                            @RenderColumnValue(column, item, isPrimary)
+                        </div>
+                    }
+                </td>
+            }
+        </tr>
+    };
+
+    private RenderFragment RenderColumnValue(VekTreeListColumn<T> column, ITreeItemData<T> item, bool isPrimary) => __builder =>
+    {
+        if (column.CellTemplate is not null)
+        {
+            @column.CellTemplate(item)
+        }
+        else
+        {
+            @FormatCellValue(column, item, isPrimary)
+        }
+    };
+}

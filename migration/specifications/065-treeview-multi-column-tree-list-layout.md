@@ -4,9 +4,12 @@
 - **Feature ID**: 065
 - **Feature Slug**: treeview-multi-column-tree-list-layout
 - **Module**: TreeView
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 65
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/131
+- **Started At**: 2026-11-24T17:34:50Z
+- **Completed At**: 2026-11-24T19:40:53Z
 
 ---
 

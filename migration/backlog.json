@@ -817,9 +817,12 @@
       "title": "TreeView Multi-Column TreeList Layout with Resizable Columns",
       "module": "TreeView",
       "priority": 65,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/065-treeview-multi-column-tree-list-layout.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-24T17:34:50Z",
+      "completed_at": "2026-11-24T19:40:53Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/131"
     },
     {
       "id": "066",
