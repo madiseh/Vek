@@ -4,9 +4,12 @@
 - **Feature ID**: 075
 - **Feature Slug**: fileupload-multi-file-queue-and-cancel
 - **Module**: FileUpload
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 75
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/130
+- **Started At**: 2026-11-24T17:34:51Z
+- **Completed At**: 2026-11-24T19:39:36Z
 
 ---
 

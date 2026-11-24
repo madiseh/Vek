@@ -934,9 +934,12 @@
       "title": "FileUpload Multi-File Queue Management with Individual Retry and Cancel",
       "module": "FileUpload",
       "priority": 75,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/075-fileupload-multi-file-queue-and-cancel.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-24T17:34:51Z",
+      "completed_at": "2026-11-24T19:39:36Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/130"
     },
     {
       "id": "076",
