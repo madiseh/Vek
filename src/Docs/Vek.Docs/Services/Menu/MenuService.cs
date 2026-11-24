@@ -137,7 +137,6 @@ namespace Vek.Docs.Services
                 .AddItem("Numeric Field", typeof(VekNumericField<T>))
                 .AddItem("Form", typeof(VekForm))
                 .AddItem("Field", typeof(VekField))
-                .AddItem("File Upload", typeof(VekFileUpload<T>))
                 .AddItem("Toggle Group", typeof(VekToggleGroup<T>), typeof(VekToggleItem<T>))
             , icon: Icons.Material.Filled.TextFields)
 
@@ -149,6 +148,16 @@ namespace Vek.Docs.Services
                 .AddItem("Validation & Coercion", typeof(VekAutocomplete<T>), "autocomplete/validation-coercion")
                 .AddItem("Keyboard & Accessibility", typeof(VekAutocomplete<T>), "autocomplete/keyboard-accessibility")
             , sortByName: false, icon: Icons.Material.Filled.Search)
+
+            // File Upload
+            .AddNavGroup("File Upload", false, new DocsComponents()
+                .AddItem("Overview", typeof(VekFileUpload<T>), "fileupload")
+                .AddItem("Drag & Drop", typeof(VekFileUpload<T>), "fileupload/drag-and-drop")
+                .AddItem("Validation & Previews", typeof(VekFileUpload<T>), "fileupload/validation-previews")
+                .AddItem("Chunked Upload", typeof(VekFileUpload<T>), "fileupload/chunked-upload")
+                .AddItem("Templates & Styling", typeof(VekFileUpload<T>), "fileupload/templates-styling")
+                .AddItem("Drop Zone", typeof(VekDropZone<T>), "dropzone")
+            , sortByName: false, icon: Icons.Material.Filled.CloudUpload)
 
             // Pickers
             .AddNavGroup("Date Picker", false, new DocsComponents()

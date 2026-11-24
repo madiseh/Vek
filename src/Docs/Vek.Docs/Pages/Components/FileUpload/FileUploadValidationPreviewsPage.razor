@@ -1,0 +1,45 @@
+@page "/components/fileupload/validation-previews"
+
+<DocsPage>
+    <DocsPageHeader Title="File Upload - Validation & Previews" Component="@nameof(VekFileUpload<T>)">
+        <Description>Enforce file size limits, MIME types, extensions, model validation with VekForm, and image thumbnail previews.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Image Previews and Client Validation">
+                <Description>
+                    Set <CodeInline>AllowedExtensions</CodeInline>, <CodeInline>AllowedMimeTypes</CodeInline>, and <CodeInline>MaxFileSize</CodeInline> to reject unsuitable files as soon as they are selected.
+                    The default file list shows a thumbnail for accepted image files and releases its temporary browser URL when the selection changes or is cleared.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" ShowCode="false" Code="@nameof(FileUploadImagePreviewExample)">
+                <FileUploadImagePreviewExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Form Validation">
+                <Description>
+                    Use <CodeInline>For</CodeInline> to validate against your model, and bind with <CodeInline>&#64;bind-Files</CodeInline>. Handle the upload in your
+                    <CodeInline>VekForm</CodeInline> submit handler. You can also call <CodeInline>ClearAsync</CodeInline> to reset files and update form state.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" ShowCode="false" Code="@nameof(FileUploadValidationExample)">
+                <FileUploadValidationExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Drag and Drop with Form Validation">
+                <Description>
+                    This example demonstrates how to combine drag-and-drop functionality with form validation, showing how to validate files before upload and provide user feedback.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" ShowCode="false" Code="@nameof(FileUploadDragAndDropWithFormValidationExample)">
+                <FileUploadDragAndDropWithFormValidationExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

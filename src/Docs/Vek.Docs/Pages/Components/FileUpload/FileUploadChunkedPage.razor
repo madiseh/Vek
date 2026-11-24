@@ -1,0 +1,25 @@
+@page "/components/fileupload/chunked-upload"
+
+<DocsPage>
+    <DocsPageHeader Title="File Upload - Chunked Upload & Progress" Component="@nameof(VekFileUpload<T>)">
+        <Description>Upload large files in bounded chunks with progress reporting and automatic transient retry resilience.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Chunked Upload with Progress">
+                <Description>
+                    Set <CodeInline>ChunkSizeInBytes</CodeInline> and call <CodeInline>UploadFilesAsync</CodeInline> with a handler that sends each chunk to your own destination.
+                    The component reads the selected files as bounded chunks, reports progress through <CodeInline>OnUploadProgress</CodeInline>, and retries connection failures, I/O failures, timeouts, and selected transient HTTP statuses (408, 425, 429, 500, 502, 503, and 504).
+                    Permanent HTTP responses and cancellation exceptions are not retried.
+                    Use <CodeInline>File.Name</CodeInline>, <CodeInline>ChunkIndex</CodeInline>, and <CodeInline>TotalChunks</CodeInline> to identify chunks on your server.
+                    The handler receives a cancellation token so in-flight work can honor cancellation; the component cancels it when disposed.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" ShowCode="false" Code="@nameof(FileUploadChunkedExample)">
+                <FileUploadChunkedExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

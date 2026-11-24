@@ -1,0 +1,57 @@
+@page "/components/fileupload/templates-styling"
+
+<DocsPage>
+    <DocsPageHeader Title="File Upload - Custom Content & Templates" Component="@nameof(VekFileUpload<T>)">
+        <Description>Customize trigger buttons, selected file templates, chip lists, and event handling callbacks.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Custom Content">
+                <Description>
+                    Use a <CodeInline>VekButton</CodeInline>, <CodeInline>VekIconButton</CodeInline>, <CodeInline>VekFab</CodeInline>, or any custom markup with the
+                    <CodeInline>CustomContent</CodeInline> render fragment. The fragment receives the <CodeInline>VekFileUpload</CodeInline> context so you can call its API.
+                    When <CodeInline>Disabled</CodeInline> is <CodeInline>true</CodeInline>, the component disables its child controls automatically.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" ShowCode="false" Code="@nameof(FileUploadButtonExample)">
+                <FileUploadButtonExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="SelectedTemplate">
+                <Description>
+                    Use <CodeInline>SelectedTemplate</CodeInline> to customize how selected files are rendered. If you want to suppress the default chip list,
+                    provide an empty <CodeInline>&lt;SelectedTemplate /&gt;</CodeInline> or <CodeInline>SelectedTemplate="&#64;(files => builder => { })"</CodeInline>. The <CodeInline>&#64;context</CodeInline> parameter matches <CodeInline>T</CodeInline>.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" ShowCode="false" Code="@nameof(FileUploadSelectedTemplateExample)">
+                <FileUploadSelectedTemplateExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Event Options">
+                <Description>
+                    <CodeInline>VekFileUpload</CodeInline> offers two approaches for handling file changes. For <CodeInline>VekForm</CodeInline> integration, use
+                    <CodeInline>Files</CodeInline>/<CodeInline>FilesChanged</CodeInline>. For custom handling, use <CodeInline>OnFilesChanged</CodeInline>; it fires even when
+                    validation fails unless <CodeInline>SuppressOnChangeWhenInvalid</CodeInline> is set to <CodeInline>true</CodeInline>.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" ShowCode="false" Code="@nameof(FileUploadEventOptionsExample)">
+                <FileUploadEventOptionsExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Different Layouts and Styles">
+                <Description>Explore different styling and interaction ideas with the default APIs.</Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" ShowCode="false" Code="@nameof(FileUploadMiscExample)">
+                <FileUploadMiscExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

@@ -307,6 +307,18 @@
     <loc>https://vekui.dev/components/fileupload</loc>
   </url>
   <url>
+    <loc>https://vekui.dev/components/fileupload/drag-and-drop</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/fileupload/validation-previews</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/fileupload/chunked-upload</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/fileupload/templates-styling</loc>
+  </url>
+  <url>
     <loc>https://vekui.dev/components/focustrap</loc>
   </url>
   <url>
