@@ -119,11 +119,19 @@ namespace Vek.Docs.Services
                 .AddItem("Masked Input", typeof(VekMaskedInput), "mask")
                 .AddItem("Numeric Field", typeof(VekNumericField<T>))
                 .AddItem("Form", typeof(VekForm))
-                .AddItem("Autocomplete", typeof(VekAutocomplete<T>))
                 .AddItem("Field", typeof(VekField))
                 .AddItem("File Upload", typeof(VekFileUpload<T>))
                 .AddItem("Toggle Group", typeof(VekToggleGroup<T>), typeof(VekToggleItem<T>))
             , icon: Icons.Material.Filled.TextFields)
+
+            // Autocomplete
+            .AddNavGroup("Autocomplete", false, new DocsComponents()
+                .AddItem("Overview", typeof(VekAutocomplete<T>), "autocomplete")
+                .AddItem("Templates & Presentation", typeof(VekAutocomplete<T>), "autocomplete/templates-presentation")
+                .AddItem("Async Search & Virtualization", typeof(VekAutocomplete<T>), "autocomplete/async-search-virtualization")
+                .AddItem("Validation & Coercion", typeof(VekAutocomplete<T>), "autocomplete/validation-coercion")
+                .AddItem("Keyboard & Accessibility", typeof(VekAutocomplete<T>), "autocomplete/keyboard-accessibility")
+            , sortByName: false, icon: Icons.Material.Filled.Search)
 
             // Pickers
             .AddNavGroup("Date Picker", false, new DocsComponents()
