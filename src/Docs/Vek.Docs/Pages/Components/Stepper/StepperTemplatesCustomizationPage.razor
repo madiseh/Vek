@@ -1,0 +1,33 @@
+@page "/components/stepper/templates-customization"
+
+<DocsPage>
+    <DocsPageHeader Title="Stepper - Templates & Customization" Component="@nameof(VekStepper)">
+        <Description>Customize step headers, labels, connectors, action button bars, dynamic steps, and completed content.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Customization">
+                <Description>
+                    The component can be customized via <CodeInline>@nameof(VekStepper.TitleTemplate)</CodeInline>, <CodeInline>@nameof(VekStepper.LabelTemplate)</CodeInline> and <CodeInline>@nameof(VekStepper.ConnectorTemplate)</CodeInline>.
+                    You can also add a success message after the last step thanks to the <CodeInline>@nameof(VekStepper.CompletedContent)</CodeInline> fragment.<br />
+                    Use <CodeInline>@nameof(VekStepper.ActionsClass)</CodeInline> to apply custom styles, such as sticky positioning, to the action bar.<br />
+                    You can also replace the step action buttons (previous, skip and next) by providing alternative buttons via the <CodeInline>@nameof(VekStepper.ActionContent)</CodeInline> template.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(StepperCustomizationExample)" ShowCode="false">
+                <StepperCustomizationExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Dynamically adding or removing steps">
+                <Description>By maintaining a list of steps you can easily add or remove steps programmatically. In this example we also set a custom <CodeInline>@nameof(VekStepper.CompletedContent)</CodeInline> that shows after the final step has been completed. </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(StepperDynamicExample)" ShowCode="false">
+                <StepperDynamicExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>
