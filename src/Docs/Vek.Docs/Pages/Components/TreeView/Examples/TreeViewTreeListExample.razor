@@ -1,0 +1,178 @@
+@namespace Vek.Docs.Examples
+
+<VekStack Spacing="3" Style="width: 100%; min-width: 0;">
+    <VekPaper Outlined="true" Class="pa-3">
+        <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Wrap="Wrap.Wrap">
+            <VekButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary" OnClick="ExpandAllAsync">
+                Expand All
+            </VekButton>
+            <VekButton Variant="Variant.Outlined" Size="Size.Small" OnClick="CollapseAllAsync">
+                Collapse All
+            </VekButton>
+            <VekButton Variant="Variant.Outlined" Size="Size.Small" OnClick="ResetWidthsAsync">
+                Reset Column Widths
+            </VekButton>
+            <VekCheckBox @bind-Value="_dense" Label="Dense" Dense="true" />
+            <VekCheckBox @bind-Value="_bordered" Label="Bordered" Dense="true" />
+            <VekCheckBox @bind-Value="_striped" Label="Striped" Dense="true" />
+            <VekCheckBox @bind-Value="_multiSelect" Label="Multi-Select" Dense="true" />
+        </VekStack>
+    </VekPaper>
+
+    <VekTreeList @ref="_treeList"
+                 T="WorkspaceEntry"
+                 Items="@_items"
+                 SelectionMode="@(_multiSelect ? SelectionMode.MultiSelection : SelectionMode.SingleSelection)"
+                 @bind-SelectedValue="_selectedEntry"
+                 @bind-SelectedValues="_selectedEntries"
+                 Dense="@_dense"
+                 Bordered="@_bordered"
+                 Striped="@_striped"
+                 Hover="true"
+                 ColumnResizeMode="ResizeMode.Container"
+                 SortMode="SortMode.Multiple"
+                 MaxHeight="420px"
+                 FixedHeader="true"
+                 OnSortChanged="HandleSortChanged"
+                 OnColumnResized="HandleColumnResized">
+        <Columns>
+            <VekTreeListColumn T="WorkspaceEntry" Title="Module" Field="@(x => x.Name)" Width="230px" MinWidth="150" />
+            <VekTreeListColumn T="WorkspaceEntry" Title="Owner" Field="@(x => x.Owner)" Width="140px" MinWidth="95" />
+            <VekTreeListColumn T="WorkspaceEntry" Title="Kind" Field="@(x => x.Kind)" Width="115px" MinWidth="85">
+                <CellTemplate Context="node">
+                    @if (node.Value is not null)
+                    {
+                        <VekChip T="string" Size="Size.Small" Variant="Variant.Text" Color="@GetKindColor(node.Value.Kind)">
+                            @node.Value.Kind
+                        </VekChip>
+                    }
+                </CellTemplate>
+            </VekTreeListColumn>
+            <VekTreeListColumn T="WorkspaceEntry" Title="Size (KB)" Field="@(x => x.SizeKb)" Format="N0" Width="125px" MinWidth="95" Alignment="HorizontalAlignment.End" />
+            <VekTreeListColumn T="WorkspaceEntry" Title="Updated" Field="@(x => x.Updated)" Format="yyyy-MM-dd" Width="125px" MinWidth="95" Alignment="HorizontalAlignment.End" />
+        </Columns>
+    </VekTreeList>
+
+    <VekText Typo="Typo.caption" Color="Color.Secondary">
+        @_statusMessage
+    </VekText>
+</VekStack>
+
+@code {
+#nullable enable
+    private VekTreeList<WorkspaceEntry>? _treeList;
+    private bool _dense;
+    private bool _bordered = true;
+    private bool _striped;
+    private bool _multiSelect;
+    private WorkspaceEntry? _selectedEntry;
+    private IReadOnlyCollection<WorkspaceEntry>? _selectedEntries;
+    private string _statusMessage = "Click column headers to sort (Ctrl+click for multi-sort), drag header edges to resize, or double-click an edge to reset.";
+
+    private sealed record WorkspaceEntry(string Name, string Owner, string Kind, int SizeKb, DateOnly Updated);
+
+    private readonly List<ITreeItemData<WorkspaceEntry>> _items =
+    [
+        new TreeItemData<WorkspaceEntry>(new WorkspaceEntry("Core Platform", "Elena Vance", "Division", 18420, new DateOnly(2026, 10, 18)))
+        {
+            Text = "Core Platform",
+            Icon = Icons.Material.Filled.Folder,
+            Expanded = true,
+            Children =
+            [
+                new TreeItemData<WorkspaceEntry>(new WorkspaceEntry("Authentication Service", "Marcus Chen", "Service", 4210, new DateOnly(2026, 10, 14)))
+                {
+                    Text = "Authentication Service",
+                    Icon = Icons.Material.Filled.Folder,
+                    Expanded = true,
+                    Children =
+                    [
+                        new TreeItemData<WorkspaceEntry>(new WorkspaceEntry("TokenIssuer.cs", "Marcus Chen", "Source", 64, new DateOnly(2026, 10, 14)))
+                        {
+                            Text = "TokenIssuer.cs",
+                            Icon = Icons.Material.Filled.Code,
+                            HasChildren = false
+                        },
+                        new TreeItemData<WorkspaceEntry>(new WorkspaceEntry("SessionStore.cs", "Priya Nair", "Source", 48, new DateOnly(2026, 10, 11)))
+                        {
+                            Text = "SessionStore.cs",
+                            Icon = Icons.Material.Filled.Code,
+                            HasChildren = false
+                        }
+                    ]
+                },
+                new TreeItemData<WorkspaceEntry>(new WorkspaceEntry("Telemetry Pipeline", "Liam O'Connor", "Service", 7340, new DateOnly(2026, 10, 9)))
+                {
+                    Text = "Telemetry Pipeline",
+                    Icon = Icons.Material.Filled.Folder,
+                    Expanded = false,
+                    Children =
+                    [
+                        new TreeItemData<WorkspaceEntry>(new WorkspaceEntry("MetricsCollector.cs", "Liam O'Connor", "Source", 92, new DateOnly(2026, 10, 9)))
+                        {
+                            Text = "MetricsCollector.cs",
+                            Icon = Icons.Material.Filled.Code,
+                            HasChildren = false
+                        }
+                    ]
+                }
+            ]
+        },
+        new TreeItemData<WorkspaceEntry>(new WorkspaceEntry("Design System", "Sofia Rossi", "Division", 9650, new DateOnly(2026, 10, 21)))
+        {
+            Text = "Design System",
+            Icon = Icons.Material.Filled.Folder,
+            Expanded = true,
+            Children =
+            [
+                new TreeItemData<WorkspaceEntry>(new WorkspaceEntry("Component Tokens", "Sofia Rossi", "Library", 1280, new DateOnly(2026, 10, 21)))
+                {
+                    Text = "Component Tokens",
+                    Icon = Icons.Material.Filled.Palette,
+                    HasChildren = false
+                },
+                new TreeItemData<WorkspaceEntry>(new WorkspaceEntry("TreeList Layout", "Noah Kim", "Component", 840, new DateOnly(2026, 10, 20)))
+                {
+                    Text = "TreeList Layout",
+                    Icon = Icons.Material.Filled.AccountTree,
+                    HasChildren = false
+                }
+            ]
+        },
+        new TreeItemData<WorkspaceEntry>(new WorkspaceEntry("Release Checklist", "Elena Vance", "Document", 310, new DateOnly(2026, 10, 22)))
+        {
+            Text = "Release Checklist",
+            Icon = Icons.Material.Filled.Description,
+            HasChildren = false
+        }
+    ];
+
+    private static Color GetKindColor(string kind) => kind switch
+    {
+        "Division" => Color.Primary,
+        "Service" => Color.Info,
+        "Component" => Color.Success,
+        "Library" => Color.Secondary,
+        _ => Color.Default
+    };
+
+    private Task ExpandAllAsync() => _treeList?.ExpandAllAsync() ?? Task.CompletedTask;
+
+    private Task CollapseAllAsync() => _treeList?.CollapseAllAsync() ?? Task.CompletedTask;
+
+    private Task ResetWidthsAsync() => _treeList?.ResetColumnWidthsAsync() ?? Task.CompletedTask;
+
+    private void HandleSortChanged(TreeListSortEventArgs<WorkspaceEntry> args)
+    {
+        _statusMessage = args.SortDirection == SortDirection.None
+            ? $"Cleared sort on '{args.Column.Title}'."
+            : $"Sorted '{args.Column.Title}' ({args.SortDirection}). Active sort columns: {args.ActiveSorts.Count}.";
+    }
+
+    private void HandleColumnResized(TreeListColumnResizeEventArgs<WorkspaceEntry> args)
+    {
+        _statusMessage = args.NewWidth.HasValue
+            ? $"Resized '{args.Column.Title}' from {args.OldWidth:0}px to {args.NewWidth.Value:0}px."
+            : $"Reset width on '{args.Column.Title}'.";
+    }
+}

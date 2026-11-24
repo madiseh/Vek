@@ -210,3 +210,372 @@
     transform: scaleX(-1);
   }
 }
+
+.vek-treelist {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  color: var(--vek-palette-text-primary);
+  background-color: var(--vek-palette-surface);
+  border: 1px solid var(--vek-palette-lines-default);
+  border-radius: var(--vek-default-borderradius);
+  overflow: hidden;
+
+  @each $color in $vek-palette-colors {
+    &.vek-treelist-selected-#{$color} {
+      .vek-treelist-row.vek-treelist-row-selected {
+        background-color: var(--vek-palette-#{$color}-hover);
+        color: var(--vek-palette-#{$color});
+      }
+    }
+  }
+
+  &.vek-treelist-resizing-active {
+    cursor: col-resize;
+    user-select: none;
+  }
+
+  &.vek-treelist-disabled {
+    color: var(--vek-palette-action-disabled);
+    pointer-events: none;
+  }
+}
+
+.vek-treelist-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+.vek-treelist-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.vek-treelist-head {
+  background-color: var(--vek-palette-background-gray);
+}
+
+.vek-treelist-fixed-header .vek-treelist-head th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: var(--vek-palette-background-gray);
+}
+
+.vek-treelist-header-cell {
+  position: relative;
+  padding: 0;
+  border-bottom: 1px solid var(--vek-palette-lines-default);
+  text-align: start;
+  font-size: var(--vek-typography-subtitle2-size);
+  font-family: var(--vek-typography-subtitle2-family);
+  font-weight: var(--vek-typography-subtitle2-weight);
+  line-height: var(--vek-typography-subtitle2-lineheight);
+  color: var(--vek-palette-text-primary);
+  vertical-align: middle;
+  user-select: none;
+
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 25%;
+    bottom: 25%;
+    inset-inline-end: 0;
+    width: 1px;
+    background-color: var(--vek-palette-lines-default);
+    pointer-events: none;
+  }
+}
+
+.vek-treelist-header-inner {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  width: 100%;
+}
+
+.vek-treelist-sort-btn,
+.vek-treelist-header-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  padding: 10px 14px;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+}
+
+.vek-treelist-sort-btn {
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--vek-palette-primary);
+    outline-offset: -2px;
+  }
+}
+
+.vek-treelist-header-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vek-treelist-sort-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.vek-treelist-sort-icon {
+  opacity: 0;
+  color: var(--vek-palette-text-secondary);
+  transition: opacity 150ms ease, transform 150ms ease;
+
+  &.vek-treelist-sort-asc {
+    opacity: 1;
+    color: var(--vek-palette-primary);
+    transform: rotate(0deg);
+  }
+
+  &.vek-treelist-sort-desc {
+    opacity: 1;
+    color: var(--vek-palette-primary);
+    transform: rotate(180deg);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vek-treelist-sort-btn:hover .vek-treelist-sort-icon {
+    opacity: 0.75;
+  }
+}
+
+.vek-treelist-sort-index {
+  font-size: 0.75rem;
+  color: var(--vek-palette-text-secondary);
+}
+
+.vek-treelist-resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  inset-inline-end: 0;
+  width: 8px;
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+  z-index: 3;
+
+  &:focus-visible {
+    outline: 2px solid var(--vek-palette-primary);
+    outline-offset: -2px;
+  }
+
+  &.vek-treelist-resizing {
+    border-inline-end: 2px solid var(--vek-palette-primary);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vek-treelist-resizer:hover {
+    border-inline-end: 2px solid var(--vek-palette-primary);
+  }
+}
+
+.vek-treelist-row {
+  transition: background-color 150ms ease;
+
+  &:focus-visible {
+    outline: 2px solid var(--vek-palette-primary);
+    outline-offset: -2px;
+  }
+}
+
+.vek-treelist-striped .vek-treelist-body .vek-treelist-row:nth-child(even) {
+  background-color: var(--vek-palette-background-gray);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vek-treelist-hover .vek-treelist-body .vek-treelist-row:hover {
+    background-color: var(--vek-palette-table-hover);
+  }
+}
+
+.vek-treelist-cell {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--vek-palette-table-lines);
+  font-size: var(--vek-typography-body2-size);
+  font-family: var(--vek-typography-body2-family);
+  line-height: var(--vek-typography-body2-lineheight);
+  vertical-align: middle;
+  min-width: 0;
+}
+
+.vek-treelist-body .vek-treelist-row:last-child .vek-treelist-cell {
+  border-bottom: none;
+}
+
+.vek-treelist-bordered {
+  .vek-treelist-header-cell,
+  .vek-treelist-cell {
+    border-inline-end: 1px solid var(--vek-palette-table-lines);
+
+    &:last-child {
+      border-inline-end: none;
+    }
+  }
+}
+
+.vek-treelist-tree-cell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.vek-treelist-cell-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vek-treelist-toggle-btn,
+.vek-treelist-toggle-spacer {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vek-treelist-toggle-btn {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--vek-palette-text-secondary);
+  border-radius: var(--vek-default-borderradius);
+  cursor: pointer;
+  transition: transform 200ms cubic-bezier(0.25, 0.8, 0.5, 1), background-color 150ms ease;
+
+  &:hover:not(:disabled) {
+    background-color: var(--vek-palette-action-default-hover);
+    color: var(--vek-palette-text-primary);
+  }
+
+  &.vek-treelist-toggle-expanded {
+    transform: rotate(90deg);
+  }
+
+  &.vek-treelist-toggle-loading {
+    animation: rotation 1s infinite linear;
+  }
+}
+
+.vek-treelist-checkbox {
+  padding: 2px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  border-radius: var(--vek-default-borderradius);
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.5;
+  }
+}
+
+.vek-treelist-node-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-inline-end: 2px;
+  color: var(--vek-palette-text-secondary);
+}
+
+.vek-treelist-align-start {
+  text-align: start;
+
+  .vek-treelist-sort-btn,
+  .vek-treelist-header-content {
+    justify-content: flex-start;
+  }
+}
+
+.vek-treelist-align-center {
+  text-align: center;
+
+  .vek-treelist-sort-btn,
+  .vek-treelist-header-content {
+    justify-content: center;
+  }
+}
+
+.vek-treelist-align-end {
+  text-align: end;
+
+  .vek-treelist-sort-btn,
+  .vek-treelist-header-content {
+    justify-content: flex-end;
+  }
+}
+
+.vek-treelist-align-left {
+  text-align: left;
+
+  .vek-treelist-sort-btn,
+  .vek-treelist-header-content {
+    justify-content: flex-start;
+  }
+}
+
+.vek-treelist-align-right {
+  text-align: right;
+
+  .vek-treelist-sort-btn,
+  .vek-treelist-header-content {
+    justify-content: flex-end;
+  }
+}
+
+.vek-treelist-dense {
+  .vek-treelist-sort-btn,
+  .vek-treelist-header-content {
+    padding: 6px 10px;
+  }
+
+  .vek-treelist-cell {
+    padding: 4px 10px;
+  }
+}
+
+.vek-treelist-empty-cell {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--vek-palette-text-secondary);
+}
+
+.vek-application-layout-rtl {
+  .vek-treelist-toggle-btn:not(.vek-treelist-toggle-expanded):not(.vek-treelist-toggle-loading) {
+    transform: scaleX(-1);
+  }
+}
