@@ -1,0 +1,115 @@
+@using System.Net
+@using System.Net.Http
+@using Microsoft.AspNetCore.Components.Forms
+@namespace Vek.Docs.Examples
+
+<div class="d-flex flex-column gap-3" style="max-width: 48rem;">
+    <div class="d-flex flex-wrap gap-2">
+        <VekButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Disabled="@(!HasQueuedItems || _isUploading)"
+                   OnClick="StartUploadAsync">
+            @(_isUploading ? "Uploading queue..." : "Start upload")
+        </VekButton>
+        <VekButton Variant="Variant.Outlined"
+                   Color="Color.Secondary"
+                   Disabled="@_isUploading"
+                   OnClick="LoadSampleBatch">
+            Reset sample batch
+        </VekButton>
+        <VekButton Variant="Variant.Text"
+                   Disabled="@(_files is null || _files.Count == 0)"
+                   OnClick="ClearAllAsync">
+            Clear all
+        </VekButton>
+    </div>
+
+    <VekFileUpload T="IReadOnlyList<IBrowserFile>"
+                   @ref="_fileUpload"
+                   @bind-Files="_files"
+                   @bind-Queue="_queue"
+                   ShowQueue="true"
+                   AppendMultipleFiles="true"
+                   ChunkSizeInBytes="65536"
+                   MaxChunkRetries="0"
+                   UploadChunk="UploadChunkAsync" />
+
+    <VekText Typo="Typo.caption">
+        Select files or use the preloaded batch to test per-file progress bars, canceling active uploads, retrying failed items, and clearing completed entries.
+    </VekText>
+</div>
+
+@code {
+    private VekFileUpload<IReadOnlyList<IBrowserFile>> _fileUpload = default!;
+    private IReadOnlyList<IBrowserFile> _files;
+    private IReadOnlyList<FileUploadItem> _queue;
+    private bool _isUploading;
+    private bool _failBrokenExportOnce = true;
+
+    private bool HasQueuedItems => _queue?.Any(item => item.Status == FileUploadStatus.Queued) == true;
+
+    protected override void OnInitialized()
+    {
+        LoadSampleBatch();
+    }
+
+    private void LoadSampleBatch()
+    {
+        _failBrokenExportOnce = true;
+        _files =
+        [
+            new SampleBrowserFile("quarterly-report.pdf", 192 * 1024, "application/pdf"),
+            new SampleBrowserFile("broken-export.csv", 128 * 1024, "text/csv"),
+            new SampleBrowserFile("release-notes.md", 64 * 1024, "text/markdown")
+        ];
+    }
+
+    private async Task StartUploadAsync()
+    {
+        if (_fileUpload is null || _isUploading)
+            return;
+
+        _isUploading = true;
+        try
+        {
+            await _fileUpload.UploadFilesAsync(UploadChunkAsync);
+        }
+        finally
+        {
+            _isUploading = false;
+        }
+    }
+
+    private async Task ClearAllAsync()
+    {
+        if (_fileUpload is null)
+            return;
+
+        await _fileUpload.ClearAsync();
+        _failBrokenExportOnce = true;
+    }
+
+    private async Task UploadChunkAsync(FileUploadChunkEventArgs chunk, CancellationToken cancellationToken)
+    {
+        await Task.Delay(120, cancellationToken);
+
+        if (chunk.File.Name == "broken-export.csv" && _failBrokenExportOnce && chunk.ChunkIndex == 0)
+        {
+            _failBrokenExportOnce = false;
+            throw new HttpRequestException("Simulated server error for demonstration.", null, HttpStatusCode.BadRequest);
+        }
+    }
+
+    private sealed class SampleBrowserFile(string name, long size, string contentType) : IBrowserFile
+    {
+        private readonly byte[] _content = new byte[size];
+
+        public string Name { get; } = name;
+        public DateTimeOffset LastModified { get; } = DateTimeOffset.UtcNow;
+        public long Size { get; } = size;
+        public string ContentType { get; } = contentType;
+
+        public Stream OpenReadStream(long maxAllowedSize = 512000, CancellationToken cancellationToken = default)
+            => new MemoryStream(_content);
+    }
+}

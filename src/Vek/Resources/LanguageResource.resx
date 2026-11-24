@@ -597,6 +597,63 @@
   <data name="VekFileUpload_MaximumFileCountExceeded" xml:space="preserve">
     <value>Selected {0} files, which exceeds the maximum of {1}</value>
   </data>
+  <data name="VekFileUpload_QueueLabel" xml:space="preserve">
+    <value>File upload queue</value>
+  </data>
+  <data name="VekFileUpload_QueueTableLabel" xml:space="preserve">
+    <value>Queued files</value>
+  </data>
+  <data name="VekFileUpload_QueueSummary" xml:space="preserve">
+    <value>{0} of {1} uploaded</value>
+  </data>
+  <data name="VekFileUpload_ClearCompleted" xml:space="preserve">
+    <value>Clear completed</value>
+  </data>
+  <data name="VekFileUpload_ColumnFile" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="VekFileUpload_ColumnSize" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="VekFileUpload_ColumnProgress" xml:space="preserve">
+    <value>Progress</value>
+  </data>
+  <data name="VekFileUpload_ColumnStatus" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="VekFileUpload_ColumnActions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="VekFileUpload_StatusQueued" xml:space="preserve">
+    <value>Queued</value>
+  </data>
+  <data name="VekFileUpload_StatusUploading" xml:space="preserve">
+    <value>Uploading</value>
+  </data>
+  <data name="VekFileUpload_StatusSuccess" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="VekFileUpload_StatusError" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="VekFileUpload_Cancel" xml:space="preserve">
+    <value>Cancel upload</value>
+  </data>
+  <data name="VekFileUpload_CancelFile" xml:space="preserve">
+    <value>Cancel upload for {0}</value>
+  </data>
+  <data name="VekFileUpload_Retry" xml:space="preserve">
+    <value>Retry upload</value>
+  </data>
+  <data name="VekFileUpload_RetryFile" xml:space="preserve">
+    <value>Retry upload for {0}</value>
+  </data>
+  <data name="VekFileUpload_ProgressLabel" xml:space="preserve">
+    <value>Upload progress for {0}</value>
+  </data>
+  <data name="VekFileUpload_UploadCanceled" xml:space="preserve">
+    <value>Upload canceled.</value>
+  </data>
   <data name="VekExitPrompt_Title" xml:space="preserve">
     <value>Confirm Navigation</value>
   </data>

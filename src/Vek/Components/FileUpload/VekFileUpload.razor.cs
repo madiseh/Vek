@@ -2,6 +2,7 @@
 // Vek licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
@@ -22,6 +23,9 @@ namespace Vek
     {
         private readonly ParameterState<T?> _filesState;
         private readonly ParameterState<bool> _draggingState;
+        private readonly ParameterState<bool> _showQueueState;
+        private readonly ParameterState<bool> _autoUploadState;
+        private readonly ParameterState<IReadOnlyList<FileUploadItem>?> _queueState;
         private readonly CancellationTokenSource _lifetimeCancellation = new();
         private readonly CancellationToken _lifetimeToken;
 
@@ -41,15 +45,30 @@ namespace Vek
             using var registerScope = CreateRegisterScope();
             _filesState = registerScope.RegisterParameter<T?>(nameof(Files))
                 .WithParameter(() => Files)
-                .WithEventCallback(() => FilesChanged);
+                .WithEventCallback(() => FilesChanged)
+                .WithChangeHandler(OnFilesParameterChangedAsync);
             _draggingState = registerScope.RegisterParameter<bool>(nameof(Dragging))
                 .WithParameter(() => Dragging)
                 .WithEventCallback(() => DraggingChanged);
+            _showQueueState = registerScope.RegisterParameter<bool>(nameof(ShowQueue))
+                .WithParameter(() => ShowQueue);
+            _autoUploadState = registerScope.RegisterParameter<bool>(nameof(AutoUpload))
+                .WithParameter(() => AutoUpload);
+            _queueState = registerScope.RegisterParameter<IReadOnlyList<FileUploadItem>?>(nameof(Queue))
+                .WithParameter(() => Queue)
+                .WithEventCallback(() => QueueChanged)
+                .WithChangeHandler(OnQueueParameterChangedAsync);
         }
 
         private readonly string _id = Identifier.Create();
         private readonly List<string> _validationErrors = [];
         private readonly Dictionary<IBrowserFile, string> _imagePreviewUrls = new(ReferenceEqualityComparer.Instance);
+        private readonly List<FileUploadItem> _queueItems = [];
+        private readonly Dictionary<string, CancellationTokenSource> _activeUploadTokens = new(StringComparer.Ordinal);
+        private readonly HashSet<string> _canceledItemIds = new(StringComparer.Ordinal);
+        private Func<FileUploadChunkEventArgs, CancellationToken, Task>? _lastUploadChunkHandler;
+        private bool _isSyncingQueue;
+        private bool _hasExternalQueue;
 
         protected string Classname =>
             new CssBuilder("vek-file-upload")
@@ -128,6 +147,47 @@ namespace Vek
         [Parameter]
         [Category(CategoryTypes.FileUpload.Behavior)]
         public EventCallback<FileUploadProgressEventArgs> OnUploadProgress { get; set; }
+
+        /// <summary>
+        /// Displays the interactive upload queue table with individual progress bars and cancel/retry actions.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. Ignored when <see cref="SelectedTemplate"/> is supplied.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FileUpload.Appearance)]
+        public bool ShowQueue { get; set; }
+
+        /// <summary>
+        /// Starts uploading newly queued files automatically after selection when <see cref="UploadChunk"/> is set.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FileUpload.Behavior)]
+        public bool AutoUpload { get; set; }
+
+        /// <summary>
+        /// Uploads one chunk to the consumer's destination when running queue uploads or retrying failed items.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FileUpload.Behavior)]
+        public Func<FileUploadChunkEventArgs, CancellationToken, Task>? UploadChunk { get; set; }
+
+        /// <summary>
+        /// The tracked upload queue items for the selected files.
+        /// </summary>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FileUpload.Behavior)]
+        public IReadOnlyList<FileUploadItem>? Queue { get; set; }
+
+        /// <summary>
+        /// Occurs when <see cref="Queue"/> has changed.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FileUpload.Behavior)]
+        public EventCallback<IReadOnlyList<FileUploadItem>?> QueueChanged { get; set; }
 
         /// <summary>
         /// Occurs when a drag operation enters this component.
@@ -422,6 +482,7 @@ namespace Vek
                     // Single selection with matching name: clear selection
                     await _filesState.SetValueAsync(default);
                     await RevokeImagePreviewsForFilesAsync([singleFile]);
+                    await SyncQueueFromFilesAsync(default);
                     return true;
 
                 case IReadOnlyList<IBrowserFile> fileList:
@@ -436,16 +497,11 @@ namespace Vek
                         var removedFiles = fileList.Where(f => f.Name == filename).ToArray();
                         await RevokeImagePreviewsForFilesAsync(removedFiles);
 
-                        if (updatedList.Count == 0)
-                        {
-                            // Treat removal of the last file as "no selection"
-                            await _filesState.SetValueAsync(default);
-                        }
-                        else
-                        {
-                            // T is expected to be IReadOnlyList<IBrowserFile> here
-                            await _filesState.SetValueAsync((T)(object)updatedList);
-                        }
+                        T? nextValue = updatedList.Count == 0
+                            ? default
+                            : (T)(object)updatedList;
+                        await _filesState.SetValueAsync(nextValue);
+                        await SyncQueueFromFilesAsync(nextValue);
 
                         return true;
                     }
@@ -485,6 +541,7 @@ namespace Vek
                     // Single selection with the same instance: clear selection
                     await _filesState.SetValueAsync(default);
                     await RevokeImagePreviewsForFilesAsync([singleFile]);
+                    await SyncQueueFromFilesAsync(default);
                     return true;
 
                 case IReadOnlyList<IBrowserFile> fileList:
@@ -499,14 +556,11 @@ namespace Vek
 
                         await RevokeImagePreviewsForFilesAsync([file]);
 
-                        if (updatedList.Count == 0)
-                        {
-                            await _filesState.SetValueAsync(default);
-                        }
-                        else
-                        {
-                            await _filesState.SetValueAsync((T)(object)updatedList);
-                        }
+                        T? nextValue = updatedList.Count == 0
+                            ? default
+                            : (T)(object)updatedList;
+                        await _filesState.SetValueAsync(nextValue);
+                        await SyncQueueFromFilesAsync(nextValue);
 
                         return true;
                     }
@@ -532,6 +586,7 @@ namespace Vek
         /// </remarks>
         public async Task ClearAsync()
         {
+            CancelAndClearActiveUploads();
             ValidationErrors.RemoveAll(_validationErrors.Contains);
 
             _validationErrors.Clear();
@@ -540,6 +595,18 @@ namespace Vek
 
             await NotifyValueChangedAsync(default);
             await JsRuntime.InvokeVoidAsyncWithErrorHandling("vekInput.resetValue", GetActiveInputId());
+        }
+
+        /// <summary>
+        /// Uploads the currently selected files one chunk at a time using <see cref="UploadChunk"/> or the most recent upload handler.
+        /// </summary>
+        /// <param name="cancellationToken">Cancels the upload operation.</param>
+        public Task UploadFilesAsync(CancellationToken cancellationToken = default)
+        {
+            var handler = UploadChunk ?? _lastUploadChunkHandler
+                ?? throw new InvalidOperationException($"Specify an upload handler via {nameof(UploadChunk)} or pass one to {nameof(UploadFilesAsync)}.");
+
+            return UploadFilesAsync(handler, cancellationToken);
         }
 
         /// <summary>
@@ -565,21 +632,131 @@ namespace Vek
             if (MaxChunkRetries < 0)
                 throw new InvalidOperationException($"{nameof(MaxChunkRetries)} cannot be negative.");
 
-            using var linkedCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _lifetimeToken);
-            var files = GetSelectedFiles();
+            _lastUploadChunkHandler = uploadChunk;
 
-            foreach (var file in files)
+            if (_queueItems.Count == 0 && GetSelectedFiles().Count > 0)
+                await SyncQueueFromFilesAsync(_filesState.Value);
+
+            using var linkedCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _lifetimeToken);
+            var isQueueMode = _showQueueState.Value || _hasExternalQueue;
+            var itemsToUpload = isQueueMode
+                ? _queueItems.Where(item => item.Status == FileUploadStatus.Queued).ToArray()
+                : _queueItems.ToArray();
+
+            foreach (var item in itemsToUpload)
             {
                 linkedCancellation.Token.ThrowIfCancellationRequested();
 
-                await FileUploadChunkManager.UploadAsync(
-                    file,
-                    ChunkSizeInBytes,
-                    MaxChunkRetries,
-                    uploadChunk,
-                    progress => OnUploadProgress.InvokeAsync(progress),
-                    linkedCancellation.Token);
+                if (isQueueMode && item.Status != FileUploadStatus.Queued)
+                    continue;
+
+                await UploadItemAsync(item, uploadChunk, linkedCancellation.Token, throwOnFailure: !isQueueMode);
             }
+        }
+
+        /// <summary>
+        /// Cancels a queued or active upload for the specified file entry.
+        /// </summary>
+        /// <param name="fileId">The identifier of the <see cref="FileUploadItem"/> to cancel.</param>
+        public async Task CancelUpload(string fileId)
+        {
+            if (string.IsNullOrWhiteSpace(fileId))
+                return;
+
+            var item = _queueItems.FirstOrDefault(entry => string.Equals(entry.Id, fileId, StringComparison.Ordinal));
+            if (item is null || item.Status is not (FileUploadStatus.Queued or FileUploadStatus.Uploading))
+                return;
+
+            _canceledItemIds.Add(fileId);
+
+            if (_activeUploadTokens.TryGetValue(fileId, out var itemCts))
+            {
+                try
+                {
+                    await itemCts.CancelAsync();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Upload already completed and disposed its token source.
+                }
+            }
+
+            item.Status = FileUploadStatus.Error;
+            item.ErrorMessage = Localizer[LanguageResource.VekFileUpload_UploadCanceled];
+
+            await NotifyQueueChangedAsync();
+            if (!_lifetimeToken.IsCancellationRequested)
+                await InvokeAsync(StateHasChanged);
+        }
+
+        /// <summary>
+        /// Retries a failed or canceled upload item in the queue.
+        /// </summary>
+        /// <param name="fileId">The identifier of the <see cref="FileUploadItem"/> to retry.</param>
+        public async Task RetryUpload(string fileId)
+        {
+            if (string.IsNullOrWhiteSpace(fileId))
+                return;
+
+            var item = _queueItems.FirstOrDefault(entry => string.Equals(entry.Id, fileId, StringComparison.Ordinal));
+            if (item is null || item.Status != FileUploadStatus.Error)
+                return;
+
+            item.Status = FileUploadStatus.Queued;
+            item.Progress = 0;
+            item.BytesUploaded = 0;
+            item.ErrorMessage = null;
+
+            var handler = UploadChunk ?? _lastUploadChunkHandler;
+            if (handler is null)
+            {
+                await NotifyQueueChangedAsync();
+                if (!_lifetimeToken.IsCancellationRequested)
+                    await InvokeAsync(StateHasChanged);
+                return;
+            }
+
+            if (ChunkSizeInBytes <= 0)
+                throw new InvalidOperationException($"{nameof(ChunkSizeInBytes)} must be greater than zero.");
+
+            if (MaxChunkRetries < 0)
+                throw new InvalidOperationException($"{nameof(MaxChunkRetries)} cannot be negative.");
+
+            await UploadItemAsync(item, handler, _lifetimeToken, throwOnFailure: false);
+        }
+
+        /// <summary>
+        /// Removes all successfully uploaded entries from the queue and current selection.
+        /// </summary>
+        public async Task ClearCompleted()
+        {
+            var completedItems = _queueItems
+                .Where(item => item.Status == FileUploadStatus.Success)
+                .ToArray();
+
+            if (completedItems.Length == 0)
+                return;
+
+            foreach (var item in completedItems)
+            {
+                _queueItems.Remove(item);
+            }
+
+            await RevokeImagePreviewsForFilesAsync(completedItems.Select(item => item.File));
+
+            _isSyncingQueue = true;
+            try
+            {
+                await UpdateFilesStateFromQueueAsync();
+                await NotifyQueueChangedAsync();
+            }
+            finally
+            {
+                _isSyncingQueue = false;
+            }
+
+            if (!_lifetimeToken.IsCancellationRequested)
+                await InvokeAsync(StateHasChanged);
         }
 
         /// <summary>
@@ -591,6 +768,7 @@ namespace Vek
         protected override async ValueTask DisposeAsyncCore()
         {
             _lifetimeCancellation.Cancel();
+            DisposeActiveUploadTokens();
             await RevokeImagePreviewsAsync();
             _lifetimeCancellation.Dispose();
             await base.DisposeAsyncCore();
@@ -640,6 +818,13 @@ namespace Vek
 
             if (!ErrorState.Value || !SuppressOnChangeWhenInvalid)
                 await OnFilesChanged.InvokeAsync(args);
+
+            if (_autoUploadState.Value &&
+                (UploadChunk ?? _lastUploadChunkHandler) is { } autoUploadHandler &&
+                _queueItems.Any(item => item.Status == FileUploadStatus.Queued))
+            {
+                await UploadFilesAsync(autoUploadHandler);
+            }
         }
 
         private IReadOnlyList<IBrowserFile> GetSelectedFiles()
@@ -833,8 +1018,318 @@ namespace Vek
         {
             Touched = true;
             await _filesState.SetValueAsync(value);
+            await SyncQueueFromFilesAsync(value);
             await BeginValidateAsync();
             FieldChanged(value);
+        }
+
+        private async Task OnFilesParameterChangedAsync(ParameterChangedEventArgs<T?> args)
+        {
+            if (_isSyncingQueue)
+                return;
+
+            await SyncQueueFromFilesAsync(args.Value);
+        }
+
+        private async Task OnQueueParameterChangedAsync(ParameterChangedEventArgs<IReadOnlyList<FileUploadItem>?> args)
+        {
+            if (_isSyncingQueue)
+                return;
+
+            _hasExternalQueue = args.Value is not null;
+            var incoming = args.Value ?? [];
+            if (_queueItems.SequenceEqual(incoming))
+                return;
+
+            var incomingIds = incoming.Select(item => item.Id).ToHashSet(StringComparer.Ordinal);
+            foreach (var removed in _queueItems.Where(item => !incomingIds.Contains(item.Id)).ToArray())
+            {
+                CancelActiveUploadToken(removed.Id);
+            }
+
+            _queueItems.Clear();
+            _queueItems.AddRange(incoming);
+
+            if (!args.ParameterView.TryGetValue<T?>(nameof(Files), out _))
+            {
+                _isSyncingQueue = true;
+                try
+                {
+                    await UpdateFilesStateFromQueueAsync();
+                }
+                finally
+                {
+                    _isSyncingQueue = false;
+                }
+            }
+        }
+
+        private async Task SyncQueueFromFilesAsync(T? value)
+        {
+            if (_isSyncingQueue)
+                return;
+
+            _isSyncingQueue = true;
+            try
+            {
+                var files = GetFilesFromValue(value);
+                var existingByFile = new Dictionary<IBrowserFile, FileUploadItem>(ReferenceEqualityComparer.Instance);
+                foreach (var item in _queueItems)
+                {
+                    existingByFile.TryAdd(item.File, item);
+                }
+
+                var retainedSet = new HashSet<IBrowserFile>(files, ReferenceEqualityComparer.Instance);
+                foreach (var removed in _queueItems.Where(item => !retainedSet.Contains(item.File)).ToArray())
+                {
+                    CancelActiveUploadToken(removed.Id);
+                }
+
+                _queueItems.Clear();
+                foreach (var file in files)
+                {
+                    _queueItems.Add(existingByFile.TryGetValue(file, out var existing)
+                        ? existing
+                        : new FileUploadItem(file));
+                }
+
+                await NotifyQueueChangedAsync();
+            }
+            finally
+            {
+                _isSyncingQueue = false;
+            }
+        }
+
+        private Task UpdateFilesStateFromQueueAsync()
+        {
+            if (typeof(T) == typeof(IReadOnlyList<IBrowserFile>))
+            {
+                var nextList = _queueItems.Count == 0
+                    ? default
+                    : (T?)(object)_queueItems.Select(item => item.File).ToList().AsReadOnly();
+                return _filesState.SetValueAsync(nextList);
+            }
+
+            if (typeof(T) == typeof(IBrowserFile))
+            {
+                var nextFile = _queueItems.Count == 0
+                    ? default
+                    : (T?)(object)_queueItems[0].File;
+                return _filesState.SetValueAsync(nextFile);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        private Task NotifyQueueChangedAsync()
+        {
+            IReadOnlyList<FileUploadItem> snapshot = _queueItems.Count == 0 ? [] : _queueItems.ToArray();
+            return _queueState.SetValueAsync(snapshot);
+        }
+
+        private async Task UploadItemAsync(
+            FileUploadItem item,
+            Func<FileUploadChunkEventArgs, CancellationToken, Task> uploadChunk,
+            CancellationToken outerToken,
+            bool throwOnFailure)
+        {
+            if (item.Status == FileUploadStatus.Uploading || _activeUploadTokens.ContainsKey(item.Id))
+                return;
+
+            using var itemCts = CancellationTokenSource.CreateLinkedTokenSource(outerToken, _lifetimeToken);
+            _activeUploadTokens[item.Id] = itemCts;
+            _canceledItemIds.Remove(item.Id);
+
+            item.Status = FileUploadStatus.Uploading;
+            item.Progress = 0;
+            item.BytesUploaded = 0;
+            item.ErrorMessage = null;
+            if (!_lifetimeToken.IsCancellationRequested)
+                await InvokeAsync(StateHasChanged);
+
+            try
+            {
+                await FileUploadChunkManager.UploadAsync(
+                    item.File,
+                    ChunkSizeInBytes,
+                    MaxChunkRetries,
+                    uploadChunk,
+                    async progress =>
+                    {
+                        item.BytesUploaded = progress.BytesUploaded;
+                        item.Progress = progress.PercentComplete;
+                        if (!_lifetimeToken.IsCancellationRequested)
+                        {
+                            await InvokeAsync(async () =>
+                            {
+                                await OnUploadProgress.InvokeAsync(progress);
+                                StateHasChanged();
+                            });
+                        }
+                    },
+                    itemCts.Token);
+
+                item.Status = FileUploadStatus.Success;
+                item.Progress = 100;
+                item.BytesUploaded = item.Size;
+                item.ErrorMessage = null;
+            }
+            catch (OperationCanceledException)
+            {
+                var canceledIndividually = _canceledItemIds.Remove(item.Id);
+                item.Status = FileUploadStatus.Error;
+                item.ErrorMessage = Localizer[LanguageResource.VekFileUpload_UploadCanceled];
+
+                if (!canceledIndividually && (throwOnFailure || outerToken.IsCancellationRequested || _lifetimeToken.IsCancellationRequested))
+                    throw;
+            }
+            catch (Exception exception)
+            {
+                item.Status = FileUploadStatus.Error;
+                item.ErrorMessage = exception.Message;
+
+                if (throwOnFailure)
+                    throw;
+            }
+            finally
+            {
+                _activeUploadTokens.Remove(item.Id);
+                await NotifyQueueChangedAsync();
+                if (!_lifetimeToken.IsCancellationRequested)
+                    await InvokeAsync(StateHasChanged);
+            }
+        }
+
+        private void CancelActiveUploadToken(string fileId)
+        {
+            _canceledItemIds.Add(fileId);
+            if (!_activeUploadTokens.Remove(fileId, out var cts))
+                return;
+
+            try
+            {
+                cts.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Upload already completed and disposed its token source.
+            }
+        }
+
+        private void CancelAndClearActiveUploads()
+        {
+            foreach (var (fileId, cts) in _activeUploadTokens.ToArray())
+            {
+                _canceledItemIds.Add(fileId);
+                try
+                {
+                    cts.Cancel();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Upload already completed and disposed its token source.
+                }
+            }
+
+            _activeUploadTokens.Clear();
+        }
+
+        private void DisposeActiveUploadTokens()
+        {
+            foreach (var cts in _activeUploadTokens.Values)
+            {
+                cts.Dispose();
+            }
+
+            _activeUploadTokens.Clear();
+            _canceledItemIds.Clear();
+        }
+
+        private Task OnCancelUploadClickAsync(string fileId)
+            => GetDisabledState() ? Task.CompletedTask : CancelUpload(fileId);
+
+        private Task OnRetryUploadClickAsync(string fileId)
+            => GetDisabledState() ? Task.CompletedTask : RetryUpload(fileId);
+
+        private Task OnClearCompletedClickAsync()
+            => GetDisabledState() ? Task.CompletedTask : ClearCompleted();
+
+        private bool HasCompletedItems()
+            => _queueItems.Any(item => item.Status == FileUploadStatus.Success);
+
+        private string GetQueueSummaryText()
+        {
+            var completedCount = _queueItems.Count(item => item.Status == FileUploadStatus.Success);
+            return Localizer[LanguageResource.VekFileUpload_QueueSummary, completedCount, _queueItems.Count];
+        }
+
+        private static string GetQueueRowClass(FileUploadItem item)
+            => new CssBuilder("vek-file-upload-queue-row")
+                .AddClass($"vek-file-upload-queue-row-{GetStatusModifier(item.Status)}")
+                .Build();
+
+        private static string GetProgressBarClass(FileUploadItem item)
+            => new CssBuilder("vek-file-upload-queue-progress")
+                .AddClass($"vek-file-upload-queue-progress-{GetStatusModifier(item.Status)}")
+                .Build();
+
+        private static string GetStatusBadgeClass(FileUploadItem item)
+            => new CssBuilder("vek-file-upload-queue-status-badge")
+                .AddClass($"vek-file-upload-queue-status-{GetStatusModifier(item.Status)}")
+                .Build();
+
+        private static string GetProgressBarFillStyle(FileUploadItem item)
+        {
+            var percent = Math.Clamp(item.Progress, 0d, 100d);
+            return StyleBuilder.Default("width", $"{percent.ToString("0.##", CultureInfo.InvariantCulture)}%").Build();
+        }
+
+        private static string GetRoundedProgress(FileUploadItem item)
+            => Math.Clamp((int)Math.Round(item.Progress), 0, 100).ToString(CultureInfo.InvariantCulture);
+
+        private string GetProgressAriaText(FileUploadItem item)
+            => $"{GetRoundedProgress(item)}% ({GetStatusText(item)})";
+
+        private string GetProgressAriaLabel(FileUploadItem item)
+            => Localizer[LanguageResource.VekFileUpload_ProgressLabel, item.Name];
+
+        private string GetCancelAriaLabel(FileUploadItem item)
+            => Localizer[LanguageResource.VekFileUpload_CancelFile, item.Name];
+
+        private string GetRetryAriaLabel(FileUploadItem item)
+            => Localizer[LanguageResource.VekFileUpload_RetryFile, item.Name];
+
+        private string GetStatusText(FileUploadItem item) => item.Status switch
+        {
+            FileUploadStatus.Queued => Localizer[LanguageResource.VekFileUpload_StatusQueued],
+            FileUploadStatus.Uploading => Localizer[LanguageResource.VekFileUpload_StatusUploading],
+            FileUploadStatus.Success => Localizer[LanguageResource.VekFileUpload_StatusSuccess],
+            FileUploadStatus.Error => Localizer[LanguageResource.VekFileUpload_StatusError],
+            _ => string.Empty
+        };
+
+        private static string GetStatusModifier(FileUploadStatus status) => status switch
+        {
+            FileUploadStatus.Queued => "queued",
+            FileUploadStatus.Uploading => "uploading",
+            FileUploadStatus.Success => "success",
+            FileUploadStatus.Error => "error",
+            _ => "queued"
+        };
+
+        private static string FormatFileSize(long bytes)
+        {
+            if (bytes < 1024)
+                return $"{bytes.ToString(CultureInfo.InvariantCulture)} B";
+
+            if (bytes < 1024 * 1024)
+                return $"{(bytes / 1024d).ToString("0.#", CultureInfo.InvariantCulture)} KB";
+
+            if (bytes < 1024L * 1024 * 1024)
+                return $"{(bytes / (1024d * 1024d)).ToString("0.##", CultureInfo.InvariantCulture)} MB";
+
+            return $"{(bytes / (1024d * 1024d * 1024d)).ToString("0.##", CultureInfo.InvariantCulture)} GB";
         }
 
         /// <inheritdoc />
@@ -849,7 +1344,11 @@ namespace Vek
 
         protected internal override T? ReadValue => _filesState.Value;
 
-        protected override Task SetValueCoreAsync(T? value) => _filesState.SetValueAsync(value);
+        protected override async Task SetValueCoreAsync(T? value)
+        {
+            await _filesState.SetValueAsync(value);
+            await SyncQueueFromFilesAsync(value);
+        }
 
         protected override async Task ValidateValue()
         {
