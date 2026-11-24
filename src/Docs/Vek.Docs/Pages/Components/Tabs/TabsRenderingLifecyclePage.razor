@@ -1,0 +1,43 @@
+@page "/components/tabs/rendering-lifecycle"
+
+<DocsPage>
+    <DocsPageHeader Title="Tabs - Rendering & Lifecycle" Component="@nameof(VekTabs)">
+        <Description>Configure lazy tab rendering, tab state caching, KeepPanelsAlive, and lexicographical sorting.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Tab Render Modes">
+                <Description>
+                    Configure lazy rendering and panel caching to prevent unnecessary re-rendering of inactive tabs.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TabsRenderModesExample)" ShowCode="false">
+                <TabsRenderModesExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Keep Panels Alive">
+                <Description>
+                    Enable <CodeInline>KeepPanelsAlive</CodeInline> to retain DOM state and component state across tab switching.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TabsKeepPanelsAliveExample)" ShowCode="false">
+                <TabsKeepPanelsAliveExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Tab Sorting">
+                <Description>
+                    Use <CodeInline>SortDirection</CodeInline>, <CodeInline>SortKey</CodeInline>, or a custom <CodeInline>SortComparer</CodeInline> to order tab headers.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TabsSortByTextExample)" ShowCode="false" Block="true" FullWidth="true">
+                <TabsSortByTextExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

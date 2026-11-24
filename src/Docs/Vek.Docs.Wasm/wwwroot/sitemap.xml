@@ -406,6 +406,18 @@
     <loc>https://vekui.dev/components/tabs</loc>
   </url>
   <url>
+    <loc>https://vekui.dev/components/tabs/orientation-positioning</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/tabs/dynamic-closable</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/tabs/rendering-lifecycle</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/tabs/headers-badges</loc>
+  </url>
+  <url>
     <loc>https://vekui.dev/components/textfield</loc>
   </url>
   <url>

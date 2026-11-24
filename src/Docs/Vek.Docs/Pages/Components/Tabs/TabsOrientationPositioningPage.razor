@@ -1,0 +1,43 @@
+@page "/components/tabs/orientation-positioning"
+
+<DocsPage>
+    <DocsPageHeader Title="Tabs - Orientation & Positioning" Component="@nameof(VekTabs)">
+        <Description>Configure vertical or horizontal tab strips, position alignments, centered tabs, and custom tab widths.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Multi-Orientation and Position">
+                <Description>
+                    The tab strip can be positioned on any side of the container using the <CodeInline>TabPosition</CodeInline> property. Setting it to <CodeInline>TabPosition.Left</CodeInline> or <CodeInline>TabPosition.Right</CodeInline> switches the tab strip to a vertical orientation, displaying active indicator sliders along the inner boundary and enabling ArrowUp / ArrowDown keyboard navigation.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TabsMultiOrientationExample)" ShowCode="true" Block="true" FullWidth="true">
+                <TabsMultiOrientationExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Centered Tabs">
+                <Description>
+                    The <CodeInline>Centered</CodeInline> property aligns the tabs in the middle of the container.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TabsCenteredExample)" ShowCode="false" Block="true" FullWidth="true">
+                <TabsCenteredExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Tab Width and Tooltips">
+                <Description>
+                    The <CodeInline>MinimumTabWidth</CodeInline> property defines a minimum width for each tab, and <CodeInline>ToolTip</CodeInline> activates when the user hovers over the tab.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TabsMinimumTabWidthExample)" ShowCode="false">
+                <TabsMinimumTabWidthExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>
