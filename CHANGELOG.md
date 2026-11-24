@@ -3,6 +3,36 @@
 All notable changes to Vek will be documented in this file.
 For GitHub Releases and downloadable packages, see the [Releases page](https://github.com/madiseh/Vek/releases).
 
+## [v1.4.0] - 2026-11-24
+
+> Vek v1.4.0 adds fluent message boxes, chunked file uploads with progress, DropZone templates, DataGrid row reordering, and FileUpload image previews with client-side validation. It also respects reduced-motion preferences in the mini Drawer and improves DatePicker and DataGrid documentation.
+
+### Component Features and Fixes
+- **MessageBox:** Add fluent confirmation, prompt, and custom action APIs. ([PR #114](https://github.com/madiseh/Vek/pull/114))
+- **FileUpload:** Add chunked uploads with progress, retry, and cancellation support. ([PR #115](https://github.com/madiseh/Vek/pull/115))
+- **DropZone:** Add custom empty-state, drag-over, and item templates. ([PR #116](https://github.com/madiseh/Vek/pull/116))
+- **Drawer:** Respect reduced-motion preferences for the mini variant. ([PR #120](https://github.com/madiseh/Vek/pull/120))
+- **DataGrid:** Add pointer and keyboard row reordering with a dedicated drag handle. ([PR #122](https://github.com/madiseh/Vek/pull/122))
+- **FileUpload:** Add image previews and client-side extension and MIME type validation. ([PR #123](https://github.com/madiseh/Vek/pull/123))
+
+### Documentation
+- Improve the DatePicker and DataGrid feature guides, navigation, and overview layouts. ([PR #126](https://github.com/madiseh/Vek/pull/126))
+
+### Contributors
+- [@madiseh](https://github.com/madiseh) — [PR #114](https://github.com/madiseh/Vek/pull/114), [#115](https://github.com/madiseh/Vek/pull/115), [#116](https://github.com/madiseh/Vek/pull/116), [#117](https://github.com/madiseh/Vek/pull/117), [#118](https://github.com/madiseh/Vek/pull/118), [#119](https://github.com/madiseh/Vek/pull/119), [#120](https://github.com/madiseh/Vek/pull/120), [#121](https://github.com/madiseh/Vek/pull/121), [#122](https://github.com/madiseh/Vek/pull/122), [#123](https://github.com/madiseh/Vek/pull/123), [#124](https://github.com/madiseh/Vek/pull/124), [#125](https://github.com/madiseh/Vek/pull/125), [#126](https://github.com/madiseh/Vek/pull/126)
+
+### Feature Screenshots
+![Vek v1.4.0 feature screenshots](https://github.com/madiseh/Vek/releases/download/v1.4.0/release-slideshow.gif)
+
+1. Fluent MessageBox actions — [PR #114](https://github.com/madiseh/Vek/pull/114)
+2. Chunked FileUpload progress — [PR #115](https://github.com/madiseh/Vek/pull/115)
+3. DropZone templates — [PR #116](https://github.com/madiseh/Vek/pull/116)
+4. Mini Drawer reduced-motion behavior — [PR #120](https://github.com/madiseh/Vek/pull/120)
+5. DataGrid row reordering — [PR #122](https://github.com/madiseh/Vek/pull/122)
+6. FileUpload image previews — [PR #123](https://github.com/madiseh/Vek/pull/123)
+
+**Full Changelog**: https://github.com/madiseh/Vek/compare/v1.3.4...v1.4.0
+
 ## [v1.3.4] - 2026-11-23
 
 > Vek v1.3.4 adds six component improvements across notifications, progress, data grids, tree views, file uploads, and sliders. It also improves the Expense Tracker showcase, adds a nested SplitPanel example, refreshes the component catalog, and fixes responsive layout issues in the documentation site.
