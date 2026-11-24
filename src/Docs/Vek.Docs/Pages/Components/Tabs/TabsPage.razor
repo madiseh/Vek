@@ -23,270 +23,35 @@
         </DocsPageSection>
 
         <DocsPageSection>
-            <SectionHeader Title="Multi-Orientation and Position">
-                <Description>
-                    The tab strip can be positioned on any side of the container using the <CodeInline>TabPosition</CodeInline> property. Setting it to <CodeInline>TabPosition.Left</CodeInline> or <CodeInline>TabPosition.Right</CodeInline> switches the tab strip to a vertical orientation, displaying active indicator sliders along the inner boundary and enabling ArrowUp / ArrowDown keyboard navigation.
-                </Description>
+            <SectionHeader Title="Explore Features">
+                <Description>Browse specific features and usage patterns in detail:</Description>
             </SectionHeader>
-            <SectionContent Code="@nameof(TabsMultiOrientationExample)" ShowCode="true" Block="true" FullWidth="true">
-                <TabsMultiOrientationExample />
-            </SectionContent>
-            <SectionSubGroups>
-                <DocsPageSection>
-                    <SectionHeader Title="Legacy Position Selector">
-                        <Description>
-                            The tab bar can also be configured with the legacy <CodeInline>Position</CodeInline> parameter.
-                        </Description>
-                    </SectionHeader>
-                    <SectionContent Code="@nameof(TabsPositionExample)" ShowCode="false" Block="true" FullWidth="true">
-                        <TabsPositionExample />
-                    </SectionContent>
-                </DocsPageSection>
-                <DocsPageSection>
-                    <SectionHeader Title="Centered">
-                        <Description>
-                            The <CodeInline>Centered</CodeInline> property aligns the tabs in the middle of the container.
-                        </Description>
-                    </SectionHeader>
-                    <SectionContent Code="@nameof(TabsCenteredExample)" ShowCode="false" Block="true" FullWidth="true">
-                        <TabsCenteredExample />
-                    </SectionContent>
-                </DocsPageSection>
-            </SectionSubGroups>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Tab Sorting">
-                <Description>
-                    TabPanels appear in the order they are processed by the RenderTreeBuilder, which can be affected by component nesting in complex scenarios.
-                    Use the <CodeInline>SortDirection</CodeInline> property to sort lexicographically by <CodeInline>Text</CodeInline>.<br />
-                    <br />
-                    Note that sorting is applied during initial rendering, when TabPanels are being added to the parent Tabs. Sorting is not re-evaluated
-                    if properties are changed at runtime.
-                </Description>
-            </SectionHeader>
-            <SectionContent Code="@nameof(TabsSortByTextExample)" ShowCode="false" Block="true" FullWidth="true">
-                <TabsSortByTextExample />
-            </SectionContent>
-            <SectionSubGroups>
-                <DocsPageSection>
-                    <SectionHeader Title="Sort Keys">
-                        <Description>
-                            The TabPanel's <CodeInline>SortKey</CodeInline> property is used in preference to the <CodeInline>Text</CodeInline> property, if set.
-                        </Description>
-                    </SectionHeader>
-                    <SectionContent Code="@nameof(TabsSortBySortKeyExample)" ShowCode="false" Block="true" FullWidth="true">
-                        <TabsSortBySortKeyExample />
-                    </SectionContent>
-                </DocsPageSection>
-                <DocsPageSection>
-                    <SectionHeader Title="Custom Sorting">
-                        <Description>
-                            Specify a custom <CodeInline>SortComparer</CodeInline> which implements <CodeInline>IComparer&lt;VekTabPanel&gt;</CodeInline> to
-                            override the default sorting behaviour. In this scenario, sort direction must be handled by the custom SortComparer.
-                        </Description>
-                    </SectionHeader>
-                    <SectionContent Code="@nameof(TabsSortByComparerExample)" ShowCode="false" Block="true" FullWidth="true">
-                        <TabsSortByComparerExample />
-                    </SectionContent>
-                </DocsPageSection>
-            </SectionSubGroups>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Tab Width">
-                <Description>
-                    The <CodeInline>MinimumTabWidth</CodeInline> property defines a minimum width for each tab.
-                </Description>
-            </SectionHeader>
-            <SectionContent Code="@nameof(TabsMinimumTabWidthExample)" ShowCode="false">
-                <TabsMinimumTabWidthExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Tooltips">
-                <Description>
-                    Tooltips can be added which will activate when the user hovers over the tab.
-                </Description>
-            </SectionHeader>
-            <SectionContent Code="@nameof(TabsToolTipExample)" ShowCode="false">
-                <TabsToolTipExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Badges">
-                <Description>
-                    Badges can be applied to icons or text within tabs for additional context.
-                </Description>
-            </SectionHeader>
-            <SectionContent Code="@nameof(TabsWithBagdesExample)" ShowCode="false">
-                <TabsWithBagdesExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Header Templates and Icon Slots">
-                <Description>
-                    Tabs can display status notification badges via <CodeInline>BadgeContent</CodeInline> and <CodeInline>BadgeColor</CodeInline>, position leading or trailing icons using <CodeInline>IconPosition</CodeInline> (<CodeInline>TabIconPosition.Start</CodeInline> or <CodeInline>TabIconPosition.End</CodeInline>), or render a fully customized header using the <CodeInline>HeaderTemplate</CodeInline> slot.
-                </Description>
-            </SectionHeader>
-            <SectionContent Code="@nameof(TabsRichHeadersExample)" ShowCode="true" Block="true">
-                <TabsRichHeadersExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Drag and Drop Tabs">
-                <Description>
-                    Tab reordering can be enabled by setting <CodeInline>AllowTabReorder</CodeInline> to <CodeInline>true</CodeInline>.
-                    Users can drag tab headers to rearrange the panels; <CodeInline>OnTabReordered</CodeInline> reports the old and new indexes and moved panel.
-                </Description>
-            </SectionHeader>
-            <SectionContent Code="@nameof(TabsDragAndDropExample)" ShowCode="false" HighLight="AllowTabReorder,OnTabReordered">
-                <TabsDragAndDropExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Scrolling Tabs">
-                <Description>
-                    If the total size of all tabs exceeds the size of the container, scroll buttons are automatically added.
-                    <CodeInline>ScrollMode</CodeInline> controls this behavior: <CodeInline>Auto</CodeInline> adds buttons when needed,
-                    <CodeInline>NavButtons</CodeInline> keeps them visible, and <CodeInline>None</CodeInline> disables header scrolling.
-                    Mouse wheel input scrolls overflowing horizontal headers, and selecting a tab smoothly brings it into view.
-                </Description>
-            </SectionHeader>
-            <SectionContent Code="@nameof(TabsScrollExample)" ShowCode="false" Block="true" FullWidth="true">
-                <TabsScrollExample />
-            </SectionContent>
-            <SectionSubGroups>
-                <DocsPageSection>
-                    <SectionHeader Title="Scroll Icons">
-                        <Description>
-                            The scroll icons can be customized using the <CodeInline>PrevIcon</CodeInline> and <CodeInline>NextIcon</CodeInline> properties.
-                        </Description>
-                    </SectionHeader>
-                    <SectionContent Code="@nameof(TabsCustomScrollIconsExample)" ShowCode="false" Block="true" FullWidth="true">
-                        <TabsCustomScrollIconsExample />
-                    </SectionContent>
-                </DocsPageSection>
-            </SectionSubGroups>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Render Fragments">
-                <Description>
-                    Custom tab header content can be provided for special scenarios.
-                    Specify only <CodeInline>TabContent</CodeInline> to customize the tab content, or specify <CodeInline>TabWrapperContent</CodeInline> to provide a wrapper around the entire tab header.
-                    The header of the active tab can be customized using <CodeInline>ActiveTabClass</CodeInline>.
-                </Description>
-            </SectionHeader>
-            <SectionContent Code="@nameof(TabsContentExample)" ShowCode="false" HighLight="TabContent,TabWrapperContent">
-                <TabsContentExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Visibility">
-                <Description>
-                    The <CodeInline>Visible</CodeInline> property defines whether the tab is visible or hidden.
-                </Description>
-            </SectionHeader>
-            <SectionContent Code="@nameof(TabsVisibleExample)" ShowCode="false" FullWidth="true">
-                <TabsVisibleExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Set Active Panel">
-                <Description>
-                    Programmatic selection of an active tab is supported through bindings.
-                </Description>
-            </SectionHeader>
-            <SectionContent Code="@nameof(TabsSetActiveExample)" ShowCode="false" Block="true">
-                <TabsSetActiveExample />
-            </SectionContent>
-            <SectionSubGroups>
-                <DocsPageSection>
-                    <SectionHeader Title="Binding Active Panel">
-                        <Description>
-                            Two-way synchronization of the selected panel is possible using bindings.
-                        </Description>
-                    </SectionHeader>
-                    <SectionContent Code="@nameof(TabsBindingExample)" ShowCode="false" Block="true">
-                        <TabsBindingExample />
-                    </SectionContent>
-                </DocsPageSection>
-            </SectionSubGroups>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Closable Tabs">
-                <Description>
-                    Tabs can display a close button by setting <CodeInline>Closeable</CodeInline> on <CodeInline>VekTabs</CodeInline> or individual <CodeInline>VekTabPanel</CodeInline> components.
-                    Lifecycle events <CodeInline>OnTabClosing</CodeInline> and <CodeInline>OnTabClosed</CodeInline> support prompting before close or cancelling the operation. When an active tab is closed, adjacent tabs are automatically activated.
-                    The <CodeInline>CloseButtonDisplayMode</CodeInline> property controls whether close buttons appear <CodeInline>Always</CodeInline>, <CodeInline>OnHover</CodeInline>, or for the <CodeInline>ActiveTabOnly</CodeInline>.
-                </Description>
-            </SectionHeader>
-            <SectionContent Code="@nameof(TabsClosableExample)" ShowCode="true" Block="true">
-                <TabsClosableExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Dynamic Tabs">
-                <Description>
-                    A browser-like tab experience can be enabled, allowing users to dynamically add and close tabs.
-                    The close icon can be hidden by disabling <CodeInline>ShowCloseIcon</CodeInline>.
-                </Description>
-            </SectionHeader>
-            <SectionContent Code="@nameof(DynamicTabsSimpleExample)" ShowCode="false" Block="true">
-                <DynamicTabsSimpleExample />
-            </SectionContent>
-            <SectionSubGroups>
-                <DocsPageSection>
-                    <SectionHeader Title="Advanced Dynamic Tabs">
-                        <Description>
-                            Flexibility in styling can be enhanced using <CodeInline>Header</CodeInline> and <CodeInline>TabPanelHeader</CodeInline>.
-                            Header positioning is adjustable through <CodeInline>HeaderPosition</CodeInline> or <CodeInline>TabPanelHeaderPosition</CodeInline>.
-                        </Description>
-                    </SectionHeader>
-                    <SectionContent Code="@nameof(CustomDynamicTabsExample)" ShowCode="false" Block="true">
-                        <CustomDynamicTabsExample />
-                    </SectionContent>
-                </DocsPageSection>
-            </SectionSubGroups>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Render Modes">
-                <Description>
-                    Configure how tab panels are rendered and preserved in the DOM using the <CodeInline>RenderMode</CodeInline> property:
-                    <ul>
-                        <li><CodeInline>TabsRenderMode.ActiveTab</CodeInline> (default): Only the active tab panel is rendered in the DOM. Inactive tab panels are removed and recreated upon activation.</li>
-                        <li><CodeInline>TabsRenderMode.ActiveTabLazily</CodeInline>: Tab panels are created on demand upon first activation and cached in the DOM, preserving form state, text input, and scroll positions across tab switches.</li>
-                        <li><CodeInline>TabsRenderMode.AllTabs</CodeInline>: All tab panels are rendered immediately upon initialization and kept in the DOM, with inactive panels hidden using CSS.</li>
-                    </ul>
-                </Description>
-            </SectionHeader>
-            <SectionContent Code="@nameof(TabsRenderModesExample)" ShowCode="true" Block="true">
-                <TabsRenderModesExample />
-            </SectionContent>
-        </DocsPageSection>
-
-        <DocsPageSection>
-            <SectionHeader Title="Keep Panels Alive">
-                <Description>
-                    By default, tab panels are removed when switching to another tab and rerendered once the tab is selected again.
-                    This behavior can be changed by setting the <CodeInline>KeepPanelsAlive</CodeInline> property to <CodeInline>true</CodeInline>. Then, all tabs are rendered at once and inactive tab panels only get hidden but not destroyed.
-                    The <CodeInline>LazyLoadPanels</CodeInline> property additionally allows rendering tab panels only once they get activated. This property requires <CodeInline>KeepPanelsAlive</CodeInline> to also be <CodeInline>true</CodeInline>.
-                </Description>
-            </SectionHeader>
-            <SectionContent Code="@nameof(TabsKeepPanelsAliveExample)" ShowCode="false" Block="true">
-                <TabsKeepPanelsAliveExample />
-            </SectionContent>
+            <div class="docs-explore-grid">
+                <DocsExploreCard Title="Orientation & Positioning" Category="Tabs" Link="/components/tabs/orientation-positioning" Description="Vertical TabPosition modes, centered alignment, custom tab widths, and tooltips.">
+                    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <VekIcon Icon="@Icons.Material.Filled.ViewColumn" Color="Color.Primary" Size="Size.Large" />
+                        <VekText Typo="Typo.body2">Vertical · Horizontal · Centered</VekText>
+                    </VekStack>
+                </DocsExploreCard>
+                <DocsExploreCard Title="Dynamic & Closable" Category="Tabs" Link="/components/tabs/dynamic-closable" Description="Closable tabs, lifecycle close events, dynamic tab binding, and drag-and-drop reordering.">
+                    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <VekIcon Icon="@Icons.Material.Filled.Tab" Color="Color.Info" Size="Size.Large" />
+                        <VekText Typo="Typo.body2">Closable · Drag & Drop · Dynamic</VekText>
+                    </VekStack>
+                </DocsExploreCard>
+                <DocsExploreCard Title="Rendering & Lifecycle" Category="Tabs" Link="/components/tabs/rendering-lifecycle" Description="Lazy rendering, tab panel caching, KeepPanelsAlive, and lexicographical sorting.">
+                    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <VekIcon Icon="@Icons.Material.Filled.Cached" Color="Color.Success" Size="Size.Large" />
+                        <VekText Typo="Typo.body2">Lazy Render · KeepPanelsAlive</VekText>
+                    </VekStack>
+                </DocsExploreCard>
+                <DocsExploreCard Title="Headers, Badges & Scrolling" Category="Tabs" Link="/components/tabs/headers-badges" Description="Custom HeaderTemplates, status notification badges, start/end icons, and scroll overflow buttons.">
+                    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <VekIcon Icon="@Icons.Material.Filled.Badge" Color="Color.Warning" Size="Size.Large" />
+                        <VekText Typo="Typo.body2">HeaderTemplate · Badges · Scroll</VekText>
+                    </VekStack>
+                </DocsExploreCard>
+            </div>
         </DocsPageSection>
 
     </DocsPageContent>

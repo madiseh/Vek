@@ -1,0 +1,44 @@
+@page "/components/tabs/dynamic-closable"
+
+<DocsPage>
+    <DocsPageHeader Title="Tabs - Dynamic & Closable Tabs" Component="@nameof(VekTabs)">
+        <Description>Manage closable tab panels with lifecycle confirmation guards and dynamic tab collections.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Closable Tabs">
+                <Description>
+                    Enable <CodeInline>Closable</CodeInline> to render close buttons on tab panels. Intercept closing with <CodeInline>OnCloseTab</CodeInline> and handle panel disposal.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TabsClosableExample)" ShowCode="false">
+                <TabsClosableExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Dynamic Tabs">
+                <Description>
+                    Use <CodeInline>VekDynamicTabs</CodeInline> to bind dynamic collections of panels with add and close actions.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(DynamicTabsSimpleExample)" ShowCode="false">
+                <DynamicTabsSimpleExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Drag and Drop Reordering">
+                <Description>
+                    Tab reordering can be enabled by setting <CodeInline>AllowTabReorder</CodeInline> to <CodeInline>true</CodeInline>.
+                    Users can drag tab headers to rearrange the panels; <CodeInline>OnTabReordered</CodeInline> reports the old and new indexes and moved panel.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TabsDragAndDropExample)" ShowCode="false" HighLight="AllowTabReorder,OnTabReordered">
+                <TabsDragAndDropExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

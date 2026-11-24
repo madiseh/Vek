@@ -1,0 +1,43 @@
+@page "/components/tabs/headers-badges"
+
+<DocsPage>
+    <DocsPageHeader Title="Tabs - Headers, Badges & Scrolling" Component="@nameof(VekTabs)">
+        <Description>Enhance tab headers with notification badges, custom header templates, start/end icons, and scroll overflow buttons.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Header Templates and Icon Slots">
+                <Description>
+                    Tabs can display status notification badges via <CodeInline>BadgeContent</CodeInline> and <CodeInline>BadgeColor</CodeInline>, position leading or trailing icons using <CodeInline>IconPosition</CodeInline> (<CodeInline>TabIconPosition.Start</CodeInline> or <CodeInline>TabIconPosition.End</CodeInline>), or render a fully customized header using the <CodeInline>HeaderTemplate</CodeInline> slot.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TabsRichHeadersExample)" ShowCode="true" Block="true">
+                <TabsRichHeadersExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Badges">
+                <Description>
+                    Badges can be applied to icons or text within tabs for additional status indicators.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TabsWithBagdesExample)" ShowCode="false">
+                <TabsWithBagdesExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Scrollable Tabs">
+                <Description>
+                    When tab headers overflow their available container width, navigation scroll arrows appear automatically.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TabsScrollExample)" ShowCode="false">
+                <TabsScrollExample />
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>
