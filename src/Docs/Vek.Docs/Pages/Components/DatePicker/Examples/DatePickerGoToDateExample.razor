@@ -30,9 +30,9 @@
         return _picker.GoToDate(DateTime.Today);
     }
 
-    private void CurrentDate()
+    private Task CurrentDate()
     {
-        _picker.GoToDate();
+        return _picker.GoToDate(DateTime.Today);
     }
 
     private Task VekReleaseAsync()
