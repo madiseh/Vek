@@ -4,10 +4,12 @@
 - **Feature ID**: 016
 - **Feature Slug**: datagrid-row-drag-reorder
 - **Module**: DataGrid
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 16
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/122
 - **Started At**: 2026-11-24T05:37:35Z
+- **Completed At**: 2026-11-24T06:19:49Z
 
 ---
 
