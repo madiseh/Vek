@@ -120,6 +120,7 @@ namespace Vek.Docs.Services
                 .AddItem("Navigate Calendar Views", typeof(VekDatePicker), "datepicker/calendar-navigation")
                 .AddItem("Choose a Calendar Display", typeof(VekDatePicker), "datepicker/display-modes")
                 .AddItem("Format Dates for a Culture", typeof(VekDatePicker), "datepicker/culture-formatting")
+                .AddItem("Keyboard & Accessibility", typeof(VekDatePicker), "datepicker/keyboard-accessibility")
                 .AddItem("Select a Date Range", typeof(VekDateRangePicker), "daterangepicker")
             , sortByName: false)
             .AddNavGroup("Pickers", false, new DocsComponents()

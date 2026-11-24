@@ -22,13 +22,14 @@ This skill plans documentation. Do not edit component docs, examples, navigation
 - Start from tasks developers need to complete with the component. Name each proposed subpage by the outcome or task, not by a parameter or implementation detail. Put API names in the supporting topic list and examples.
 - Group related capabilities when they contribute to one coherent task. Avoid a page per parameter and avoid a flat catalog of every feature.
 - Keep the component's main page as a concise introduction with one to three core, practical examples when the user wants a subpage structure. Include a canonical quick start and, when useful, one or two common use cases. Put specialized or advanced examples on the relevant child pages so the overview remains an introduction rather than a feature catalog.
-- When the component has feature subpages, add an **Explore Features** section to the main page after its introduction and quick start. Use the supporting line "Browse specific features and usage patterns in detail:" and link to every proposed child page.
+- When the component has feature subpages, place **Explore Features** as the final section at the very bottom of the overview page, after all examples and other overview content. Use the supporting line "Browse specific features and usage patterns in detail:" and link to every proposed child page. Do not place any content after Explore Features.
+- Keep advanced keyboard navigation and accessibility guidance out of overview pages. When this material is relevant, put it on a dedicated standalone specialist page and link to it from Explore Features.
 - Make each feature subpage a standalone Docs page with its own `@page` route, navigation entry, and direct card link, following the DataGrid docs pattern. Do not implement specialist use cases only as anchors, tabs, accordions, or sections inside the overview page. A route may remain hierarchically named under the component (for example, `/components/datepicker/typed-input`); it must still resolve as its own page.
 - Split a distinct companion component into its own child page when it has a separate public API and enough related behavior to teach independently (for example, a range-selection component under a date-picker family).
 - Order pages from the common first task to more specialized work, based on the component's actual learning path and Vek's strengths. Do not preserve an upstream order merely because it exists elsewhere.
 - Make examples small and directly about the component. Each should show a real, recognizable use case and at least one relevant Vek API or behavior. Keep focused component examples in component docs; reserve complete, multi-step product experiences for Showcases.
 - Prefer Vek-specific capabilities as proof points where the API supports them. Do not claim a capability is unique to Vek without evidence, and do not make examples feel different through arbitrary renaming or cosmetic changes alone.
-- Identify content that should remain common guidance, such as accessibility, instead of forcing every topic into a separate route. Explain the placement briefly.
+- Keep introductory accessibility notes concise when they help explain a core example. Move advanced keyboard shortcuts and interaction guidance to a standalone specialist page rather than adding it to the overview.
 
 ## Explore Features card design
 
@@ -50,11 +51,12 @@ Return a proposal the user can review before any edits:
 
 1. **Main page role:** what remains on the component's landing page.
 2. **Main-page examples:** propose one to three core practical examples and identify the specialized examples that belong on child pages.
-3. **Explore Features section:** give the heading and supporting line, proposed responsive card layout, each card's title, route, task, unique icon/preview idea, and motion treatment.
-4. **Proposed subpages, in order:** for each, give a task-first title, the use case it serves, the Vek API/capabilities it covers, and one or two focused specialist example ideas.
-5. **Separate companion pages:** name any related component that merits its own child page and why.
-6. **Current material mapping:** indicate what moves, stays, is regrouped, or needs new evidence/examples.
-7. **Open decisions:** ask only for decisions that cannot be resolved from the repository or the user's instructions. Ask one question at a time when interviewing the user.
+3. **Overview section order:** explicitly show **Explore Features** as the final section on the overview page; keep advanced keyboard and accessibility guidance on a dedicated specialist page.
+4. **Explore Features section:** give the heading and supporting line, proposed responsive card layout, each card's title, standalone route, task, unique icon/preview idea, and motion treatment.
+5. **Proposed subpages, in order:** for each, give a task-first title, its standalone route, the use case it serves, the Vek API/capabilities it covers, and one or two focused specialist example ideas.
+6. **Separate companion pages:** name any related component that merits its own child page and why.
+7. **Current material mapping:** indicate what moves, stays, is regrouped, or needs new evidence/examples.
+8. **Open decisions:** ask only for decisions that cannot be resolved from the repository or the user's instructions. Ask one question at a time when interviewing the user.
 
 Keep the proposal proportional to the component. Do not force a fixed number of subpages or use cases. If the existing material already has a strong structure, recommend targeted changes instead of restructuring for its own sake.
 

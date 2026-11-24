@@ -1,0 +1,40 @@
+@page "/components/datepicker/keyboard-accessibility"
+
+<DocsPage>
+    <DocsPageHeader Title="Date Picker - Keyboard & Accessibility" Component="@nameof(VekDatePicker)">
+        <Description>Move through the calendar and choose dates without a pointer by using the keyboard.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+        <DocsPageSection>
+            <SectionHeader Title="Navigate the calendar with keys">
+                <Description>
+                    Use these shortcuts to move between dates and calendar views, select a date, or close the picker.
+                </Description>
+            </SectionHeader>
+            <SectionContent>
+                <VekSimpleTable Outlined="true" Hover="true">
+                    <thead>
+                    <tr>
+                        <th>Keys</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr><td><CodeInline>Enter</CodeInline></td><td>Open the picker or submit the value from the picker.</td></tr>
+                    <tr><td><CodeInline>Space</CodeInline></td><td>Open the picker.</td></tr>
+                    <tr><td><CodeInline>Backspace</CodeInline></td><td>Go back to the previous view or close without submitting the value.</td></tr>
+                    <tr><td><CodeInline>Escape</CodeInline></td><td>Close the picker without submitting the value.</td></tr>
+                    <tr><td><CodeInline>ArrowLeft</CodeInline></td><td>Decrement the month or date in the current view.</td></tr>
+                    <tr><td><CodeInline>ArrowRight</CodeInline></td><td>Increment the month or date in the current view.</td></tr>
+                    <tr><td><CodeInline>ArrowUp</CodeInline></td><td>Decrement the year in year view, or move up one row in date or month view.</td></tr>
+                    <tr><td><CodeInline>ArrowDown</CodeInline></td><td>Increment the year in year view, or move down one row in date or month view.</td></tr>
+                    <tr><td><CodeInline>Shift + ArrowLeft</CodeInline></td><td>Decrement the month in date or month view.</td></tr>
+                    <tr><td><CodeInline>Shift + ArrowRight</CodeInline></td><td>Increment the month in date view.</td></tr>
+                    <tr><td><CodeInline>Shift + ArrowUp</CodeInline></td><td>Decrement the year in month or date view.</td></tr>
+                    <tr><td><CodeInline>Shift + ArrowDown</CodeInline></td><td>Increment the year in month or date view.</td></tr>
+                    </tbody>
+                </VekSimpleTable>
+            </SectionContent>
+        </DocsPageSection>
+    </DocsPageContent>
+</DocsPage>
