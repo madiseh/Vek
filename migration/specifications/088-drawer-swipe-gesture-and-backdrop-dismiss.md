@@ -4,9 +4,11 @@
 - **Feature ID**: 088
 - **Feature Slug**: drawer-swipe-gesture-and-backdrop-dismiss
 - **Module**: Drawer
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 88
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/173
+- **Completed At**: 2026-11-25T11:27:21Z
 
 ---
 

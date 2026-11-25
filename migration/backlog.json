@@ -1111,9 +1111,11 @@
       "title": "Drawer Mobile Edge-Swipe Touch Gestures and Backdrop Tap Dismiss",
       "module": "Drawer",
       "priority": 88,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/088-drawer-swipe-gesture-and-backdrop-dismiss.md",
-      "dependencies": []
+      "dependencies": [],
+      "completed_at": "2026-11-25T11:27:21Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/173"
     },
     {
       "id": "089",
