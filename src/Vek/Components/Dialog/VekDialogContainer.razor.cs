@@ -142,7 +142,7 @@ namespace Vek
 
         protected string Classname =>
             new CssBuilder("vek-dialog")
-                .AddClass(GetAnimationClass())
+                .AddClass(GetAnimationClass(), !string.IsNullOrEmpty(GetAnimationClass()))
                 .AddClass("vek-dialog-sheet-mobile", GetBottomSheetOnMobile())
                 .AddClass(GetMaxWidth(), !IsMaximized)
                 .AddClass("vek-dialog-width-full", GetFullWidth() && !IsMaximized)
@@ -416,12 +416,12 @@ namespace Vek
 
         private bool GetShowMaximizeButton() => _dialog?.ShowMaximizeButtonValue ?? GetDialogOptionsOrDefault.ShowMaximizeButton ?? GlobalDialogOptions.ShowMaximizeButton ?? false;
 
-        private DialogAnimation GetAnimation() => _dialog?.AnimationValue ?? GetDialogOptionsOrDefault.Animation ?? GlobalDialogOptions.Animation ?? DialogAnimation.Zoom;
+        private DialogAnimation? GetAnimation() => _dialog?.AnimationValue ?? GetDialogOptionsOrDefault.Animation ?? GlobalDialogOptions.Animation;
 
-        private string GetAnimationClass()
+        private string? GetAnimationClass()
         {
             var animation = GetAnimation();
-            return $"vek-dialog-animation-{animation.ToStringFast(true)}";
+            return animation is null or DialogAnimation.None ? null : $"vek-dialog-animation-{animation.Value.ToStringFast(true)}";
         }
 
         private bool GetBottomSheetOnMobile() => _dialog?.BottomSheetOnMobileValue ?? GetDialogOptionsOrDefault.BottomSheetOnMobile ?? GlobalDialogOptions.BottomSheetOnMobile ?? false;

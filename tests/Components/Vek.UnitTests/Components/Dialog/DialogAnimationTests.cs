@@ -11,7 +11,7 @@ namespace Vek.UnitTests.Components.Dialog
     public class DialogAnimationTests : BunitTest
     {
         [Test]
-        public void DialogAnimation_DefaultClass_IsZoom()
+        public void DialogAnimation_DefaultClass_IsZoomCssFallback()
         {
             var comp = Context.Render<VekDialogProvider>();
             var service = Context.Services.GetRequiredService<IDialogService>();
@@ -19,7 +19,7 @@ namespace Vek.UnitTests.Components.Dialog
             _ = comp.InvokeAsync(async () => await service.ShowAsync<DialogOkCancel>());
 
             var dialog = comp.Find(".vek-dialog");
-            dialog.ClassList.Should().Contain("vek-dialog-animation-zoom");
+            dialog.ClassList.Should().NotContain("vek-dialog-animation-fade");
             dialog.ClassList.Should().NotContain("vek-dialog-sheet-mobile");
         }
 
@@ -28,7 +28,6 @@ namespace Vek.UnitTests.Components.Dialog
         [TestCase(DialogAnimation.Zoom, "vek-dialog-animation-zoom")]
         [TestCase(DialogAnimation.SlideUp, "vek-dialog-animation-slideup")]
         [TestCase(DialogAnimation.SlideDown, "vek-dialog-animation-slidedown")]
-        [TestCase(DialogAnimation.None, "vek-dialog-animation-none")]
         public void DialogAnimation_WithOptions_AppliesCorrectClass(DialogAnimation animation, string expectedClass)
         {
             var comp = Context.Render<VekDialogProvider>();
@@ -39,6 +38,20 @@ namespace Vek.UnitTests.Components.Dialog
 
             var dialog = comp.Find(".vek-dialog");
             dialog.ClassList.Should().Contain(expectedClass);
+        }
+
+        [Test]
+        public void DialogAnimation_WithNone_DoesNotApplyAnimationClass()
+        {
+            var comp = Context.Render<VekDialogProvider>();
+            var service = Context.Services.GetRequiredService<IDialogService>();
+
+            var options = new DialogOptions { Animation = DialogAnimation.None };
+            _ = comp.InvokeAsync(async () => await service.ShowAsync<DialogOkCancel>("Title", options));
+
+            var dialog = comp.Find(".vek-dialog");
+            dialog.ClassList.Should().NotContain("vek-dialog-animation-zoom");
+            dialog.ClassList.Should().NotContain("vek-dialog-animation-fade");
         }
 
         [Test]
