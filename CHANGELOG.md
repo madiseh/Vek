@@ -1,7 +1,28 @@
 # Vek Changelog
 
-All notable changes to Vek will be documented in this file.
+All notable changes to Vek will be documented here.
 For GitHub Releases and downloadable packages, see the [Releases page](https://github.com/madiseh/Vek/releases).
+
+## [v1.4.1] - 2026-11-25
+
+> Vek v1.4.1 adds dialog maximize and fullscreen controls, a multi-file upload queue, resizable multi-column TreeList views, and immediate inline DataGrid editing. It also improves mobile landing-page layouts and expands task-focused component documentation.
+
+### Component Features and Fixes
+- **Dialog:** Add maximize, restore, and fullscreen controls. ([PR #128](https://github.com/madiseh/Vek/pull/128))
+- **FileUpload:** Manage multiple uploads with per-file progress, cancel, retry, and queue controls. ([PR #130](https://github.com/madiseh/Vek/pull/130))
+- **TreeView:** Add a resizable multi-column TreeList with sorting, selection, and keyboard navigation. ([PR #131](https://github.com/madiseh/Vek/pull/131))
+- **DataGrid:** Apply inline text and numeric edits as users type so Enter commits the latest value. ([PR #171](https://github.com/madiseh/Vek/pull/171))
+- **Landing page:** Improve mobile spacing, responsive controls, and hero background rendering. ([PR #170](https://github.com/madiseh/Vek/pull/170))
+
+### Documentation
+- Add live keyboard accessibility samples for DatePicker, DataGrid, and Tabs. ([PR #129](https://github.com/madiseh/Vek/pull/129), [PR #168](https://github.com/madiseh/Vek/pull/168))
+- Reorganize TreeView, Dialog, FileUpload, Stepper, Drawer, Autocomplete, and Tabs guides into task-focused pages. ([PR #132](https://github.com/madiseh/Vek/pull/132), [PR #133](https://github.com/madiseh/Vek/pull/133), [PR #134](https://github.com/madiseh/Vek/pull/134), [PR #135](https://github.com/madiseh/Vek/pull/135), [PR #136](https://github.com/madiseh/Vek/pull/136), [PR #137](https://github.com/madiseh/Vek/pull/137), [PR #138](https://github.com/madiseh/Vek/pull/138))
+- Improve the Explore Features grid styling across component pages. ([PR #166](https://github.com/madiseh/Vek/pull/166))
+
+### Contributors
+- [@madiseh](https://github.com/madiseh) - [PR #127](https://github.com/madiseh/Vek/pull/127), [#128](https://github.com/madiseh/Vek/pull/128), [#129](https://github.com/madiseh/Vek/pull/129), [#130](https://github.com/madiseh/Vek/pull/130), [#131](https://github.com/madiseh/Vek/pull/131), [#132](https://github.com/madiseh/Vek/pull/132), [#133](https://github.com/madiseh/Vek/pull/133), [#134](https://github.com/madiseh/Vek/pull/134), [#135](https://github.com/madiseh/Vek/pull/135), [#136](https://github.com/madiseh/Vek/pull/136), [#137](https://github.com/madiseh/Vek/pull/137), [#138](https://github.com/madiseh/Vek/pull/138), [#166](https://github.com/madiseh/Vek/pull/166), [#167](https://github.com/madiseh/Vek/pull/167), [#168](https://github.com/madiseh/Vek/pull/168), [#169](https://github.com/madiseh/Vek/pull/169), [#170](https://github.com/madiseh/Vek/pull/170), [#171](https://github.com/madiseh/Vek/pull/171)
+
+**Full Changelog**: https://github.com/madiseh/Vek/compare/v1.4.0...v1.4.1
 
 ## [v1.4.0] - 2026-11-24
 
