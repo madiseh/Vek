@@ -4,9 +4,11 @@
 - **Feature ID**: 014
 - **Feature Slug**: datagrid-column-header-filter-button
 - **Module**: DataGrid
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 14
 - **Dependencies**: ["004"]
+- **Pull Request**: https://github.com/madiseh/Vek/pull/174
+- **Completed At**: 2026-11-25T11:39:04Z
 
 ---
 
