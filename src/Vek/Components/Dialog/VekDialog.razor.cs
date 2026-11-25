@@ -27,6 +27,8 @@ namespace Vek
         private readonly ParameterState<bool> _visibleState;
         private readonly ParameterState<bool?> _showMaximizeButtonState;
         private readonly ParameterState<bool> _maximizedState;
+        private readonly ParameterState<DialogAnimation?> _animationState;
+        private readonly ParameterState<bool?> _bottomSheetOnMobileState;
         private readonly SemaphoreSlim _showLock = new SemaphoreSlim(1, 1);
 
         /// <summary>
@@ -45,6 +47,10 @@ namespace Vek
                 .WithParameter(() => Maximized)
                 .WithEventCallback(() => MaximizedChanged)
                 .WithChangeHandler(OnMaximizedChangedAsync);
+            _animationState = registerScope.RegisterParameter<DialogAnimation?>(nameof(Animation))
+                .WithParameter(() => Animation);
+            _bottomSheetOnMobileState = registerScope.RegisterParameter<bool?>(nameof(BottomSheetOnMobile))
+                .WithParameter(() => BottomSheetOnMobile);
         }
 
         protected string ContentClassname => new CssBuilder("vek-dialog-content")
@@ -212,6 +218,26 @@ namespace Vek
         public bool Maximized { get; set; }
 
         /// <summary>
+        /// The entrance animation used when this dialog appears.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>, which falls back to <see cref="DialogOptions.Animation"/> or <see cref="VekDialogProvider.Animation"/> (defaulting to <see cref="DialogAnimation.Zoom"/>).
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.Dialog.Appearance)]
+        public DialogAnimation? Animation { get; set; }
+
+        /// <summary>
+        /// Renders this dialog as a bottom drawer/sheet anchored to the bottom of the screen on small viewports.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>, which falls back to <see cref="DialogOptions.BottomSheetOnMobile"/> or <see cref="VekDialogProvider.BottomSheetOnMobile"/> (defaulting to <c>false</c>).
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.Dialog.Appearance)]
+        public bool? BottomSheetOnMobile { get; set; }
+
+        /// <summary>
         /// Occurs when <see cref="Maximized"/> has changed.
         /// </summary>
         [Parameter]
@@ -220,6 +246,10 @@ namespace Vek
         internal bool? ShowMaximizeButtonValue => _showMaximizeButtonState.Value;
 
         internal bool MaximizedValue => _maximizedState.Value;
+
+        internal DialogAnimation? AnimationValue => _animationState.Value;
+
+        internal bool? BottomSheetOnMobileValue => _bottomSheetOnMobileState.Value;
 
         internal Task UpdateMaximizedAsync(bool maximized) => _maximizedState.SetValueAsync(maximized);
 
@@ -324,6 +354,8 @@ namespace Vek
                     [nameof(ShowMaximizeButton)] = _showMaximizeButtonState.Value,
                     [nameof(Maximized)] = _maximizedState.Value,
                     [nameof(MaximizedChanged)] = EventCallback.Factory.Create<bool>(this, value => _maximizedState.SetValueAsync(value)),
+                    [nameof(Animation)] = _animationState.Value,
+                    [nameof(BottomSheetOnMobile)] = _bottomSheetOnMobileState.Value,
                 };
 #pragma warning restore CS0618 // Type or member is obsolete
 

@@ -1,0 +1,36 @@
+@namespace Vek.Docs.Examples
+@inject IDialogService DialogService
+
+<VekStack Row="true" Spacing="3" Wrap="Wrap.Wrap">
+    <VekButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => OpenWithAnimation(DialogAnimation.Zoom))">Zoom (Default)</VekButton>
+    <VekButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => OpenWithAnimation(DialogAnimation.Fade))">Fade</VekButton>
+    <VekButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="@(() => OpenWithAnimation(DialogAnimation.SlideUp))">Slide Up</VekButton>
+    <VekButton Variant="Variant.Filled" Color="Color.Info" OnClick="@(() => OpenWithAnimation(DialogAnimation.SlideDown))">Slide Down</VekButton>
+    <VekButton Variant="Variant.Outlined" Color="Color.Default" OnClick="@(() => OpenWithAnimation(DialogAnimation.None))">None</VekButton>
+    <VekButton Variant="Variant.Filled" Color="Color.Success" OnClick="OpenBottomSheet">Bottom Sheet (Mobile)</VekButton>
+</VekStack>
+
+@code {
+    private Task OpenWithAnimation(DialogAnimation animation)
+    {
+        var options = new DialogOptions
+        {
+            Animation = animation,
+            CloseButton = true
+        };
+
+        return DialogService.ShowAsync<DialogAnimationExample_Dialog>($"{animation} Entrance", options);
+    }
+
+    private Task OpenBottomSheet()
+    {
+        var options = new DialogOptions
+        {
+            BottomSheetOnMobile = true,
+            Animation = DialogAnimation.SlideUp,
+            CloseButton = true
+        };
+
+        return DialogService.ShowAsync<DialogAnimationExample_Dialog>("Bottom Sheet Mode", options);
+    }
+}

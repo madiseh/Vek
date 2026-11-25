@@ -59,6 +59,23 @@
     bottom: 32px;
     right: 32px;
   }
+
+  @media (max-width: $breakpoint-sm) {
+    &.vek-dialog-container-sheet-mobile {
+      align-items: flex-end !important;
+      justify-content: center !important;
+      padding: 0 !important;
+
+      .vek-dialog {
+        position: relative !important;
+        top: auto !important;
+        bottom: 0 !important;
+        left: auto !important;
+        right: auto !important;
+        margin: 0 !important;
+      }
+    }
+  }
 }
 
 .vek-dialog {
@@ -68,13 +85,68 @@
   color: var(--vek-palette-text-primary);
   background-color: var(--vek-palette-surface);
   border-radius: var(--vek-default-borderradius);
-  -webkit-animation: vek-open-dialog-center 0.1s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
-  animation: vek-open-dialog-center 0.1s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+  -webkit-animation: vek-open-dialog-zoom 0.15s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+  animation: vek-open-dialog-zoom 0.15s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
   box-shadow: 0px 11px 15px -7px rgba(0,0,0,0.2), 0px 24px 38px 3px rgba(0,0,0,0.14), 0px 9px 46px 8px rgba(0,0,0,0.12);
   max-height: calc(100vh - var(--vek-appbar-height)); // keep as fallback
   max-height: calc(100dvh - var(--vek-appbar-height));
   overflow-y: auto;
   outline-style: none;
+
+  &.vek-dialog-animation-zoom {
+    -webkit-animation: vek-open-dialog-zoom 0.15s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+    animation: vek-open-dialog-zoom 0.15s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+  }
+
+  &.vek-dialog-animation-fade {
+    -webkit-animation: vek-open-dialog-fade 0.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+    animation: vek-open-dialog-fade 0.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  &.vek-dialog-animation-slideup {
+    -webkit-animation: vek-open-dialog-slideup 0.25s cubic-bezier(0.0, 0, 0.2, 1) both;
+    animation: vek-open-dialog-slideup 0.25s cubic-bezier(0.0, 0, 0.2, 1) both;
+  }
+
+  &.vek-dialog-animation-slidedown {
+    -webkit-animation: vek-open-dialog-slidedown 0.25s cubic-bezier(0.0, 0, 0.2, 1) both;
+    animation: vek-open-dialog-slidedown 0.25s cubic-bezier(0.0, 0, 0.2, 1) both;
+  }
+
+  &.vek-dialog-animation-none {
+    -webkit-animation: none;
+    animation: none;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    &.vek-dialog-sheet-mobile {
+      width: 100% !important;
+      max-width: 100% !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+      border-top-left-radius: var(--vek-default-borderradius);
+      border-top-right-radius: var(--vek-default-borderradius);
+      margin-bottom: 0 !important;
+      -webkit-animation: vek-open-dialog-slideup 0.25s cubic-bezier(0.0, 0, 0.2, 1) both;
+      animation: vek-open-dialog-slideup 0.25s cubic-bezier(0.0, 0, 0.2, 1) both;
+
+      & .vek-dialog-title {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+
+      & .vek-dialog-actions {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    -webkit-animation: none !important;
+    animation: none !important;
+  }
 
   &.vek-dialog-rtl .vek-dialog-title .vek-dialog-title-actions {
     right: unset;
@@ -309,36 +381,106 @@
   }
 }
 
-@-webkit-keyframes vek-open-dialog-center {
+@-webkit-keyframes vek-open-dialog-zoom {
   0% {
     opacity: 0;
-  }
-
-  1% {
-    -webkit-transform: scale(0.5);
-    transform: scale(0.5);
-    opacity: 1;
+    -webkit-transform: scale(0.8);
+    transform: scale(0.8);
   }
 
   100% {
+    opacity: 1;
     -webkit-transform: scale(1);
     transform: scale(1);
   }
 }
 
-@keyframes vek-open-dialog-center {
+@keyframes vek-open-dialog-zoom {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale(0.8);
+    transform: scale(0.8);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+}
+
+@-webkit-keyframes vek-open-dialog-fade {
   0% {
     opacity: 0;
   }
 
-  1% {
-    -webkit-transform: scale(0.5);
-    transform: scale(0.5);
+  100% {
     opacity: 1;
+  }
+}
+
+@keyframes vek-open-dialog-fade {
+  0% {
+    opacity: 0;
   }
 
   100% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes vek-open-dialog-slideup {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(40px);
+    transform: translateY(40px);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes vek-open-dialog-slideup {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(40px);
+    transform: translateY(40px);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+  }
+}
+
+@-webkit-keyframes vek-open-dialog-slidedown {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(-40px);
+    transform: translateY(-40px);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes vek-open-dialog-slidedown {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(-40px);
+    transform: translateY(-40px);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
   }
 }
