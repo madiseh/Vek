@@ -19,8 +19,27 @@ For GitHub Releases and downloadable packages, see the [Releases page](https://g
 - Reorganize TreeView, Dialog, FileUpload, Stepper, Drawer, Autocomplete, and Tabs guides into task-focused pages. ([PR #132](https://github.com/madiseh/Vek/pull/132), [PR #133](https://github.com/madiseh/Vek/pull/133), [PR #134](https://github.com/madiseh/Vek/pull/134), [PR #135](https://github.com/madiseh/Vek/pull/135), [PR #136](https://github.com/madiseh/Vek/pull/136), [PR #137](https://github.com/madiseh/Vek/pull/137), [PR #138](https://github.com/madiseh/Vek/pull/138))
 - Improve the Explore Features grid styling across component pages. ([PR #166](https://github.com/madiseh/Vek/pull/166))
 
+### Feature Screenshots
+![Vek v1.4.1 feature screenshots](https://github.com/madiseh/Vek/releases/download/v1.4.1/release-slideshow.gif)
+
+1. Dialog in its default state - [PR #128](https://github.com/madiseh/Vek/pull/128)
+2. Maximized Dialog - [PR #128](https://github.com/madiseh/Vek/pull/128)
+3. FileUpload multi-file queue - [PR #130](https://github.com/madiseh/Vek/pull/130)
+4. FileUpload progress and error states - [PR #130](https://github.com/madiseh/Vek/pull/130)
+5. Multi-column TreeList - [PR #131](https://github.com/madiseh/Vek/pull/131)
+6. TreeList sorting and selection - [PR #131](https://github.com/madiseh/Vek/pull/131)
+
 ### Contributors
 - [@madiseh](https://github.com/madiseh) - [PR #127](https://github.com/madiseh/Vek/pull/127), [#128](https://github.com/madiseh/Vek/pull/128), [#129](https://github.com/madiseh/Vek/pull/129), [#130](https://github.com/madiseh/Vek/pull/130), [#131](https://github.com/madiseh/Vek/pull/131), [#132](https://github.com/madiseh/Vek/pull/132), [#133](https://github.com/madiseh/Vek/pull/133), [#134](https://github.com/madiseh/Vek/pull/134), [#135](https://github.com/madiseh/Vek/pull/135), [#136](https://github.com/madiseh/Vek/pull/136), [#137](https://github.com/madiseh/Vek/pull/137), [#138](https://github.com/madiseh/Vek/pull/138), [#166](https://github.com/madiseh/Vek/pull/166), [#167](https://github.com/madiseh/Vek/pull/167), [#168](https://github.com/madiseh/Vek/pull/168), [#169](https://github.com/madiseh/Vek/pull/169), [#170](https://github.com/madiseh/Vek/pull/170), [#171](https://github.com/madiseh/Vek/pull/171)
+
+### Test Results
+- Total: 8,770 - 8,768 passed, 0 failed, 2 skipped.
+- `Vek.UnitTests`: 6,815 total - 6,813 passed, 0 failed, 2 skipped.
+- `Vek.UnitTests.Docs`: 1,564 total - 1,564 passed, 0 failed, 0 skipped.
+- `Vek.UnitTests.Analyzers`: 391 total - 391 passed, 0 failed, 0 skipped.
+- Format check passed; build-only projects passed: `src/Docs/Vek.Docs.Server` and `src/Docs/Vek.Docs.WasmHost`.
+- [CI run 45591776357](https://github.com/madiseh/Vek/actions/runs/45591776357).
+- [Download JUnit reports](https://github.com/madiseh/Vek/releases/download/v1.4.1/test-results-v1.4.1.zip).
 
 **Full Changelog**: https://github.com/madiseh/Vek/compare/v1.4.0...v1.4.1
 
