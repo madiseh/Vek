@@ -47,6 +47,22 @@ This skill plans documentation. Do not edit component docs, examples, navigation
 - Add sitemap entries for new public routes and remove or correct entries for routes that were removed or renamed. Preserve the sitemap's existing canonical host and organization.
 - If all public URLs remain the same, leave the sitemap unchanged and report that it was checked.
 
+## Verification Gates
+
+Before completing a documentation implementation or pull request, systematically verify these four gates:
+
+1. **Keyboard & Accessibility Placement:**
+   - In `MenuService.cs`, the `Keyboard & Accessibility` subpage MUST always be the last nested menu item in the component's navigation group (or immediately before companion component links like Date Range).
+   - In the Overview page's `Explore Features` grid, the `Keyboard & Accessibility` card MUST be the final card in the grid (or the final card before any companion component cards).
+2. **Interactive Component Sample on Keyboard Page:**
+   - The dedicated `Keyboard & Accessibility` subpage MUST include at least one interactive live component example (`<SectionContent>`) alongside the shortcut reference table, so users can test and practice the documented keyboard and accessibility interactions directly on the page.
+3. **Explore Features Exclusivity and Strict Termination:**
+   - The `Explore Features` section MUST be the absolute final section in the component's Overview page (`*Page.razor`).
+   - The container element MUST use `<div class="vek-bento-grid mt-4">` (never unstyled custom classes).
+   - Under NO circumstances may any content, description, section, or notes appear after the `Explore Features` section.
+4. **Primary Navigation Icon Assignment:**
+   - The component's navigation group in `MenuService.cs` MUST have a distinct, highly relevant icon assigned (`icon: Icons.Material.Filled.<IconName>`) that clearly reflects the component's purpose. Avoid generic icons.
+
 ## Output
 
 Return a proposal the user can review before any edits:
