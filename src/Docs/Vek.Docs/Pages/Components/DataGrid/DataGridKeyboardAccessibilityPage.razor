@@ -1,0 +1,50 @@
+@page "/components/datagrid/keyboard-accessibility"
+
+<DocsPage>
+    <DocsPageHeader Title="Data Grid - Keyboard Navigation & APG" Component="@nameof(VekDataGrid<T>)">
+        <Description>Full 2D cell and row traversal, selection modifiers, column sorting, and screen reader announcements compliant with the W3C APG grid pattern.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Try Keyboard Navigation">
+                <Description>
+                    Click any cell below and use the arrow keys to navigate between cells and rows. Press <CodeInline>Space</CodeInline> to toggle selection, hold <CodeInline>Shift</CodeInline> to extend range selection, or press <CodeInline>Enter</CodeInline> to start inline editing.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridKeyboardNavigationExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridKeyboardNavigationExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="W3C APG Grid Pattern Shortcuts">
+                <Description>
+                    The Data Grid implements the W3C Accessible Rich Internet Applications (WAI-ARIA) APG Grid pattern with the following shortcuts:
+                </Description>
+            </SectionHeader>
+            <SectionContent>
+                <VekSimpleTable Outlined="true" Hover="true">
+                    <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr><td><CodeInline>ArrowUp</CodeInline> / <CodeInline>ArrowDown</CodeInline></td><td>Moves focus up or down one row in the same column.</td></tr>
+                    <tr><td><CodeInline>ArrowLeft</CodeInline> / <CodeInline>ArrowRight</CodeInline></td><td>Moves focus left or right one cell across visible columns.</td></tr>
+                    <tr><td><CodeInline>Home</CodeInline> / <CodeInline>End</CodeInline></td><td>Moves focus to the first or last cell in the current row.</td></tr>
+                    <tr><td><CodeInline>Ctrl + Home</CodeInline> / <CodeInline>Ctrl + End</CodeInline></td><td>Moves focus to the very first cell in the top row or the last cell in the bottom row.</td></tr>
+                    <tr><td><CodeInline>PageUp</CodeInline> / <CodeInline>PageDown</CodeInline></td><td>Moves focus up or down by one visible page size.</td></tr>
+                    <tr><td><CodeInline>Space</CodeInline></td><td>Selects or deselects the current focused row or cell.</td></tr>
+                    <tr><td><CodeInline>Shift + ArrowUp / Down</CodeInline></td><td>Extends contiguous range selection across rows.</td></tr>
+                    <tr><td><CodeInline>Enter</CodeInline></td><td>Enters edit mode on editable cells or saves the current row edit.</td></tr>
+                    <tr><td><CodeInline>Escape</CodeInline></td><td>Cancels active cell or row editing without persisting changes.</td></tr>
+                    </tbody>
+                </VekSimpleTable>
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>
