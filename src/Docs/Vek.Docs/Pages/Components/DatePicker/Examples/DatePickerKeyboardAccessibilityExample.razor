@@ -1,13 +1,21 @@
 @namespace Vek.Docs.Examples
 
-<VekDatePicker @bind-Date="_selectedDate"
-               PickerVariant="PickerVariant.Static"
-               StartMonth="new DateTime(2026, 12, 1)" />
+<VekStack Spacing="3" Style="max-width: 320px;">
+    <VekDatePicker @bind-Date="_selectedDate"
+                   Label="Select date with keyboard"
+                   HelperText="Focus the input and press Enter, Space, or Alt+ArrowDown"
+                   Clearable="true" />
 
-<VekText Typo="Typo.caption" Class="mt-2">
-    Selected date: @(_selectedDate?.ToString("D") ?? "none")
-</VekText>
+    <VekPaper Class="pa-3" Outlined="true">
+        <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+            <VekText Typo="Typo.body2">Selected date:</VekText>
+            <VekChip T="string" Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small">
+                @(_selectedDate?.ToString("D") ?? "None")
+            </VekChip>
+        </VekStack>
+    </VekPaper>
+</VekStack>
 
 @code {
-    private DateTime? _selectedDate = new DateTime(2026, 12, 8);
+    private DateTime? _selectedDate = new DateTime(2026, 12, 10);
 }
