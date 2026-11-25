@@ -1,0 +1,132 @@
+@using System.Globalization
+@using System.Collections
+@namespace Vek
+@typeparam TItem
+@typeparam TValue
+
+<div class="column-filter-values" role="group" aria-label="Filter values">
+    <VekTextField T="string" Value="@_search" ValueChanged="@SearchChangedAsync" Label="@SearchLabel" />
+    @if (IsDate)
+    {
+        @foreach (var year in DateValues.GroupBy(value => value?.Year).OrderBy(group => group.Key))
+        {
+            <details open>
+                <summary>@FormatYear(year.Key)</summary>
+                @foreach (var month in year.GroupBy(value => value?.Month).OrderBy(group => group.Key))
+                {
+                    <details open>
+                        <summary>@FormatMonth(month.Key)</summary>
+                        @foreach (var date in month.OrderBy(value => value?.Day))
+                        {
+                            <VekCheckBox T="bool" Value="@IsSelected(date)" ValueChanged="@(selected => ToggleAsync(date, selected))" Label="@FormatDate(date)" />
+                        }
+                    </details>
+                }
+            </details>
+        }
+    }
+    else
+    {
+        <VekList T="TValue" SelectionMode="@(SelectionMode.MultiSelection)" SelectedValues="@SelectedValues" SelectedValuesChanged="@OnSelectedValuesChangedAsync">
+            @foreach (var value in FilteredValues)
+            {
+                <VekListItem T="TValue" Value="@value">@FormatValue(value)</VekListItem>
+            }
+            @if (HasNullValue)
+            {
+                <VekListItem T="TValue" Value="@(default(TValue))">(Blanks)</VekListItem>
+            }
+        </VekList>
+    }
+    <div class="d-flex justify-end">
+        <VekButton OnClick="@ClearAsync">Clear</VekButton>
+        <VekButton Color="@Color.Primary" OnClick="@ApplyAsync">Apply</VekButton>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<TItem> Items { get; set; } = [];
+    [Parameter, EditorRequired] public Func<TItem, TValue?> GetValue { get; set; } = default!;
+    [Parameter, EditorRequired] public IFilterDefinition<TItem> FilterDefinition { get; set; } = default!;
+    [Parameter] public EventCallback<IReadOnlyCollection<TValue?>> SelectedValuesChanged { get; set; }
+    [Parameter] public EventCallback<IFilterDefinition<TItem>> FilterChanged { get; set; }
+    [Parameter] public string SearchLabel { get; set; } = "Search values";
+
+    private string _search = string.Empty;
+    private bool IsDate => typeof(TValue) == typeof(DateTime) || typeof(TValue) == typeof(DateTime?) || typeof(TValue) == typeof(DateOnly) || typeof(TValue) == typeof(DateOnly?);
+    private IReadOnlyList<TValue?> DistinctValues => _distinctValues;
+    private IReadOnlyCollection<TValue?> SelectedValues => _selectedValues;
+    private IEnumerable<TValue?> FilteredValues => DistinctValues.Where(value => FormatValue(value).Contains(_search, StringComparison.CurrentCultureIgnoreCase));
+    private bool HasNullValue => Items.Any(item => GetValue(item) is null);
+    private IEnumerable<DateTime?> DateValues => DistinctValues.Select(value => value switch { DateTime dt => dt, DateOnly date => date.ToDateTime(TimeOnly.MinValue), _ => (DateTime?)null });
+    private IReadOnlyCollection<TValue?> _selectedValues = [];
+    private IReadOnlyList<TValue?> _distinctValues = [];
+    private IReadOnlyList<TItem> _lastItems = [];
+
+    protected override void OnParametersSet()
+    {
+        if (!ReferenceEquals(Items, _lastItems))
+        {
+            _lastItems = Items;
+            _distinctValues = Items.Select(GetValue).Distinct().OrderBy(value => value?.ToString(), StringComparer.CurrentCultureIgnoreCase).ToArray();
+        }
+        _selectedValues = FilterDefinition.Value switch
+        {
+            IReadOnlyCollection<TValue?> values => values,
+            System.Collections.IEnumerable values => values.Cast<object?>().Select(value => (TValue?)value).ToArray(),
+            _ => []
+        };
+    }
+
+    private Task SearchChangedAsync(string value)
+    {
+        _search = value;
+        return Task.CompletedTask;
+    }
+
+    private Task OnSelectedValuesChangedAsync(IReadOnlyCollection<TValue?>? values)
+    {
+        _selectedValues = values ?? [];
+        return SelectedValuesChanged.InvokeAsync(_selectedValues);
+    }
+
+    private static string FormatValue(TValue? value) => value?.ToString() ?? "(Blanks)";
+    private static string FormatYear(int? year) => year?.ToString(CultureInfo.CurrentCulture) ?? "(Blanks)";
+    private static string FormatMonth(int? month) => month?.ToString("00", CultureInfo.CurrentCulture) ?? "(Blanks)";
+    private static string FormatDate(DateTime? date) => date?.ToString("d", CultureInfo.CurrentCulture) ?? "(Blanks)";
+    private bool IsSelected(DateTime? date) => SelectedValues.Cast<object?>().Any(value => Equals(ToDateTime(value), date));
+
+    private async Task ToggleAsync(DateTime? date, bool selected)
+    {
+        var values = SelectedValues.ToList();
+        var match = values.FirstOrDefault(value => Equals(ToDateTime(value), date));
+        if (selected && !values.Any(value => Equals(ToDateTime(value), date)))
+        {
+            values.Add((TValue?)(object?)ConvertDate(date));
+        }
+        else if (!selected && match is not null)
+        {
+            values.Remove(match);
+        }
+
+        await OnSelectedValuesChangedAsync(values);
+    }
+
+    private static DateTime? ToDateTime(object? value) => value switch { DateTime dateTime => dateTime, DateOnly dateOnly => dateOnly.ToDateTime(TimeOnly.MinValue), _ => null };
+    private static object? ConvertDate(DateTime? date) => typeof(TValue) == typeof(DateOnly) || typeof(TValue) == typeof(DateOnly?) ? date is null ? null : DateOnly.FromDateTime(date.Value) : date;
+
+    private async Task ClearAsync()
+    {
+        _selectedValues = [];
+        await SelectedValuesChanged.InvokeAsync(_selectedValues);
+        FilterDefinition.Value = null;
+        if (FilterDefinition is FilterDefinition<TItem> definition)
+        {
+            definition.FilterFunction = null;
+        }
+
+        await FilterChanged.InvokeAsync(FilterDefinition);
+    }
+
+    private Task ApplyAsync() => FilterChanged.InvokeAsync(FilterDefinition);
+}

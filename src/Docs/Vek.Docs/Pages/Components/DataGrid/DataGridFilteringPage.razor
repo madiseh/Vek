@@ -54,6 +54,17 @@
             </DocsPageSection>
 
             <DocsPageSection>
+                <SectionHeader Title="Header Value Checklist">
+                    <Description>
+                        Open a typed column's filter button to search its distinct values, select values, and apply or clear the filter. Date and date-only columns organize values by year, month, and day.
+                    </Description>
+                </SectionHeader>
+                <SectionContent DarkenBackground="true" Code="@nameof(DataGridHeaderValueFilterExample)" ShowCode="false" Block="true" FullWidth="true">
+                    <DataGridHeaderValueFilterExample />
+                </SectionContent>
+            </DocsPageSection>
+
+            <DocsPageSection>
                 <SectionHeader Title="Row and Menu FilterTemplate">
                     <Description>
                         <CodeInline>&lt;Column&gt;.&lt;FilterTemplate&gt;</CodeInline> also works in <CodeInline>DataGridFilterMode.ColumnFilterRow</CodeInline> and <CodeInline>DataGridFilterMode.ColumnFilterMenu</CodeInline>. These modes also use <CodeInline>FilterContext&lt;T&gt;</CodeInline>, so the same context shape is reused while <CodeInline>Actions</CodeInline> operate on the currently rendered filter UI.
