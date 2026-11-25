@@ -707,6 +707,7 @@
                                ValueChanged="@cell.StringValueChangedAsync"
                                Margin="@Margin.Dense" Style="margin-top:0"
                                Required="@column.Required"
+                               Immediate="@(EditMode == DataGridEditMode.Inline)"
                                Variant="@Variant.Text" Culture="@column.Culture" />
              }
              else if (column.isNumber)
@@ -716,6 +717,7 @@
                                   ValueChanged="@cell.NumberValueChangedAsync"
                                   Margin="@Margin.Dense" Style="margin-top:0"
                                   Required="@column.Required"
+                                  Immediate="@(EditMode == DataGridEditMode.Inline)"
                                   Variant="@Variant.Text" Culture="@column.Culture"
                                   Format="@column.ContentFormat" />
              }
