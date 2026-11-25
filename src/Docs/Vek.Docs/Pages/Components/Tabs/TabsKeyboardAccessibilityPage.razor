@@ -1,0 +1,47 @@
+@page "/components/tabs/keyboard-accessibility"
+
+<DocsPage>
+    <DocsPageHeader Title="Tabs - Keyboard Navigation & APG" Component="@nameof(VekTabs)">
+        <Description>W3C APG tab pattern navigation: move between tab panels, auto-activate selection, home/end jumping, and close shortcuts.</Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+
+        <DocsPageSection>
+            <SectionHeader Title="Try Keyboard Navigation">
+                <Description>
+                    Focus a tab header below and use <CodeInline>ArrowRight</CodeInline> and <CodeInline>ArrowLeft</CodeInline> (or <CodeInline>ArrowUp</CodeInline> and <CodeInline>ArrowDown</CodeInline> in vertical orientation) to navigate between tabs. Use <CodeInline>Home</CodeInline> and <CodeInline>End</CodeInline> to jump directly to the first or last tab.
+                </Description>
+            </SectionHeader>
+            <SectionContent Code="@nameof(TabsSimpleExample)" ShowCode="false" Block="true">
+                <TabsSimpleExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="W3C APG Tabs Pattern Shortcuts">
+                <Description>
+                    VekTabs follows the W3C Tabs design pattern with the following standard keyboard interactions:
+                </Description>
+            </SectionHeader>
+            <SectionContent>
+                <VekSimpleTable Outlined="true" Hover="true">
+                    <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr><td><CodeInline>ArrowRight</CodeInline> / <CodeInline>ArrowLeft</CodeInline></td><td>In horizontal tabs: moves focus to the next or previous tab header (wrapping around at boundaries).</td></tr>
+                    <tr><td><CodeInline>ArrowDown</CodeInline> / <CodeInline>ArrowUp</CodeInline></td><td>In vertical tabs (<CodeInline>TabPosition.Left</CodeInline> or <CodeInline>TabPosition.Right</CodeInline>): moves focus to the next or previous tab.</td></tr>
+                    <tr><td><CodeInline>Home</CodeInline></td><td>Moves focus directly to the first tab panel header.</td></tr>
+                    <tr><td><CodeInline>End</CodeInline></td><td>Moves focus directly to the last tab panel header.</td></tr>
+                    <tr><td><CodeInline>Enter</CodeInline> / <CodeInline>Space</CodeInline></td><td>Activates the focused tab panel when manual activation is configured.</td></tr>
+                    <tr><td><CodeInline>Delete</CodeInline> / <CodeInline>Ctrl + W</CodeInline></td><td>Closes the current closable tab when <CodeInline>Closable="true"</CodeInline>.</td></tr>
+                    </tbody>
+                </VekSimpleTable>
+            </SectionContent>
+        </DocsPageSection>
+
+    </DocsPageContent>
+</DocsPage>

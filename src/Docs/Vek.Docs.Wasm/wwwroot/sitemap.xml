@@ -229,6 +229,9 @@
     <loc>https://vekui.dev/components/datagrid/virtualization</loc>
   </url>
   <url>
+    <loc>https://vekui.dev/components/datagrid/keyboard-accessibility</loc>
+  </url>
+  <url>
     <loc>https://vekui.dev/components/datepicker</loc>
   </url>
   <url>
@@ -473,6 +476,9 @@
   </url>
   <url>
     <loc>https://vekui.dev/components/tabs/headers-badges</loc>
+  </url>
+  <url>
+    <loc>https://vekui.dev/components/tabs/keyboard-accessibility</loc>
   </url>
   <url>
     <loc>https://vekui.dev/components/textfield</loc>
