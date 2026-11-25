@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <None Update="Pages\ExpenseTrackerPage.razor.css" CssScope="vek-showcase-expense-tracker" />
+    <None Update="Pages\LoginShowcasePage.razor.css" CssScope="vek-showcase-login-blocks" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,89 @@
+.login-showcase-container {
+    max-width: 1440px;
+    margin-inline: auto;
+    padding: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+.login-showcase-container ::deep .header-section {
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.login-showcase-container ::deep .block-controls-bar {
+    border-radius: var(--vek-default-borderradius, 8px);
+    background: var(--vek-palette-background-grey, rgba(0, 0, 0, 0.03));
+}
+
+.login-showcase-container ::deep .block-viewport {
+    background-color: var(--vek-palette-background-grey, #f8fafc);
+    border: 1px solid var(--vek-palette-lines-default, rgba(0, 0, 0, 0.12));
+    border-radius: var(--vek-default-borderradius, 12px);
+    overflow: hidden;
+    min-height: 520px;
+}
+
+.login-showcase-container ::deep .block-viewport.dark-viewport {
+    background-color: #09090b;
+}
+
+.login-showcase-container ::deep .code-container {
+    background: #0d1117;
+    border-radius: var(--vek-default-borderradius, 8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+}
+
+.login-showcase-container ::deep .code-pre {
+    margin: 0;
+    padding: 1.25rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: #e6edf3;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+.login-showcase-container ::deep .brand-logo-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+}
+
+.login-showcase-container ::deep .split-hero-side {
+    background: linear-gradient(135deg, var(--vek-palette-primary-darken, #111827) 0%, var(--vek-palette-primary, #1e293b) 100%);
+    color: #ffffff;
+    min-height: 520px;
+}
+
+.login-showcase-container ::deep .split-hero-content {
+    height: 100%;
+}
+
+.login-showcase-container ::deep .quote-card {
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.login-showcase-container ::deep .login-card-fixed-width {
+    width: 100%;
+    max-width: 440px;
+}
+
+.login-showcase-container ::deep .social-btn {
+    border-color: var(--vek-palette-lines-default, rgba(0, 0, 0, 0.15));
+}
+
+@media (max-width: 768px) {
+    .login-showcase-container {
+        padding: 0.75rem;
+    }
+
+    .login-showcase-container ::deep .block-viewport {
+        min-height: auto;
+    }
+
+    .login-showcase-container ::deep .split-hero-side {
+        min-height: 220px;
+    }
+}
