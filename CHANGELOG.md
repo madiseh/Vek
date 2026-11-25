@@ -38,7 +38,8 @@ For GitHub Releases and downloadable packages, see the [Releases page](https://g
 - `Vek.UnitTests.Docs`: 1,564 total - 1,564 passed, 0 failed, 0 skipped.
 - `Vek.UnitTests.Analyzers`: 391 total - 391 passed, 0 failed, 0 skipped.
 - Format check passed; build-only projects passed: `src/Docs/Vek.Docs.Server` and `src/Docs/Vek.Docs.WasmHost`.
-- [CI run 45591776357](https://github.com/madiseh/Vek/actions/runs/45591776357).
+- Source commit: `d15741f85472bb2a988d5de801b96a7070fe93f0`.
+- [CI run 45592558098](https://github.com/madiseh/Vek/actions/runs/45592558098).
 - [Download JUnit reports](https://github.com/madiseh/Vek/releases/download/v1.4.1/test-results-v1.4.1.zip).
 
 **Full Changelog**: https://github.com/madiseh/Vek/compare/v1.4.0...v1.4.1
