@@ -6,6 +6,18 @@
   color: var(--vek-palette-text-primary);
   overflow-x: hidden;
 
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 700px;
+    background: radial-gradient(ellipse 90% 70% at 50% 0%, rgba(37, 99, 235, 0.14) 0%, rgba(14, 165, 233, 0.06) 50%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
   // Header and container constraints
   .landing-container {
     max-width: 1200px;
@@ -13,6 +25,10 @@
     padding: 0 24px;
     position: relative;
     z-index: 1;
+
+    @media (max-width: 600px) {
+      padding: 0 16px;
+    }
   }
 
   .docs-appbar-menu-trigger {
@@ -29,19 +45,11 @@
     padding-top: 130px;
     padding-bottom: 70px;
     text-align: center;
-    overflow: hidden;
+    overflow: visible;
 
-    &::before {
-      content: "";
-      position: absolute;
-      top: -160px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: min(1000px, 100%);
-      height: 600px;
-      background: radial-gradient(circle, rgba(37, 99, 235, 0.16) 0%, rgba(14, 165, 233, 0.08) 40%, rgba(0, 0, 0, 0) 70%);
-      pointer-events: none;
-      z-index: 0;
+    @media (max-width: 767px) {
+      padding-top: 88px;
+      padding-bottom: 48px;
     }
 
     .hero-badge {
@@ -57,7 +65,14 @@
       color: var(--vek-palette-primary);
       margin-bottom: 24px;
       text-decoration: none;
+      max-width: 100%;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+      @media (max-width: 600px) {
+        font-size: 0.8rem;
+        padding: 6px 14px;
+        gap: 8px;
+      }
 
       &:hover {
         background: rgba(37, 99, 235, 0.14);
@@ -76,12 +91,17 @@
 
     .hero-title {
       font-family: 'Plus Jakarta Sans', sans-serif !important;
-      font-size: clamp(2.4rem, 5vw, 4.2rem) !important;
+      font-size: clamp(2.1rem, 5vw, 4.2rem) !important;
       font-weight: 800 !important;
       letter-spacing: -0.035em !important;
-      line-height: 1.1 !important;
+      line-height: 1.15 !important;
       max-width: 900px;
       margin: 0 auto 24px auto;
+      text-wrap: balance;
+
+      @media (max-width: 600px) {
+        margin-bottom: 16px;
+      }
     }
 
     .hero-gradient-text {
@@ -98,6 +118,13 @@
       color: var(--vek-palette-text-secondary) !important;
       max-width: 760px;
       margin: 0 auto 36px auto;
+      text-wrap: balance;
+
+      @media (max-width: 600px) {
+        font-size: 1rem !important;
+        line-height: 1.6 !important;
+        margin-bottom: 28px auto;
+      }
     }
 
     .hero-actions {
@@ -107,6 +134,18 @@
       flex-wrap: wrap;
       gap: 16px;
       margin-bottom: 32px;
+
+      @media (max-width: 600px) {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+        margin-bottom: 24px;
+
+        > .vek-button {
+          width: 100%;
+          justify-content: center;
+        }
+      }
     }
 
     .hero-install-box {
@@ -121,6 +160,22 @@
       font-size: 0.9rem;
       color: var(--vek-palette-text-primary);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      max-width: 100%;
+
+      @media (max-width: 600px) {
+        font-size: 0.8rem;
+        padding: 8px 14px;
+        gap: 10px;
+        width: 100%;
+        justify-content: space-between;
+        box-sizing: border-box;
+
+        .install-cmd {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
 
       .install-cmd {
         user-select: all;
@@ -153,6 +208,11 @@
     box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.12);
     overflow: hidden;
     text-align: left;
+
+    @media (max-width: 767px) {
+      margin-top: 32px;
+      border-radius: 10px;
+    }
 
     .preview-header {
       display: flex;
@@ -216,6 +276,7 @@
 
       @media (max-width: 900px) {
         grid-template-columns: 1fr;
+        min-height: auto;
       }
 
       .preview-code-pane {
@@ -227,6 +288,13 @@
         line-height: 1.6;
         overflow-x: auto;
         border-right: 1px solid var(--vek-palette-divider);
+
+        @media (max-width: 600px) {
+          padding: 16px;
+          font-size: 0.8rem;
+          border-right: none;
+          border-bottom: 1px solid var(--vek-palette-divider);
+        }
 
         pre {
           margin: 0;
@@ -247,6 +315,11 @@
         justify-content: center;
         background: var(--vek-palette-surface);
         gap: 20px;
+
+        @media (max-width: 600px) {
+          padding: 20px 16px;
+          gap: 16px;
+        }
       }
     }
   }
@@ -266,6 +339,17 @@
         max-width: 100%;
         overflow-x: auto;
         overscroll-behavior-x: contain;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch;
+
+        &::-webkit-scrollbar {
+          height: 3px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: var(--vek-palette-divider);
+          border-radius: 4px;
+        }
       }
 
       .preview-chip {
@@ -281,9 +365,17 @@
     border-bottom: 1px solid var(--vek-palette-divider);
     background: var(--vek-palette-background-gray);
 
+    @media (max-width: 600px) {
+      padding: 36px 0;
+    }
+
     .metric-card {
       padding: 20px 16px;
       text-align: center;
+
+      @media (max-width: 600px) {
+        padding: 12px 8px;
+      }
 
       .metric-value {
         font-family: 'Plus Jakarta Sans', sans-serif !important;
@@ -294,6 +386,10 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 6px;
+
+        @media (max-width: 600px) {
+          font-size: 2rem !important;
+        }
       }
 
       .metric-label {
@@ -302,6 +398,10 @@
         color: var(--vek-palette-text-secondary);
         text-transform: uppercase;
         letter-spacing: 0.02em;
+
+        @media (max-width: 600px) {
+          font-size: 0.75rem;
+        }
       }
     }
   }
@@ -310,10 +410,18 @@
   .bento-section {
     padding: 100px 0 60px 0;
 
+    @media (max-width: 600px) {
+      padding: 60px 0 36px 0;
+    }
+
     .section-header {
       text-align: center;
       max-width: 700px;
       margin: 0 auto 60px auto;
+
+      @media (max-width: 600px) {
+        margin-bottom: 32px;
+      }
 
       .section-badge {
         font-size: 0.85rem;
@@ -330,12 +438,20 @@
         font-weight: 800 !important;
         letter-spacing: -0.025em;
         margin-bottom: 16px;
+
+        @media (max-width: 600px) {
+          font-size: 1.85rem !important;
+        }
       }
 
       .section-subtitle {
         color: var(--vek-palette-text-secondary);
         font-size: 1.1rem;
         line-height: 1.6;
+
+        @media (max-width: 600px) {
+          font-size: 0.95rem;
+        }
       }
     }
 
@@ -350,6 +466,10 @@
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       overflow: hidden;
+
+      @media (max-width: 600px) {
+        padding: 20px;
+      }
 
       &:hover {
         border-color: rgba(37, 99, 235, 0.4);
@@ -619,6 +739,10 @@
   .final-cta-section {
     padding: 40px 0 100px 0;
 
+    @media (max-width: 600px) {
+      padding: 24px 0 60px 0;
+    }
+
     .final-cta-card {
       border-radius: 16px;
       background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(14, 165, 233, 0.08) 100%);
@@ -627,6 +751,10 @@
       text-align: center;
       position: relative;
       overflow: hidden;
+
+      @media (max-width: 600px) {
+        padding: 36px 16px;
+      }
 
       .cta-title {
         font-family: 'Plus Jakarta Sans', sans-serif !important;
@@ -642,6 +770,11 @@
         max-width: 600px;
         margin: 0 auto 32px auto;
         line-height: 1.6;
+
+        @media (max-width: 600px) {
+          font-size: 0.95rem;
+          margin-bottom: 24px;
+        }
       }
 
       .cta-buttons {
@@ -649,6 +782,17 @@
         justify-content: center;
         gap: 16px;
         flex-wrap: wrap;
+
+        @media (max-width: 600px) {
+          flex-direction: column;
+          width: 100%;
+          gap: 12px;
+
+          > .vek-button {
+            width: 100%;
+            justify-content: center;
+          }
+        }
       }
     }
   }
