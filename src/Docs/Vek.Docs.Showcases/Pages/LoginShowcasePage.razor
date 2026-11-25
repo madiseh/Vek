@@ -1,0 +1,375 @@
+@page "/showcases/login"
+@layout DocsLayout
+
+<VekMainContent>
+<VekStack Spacing="5" Class="login-showcase-container" vek-showcase-login-blocks="">
+    <!-- Header Section -->
+    <VekStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="header-section">
+        <VekStack Spacing="1">
+            <VekText Typo="Typo.overline">BLOCKS & SHOWCASE</VekText>
+            <VekText Typo="Typo.h3">Authentication & Login Blocks</VekText>
+            <VekText Typo="Typo.body1" Color="Color.Secondary">
+                Clean, accessible, and responsive login templates crafted exclusively with Vek components. Ready to copy and paste.
+            </VekText>
+        </VekStack>
+
+        <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+            <VekButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.ContentCopy"
+                       OnClick="CopyCurrentCodeAsync">
+                Copy Code
+            </VekButton>
+        </VekStack>
+    </VekStack>
+
+    <!-- Block Controls Bar -->
+    <VekCard Outlined="true" Class="pa-3 block-controls-bar">
+        <VekGrid Spacing="2" AlignItems="AlignItems.Center">
+            <VekItem xs="12" md="8">
+                <VekStack Row="true" Spacing="2" AlignItems="AlignItems.Center" Style="flex-wrap: wrap;">
+                    <VekText Typo="Typo.subtitle2" Class="me-2">Variants:</VekText>
+                    @foreach (var variant in _variants)
+                    {
+                        <VekButton Variant="@(_activeVariantId == variant.Id ? Variant.Filled : Variant.Text)"
+                                   Color="@(_activeVariantId == variant.Id ? Color.Primary : Color.Default)"
+                                   Size="Size.Small"
+                                   OnClick="@(() => SelectVariant(variant.Id))">
+                            @variant.Title.Split('-')[0].Trim()
+                        </VekButton>
+                    }
+                </VekStack>
+            </VekItem>
+
+            <VekItem xs="12" md="4" Class="d-flex justify-md-end">
+                <VekTabs @bind-ActivePanelIndex="_tabIndex" Rounded="true" ApplyEffectsToContainer="false">
+                    <VekTabPanel Text="Preview" Icon="@Icons.Material.Filled.Visibility" />
+                    <VekTabPanel Text="Code" Icon="@Icons.Material.Filled.Code" />
+                </VekTabs>
+            </VekItem>
+        </VekGrid>
+    </VekCard>
+
+    <!-- Tab Panels for Preview and Code -->
+    @if (_tabIndex == 0)
+    {
+        <!-- Preview Mode -->
+        <VekCard Outlined="true" Class="block-viewport pa-6 pa-md-12 d-flex align-center justify-center">
+            @if (_activeVariantId == "login-01")
+            {
+                <!-- Variant 1: Centered Card -->
+                <VekCard Outlined="true" Class="pa-8 login-card-fixed-width" Style="border-radius: 12px; background: var(--vek-palette-surface);">
+                    <VekCardContent>
+                        <VekStack Spacing="4">
+                            <VekStack Spacing="1" AlignItems="AlignItems.Center">
+                                <VekText Typo="Typo.h5">Welcome back</VekText>
+                                <VekText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                                    Enter your email to sign in to your account
+                                </VekText>
+                            </VekStack>
+
+                            <VekButton Variant="Variant.Outlined"
+                                       Color="Color.Default"
+                                       FullWidth="true"
+                                       Class="social-btn"
+                                       StartIcon="@Icons.Custom.Brands.Google"
+                                       OnClick="@(() => SimulateSocialAuth("Google"))">
+                                Continue with Google
+                            </VekButton>
+
+                            <VekDivider Text="OR CONTINUE WITH" />
+
+                            <VekStack Spacing="3">
+                                <VekTextField @bind-Value="_v1Email"
+                                              Label="Email"
+                                              Placeholder="name@example.com"
+                                              InputType="InputType.Email"
+                                              Variant="Variant.Outlined"
+                                              Required="true" />
+
+                                <VekTextField @bind-Value="_v1Password"
+                                              Label="Password"
+                                              InputType="@(_v1ShowPassword ? InputType.Text : InputType.Password)"
+                                              Variant="Variant.Outlined"
+                                              Adornment="Adornment.End"
+                                              AdornmentIcon="@(_v1ShowPassword ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                                              OnAdornmentClick="@(() => _v1ShowPassword = !_v1ShowPassword)"
+                                              Required="true" />
+
+                                <VekStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                                    <VekCheckBox @bind-Value="_v1RememberMe" Label="Remember me" Dense="true" />
+                                    <VekLink Href="#forgot" Underline="Underline.Hover" Typo="Typo.body2">
+                                        Forgot password?
+                                    </VekLink>
+                                </VekStack>
+
+                                <VekButton Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           FullWidth="true"
+                                           OnClick="@(() => SimulateLogin("Login 01"))">
+                                    Sign in
+                                </VekButton>
+                            </VekStack>
+
+                            <VekText Typo="Typo.body2" Align="Align.Center">
+                                Don't have an account? <VekLink Href="#signup" Underline="Underline.Hover">Sign up</VekLink>
+                            </VekText>
+                        </VekStack>
+                    </VekCardContent>
+                </VekCard>
+            }
+            else if (_activeVariantId == "login-02")
+            {
+                <!-- Variant 2: Split Screen -->
+                <VekCard Outlined="true" Style="max-width: 900px; width: 100%; border-radius: 12px; overflow: hidden; background: var(--vek-palette-surface);">
+                    <VekGrid Spacing="0">
+                        <VekItem xs="12" md="6" Class="pa-8 d-flex flex-column justify-center">
+                            <VekStack Spacing="4" Style="max-width: 360px; margin: 0 auto; width: 100%;">
+                                <VekStack Spacing="1">
+                                    <VekText Typo="Typo.h5">Welcome back</VekText>
+                                    <VekText Typo="Typo.body2" Color="Color.Secondary">
+                                        Login to your Acme Inc account
+                                    </VekText>
+                                </VekStack>
+
+                                <VekStack Spacing="3">
+                                    <VekTextField @bind-Value="_v2Email"
+                                                  Label="Email address"
+                                                  Placeholder="m@example.com"
+                                                  InputType="InputType.Email"
+                                                  Variant="Variant.Outlined"
+                                                  Required="true" />
+
+                                    <VekTextField @bind-Value="_v2Password"
+                                                  Label="Password"
+                                                  InputType="@(_v2ShowPassword ? InputType.Text : InputType.Password)"
+                                                  Variant="Variant.Outlined"
+                                                  Adornment="Adornment.End"
+                                                  AdornmentIcon="@(_v2ShowPassword ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                                                  OnAdornmentClick="@(() => _v2ShowPassword = !_v2ShowPassword)"
+                                                  Required="true" />
+
+                                    <VekButton Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               FullWidth="true"
+                                               OnClick="@(() => SimulateLogin("Login 02"))">
+                                        Sign In
+                                    </VekButton>
+                                </VekStack>
+
+                                <VekDivider Text="OR" />
+
+                                <VekStack Spacing="2">
+                                    <VekButton Variant="Variant.Outlined"
+                                               Color="Color.Default"
+                                               FullWidth="true"
+                                               Class="social-btn"
+                                               StartIcon="@Icons.Custom.Brands.GitHub"
+                                               OnClick="@(() => SimulateSocialAuth("GitHub"))">
+                                        Login with GitHub
+                                    </VekButton>
+                                    <VekButton Variant="Variant.Outlined"
+                                               Color="Color.Default"
+                                               FullWidth="true"
+                                               Class="social-btn"
+                                               StartIcon="@Icons.Custom.Brands.Google"
+                                               OnClick="@(() => SimulateSocialAuth("Google"))">
+                                        Login with Google
+                                    </VekButton>
+                                </VekStack>
+
+                                <VekText Typo="Typo.caption" Align="Align.Center" Color="Color.Secondary">
+                                    By clicking continue, you agree to our <VekLink Href="#terms" Underline="Underline.Hover">Terms of Service</VekLink> and <VekLink Href="#privacy" Underline="Underline.Hover">Privacy Policy</VekLink>.
+                                </VekText>
+                            </VekStack>
+                        </VekItem>
+
+                        <VekItem xs="12" md="6" Class="split-hero-side pa-10 d-none d-md-flex flex-column justify-space-between">
+                            <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                                <VekIcon Icon="@Icons.Material.Filled.AutoAwesome" Color="Color.Warning" />
+                                <VekText Typo="Typo.h6">Acme Corporation</VekText>
+                            </VekStack>
+
+                            <VekStack Spacing="2">
+                                <VekText Typo="Typo.h5">"Everything you need to deliver modern apps in minutes."</VekText>
+                                <VekText Typo="Typo.body2" Style="opacity: 0.85;">
+                                    Explore our component system with enterprise accessibility, theming, and responsive layouts built-in.
+                                </VekText>
+                            </VekStack>
+
+                            <VekText Typo="Typo.caption" Style="opacity: 0.65;">
+                                © 2026 Acme Inc. All rights reserved.
+                            </VekText>
+                        </VekItem>
+                    </VekGrid>
+                </VekCard>
+            }
+            else if (_activeVariantId == "login-03")
+            {
+                <!-- Variant 3: Muted Minimalist -->
+                <VekCard Outlined="true" Class="pa-8 login-card-fixed-width" Style="border-radius: 16px; background: var(--vek-palette-surface);">
+                    <VekCardContent>
+                        <VekStack Spacing="4">
+                            <VekStack Spacing="1" AlignItems="AlignItems.Center">
+                                <VekIcon Icon="@Icons.Material.Filled.Lock" Color="Color.Primary" Size="Size.Large" />
+                                <VekText Typo="Typo.h5">Sign In to Platform</VekText>
+                                <VekText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                                    Access your cloud dashboard & analytics
+                                </VekText>
+                            </VekStack>
+
+                            <VekStack Spacing="3">
+                                <VekTextField @bind-Value="_v3Email"
+                                              Label="Work Email"
+                                              Placeholder="name@company.com"
+                                              InputType="InputType.Email"
+                                              Variant="Variant.Outlined"
+                                              Required="true" />
+
+                                <VekTextField @bind-Value="_v3Password"
+                                              Label="Password"
+                                              InputType="@(_v3ShowPassword ? InputType.Text : InputType.Password)"
+                                              Variant="Variant.Outlined"
+                                              Adornment="Adornment.End"
+                                              AdornmentIcon="@(_v3ShowPassword ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                                              OnAdornmentClick="@(() => _v3ShowPassword = !_v3ShowPassword)"
+                                              Required="true" />
+
+                                <VekButton Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           FullWidth="true"
+                                           OnClick="@(() => SimulateLogin("Login 03"))">
+                                    Continue with Email
+                                </VekButton>
+                            </VekStack>
+
+                            <VekDivider Text="OR CONTINUE WITH" />
+
+                            <VekGrid Spacing="2">
+                                <VekItem xs="6">
+                                    <VekButton Variant="Variant.Outlined"
+                                               FullWidth="true"
+                                               Class="social-btn"
+                                               StartIcon="@Icons.Custom.Brands.GitHub"
+                                               OnClick="@(() => SimulateSocialAuth("GitHub"))">
+                                        GitHub
+                                    </VekButton>
+                                </VekItem>
+                                <VekItem xs="6">
+                                    <VekButton Variant="Variant.Outlined"
+                                               FullWidth="true"
+                                               Class="social-btn"
+                                               StartIcon="@Icons.Custom.Brands.Google"
+                                               OnClick="@(() => SimulateSocialAuth("Google"))">
+                                        Google
+                                    </VekButton>
+                                </VekItem>
+                            </VekGrid>
+                        </VekStack>
+                    </VekCardContent>
+                </VekCard>
+            }
+            else if (_activeVariantId == "login-04")
+            {
+                <!-- Variant 4: Split Side Hero -->
+                <VekCard Outlined="true" Style="max-width: 980px; width: 100%; border-radius: 12px; overflow: hidden; background: var(--vek-palette-surface);">
+                    <VekGrid Spacing="0">
+                        <VekItem xs="12" md="5" Class="pa-10 d-flex flex-column justify-space-between" Style="background: #09090b; color: #ffffff;">
+                            <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                                <VekIcon Icon="@Icons.Material.Filled.Shield" Color="Color.Info" />
+                                <VekText Typo="Typo.h6">Vek Platform</VekText>
+                            </VekStack>
+
+                            <VekStack Spacing="3">
+                                <VekCard Outlined="true" Class="pa-4 quote-card">
+                                    <VekCardContent Class="pa-0">
+                                        <VekText Typo="Typo.body2" Style="font-style: italic; color: #f1f5f9;">
+                                            "This library has saved our team countless hours of work. Blazor component authoring feels smooth, modern and rock solid."
+                                        </VekText>
+                                        <VekText Typo="Typo.caption" Class="mt-3 d-block" Style="color: #94a3b8;">
+                                            Sofia Davis — Engineering Lead
+                                        </VekText>
+                                    </VekCardContent>
+                                </VekCard>
+                            </VekStack>
+
+                            <VekText Typo="Typo.caption" Style="color: #64748b;">
+                                Designed for high performance Blazor apps.
+                            </VekText>
+                        </VekItem>
+
+                        <VekItem xs="12" md="7" Class="pa-8 d-flex flex-column justify-center">
+                            <VekStack Spacing="4" Style="max-width: 380px; margin: 0 auto; width: 100%;">
+                                <VekStack Spacing="1">
+                                    <VekText Typo="Typo.h5">Create or sign in</VekText>
+                                    <VekText Typo="Typo.body2" Color="Color.Secondary">
+                                        Enter your email below to access your workspace
+                                    </VekText>
+                                </VekStack>
+
+                                <VekButton Variant="Variant.Outlined"
+                                           FullWidth="true"
+                                           Class="social-btn"
+                                           StartIcon="@Icons.Custom.Brands.GitHub"
+                                           OnClick="@(() => SimulateSocialAuth("GitHub"))">
+                                    Continue with GitHub
+                                </VekButton>
+
+                                <VekDivider Text="OR USE EMAIL" />
+
+                                <VekStack Spacing="3">
+                                    <VekTextField @bind-Value="_v4Email"
+                                                  Label="Email address"
+                                                  Placeholder="name@company.com"
+                                                  InputType="InputType.Email"
+                                                  Variant="Variant.Outlined"
+                                                  Required="true" />
+
+                                    <VekTextField @bind-Value="_v4Password"
+                                                  Label="Password"
+                                                  InputType="@(_v4ShowPassword ? InputType.Text : InputType.Password)"
+                                                  Variant="Variant.Outlined"
+                                                  Adornment="Adornment.End"
+                                                  AdornmentIcon="@(_v4ShowPassword ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                                                  OnAdornmentClick="@(() => _v4ShowPassword = !_v4ShowPassword)"
+                                                  Required="true" />
+
+                                    <VekCheckBox @bind-Value="_v4TermsAccepted" Label="I agree to the terms and privacy policy" Dense="true" />
+
+                                    <VekButton Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               FullWidth="true"
+                                               OnClick="@(() => SimulateLogin("Login 04"))">
+                                        Sign in with Email
+                                    </VekButton>
+                                </VekStack>
+                            </VekStack>
+                        </VekItem>
+                    </VekGrid>
+                </VekCard>
+            }
+        </VekCard>
+    }
+    else
+    {
+        <!-- Code Mode -->
+        <VekCard Outlined="true" Class="code-container pa-4">
+            <VekStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-3 px-2">
+                <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                    <VekIcon Icon="@Icons.Material.Filled.Code" Color="Color.Default" />
+                    <VekText Typo="Typo.subtitle2" Style="color: #94a3b8;">@_activeVariantId.ToUpperInvariant().Replace("-", " ") — Blazor Razor Code</VekText>
+                </VekStack>
+                <VekButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Size="Size.Small"
+                           StartIcon="@Icons.Material.Filled.ContentCopy"
+                           OnClick="CopyCurrentCodeAsync">
+                    Copy Code
+                </VekButton>
+            </VekStack>
+            <VekDivider Style="border-color: rgba(255, 255, 255, 0.1);" />
+            <pre class="code-pre">@GetCurrentVariantCode()</pre>
+        </VekCard>
+    }
+</VekStack>
+</VekMainContent>
