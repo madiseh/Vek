@@ -258,7 +258,7 @@ public class DataGridKeyboardNavigationTests : BunitTest
         comp.Instance.IsEditingItem(items[0]).Should().BeTrue();
 
         var nameInput = comp.FindAll("tbody tr")[0].QuerySelectorAll("input")[1];
-        await nameInput.ChangeAsync("Alice Updated");
+        await nameInput.InputAsync("Alice Updated");
 
         await table.KeyDownAsync(new KeyboardEventArgs { Key = "Enter" });
         comp.Instance.IsEditingItem(items[0]).Should().BeFalse();
