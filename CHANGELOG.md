@@ -3,6 +3,43 @@
 All notable changes to Vek will be documented here.
 For GitHub Releases and downloadable packages, see the [Releases page](https://github.com/madiseh/Vek/releases).
 
+## [v1.4.2] - 2026-11-26
+
+> Vek v1.4.2 introduces entrance animations and responsive bottom sheet styling for dialogs, edge-swipe gestures and backdrop dismiss for mobile drawers, Excel-style popup checklist filtering for DataGrid column headers, and a responsive Authentication & Login Blocks showcase.
+
+### Component Features and Fixes
+- **Dialog:** Add configurable entrance animations (`Fade`, `Zoom`, `SlideUp`, `SlideDown`, `None`) via `DialogAnimation` and responsive `BottomSheetOnMobile` positioning. ([PR #172](https://github.com/madiseh/Vek/pull/172))
+- **Drawer:** Add mobile edge-swipe touch gestures and backdrop tap dismiss for temporary drawers. ([PR #173](https://github.com/madiseh/Vek/pull/173))
+- **DataGrid:** Add Excel-style popup checklist filtering for column headers with search and distinct value selection. ([PR #174](https://github.com/madiseh/Vek/pull/174))
+
+### Documentation and Showcases
+- **Showcases:** Add responsive Authentication & Login Blocks showcase with 4 layout patterns (Centered Card, Split Screen, Muted Minimalist, Split Side Hero) and copyable Razor implementations. ([PR #175](https://github.com/madiseh/Vek/pull/175))
+
+### Feature Screenshots
+![Vek v1.4.2 feature screenshots](https://github.com/madiseh/Vek/releases/download/v1.4.2/release-slideshow.gif)
+
+1. Dialog Default Zoom Animation - [PR #172](https://github.com/madiseh/Vek/pull/172)
+2. Dialog Bottom Sheet Mode - [PR #172](https://github.com/madiseh/Vek/pull/172)
+3. Drawer Default State - [PR #173](https://github.com/madiseh/Vek/pull/173)
+4. Drawer Interactive Edge-Swipe Dragging - [PR #173](https://github.com/madiseh/Vek/pull/173)
+5. DataGrid Header Filter Icon - [PR #174](https://github.com/madiseh/Vek/pull/174)
+6. DataGrid Distinct Value Checklist - [PR #174](https://github.com/madiseh/Vek/pull/174)
+
+### Contributors
+- [@madiseh](https://github.com/madiseh) - [PR #172](https://github.com/madiseh/Vek/pull/172), [#173](https://github.com/madiseh/Vek/pull/173), [#174](https://github.com/madiseh/Vek/pull/174), [#175](https://github.com/madiseh/Vek/pull/175)
+
+### Test Results
+- Total: 8,787 - 8,785 passed, 0 failed, 2 skipped.
+- `Vek.UnitTests`: 6,825 total - 6,823 passed, 0 failed, 2 skipped.
+- `Vek.UnitTests.Docs`: 1,571 total - 1,571 passed, 0 failed, 0 skipped.
+- `Vek.UnitTests.Analyzers`: 391 total - 391 passed, 0 failed, 0 skipped.
+- Format check passed; build-only projects passed: `src/Docs/Vek.Docs.Server` and `src/Docs/Vek.Docs.WasmHost`.
+- Source commit: `cbaba249ed356c9813db39ef42d2c8312941e57d`.
+- [CI run 45870942610](https://github.com/madiseh/Vek/actions/runs/45870942610).
+- [Download JUnit reports](https://github.com/madiseh/Vek/releases/download/v1.4.2/test-results-v1.4.2.zip).
+
+**Full Changelog**: https://github.com/madiseh/Vek/compare/v1.4.1...v1.4.2
+
 ## [v1.4.1] - 2026-11-25
 
 > Vek v1.4.1 adds dialog maximize and fullscreen controls, a multi-file upload queue, resizable multi-column TreeList views, and immediate inline DataGrid editing. It also improves mobile landing-page layouts and expands task-focused component documentation.
