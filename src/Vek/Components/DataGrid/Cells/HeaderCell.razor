@@ -175,6 +175,22 @@ else if (Column != null && !Column.HiddenState.Value)
                     {
                         @Column.FilterTemplate(Column.FilterContext)
                     }
+                    else if (Column.RenderHeaderFilterPopup() is { } headerFilterPopup)
+                    {
+                        @headerFilterPopup
+                    }
+                    else if (Column.PropertyType == typeof(string))
+                    {
+                        <VekGrid>
+                            <VekItem xs="12">
+                                @DataGrid?.Filter(Column.FilterContext.FilterDefinition!, Column)
+                            </VekItem>
+                            <VekItem xs="12" Class="d-flex justify-end">
+                                <VekButton Class="clear-filter-button" OnClick="@ClearFilterAsync">@Localizer[LanguageResource.VekDataGrid_Clear]</VekButton>
+                                <VekButton Class="apply-filter-button" Color="@Color.Primary" OnClick="@ApplyFilterAsync">@Localizer[LanguageResource.VekDataGrid_Filter]</VekButton>
+                            </VekItem>
+                        </VekGrid>
+                    }
                     else
                     {
                         <VekGrid>

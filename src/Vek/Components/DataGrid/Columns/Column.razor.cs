@@ -1133,6 +1133,8 @@ namespace Vek
 
         protected internal abstract object? PropertyFunc(T item);
 
+        internal virtual RenderFragment? RenderHeaderFilterPopup() => null;
+
         protected internal virtual Type? PropertyType { get; }
 
         protected internal abstract void SetProperty(object? item, object? value);

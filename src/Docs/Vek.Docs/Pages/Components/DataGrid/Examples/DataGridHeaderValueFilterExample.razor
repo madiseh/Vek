@@ -1,0 +1,27 @@
+@using Vek.Examples.Data.Models
+@namespace Vek.Docs.Examples
+
+<VekPopoverProvider />
+<VekDataGrid T="Element" Items="@_elements" Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" RowsPerPage="5">
+    <Columns>
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Group" Title="Category" />
+        <PropertyColumn Property="x => x.Molar" Title="Molar mass" />
+    </Columns>
+</VekDataGrid>
+
+@code {
+    private readonly IReadOnlyList<Element> _elements =
+    [
+        new() { Number = 1, Name = "Hydrogen", Group = "Nonmetal", Molar = 1.008 },
+        new() { Number = 2, Name = "Helium", Group = "Noble gas", Molar = 4.0026 },
+        new() { Number = 3, Name = "Lithium", Group = "Alkali metal", Molar = 6.94 },
+        new() { Number = 4, Name = "Beryllium", Group = "Alkaline earth metal", Molar = 9.0122 },
+        new() { Number = 5, Name = "Boron", Group = "Metalloid", Molar = 10.81 },
+        new() { Number = 6, Name = "Carbon", Group = "Nonmetal", Molar = 12.011 },
+        new() { Number = 7, Name = "Nitrogen", Group = "Nonmetal", Molar = 14.007 },
+        new() { Number = 8, Name = "Oxygen", Group = "Nonmetal", Molar = 15.999 },
+        new() { Number = 9, Name = "Fluorine", Group = "Halogen", Molar = 18.998 },
+        new() { Number = 10, Name = "Neon", Group = "Noble gas", Molar = 20.180 }
+    ];
+}

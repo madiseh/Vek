@@ -4,8 +4,10 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Vek.Utilities.Expressions;
 
@@ -53,6 +55,8 @@ namespace Vek
             if (_lastAssignedProperty != Property)
             {
                 _lastAssignedProperty = Property;
+                _compiledPropertyFunc = null;
+                _compiledPropertyFuncFor = null;
                 var safePropertyExpression = ExpressionNull.AddNullChecks(Property);
                 var compiledPropertyExpression = safePropertyExpression.Compile();
                 _cellContentFunc = item => compiledPropertyExpression(item);
@@ -88,6 +92,74 @@ namespace Vek
 
         protected internal override object? CellContent(T item)
             => _cellContentFunc!(item);
+
+        internal override RenderFragment? RenderHeaderFilterPopup()
+        {
+            if (FilterTemplate is null && (typeof(TProperty) == typeof(string) || typeof(TProperty).IsEnum || Nullable.GetUnderlyingType(typeof(TProperty))?.IsEnum == true))
+            {
+                return null;
+            }
+
+            if (FilterTemplate is not null)
+            {
+                return builder => builder.AddContent(0, FilterTemplate(FilterContext));
+            }
+
+            return builder =>
+            {
+                builder.OpenComponent<DataGridHeaderFilterPopup<T, TProperty>>(0);
+                builder.AddAttribute(1, nameof(DataGridHeaderFilterPopup<T, TProperty>.Items), DataGrid!.Items?.ToArray() ?? Array.Empty<T>());
+                builder.AddAttribute(2, nameof(DataGridHeaderFilterPopup<T, TProperty>.GetValue), (Func<T, TProperty>)GetTypedPropertyValue);
+                builder.AddAttribute(3, nameof(DataGridHeaderFilterPopup<T, TProperty>.FilterDefinition), FilterContext.FilterDefinition!);
+                builder.AddAttribute(4, nameof(DataGridHeaderFilterPopup<T, TProperty>.SelectedValuesChanged), EventCallback.Factory.Create<IReadOnlyCollection<TProperty?>?>(this, SetHeaderFilterValuesAsync));
+                builder.AddAttribute(5, nameof(DataGridHeaderFilterPopup<T, TProperty>.FilterChanged), EventCallback.Factory.Create<IFilterDefinition<T>>(this, ApplyHeaderFilterAsync));
+                builder.AddAttribute(6, nameof(DataGridHeaderFilterPopup<T, TProperty>.SearchLabel), "Search values");
+                builder.CloseComponent();
+            };
+        }
+
+        private TProperty GetTypedPropertyValue(T item)
+        {
+            if (_compiledPropertyFunc == null || _compiledPropertyFuncFor != Property)
+            {
+                _compiledPropertyFunc = Property.Compile();
+                _compiledPropertyFuncFor = Property;
+            }
+
+            return _compiledPropertyFunc(item);
+        }
+
+        private Task SetHeaderFilterValuesAsync(IReadOnlyCollection<TProperty?>? values)
+        {
+            var filterDefinition = FilterContext.FilterDefinition!;
+            var selected = values?.ToArray() ?? [];
+            filterDefinition.Value = selected.Length == 0 ? null : selected;
+            if (filterDefinition is FilterDefinition<T> definition)
+            {
+                definition.FilterFunction = selected.Length == 0 ? null : item => selected.Contains(GetTypedPropertyValue(item));
+            }
+
+            return Task.CompletedTask;
+        }
+
+        private Task ApplyHeaderFilterAsync(IFilterDefinition<T> definition)
+        {
+            if (definition.Value is not System.Collections.IEnumerable selected || definition.Value is string)
+            {
+                definition.Value = null;
+                if (definition is FilterDefinition<T> emptyDefinition)
+                {
+                    emptyDefinition.FilterFunction = null;
+                }
+            }
+            else if (definition is FilterDefinition<T> typedDefinition)
+            {
+                var values = selected.Cast<object?>().ToArray();
+                typedDefinition.FilterFunction = item => values.Contains(PropertyFunc(item));
+            }
+
+            return FilterContext.Actions.ApplyFilterAsync(definition);
+        }
 
         protected internal override object? PropertyFunc(T item)
         {
