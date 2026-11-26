@@ -1,0 +1,51 @@
+@namespace Vek.Docs.Examples
+
+<VekStack Spacing="4">
+    <VekText Typo="Typo.body2">
+        Mobile edge-swipe gestures allow opening and dismissing temporary drawers via touch navigation, accompanied by backdrop tap dismiss and Escape key dismiss.
+    </VekText>
+
+    <VekStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+        <VekButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => _open = true)">
+            Open Drawer
+        </VekButton>
+        <VekSwitch @bind-Value="_enableSwipe" Label="Enable Swipe Gestures" Color="Color.Primary" />
+        <VekSwitch @bind-Value="_closeOnEscape" Label="Close on Escape" Color="Color.Secondary" />
+    </VekStack>
+
+    @if (_backdropClickedCount > 0)
+    {
+        <VekAlert Severity="Severity.Info" Dense="true">
+            Backdrop tapped @_backdropClickedCount time(s).
+        </VekAlert>
+    }
+
+    <VekDrawer @bind-Open="@_open"
+               Variant="@DrawerVariant.Temporary"
+               EnableSwipeGesture="@_enableSwipe"
+               CloseOnEscapeKey="@_closeOnEscape"
+               OnBackdropClick="OnBackdropTapped"
+               Elevation="2">
+        <VekDrawerHeader>
+            <VekText Typo="Typo.h6">Navigation</VekText>
+        </VekDrawerHeader>
+        <VekNavMenu>
+            <VekNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</VekNavLink>
+            <VekNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Inbox">Inbox</VekNavLink>
+            <VekNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Settings">Settings</VekNavLink>
+            <VekNavLink OnClick="@(() => _open = false)" Icon="@Icons.Material.Filled.Close">Dismiss</VekNavLink>
+        </VekNavMenu>
+    </VekDrawer>
+</VekStack>
+
+@code {
+    private bool _open;
+    private bool _enableSwipe = true;
+    private bool _closeOnEscape = true;
+    private int _backdropClickedCount;
+
+    private void OnBackdropTapped(MouseEventArgs args)
+    {
+        _backdropClickedCount++;
+    }
+}

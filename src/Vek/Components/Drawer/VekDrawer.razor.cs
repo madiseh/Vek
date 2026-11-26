@@ -26,6 +26,7 @@ namespace Vek
         private bool _initial = true;
         private bool _keepInitialState;
         private Breakpoint _lastUpdatedBreakpoint = Breakpoint.None;
+        private readonly DrawerSwipeHandler _swipeHandler = new();
 
         /// <summary>
         /// Creates a new instance.
@@ -100,6 +101,7 @@ namespace Vek
                 .AddStyle("height", Height, !string.IsNullOrWhiteSpace(Height))
                 .AddStyle("--vek-drawer-height", string.IsNullOrWhiteSpace(Height) ? _height.ToPx() : Height, Anchor == Anchor.Bottom || Anchor == Anchor.Top)
                 .AddStyle("visibility", "hidden", string.IsNullOrWhiteSpace(Height) && _height == 0 && Anchor is Anchor.Bottom or Anchor.Top)
+                .AddStyle("transform", $"translateX({_swipeHandler.DragOffset.ToPx()})", EnableSwipeGesture && _swipeHandler.IsDragging && _swipeHandler.DragOffset != 0)
                 .AddStyle(Style)
                 .Build();
 
@@ -111,6 +113,38 @@ namespace Vek
 
         [CascadingParameter(Name = "RightToLeft")]
         private bool RightToLeft { get; set; }
+
+        /// <summary>
+        /// Gets the swipe gesture handler associated with this drawer.
+        /// </summary>
+        public DrawerSwipeHandler SwipeHandler => _swipeHandler;
+
+        /// <summary>
+        /// Enables touch swipe gestures to open or dismiss the drawer on mobile and touch devices.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Drawer.Behavior)]
+        public bool EnableSwipeGesture { get; set; }
+
+        /// <summary>
+        /// Closes the drawer when the Escape key is pressed.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Drawer.Behavior)]
+        public bool CloseOnEscapeKey { get; set; } = true;
+
+        /// <summary>
+        /// Occurs when the backdrop / overlay behind the drawer is clicked or tapped.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.Drawer.Behavior)]
+        public EventCallback<MouseEventArgs> OnBackdropClick { get; set; }
 
         /// <summary>
         /// Shows the drawer in the same position even if the page is scrolled.
@@ -473,6 +507,86 @@ namespace Vek
             if (EffectiveVariant == DrawerVariant.Mini && _openState.Value && _closeOnPointerLeave)
             {
                 _closeOnPointerLeave = false;
+                await _openState.SetValueAsync(false);
+            }
+        }
+
+        private EventCallback<PointerEventArgs> OnPointerDownCallback =>
+            EnableSwipeGesture ? EventCallback.Factory.Create<PointerEventArgs>(this, HandlePointerDown) : default;
+
+        private EventCallback<PointerEventArgs> OnPointerMoveCallback =>
+            EnableSwipeGesture && _swipeHandler.IsTracking ? EventCallback.Factory.Create<PointerEventArgs>(this, HandlePointerMove) : default;
+
+        private EventCallback<PointerEventArgs> OnPointerUpCallback =>
+            EnableSwipeGesture && _swipeHandler.IsTracking ? EventCallback.Factory.Create<PointerEventArgs>(this, HandlePointerUpAsync) : default;
+
+        private EventCallback<PointerEventArgs> OnPointerCancelCallback =>
+            EnableSwipeGesture && _swipeHandler.IsTracking ? EventCallback.Factory.Create<PointerEventArgs>(this, HandlePointerCancel) : default;
+
+        private EventCallback<KeyboardEventArgs> OnKeyDownCallback =>
+            CloseOnEscapeKey ? EventCallback.Factory.Create<KeyboardEventArgs>(this, HandleKeyDownAsync) : default;
+
+        internal void HandlePointerDown(PointerEventArgs args)
+        {
+            if (EnableSwipeGesture)
+            {
+                _swipeHandler.OnPointerDown(args.ClientX, args.ClientY, _openState.Value, Anchor);
+            }
+        }
+
+        internal void HandlePointerMove(PointerEventArgs args)
+        {
+            if (EnableSwipeGesture && _swipeHandler.IsTracking)
+            {
+                if (_swipeHandler.OnPointerMove(args.ClientX, args.ClientY, _openState.Value, Anchor))
+                {
+                    StateHasChanged();
+                }
+            }
+        }
+
+        internal async Task HandlePointerUpAsync(PointerEventArgs args)
+        {
+            if (EnableSwipeGesture && _swipeHandler.IsTracking)
+            {
+                var (handled, newOpen) = _swipeHandler.OnPointerUp(args.ClientX, args.ClientY, _openState.Value, Anchor);
+                if (handled && newOpen != _openState.Value)
+                {
+                    await _openState.SetValueAsync(newOpen);
+                }
+                else
+                {
+                    StateHasChanged();
+                }
+            }
+        }
+
+        internal void HandlePointerCancel(PointerEventArgs args)
+        {
+            if (_swipeHandler.IsTracking)
+            {
+                _swipeHandler.Reset();
+                StateHasChanged();
+            }
+        }
+
+        internal async Task HandleKeyDownAsync(KeyboardEventArgs args)
+        {
+            if (CloseOnEscapeKey && args.Key == "Escape" && _openState.Value)
+            {
+                await _openState.SetValueAsync(false);
+            }
+        }
+
+        internal async Task HandleBackdropClickAsync(MouseEventArgs args)
+        {
+            if (OnBackdropClick.HasDelegate)
+            {
+                await OnBackdropClick.InvokeAsync(args);
+            }
+
+            if (OverlayAutoClose && _openState.Value)
+            {
                 await _openState.SetValueAsync(false);
             }
         }
