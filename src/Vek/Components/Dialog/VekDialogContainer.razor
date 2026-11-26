@@ -6,7 +6,7 @@
 @{
 }
 
-<div @attributes="UserAttributes" id="@ElementId" class="vek-dialog-container @GetPosition()" style="--vek-dialog-stack-index: @(Parent?.GetStackIndex(Id) ?? 0)" @onmousedown="ActivateDialog" @onfocusin="ActivateDialog">
+<div @attributes="UserAttributes" id="@ElementId" class="vek-dialog-container @GetPosition() @(GetBottomSheetOnMobile() ? "vek-dialog-container-sheet-mobile" : null)" style="--vek-dialog-stack-index: @(Parent?.GetStackIndex(Id) ?? 0)" @onmousedown="ActivateDialog" @onfocusin="ActivateDialog">
     <VekOverlay Visible="@(Parent?.ShouldRenderBackdrop(Id) ?? true)" OnClick="HandleBackgroundClickAsync" Class="@BackgroundClassname" DarkBackground="true" @onmouseup="OnMouseUpAsync" />
     <div @ref="_dialogContainerReference" id="_@Id.ToString("N")" role="dialog" aria-modal="@(Parent is null || Parent.IsTopmost(Id) ? "true" : null)" aria-labelledby="@GetAriaLabelledBy()" aria-label="@GetAriaLabel()" class="@Classname" style="@DialogStyle" tabindex="-1">
         @if (!GetHideHeader())

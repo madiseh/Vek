@@ -1,0 +1,25 @@
+@namespace Vek.Docs.Examples
+
+<VekDialog>
+    <TitleContent>
+        <VekText Typo="Typo.h6">@VekDialog.Title</VekText>
+    </TitleContent>
+    <DialogContent>
+        <VekText Typo="Typo.body1" Class="mb-3">
+            This dialog demonstrates configurable entrance animations and responsive bottom sheet layout for mobile viewports.
+        </VekText>
+        <VekText Typo="Typo.body2" Color="Color.Secondary">
+            On smaller screens (mobile / &lt; 600px), enabling <CodeInline>BottomSheetOnMobile</CodeInline> anchors the dialog seamlessly as a bottom sheet with slide-up entrance transitions.
+        </VekText>
+    </DialogContent>
+    <DialogActions>
+        <VekButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Close">Done</VekButton>
+    </DialogActions>
+</VekDialog>
+
+@code {
+    [CascadingParameter]
+    private IVekDialogInstance VekDialog { get; set; } = null!;
+
+    private void Close() => VekDialog.Close(DialogResult.Ok(true));
+}

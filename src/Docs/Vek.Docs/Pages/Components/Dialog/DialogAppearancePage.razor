@@ -44,5 +44,17 @@
             </SectionContent>
         </DocsPageSection>
 
+        <DocsPageSection>
+            <SectionHeader Title="Animations and Mobile Bottom Sheet">
+                <Description>
+                    Configure dialog entrance animations using <CodeInline>Animation</CodeInline> (<CodeInline>DialogAnimation.Fade</CodeInline>, <CodeInline>DialogAnimation.Zoom</CodeInline>, <CodeInline>DialogAnimation.SlideUp</CodeInline>, <CodeInline>DialogAnimation.SlideDown</CodeInline>, or <CodeInline>DialogAnimation.None</CodeInline>).
+                    Enable <CodeInline>BottomSheetOnMobile</CodeInline> to convert the dialog into a mobile bottom sheet drawer on small viewports.
+                </Description>
+            </SectionHeader>
+            <SectionContent Codes="@(new[] {new CodeFile("Page.razor", nameof(DialogAnimationExample)), new CodeFile("Dialog.razor", nameof(DialogAnimationExample_Dialog))})">
+                <DialogAnimationExample />
+            </SectionContent>
+        </DocsPageSection>
+
     </DocsPageContent>
 </DocsPage>

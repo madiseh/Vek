@@ -101,6 +101,26 @@ namespace Vek
         public DialogPosition? Position { get; set; }
 
         /// <summary>
+        /// The entrance animation used for all dialogs by default.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c> (which uses <see cref="DialogAnimation.Zoom"/>).
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Dialog.Appearance)]
+        public DialogAnimation? Animation { get; set; }
+
+        /// <summary>
+        /// Renders dialogs as bottom sheets on small screens by default.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c> (which uses <c>false</c>).
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.Dialog.Appearance)]
+        public bool? BottomSheetOnMobile { get; set; }
+
+        /// <summary>
         /// The maximum allowed with of the dialog.
         /// </summary>
         /// <remarks>
@@ -155,6 +175,8 @@ namespace Vek
                 ShowMaximizeButton = ShowMaximizeButton,
                 NoHeader = NoHeader,
                 Position = Position,
+                Animation = Animation,
+                BottomSheetOnMobile = BottomSheetOnMobile,
                 FullWidth = FullWidth,
                 MaxWidth = MaxWidth,
                 BackgroundClass = BackgroundClass,

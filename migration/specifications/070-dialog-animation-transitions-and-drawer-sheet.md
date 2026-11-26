@@ -4,9 +4,11 @@
 - **Feature ID**: 070
 - **Feature Slug**: dialog-animation-transitions-and-drawer-sheet
 - **Module**: Dialog
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 70
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/172
+- **Completed At**: 2026-11-25T11:23:09Z
 
 ---
 

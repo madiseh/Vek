@@ -883,9 +883,11 @@
       "title": "Dialog Configurable Entrance Animations and Slide-In Sheet Position",
       "module": "Dialog",
       "priority": 70,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/070-dialog-animation-transitions-and-drawer-sheet.md",
-      "dependencies": []
+      "dependencies": [],
+      "completed_at": "2026-11-25T11:23:09Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/172"
     },
     {
       "id": "071",

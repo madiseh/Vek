@@ -125,6 +125,22 @@ namespace Vek
         public string? BackgroundClass { get; init; }
 
         /// <summary>
+        /// The entrance animation used when the dialog is opened.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c> (which uses <see cref="DialogAnimation.Zoom"/>).
+        /// </remarks>
+        public DialogAnimation? Animation { get; init; }
+
+        /// <summary>
+        /// Renders the dialog as a bottom drawer/sheet anchored to the bottom of the screen on small viewports.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
+        /// </remarks>
+        public bool? BottomSheetOnMobile { get; init; }
+
+        /// <summary>
         /// The element which will receive focus when a dialog is shown.
         /// </summary>
         /// <remarks>
