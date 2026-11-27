@@ -1,10 +1,9 @@
 {
-  "claimed_at": "2026-11-27T22:09:10Z",
+  "claimed_at": "2026-11-27T23:01:04Z",
   "feature_id": "071",
-  "last_heartbeat": "2026-11-27T22:43:13Z",
-  "lease_expires_at": "2026-11-29T22:09:10Z",
+  "last_heartbeat": "2026-11-27T23:01:04Z",
+  "lease_expires_at": "2026-11-29T23:01:04Z",
   "owner": "coordinator",
-  "released_at": "2026-11-27T22:43:13Z",
   "run_id": "batch-20261128-071",
-  "state": "released"
+  "state": "claimed"
 }
