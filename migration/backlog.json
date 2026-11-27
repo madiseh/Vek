@@ -223,10 +223,12 @@
       "title": "DataGrid Master-Detail Auto-Collapse and Cascade Expand Control",
       "module": "DataGrid",
       "priority": 17,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/017-datagrid-master-detail-auto-collapse.md",
       "dependencies": [],
-      "started_at": "2026-11-27T22:24:53Z"
+      "started_at": "2026-11-27T22:24:53Z",
+      "completed_at": "2026-11-27T23:19:07Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/183"
     },
     {
       "id": "018",
