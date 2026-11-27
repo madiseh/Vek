@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Vek.Utilities;
 
@@ -245,14 +246,14 @@ namespace Vek
 
         private RenderFragment<T>? GetItemTemplate() => ItemTemplate ?? ItemRenderer ?? Container?.ItemRenderer;
 
-        private Task HandleKeyDownAsync(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args)
+        private Task HandleKeyDownAsync(KeyboardEventArgs args)
         {
             return _hasFocus && args.Key == "Enter" ? OnActivate.InvokeAsync() : Task.CompletedTask;
         }
 
-        private void HandleFocus(Microsoft.AspNetCore.Components.Web.FocusEventArgs args) => _hasFocus = true;
+        private void HandleFocus(FocusEventArgs args) => _hasFocus = true;
 
-        private void HandleBlur(Microsoft.AspNetCore.Components.Web.FocusEventArgs args) => _hasFocus = false;
+        private void HandleBlur(FocusEventArgs args) => _hasFocus = false;
 
         private string GetDraggingClass()
         {

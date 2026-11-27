@@ -17,6 +17,7 @@ using Vek.Components.Highlighter;
 using Vek.State;
 using Vek.Utilities;
 using Vek.Utilities.Clone;
+using Collections = System.Collections;
 
 namespace Vek
 {
@@ -5386,7 +5387,7 @@ namespace Vek
 
             public IEnumerator<TElement> GetEnumerator() => Enumerable.Empty<TElement>().GetEnumerator();
 
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+            Collections.IEnumerator Collections.IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
         internal record GroupKey(string? Title, object? ItemsKey);

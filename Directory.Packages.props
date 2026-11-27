@@ -37,6 +37,7 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="5.9.0" Condition="('$(MSBuildProjectName)' == 'Vek.UnitTests.Analyzers')" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(VekRoslynShippedVersion)" Condition="('$(MSBuildProjectName)' == 'Vek.Analyzers')" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" Condition="('$(MSBuildProjectName)' == 'Vek.Analyzers.TestComponents')" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" Condition="('$(MSBuildProjectName)' == 'Vek.ArchitectureTests')" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.4" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="1.1.4" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(VekRoslynShippedVersion)" Condition="('$(MSBuildProjectName)' == 'Vek.Analyzers.CodeFixes')" />
@@ -52,6 +53,7 @@
     <PackageVersion Include="Microsoft.Testing.Extensions.HangDump" Version="2.5.2" />
     <PackageVersion Include="Microsoft.Testing.Extensions.TrxReport" Version="2.5.2" />
     <PackageVersion Include="Moq" Version="4.20.72" />
+    <PackageVersion Include="NetArchTest.eNhancedEdition" Version="1.4.5" />
     <PackageVersion Include="NetEscapades.EnumGenerators.Generators" Version="1.0.0-beta21" />
     <PackageVersion Include="nunit" Version="4.6.1" />
     <PackageVersion Include="NUnit3TestAdapter" Version="6.3.1" />
