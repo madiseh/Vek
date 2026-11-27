@@ -25,5 +25,10 @@ public enum ColorPickerMode
     /// <summary>
     /// Hexadecimal values are used.
     /// </summary>
-    HEX
+    HEX,
+
+    /// <summary>
+    /// Hue, Saturation, and Value (Brightness) color values are used.
+    /// </summary>
+    HSV
 }

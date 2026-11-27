@@ -1249,9 +1249,10 @@
       "title": "ColorPicker Visual Spectrum Canvas, Alpha Slider, and Swatch Palette Presets",
       "module": "ColorPicker",
       "priority": 99,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/099-colorpicker-rgba-hex-hsv-and-palette-presets.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-27T22:10:16Z"
     },
     {
       "id": "100",

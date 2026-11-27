@@ -4,11 +4,11 @@
 
 <VekGrid>
     <VekItem md="8" Class="d-flex justify-center">
-        <VekColorPicker ShowToolbar="ShowToolbar" ShowAlpha="ShowAlpha" ShowColorField="ShowColorField" ShowPreview="ShowPreview" ShowSliders="ShowSliders" ShowInputs="ShowInputs" ShowModeSwitch="ShowModeSwitch" 
+        <VekColorPicker ShowToolbar="ShowToolbar" ShowAlpha="ShowAlpha" ShowColorField="ShowColorField" ShowPreview="ShowPreview" ShowSliders="ShowSliders" ShowInputs="ShowInputs" ShowModeSwitch="ShowModeSwitch" ShowSwatches="ShowSwatches"
                 ColorPickerMode="ColorPickerMode" PickerVariant="PickerVariant.Static" />
     </VekItem>
     <VekItem md="4">
-        <VekPaper Height="400px" Class="px-4 pt-2 pb-4">
+        <VekPaper Height="440px" Class="px-4 pt-2 pb-4">
             <VekText Typo="Typo.h6">Options</VekText>
             <VekCheckBox @bind-Value="ShowToolbar" Label="Show Toolbar" Color="Color.Primary" Dense="true" />
             <VekCheckBox @bind-Value="ShowAlpha" Label="Show Alpha" Color="Color.Primary" Dense="true" />
@@ -17,10 +17,12 @@
             <VekCheckBox @bind-Value="ShowSliders" Label="Show Sliders" Color="Color.Primary" Dense="true" />
             <VekCheckBox @bind-Value="ShowInputs" Label="Show Inputs" Color="Color.Primary" Dense="true" />
             <VekCheckBox @bind-Value="ShowModeSwitch" Label="Show Mode Switch" Color="Color.Primary" Dense="true" />
+            <VekCheckBox @bind-Value="ShowSwatches" Label="Show Swatches" Color="Color.Primary" Dense="true" />
             <VekSelect Label="Color Picker Mode" Variant="Variant.Outlined" Dense="true" Margin="Margin.Dense" @bind-Value="ColorPickerMode" Class="mt-4">
                 <VekSelectItem T="ColorPickerMode" Value="ColorPickerMode.RGB">RGB</VekSelectItem>
                 <VekSelectItem T="ColorPickerMode" Value="ColorPickerMode.HSL">HSL</VekSelectItem>
                 <VekSelectItem T="ColorPickerMode" Value="ColorPickerMode.HEX">HEX</VekSelectItem>
+                <VekSelectItem T="ColorPickerMode" Value="ColorPickerMode.HSV">HSV</VekSelectItem>
             </VekSelect>
         </VekPaper>
     </VekItem>
@@ -34,6 +36,7 @@
     public bool ShowSliders { get; set; } = true;
     public bool ShowInputs { get; set; } = true;
     public bool ShowModeSwitch { get; set; } = true;
+    public bool ShowSwatches { get; set; }
 
     public ColorPickerMode ColorPickerMode { get; set; }
 }
