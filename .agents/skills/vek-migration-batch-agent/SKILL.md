@@ -13,18 +13,21 @@ This is an explicit batch-level exception to the repository's one-feature-per-ta
 
 Every feature in the migration pipeline must belong to an active GitHub Milestone before any work begins:
 
-1. **Active Milestone Required**: Inspect existing GitHub milestones using `gh api repos/:owner/:repo/milestones`. Ensure an open milestone exists for the upcoming release or phase (e.g. `v1.5.0`). If no open milestone exists, stop immediately: **do not proceed** until a milestone is created.
-2. **Milestone Scope Enforcement**: Only features explicitly listed in the description or scope of the upcoming active milestone may be selected for a batch. If a candidate feature in the backlog is not included in the milestone, **do not execute it** — it must first be added to an active milestone by the user or an authorized milestone definition before work can start.
+1. **Active Milestone Required**: Inspect existing GitHub milestones using `python migration/scripts/milestone_gate.py list` or `gh api repos/:owner/:repo/milestones`. Ensure an open milestone exists for the upcoming release or phase (e.g. `v1.5.0`). If no open milestone exists, stop immediately: **do not proceed** until a milestone is created.
+2. **Milestone Scope Enforcement**: Only features explicitly listed in the description or scope of the upcoming active milestone may be selected for a batch. Use `python migration/scripts/milestone_gate.py verify <feature_id>` to deterministically verify any candidate feature. If a candidate feature in the backlog is not included in the milestone, **do not execute it** — it must first be added to an active milestone by the user or an authorized milestone definition before work can start.
 3. **Link PRs to Milestone**: When opening a pull request, always attach it to the active milestone using `gh pr create --milestone "<milestone_title>"` (or update with `gh pr edit <pr_url> --milestone "<milestone_title>"`).
 
 ## 1. Build a read-only batch proposal
 
-1. Read the repository instructions, `migration/AGENTS.md`, and the relevant governance docs. Fetch the latest `origin/master` and inspect its backlog without running a command that claims or changes a feature.
-2. Query GitHub for the upcoming open milestone (`gh api repos/:owner/:repo/milestones`) and identify all features covered in its scope.
-3. Select only existing `READY` features whose dependencies are completed **AND that belong to the active milestone**. Do not run `orchestrator.py --discover`; backlog discovery belongs to a separate skill/agent.
-4. Exclude features with an open PR or an active unexpired claim. Inspect each candidate specification and likely code, test, documentation, and asset paths. Prefer candidates with disjoint files and components; keep the backlog priority order among similarly isolated candidates.
-5. Select up to three eligible candidates. If fewer than three low-conflict candidates belonging to the milestone are available, propose the available count; do not invent work or relax the isolation requirement to fill the batch.
-6. Derive each target branch from the current orchestrator convention and backlog pipeline settings without running `--pick`. Present each candidate's feature ID, title, module, specification, target branch, associated milestone, and likely touched paths. State the batch size and any priority items skipped due to open PRs, claims, dependencies, path overlap, or not being in the active milestone. Wait for the user's explicit approval before creating claims, worktrees, branches, or editing files.
+Use `python migration/scripts/milestone_gate.py propose --size 3` to build a deterministic read-only batch proposal adhering strictly to active milestone scope, claim status, open PRs, and disjoint path heuristics.
+
+1. Read the repository instructions, `migration/AGENTS.md`, and the relevant governance docs. Fetch the latest `origin/master`.
+2. Run `python migration/scripts/milestone_gate.py propose --size 3`. The script automatically:
+   - Queries GitHub for the upcoming open milestone and identifies all features covered in its scope.
+   - Selects only existing `READY` features whose dependencies are completed AND that belong to the active milestone.
+   - Excludes features with an open PR or an active unexpired claim via `claim_ledger.py`.
+   - Heuristically detects touched paths and enforces disjoint components/files across the batch.
+3. Present each candidate's feature ID, title, module, specification, target branch, associated milestone, and likely touched paths from the script output. State the batch size and skipped items summary. Wait for the user's explicit approval before creating claims, worktrees, branches, or editing files.
 
 Approval authorizes a batch of up to three next eligible features within the active milestone, not only a frozen set of IDs. If a candidate is claimed by another agent after approval, skip it and substitute the next eligible low-conflict candidate within the milestone without asking again. If the source backlog changes, do not add newly discovered work to the approved batch unless it is needed as such a substitution.
 
@@ -61,31 +64,50 @@ If `inspect` or `claim` reports an active lease or open PR, skip the candidate a
 
 ## 3. Run one isolated worker per feature
 
-1. Create one subagent per feature, with one isolated worktree and target branch per worker, all based on the fetched `origin/master` commit. Never assign two workers to the same feature. After acquiring the remote claim, run `python migration/scripts/orchestrator.py --pick <feature_id>` in that feature worktree; do not use the no-argument selector to start an already approved batch item.
-2. Run workers in parallel up to both the three-feature batch cap and the runtime's available subagent capacity. If fewer than three slots are available, queue the remaining approved items and start the next worker as a slot frees. Each worker has an isolated worktree and build outputs, so its scoped build, test, and format gates may run concurrently with other workers' gates. Stagger gate execution only if measured CPU or memory contention increases total elapsed time; workers can continue independent implementation and documentation work while waiting.
-3. Each worker must read the selected specification, `migration/AGENTS.md`, root `AGENTS.md`, and applicable governance docs. Use the codebase knowledge graph for code discovery where available; use text search for literals, configuration, and non-code files.
+1. **Deterministic Worktree & Branch Setup**: For each approved candidate, execute:
+   ```bash
+   python migration/scripts/setup_worktree.py setup <feature_id> --run-id <run_id> --owner <owner>
+   ```
+   This automatically:
+   - Fetches latest `origin/master` commit and creates an isolated worktree (`wt-<feature_id>-<slug>`).
+   - Checks out the target branch derived from backlog settings.
+   - Runs `orchestrator.py --pick <feature_id>` inside the worktree to advance backlog and specification status.
+   - Writes `worker_context.json` containing exact paths, branch names, and metadata directly inside the worktree.
+2. Launch one subagent per feature directed to work inside the created worktree. Never assign two workers to the same feature.
+3. Run workers in parallel up to both the three-feature batch cap and the runtime's available subagent capacity. If fewer than three slots are available, queue the remaining approved items and start the next worker as a slot frees. Each worker has an isolated worktree and build outputs, so its scoped build, test, and format gates may run concurrently with other workers' gates. Stagger gate execution only if measured CPU or memory contention increases total elapsed time; workers can continue independent implementation and documentation work while waiting.
+4. Each worker must read `worker_context.json`, the assigned specification, `migration/AGENTS.md`, root `AGENTS.md`, and applicable governance docs. Use the codebase knowledge graph for code discovery where available; use text search for literals, configuration, and non-code files.
 4. Implement only the assigned feature, following Vek architecture and the repository's test, formatting, and build requirements. Derive implementation, test, and documentation paths from that feature's module and existing patterns; never assume every feature belongs to DataGrid.
 5. Keep style edits in `src/Vek/Styles/**/*.scss` and script edits in `src/Vek/TScripts/**/*.ts`. Do not edit or commit generated `*.min.*` bundles or their source maps from `src/Vek/wwwroot/` in a feature PR. If a local build regenerates these outputs, restore them before committing. Include or update minified bundles and maps only when preparing release artifacts.
 6. Every feature must have a working interactive documentation example on its own component page, focused tests appropriate to its behavior, and real-browser screenshot evidence of the changed documentation/example. Before capture, record the exact component documentation route and screenshot states. Use MCP Playwright at a 1440 × 900 CSS-pixel viewport. Capture the default example and one key interaction state when the feature has one; one screenshot is sufficient for a static example. Wait for the example and expected state to become visible instead of using fixed sleeps. Save ordered, feature-specific screenshots under `migration/artifacts/ui-screenshots/`, for example `<feature_id>-01-default.png` and `<feature_id>-02-selected.png`, then inspect them for readability.
 7. Preserve the source project as read-only when a specification uses one as a behavior reference. Reconstruct behavior natively in Vek. Avoid unrelated refactoring and third-party commercial UI branding in branches, commits, PRs, code comments, and docs.
-8. Run the narrowest relevant quality gates after implementation is complete. For component behavior, prefer one filtered `dotnet test`; it builds the test project's dependency graph, so do not run a separate build first. If multiple test filters are needed for the same edits, build once and run each filter with `--no-build`. If a gate fails, diagnose and make at most two focused repair iterations. If the feature still cannot pass, run `python migration/scripts/claim_ledger.py blocked <feature_id> --run-id <run_id>`, preserve its worktree and claim, and let the coordinator assign a replacement candidate. Do not claim a blocked feature is complete.
-9. Before opening a PR, run the repository CI `dotnet format` verification on every changed `src/**` and `tests/**` file. After committing the feature, derive the include list from `git diff --name-only <target-branch>...HEAD`; include every changed source and test file rather than a hand-picked subset. The final `dotnet format whitespace --folder` pass required by `AGENTS.md` only checks whitespace, line endings, and encoding; it does not catch style diagnostics such as `IMPORTS: Fix imports ordering`. From the repository root, repair and verify changes with `dotnet format Vek.slnx --no-restore --include <changed src and tests paths>` and `dotnet format Vek.slnx --no-restore --verify-no-changes --include <changed src and tests paths>`. Use paths relative to the repository root. If the root `.editorconfig` changes, follow CI and run the repository-wide format verification without `--include`. If a code fix or formatting changes source or tests, rerun only the affected targeted gate and the final format verification. Documentation or screenshot-only changes do not require repeating component tests. Do not rerun local gates just because the PR was opened; use CI as the final independent check and rerun relevant gates only after a fix.
+8. Run deterministic quality gates after implementation and documentation are complete:
+   ```bash
+   python migration/scripts/run_gates.py --module <module_name> --feature-id <feature_id>
+   ```
+   This automatically:
+   - Detects all changed `src/**` and `tests/**` files from git diff against master.
+   - Runs `dotnet format` repair pass, `dotnet format whitespace --folder` (UTF-8 BOM, LF, spacing), and strict verification (`--verify-no-changes`).
+   - Executes the narrowest filtered `dotnet test` with required Microsoft.Testing.Platform runner flags (`--hangdump`, `-p:SkipBunCompile=true`).
+   - Runs script linting if TypeScript/JavaScript files were modified.
+   - Returns structured JSON results with diagnostics. If a gate fails, diagnose and make at most two focused repair iterations. If the feature still cannot pass, run `python migration/scripts/claim_ledger.py blocked <feature_id> --run-id <run_id>`, preserve its worktree and claim, and let the coordinator assign a replacement candidate. Do not claim a blocked feature is complete.
 
 ## 4. Open and complete each PR
 
-For each successful worker result:
+For each successful worker result, finalize the PR deterministically:
 
-1. Review the worker's diff, test/build results, screenshot evidence, target branch, and claim state. Reject accidental scope changes or missing required evidence.
-2. Ensure implementation, tests, docs, and verified screenshots are committed and pushed to the feature branch before creating a PR.
-3. Follow the Git commit and pull request title conventions in `docs/governance/development-rules.md` for every commit subject and PR title. Use `<type>(<scope>): <imperative summary>`; for example, `feat(button): add loading state with auto-disable`. Put `Migration <feature_id>` and its context in the PR description, not as a `[Migration NNN]` title prefix. Reference related GitHub issues in the description with closing keywords.
-4. Open a draft PR targeting `master`, with a concise summary, verification results, and all screenshot embeds in reading order under `## UI screenshots`.
-   - **Attach to Milestone**: Always link the PR to the active GitHub Milestone via `gh pr create --milestone "<milestone_title>"` (e.g. `--milestone "v1.5.0"`).
-   - For committed screenshots, use the raw image URL form `https://raw.githubusercontent.com/<owner>/<repo>/<branch>/<path>` as the Markdown image source.
-   - Do not embed `https://github.com/<owner>/<repo>/blob/...` URLs. They serve an HTML file preview, so the link can open when clicked while the image remains broken inline.
-   - Check for an existing PR immediately before creation; update an existing open PR instead of creating a duplicate. Make sure any existing PR is also linked to the milestone.
-5. In that feature worktree, run `python migration/scripts/orchestrator.py --complete <feature_id> --pr <pr_url>`. This records `Completed` and the PR URL in the feature specification and backlog. Commit and push that status update to the same PR.
-6. After the PR is opened or updated, inspect its `format-check` result. If it fails, read the complete diagnostics, repair all cited changed `src/**` files, rerun the CI-equivalent verification across the full changed-file set, push the fix, and confirm the new format check passes before marking the PR ready.
-7. Verify the PR body, screenshots, base branch, title, and completion commit. Mark the PR ready for review only after the completion update is pushed and `format-check` passes. Then run `python migration/scripts/claim_ledger.py release <feature_id> --run-id <run_id>`.
+```bash
+python migration/scripts/finalize_pr.py <feature_id> --dir <worktree_dir> --run-id <run_id>
+```
+
+This automatically:
+1. **Title & Body Formatting**: Builds the `<type>(<scope>): <summary>` PR title and markdown body containing feature summary and verification points.
+2. **Screenshot Embeds**: Detects screenshots matching `<feature_id>-*.png` under `migration/artifacts/ui-screenshots/` and formats valid `raw.githubusercontent.com` URLs (never broken blob URLs).
+3. **Milestone Association**: Queries the active GitHub Milestone and links the PR via `--milestone "<milestone_title>"`.
+4. **Draft PR Creation**: Opens or updates the draft PR on GitHub via `gh pr create`.
+5. **Orchestrator Completion**: Runs `orchestrator.py --complete <feature_id> --pr <pr_url>` inside the worktree, commits the backlog/spec metadata, and pushes the update to the PR branch.
+6. **Claim Release**: Automatically releases the claim lease in `claim_ledger.py`.
+
+After the PR is opened or updated, inspect its `format-check` result on CI. If it passes, mark the PR ready for review. Leave all PRs open for the user; do not merge them.
 
 For an already-open PR, do not create a duplicate; report or update that PR as appropriate. For a merged PR, reconcile status if needed and skip it. Do not wait for prior batches' PRs to merge before starting a new batch; exclude their features because their PRs are already open.
 
@@ -93,14 +115,39 @@ For an already-open PR, do not create a duplicate; report or update that PR as a
 
 Continue until three new PRs are ready for review or no more eligible, low-conflict READY features remain. A blocked feature does not stop other workers. If the queue runs out, finish with fewer than three PRs and report that clearly.
 
-### Batch timing report
+### Deterministic Batch Timing and Report Logging
 
-For each batch, record UTC start and end timestamps per feature for these phases: claim and worktree setup; implementation; tests and builds; documentation and screenshot; formatting and review; commit and push; PR opening and completion metadata; CI wait. Workers should include phase timestamps in each progress/completion report; the coordinator records claim/worktree and PR/CI timestamps. Do not infer elapsed time from message order when timestamps are unavailable; mark it unknown or approximate and state why.
+Use `migration/scripts/batch_metrics.py` to record phase timestamps and generate the required timing matrices:
 
-The final report includes:
-- **Calendar batch duration**: earliest batch claim/setup start through the latest terminal CI result (or current time if checks remain pending), with pending CI clearly identified.
-- **Sum of feature elapsed durations**: sum of each feature's start-to-terminal time, including CI wait; this may exceed calendar duration when workers run in parallel.
-- **Agent active time**: sum of the seven non-CI phase durations across features, separately from CI waiting time.
-- One table per agent/feature with the eight requested phase durations, total elapsed duration, and any unknown/approximate values.
+```bash
+# Record phase transitions (start/end)
+python migration/scripts/batch_metrics.py --batch-id <batch_id> start-phase <feature_id> <phase>
+python migration/scripts/batch_metrics.py --batch-id <batch_id> end-phase <feature_id> <phase> [--notes "notes"]
+
+# Or record completed durations directly
+python migration/scripts/batch_metrics.py --batch-id <batch_id> record-phase <feature_id> <phase> <seconds>
+
+# Update feature status and PR URL
+python migration/scripts/batch_metrics.py --batch-id <batch_id> set-status <feature_id> completed --pr <pr_url> --title "<title>"
+
+# Generate formatted Markdown summary & phase tables
+python migration/scripts/batch_metrics.py --batch-id <batch_id> report
+```
+
+Standard phases tracked:
+- `claim_worktree_setup`
+- `implementation`
+- `tests_and_builds`
+- `documentation_and_screenshot`
+- `formatting_and_review`
+- `commit_and_push`
+- `pr_opening_and_metadata`
+- `ci_wait`
+
+The generated report includes:
+- **Calendar batch duration**: earliest batch claim/setup start through the latest terminal CI result.
+- **Sum of feature elapsed durations**: sum of each feature's start-to-terminal time (including CI wait).
+- **Agent active time**: sum of the seven non-CI phase durations across features.
+- Markdown feature matrix and detailed phase duration table per feature.
 
 Report the proposed and approved batch, each resulting feature ID and PR URL, verification outcomes, and every blocked or skipped feature with the reason and its current claim/lease state. Distinguish ready PRs from tasks that still need work. Leave all PRs open for the user; do not merge them.
