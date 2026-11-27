@@ -223,9 +223,10 @@
       "title": "DataGrid Master-Detail Auto-Collapse and Cascade Expand Control",
       "module": "DataGrid",
       "priority": 17,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/017-datagrid-master-detail-auto-collapse.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-27T22:24:53Z"
     },
     {
       "id": "018",

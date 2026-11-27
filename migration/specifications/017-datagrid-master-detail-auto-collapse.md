@@ -4,9 +4,10 @@
 - **Feature ID**: 017
 - **Feature Slug**: datagrid-master-detail-auto-collapse
 - **Module**: DataGrid
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 17
 - **Dependencies**: []
+- **Started At**: 2026-11-27T22:24:53Z
 
 ---
 

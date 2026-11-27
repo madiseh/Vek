@@ -4884,6 +4884,40 @@ namespace Vek.UnitTests.Components
             await dataGrid.WaitForAssertionAsync(() => dataGrid.Instance._openHierarchies.Count.Should().Be(4));
         }
 
+        /// <summary>
+        /// Ensures detail expansion APIs honor auto-collapse and disabled rows while bulk expansion remains explicit.
+        /// </summary>
+        [Test]
+        public async Task DataGrid_RowDetail_AutoCollapseAndProgrammaticControl()
+        {
+            var comp = Context.Render<DataGridHierarchyColumnTest>(parameters => parameters
+                .Add(x => x.AutoCollapseDetailRows, true));
+            var dataGrid = comp.FindComponent<VekDataGrid<DataGridHierarchyColumnTest.Model>>();
+            var items = dataGrid.Instance.Items.ToList();
+
+            await dataGrid.InvokeAsync(async () =>
+            {
+                await dataGrid.Instance.CollapseAllDetailsAsync();
+                await dataGrid.Instance.SetDetailRowExpandedAsync(items[0], true);
+                await dataGrid.Instance.SetDetailRowExpandedAsync(items[2], true);
+            });
+
+            await dataGrid.WaitForAssertionAsync(() =>
+            {
+                dataGrid.Instance.IsDetailRowExpanded(items[0]).Should().BeFalse();
+                dataGrid.Instance.IsDetailRowExpanded(items[2]).Should().BeTrue();
+            });
+
+            await dataGrid.InvokeAsync(() => dataGrid.Instance.ExpandAllDetailsAsync());
+            await dataGrid.WaitForAssertionAsync(() => dataGrid.Instance._openHierarchies.Count.Should().Be(4));
+            dataGrid.Instance.IsDetailRowExpanded(items[1]).Should().BeFalse();
+            await dataGrid.InvokeAsync(() => dataGrid.Instance.SetDetailRowExpandedAsync(items[1], true));
+            dataGrid.Instance.IsDetailRowExpanded(items[1]).Should().BeFalse();
+
+            await dataGrid.InvokeAsync(() => dataGrid.Instance.CollapseAllDetailsAsync());
+            await dataGrid.WaitForAssertionAsync(() => dataGrid.Instance._openHierarchies.Count.Should().Be(0));
+        }
+
         [Test]
         public async Task DataGrid_RowDetail_ExpandCollapseAllWithOne()
         {

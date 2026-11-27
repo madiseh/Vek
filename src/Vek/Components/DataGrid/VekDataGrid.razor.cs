@@ -70,6 +70,8 @@ namespace Vek
         private readonly ParameterState<T?> _selectedItemState;
         private readonly ParameterState<HashSet<T>?> _selectedItemsState;
         private readonly ParameterState<bool> _expandSingleRowState;
+        private readonly ParameterState<bool> _autoCollapseDetailRowsState;
+        private readonly DataGridDetailViewManager<T> _detailViewManager;
         internal readonly ParameterState<bool> _showFilterRowState;
         internal readonly ParameterState<int> _filterRowInputDelayState;
         internal readonly ParameterState<bool> _showSearchBoxState;
@@ -147,6 +149,7 @@ namespace Vek
             SelectedItems = new HashSet<T>(Comparer);
             _openHierarchies = new HashSet<T>(Comparer);
             _initialExpansions = new HashSet<T>(Comparer);
+            _detailViewManager = new DataGridDetailViewManager<T>(_openHierarchies);
             FocusManager = new DataGridFocusManager<T>(this);
             KeyboardHandler = new DataGridAriaKeyboardHandler<T>(this);
             using var registerScope = CreateRegisterScope();
@@ -167,6 +170,10 @@ namespace Vek
             _expandSingleRowState = registerScope.RegisterParameter<bool>(nameof(ExpandSingleRow))
                 .WithParameter(() => ExpandSingleRow)
                 .WithChangeHandler(OnExpandSingleRowChangedAsync);
+
+            _autoCollapseDetailRowsState = registerScope.RegisterParameter<bool>(nameof(AutoCollapseDetailRows))
+                .WithParameter(() => AutoCollapseDetailRows)
+                .WithChangeHandler(OnAutoCollapseDetailRowsChangedAsync);
 
             registerScope.RegisterParameter<IEqualityComparer<T>?>(nameof(Comparer))
                 .WithParameter(() => Comparer)
@@ -1951,6 +1958,14 @@ namespace Vek
         public bool ExpandSingleRow { get; set; }
 
         /// <summary>
+        /// Collapses other detail rows when a detail row is expanded.
+        /// </summary>
+        /// <remarks>Defaults to <c>false</c>.</remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public bool AutoCollapseDetailRows { get; set; }
+
+        /// <summary>
         /// The comparer used to determine row selection.
         /// </summary>
         /// <remarks>
@@ -2332,7 +2347,8 @@ namespace Vek
             // These are safe to reassign because CellContext captures them by reference but is constructed fresh inside the render fragment on every render.
             var previousSelectionCount = Selection.Count;
             Selection = new HashSet<T>(Selection, args.Value);
-            _openHierarchies = new HashSet<T>(_openHierarchies, args.Value);
+            _detailViewManager.UpdateComparer(args.Value);
+            _openHierarchies = _detailViewManager.ExpandedItems;
             _initialExpansions = new HashSet<T>(_initialExpansions, args.Value);
 
             // A coarser comparer collapses entries that were previously distinct, which silently drops rows from the selection.
@@ -2346,17 +2362,24 @@ namespace Vek
         private async Task OnExpandSingleRowChangedAsync(ParameterChangedEventArgs<bool> args)
         {
             // If user changes the ExpandSingleRow parameter, clear all open hierarchies except the first
-            if (_openHierarchies.Count > 0)
+            await KeepSingleDetailRowExpandedAsync();
+        }
+
+        private Task OnAutoCollapseDetailRowsChangedAsync(ParameterChangedEventArgs<bool> args)
+        {
+            return args.Value ? KeepSingleDetailRowExpandedAsync() : Task.CompletedTask;
+        }
+
+        private async Task KeepSingleDetailRowExpandedAsync()
+        {
+            if (_openHierarchies.Count <= 1)
             {
-                var first = _openHierarchies.First();
-                foreach (var item in _openHierarchies.Skip(1))
-                {
-                    await InvokeHierarchyVisibilityToggledAsync(new(item, false));
-                }
-                _openHierarchies.Clear();
-                _openHierarchies.Add(first);
-                await InvokeAsync(StateHasChanged);
+                return;
             }
+
+            var first = _openHierarchies.First();
+            var changes = _detailViewManager.SetExpanded(first, true, autoCollapse: true, isDisabled: null);
+            await InvokeDetailVisibilityChangesAsync(changes);
         }
 
         private async Task OnFocusedRowIndexChangedAsync(ParameterChangedEventArgs<int> args)
@@ -5091,13 +5114,8 @@ namespace Vek
         /// </summary>
         public async Task ExpandAllHierarchy()
         {
-            Debug.Assert(_buttonDisabledFunc is not null);
-            var expandedItems = FilteredItems.Where(x => !_buttonDisabledFunc(x) && _openHierarchies.Add(x));
-            foreach (var item in expandedItems)
-            {
-                await InvokeHierarchyVisibilityToggledAsync(new(item, true));
-            }
-            await InvokeAsync(StateHasChanged);
+            var changes = _detailViewManager.ExpandAll(FilteredItems, _buttonDisabledFunc);
+            await InvokeDetailVisibilityChangesAsync(changes);
         }
 
         /// <summary>
@@ -5105,13 +5123,37 @@ namespace Vek
         /// </summary>
         public async Task CollapseAllHierarchy()
         {
-            Debug.Assert(_buttonDisabledFunc is not null);
-            foreach (var openedHierarchy in _openHierarchies.Where(x => !_buttonDisabledFunc(x)).ToList())
-            {
-                await InvokeHierarchyVisibilityToggledAsync(new(openedHierarchy, false));
-                _openHierarchies.Remove(openedHierarchy);
-            }
-            await InvokeAsync(StateHasChanged);
+            var changes = _detailViewManager.CollapseAll(_buttonDisabledFunc);
+            await InvokeDetailVisibilityChangesAsync(changes);
+        }
+
+        /// <summary>
+        /// Expands every enabled detail row in the current filtered items.
+        /// </summary>
+        public Task ExpandAllDetailsAsync() => ExpandAllHierarchy();
+
+        /// <summary>
+        /// Collapses every enabled detail row that is currently expanded.
+        /// </summary>
+        public Task CollapseAllDetailsAsync() => CollapseAllHierarchy();
+
+        /// <summary>
+        /// Reports whether the specified item has an expanded detail row.
+        /// </summary>
+        public bool IsDetailRowExpanded(T item) => _detailViewManager.IsExpanded(item);
+
+        /// <summary>
+        /// Sets the detail row for an item to the requested expanded state.
+        /// </summary>
+        /// <remarks>
+        /// Expanding an item collapses other items when <see cref="AutoCollapseDetailRows"/> or <see cref="ExpandSingleRow"/> is enabled.
+        /// Items disabled by the hierarchy column are not changed.
+        /// </remarks>
+        public async Task SetDetailRowExpandedAsync(T item, bool expanded)
+        {
+            var autoCollapse = expanded && (_autoCollapseDetailRowsState.Value || _expandSingleRowState.Value);
+            var changes = _detailViewManager.SetExpanded(item, expanded, autoCollapse, _buttonDisabledFunc);
+            await InvokeDetailVisibilityChangesAsync(changes);
         }
 
         /// <summary>
@@ -5120,33 +5162,16 @@ namespace Vek
         /// <param name="item">The item whose hierarchy visibility is to be toggled.</param>
         public async Task ToggleHierarchyVisibilityAsync(T item)
         {
-            // if ExpandSingleRow is true, clear all open hierarchies, which will immediately add the item that was clicked.
-            if (_expandSingleRowState.Value)
-            {
-                var itemWasOpen = _openHierarchies.Contains(item);
-                foreach (var openedHierarchy in _openHierarchies.Where(x => x != null && !x.Equals(item)))
-                {
-                    await InvokeHierarchyVisibilityToggledAsync(new(openedHierarchy, false));
-                }
-                _openHierarchies.Clear();
-                _openHierarchies.Add(item);
-                if (!itemWasOpen)
-                {
-                    await InvokeHierarchyVisibilityToggledAsync(new(item, true));
-                }
-                await InvokeAsync(StateHasChanged);
-                return;
-            }
+            var autoCollapse = _autoCollapseDetailRowsState.Value || _expandSingleRowState.Value;
+            var changes = _detailViewManager.Toggle(item, autoCollapse, _buttonDisabledFunc);
+            await InvokeDetailVisibilityChangesAsync(changes);
+        }
 
-            // if item doesn't exist remove will return false and add the item
-            if (!_openHierarchies.Remove(item))
+        private async Task InvokeDetailVisibilityChangesAsync(IReadOnlyList<DataGridHierarchyVisibilityToggledEventArgs<T>> changes)
+        {
+            foreach (var change in changes)
             {
-                _openHierarchies.Add(item);
-                await InvokeHierarchyVisibilityToggledAsync(new(item, true));
-            }
-            else
-            {
-                await InvokeHierarchyVisibilityToggledAsync(new(item, false));
+                await InvokeHierarchyVisibilityToggledAsync(change);
             }
 
             await InvokeAsync(StateHasChanged);

@@ -1,5 +1,5 @@
 ﻿<CascadingValue Name="RightToLeft" Value="@RightToLeft" IsFixed="true">
-    <VekDataGrid @ref="_dataGrid" Items="@_filteredItems" Filterable="true" ExpandSingleRow="@ExpandSingleRow">
+    <VekDataGrid @ref="_dataGrid" Items="@_filteredItems" Filterable="true" ExpandSingleRow="@ExpandSingleRow" AutoCollapseDetailRows="@AutoCollapseDetailRows">
         <Columns>
             <HierarchyColumn EnableHeaderToggle="@EnableHeaderToggle" ButtonDisabledFunc="@(x => x.Name == "Alicia")" InitiallyExpandedFunc="@(x => x.Name == "Ira" || x.Name == "Anders")" />
             <PropertyColumn Property="x => x.Name" />
@@ -27,6 +27,9 @@
 
     [Parameter]
     public bool ExpandSingleRow { get; set; }
+
+      [Parameter]
+      public bool AutoCollapseDetailRows { get; set; }
 
     [Parameter]
     public bool LimitRowsToOne { get; set; }
