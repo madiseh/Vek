@@ -5,8 +5,16 @@
 @typeparam T
 
 <tr class="@Classname" style="@Stylename" @attributes="@UserAttributes">
-    @foreach (var column in DataGrid.RenderedColumns)
+    @foreach (var entry in DataGrid.ColumnVirtualizationEntries)
     {
-        <DataGridFilterCell @key="column" T="T" Column="@column" />
+        if (entry.IsSpacer)
+        {
+            <th class="vek-datagrid-column-virtualizer-spacer" aria-hidden="true" style="@DataGrid.GetColumnSpacerStyle(entry.SpacerWidth)"></th>
+        }
+        else
+        {
+            var column = entry.Column!;
+            <DataGridFilterCell @key="column" T="T" Column="@column" />
+        }
     }
 </tr>

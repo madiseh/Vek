@@ -40,6 +40,17 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Horizontal Column Virtualization">
+                <Description>
+                    For grids with many columns, set <CodeInline>VirtualizeColumns</CodeInline> to render only the columns near the horizontal viewport. Spacer cells preserve the full scroll width, and <CodeInline>ColumnOverscanCount</CodeInline> controls how many extra columns stay rendered on each side. Pinned columns remain available while scrolling.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridColumnVirtualizationExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridColumnVirtualizationExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="Row Reordering">
                 <Description>
                     Add a <CodeInline>&lt;DataGridDragHandleColumn&gt;</CodeInline> and enable <CodeInline>AllowRowReorder</CodeInline> to let people move rows

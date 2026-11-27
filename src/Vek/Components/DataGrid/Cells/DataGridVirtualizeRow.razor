@@ -62,14 +62,16 @@
               @ondrop:stopPropagation="DataGrid.IsRowReorderingEnabled">
             <CascadingValue Value="@DataGrid.Validator" IsFixed="true">
                 @{
-                    var colIdx = 0;
-                    foreach (var column in DataGrid.RenderedColumns)
+                      foreach (var entry in DataGrid.ColumnVirtualizationEntries)
                     {
-                        if (column.HiddenState.Value)
-                            continue;
-
-                        @DataGrid.Cell(column, itemBag.Item, itemBag.Index, colIdx)
-                        colIdx++;
+                          if (entry.IsSpacer)
+                          {
+                              <td class="vek-datagrid-column-virtualizer-spacer" aria-hidden="true" style="@DataGrid.GetColumnSpacerStyle(entry.SpacerWidth)"></td>
+                          }
+                          else
+                          {
+                              @DataGrid.Cell(entry.Column!, itemBag.Item, itemBag.Index, entry.VisibleIndex)
+                          }
                     }
                 }
             </CascadingValue>

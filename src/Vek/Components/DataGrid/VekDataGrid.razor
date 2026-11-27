@@ -4,10 +4,13 @@
 @using Vek.Extensions
 @using Vek.Resources
 @using Vek.Utilities
+@using System.Globalization
 @inject InternalVekLocalizer Localizer
 
 @{
     _currentRenderFilteredItemsCache = null;
+    _columnVirtualizer.SetOptions(IsColumnVirtualizationActive, _columnOverscanCountState.Value);
+    _columnVirtualizer.Update(RenderedColumns);
 }
 
 <CascadingValue IsFixed="true" Value="this">@Columns</CascadingValue>
@@ -104,9 +107,17 @@
                                     @Header
                                 </CascadingValue>
                                 <tr class="vek-table-row">
-                                    @foreach (var column in RenderedColumns)
+                                    @foreach (var entry in ColumnVirtualizationEntries)
                                     {
-                                        <HeaderCell @key="column" SortDirection="@(GetColumnSortDirection(column.PropertyName))" T="T" Column="@column"></HeaderCell>
+                                        if (entry.IsSpacer)
+                                        {
+                                            <th class="vek-datagrid-column-virtualizer-spacer" aria-hidden="true" style="@GetColumnSpacerStyle(entry.SpacerWidth)"></th>
+                                        }
+                                        else
+                                        {
+                                            var column = entry.Column!;
+                                            <HeaderCell @key="column" SortDirection="@(GetColumnSortDirection(column.PropertyName))" T="T" Column="@column"></HeaderCell>
+                                        }
                                     }
                                 </tr>
                                 @if (_filtersMenuVisible && FilterMode == DataGridFilterMode.Simple)
@@ -247,9 +258,17 @@
                                 else if (Filterable && FilterMode == DataGridFilterMode.ColumnFilterRow)
                                 {
                                     <tr class="vek-table-row">
-                                        @foreach (var column in RenderedColumns)
+                                        @foreach (var entry in ColumnVirtualizationEntries)
                                         {
-                                            <FilterHeaderCell T="T" Column="@column" />
+                                            if (entry.IsSpacer)
+                                            {
+                                                <th class="vek-datagrid-column-virtualizer-spacer" aria-hidden="true" style="@GetColumnSpacerStyle(entry.SpacerWidth)"></th>
+                                            }
+                                            else
+                                            {
+                                                var column = entry.Column!;
+                                                <FilterHeaderCell T="T" Column="@column" />
+                                            }
                                         }
                                     </tr>
                                 }
@@ -598,10 +617,18 @@
         @<text>
              @if (currentItems is not null)
              {
-                 foreach (var column in RenderedColumns)
+                 foreach (var entry in ColumnVirtualizationEntries)
                  {
-                     if (!column.HiddenState.Value)
+                     if (entry.IsSpacer)
                      {
+                         if (HasFooter)
+                         {
+                             <td class="vek-datagrid-column-virtualizer-spacer" aria-hidden="true" style="@GetColumnSpacerStyle(entry.SpacerWidth)"></td>
+                         }
+                     }
+                     else
+                     {
+                         var column = entry.Column!;
                          if (column.AggregateDefinition is not null || column.GetFooterTemplate() is not null || HasFooter)
                          {
                              <FooterCell T="T" Column="@column" CurrentItems="@currentItems" GroupItems="@groupItems"></FooterCell>
@@ -610,6 +637,16 @@
                  }
              }
          </text>;
+
+    internal string GetColumnSpacerStyle(double width)
+    {
+        var widthValue = $"{width.ToString("0.##", CultureInfo.InvariantCulture)}px";
+        return new StyleBuilder()
+            .AddStyle("width", widthValue)
+            .AddStyle("min-width", widthValue)
+            .AddStyle("max-width", widthValue)
+            .Build();
+    }
 
 
     internal RenderFragment Cell(Column<T> column, T item, int rowIndex, int colIndex) =>

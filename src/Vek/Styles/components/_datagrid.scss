@@ -1,6 +1,12 @@
 @import '../abstracts/variables';
 
 .vek-data-grid {
+  .vek-datagrid-column-virtualizer-spacer {
+    padding: 0 !important;
+    border: 0 !important;
+    pointer-events: none;
+  }
+
   th {
     position: relative;
   }
