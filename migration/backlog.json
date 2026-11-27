@@ -1249,10 +1249,12 @@
       "title": "ColorPicker Visual Spectrum Canvas, Alpha Slider, and Swatch Palette Presets",
       "module": "ColorPicker",
       "priority": 99,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/099-colorpicker-rgba-hex-hsv-and-palette-presets.md",
       "dependencies": [],
-      "started_at": "2026-11-27T22:10:16Z"
+      "started_at": "2026-11-27T22:10:16Z",
+      "completed_at": "2026-11-27T22:43:32Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/181"
     },
     {
       "id": "100",
