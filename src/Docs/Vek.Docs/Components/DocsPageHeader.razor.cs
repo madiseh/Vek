@@ -150,6 +150,7 @@ public sealed partial class DocsPageHeader
             Fragment = string.Empty
         };
 
-        return canonicalUri.Uri.GetLeftPart(UriPartial.Path);
+        var canonicalPath = canonicalUri.Uri.GetLeftPart(UriPartial.Path);
+        return IsApi ? canonicalPath.ToLowerInvariant() : canonicalPath;
     }
 }

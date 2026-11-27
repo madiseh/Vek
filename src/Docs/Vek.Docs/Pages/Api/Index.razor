@@ -6,7 +6,48 @@
     <DocsPageHeader Title="API Index" SubTitle="A list of all Vek components and related types." />
     <DocsPageContent>
         <DocsPageSection>
-            <SectionHeader Title="Components" />
+            <SectionHeader Title="Component API pages" />
+            <p>Browse each component's public API, including its parameters, methods, and events.</p>
+            <ul class="my-2">
+                @foreach (var type in ApiDocumentation.Types.Values)
+                {
+                    @if (type.IsComponent)
+                    {
+                        <li>
+                            <VekLink Href="@type.ApiUrl.ToLowerInvariant()">@type.NameFriendly</VekLink>
+                            @if (!string.IsNullOrWhiteSpace(type.SummaryPlain))
+                            {
+                                <span> — @type.SummaryPlain</span>
+                            }
+                        </li>
+                    }
+                }
+            </ul>
+        </DocsPageSection>
+        <DocsPageSection>
+            <SectionHeader Title="Related API types" />
+            <details>
+                <summary>Browse related types documented by Vek</summary>
+                <ul class="my-2">
+                    @foreach (var type in ApiDocumentation.Types.Values)
+                    {
+                        @if (!type.IsComponent)
+                        {
+                            <li>
+                                <VekLink Href="@type.ApiUrl.ToLowerInvariant()">@type.NameFriendly</VekLink>
+                                @if (!string.IsNullOrWhiteSpace(type.SummaryPlain))
+                                {
+                                    <span> — @type.SummaryPlain</span>
+                                }
+                            </li>
+                        }
+                    }
+                </ul>
+            </details>
+        </DocsPageSection>
+        <DocsPageSection>
+            <SectionHeader Title="Search all documented types" />
+            <p>Use the table to find related types and reference pages.</p>
             <SectionContent Outlined="true">
                 <ApiTypeTable />
             </SectionContent>
