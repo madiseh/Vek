@@ -115,14 +115,39 @@ For an already-open PR, do not create a duplicate; report or update that PR as a
 
 Continue until three new PRs are ready for review or no more eligible, low-conflict READY features remain. A blocked feature does not stop other workers. If the queue runs out, finish with fewer than three PRs and report that clearly.
 
-### Batch timing report
+### Deterministic Batch Timing and Report Logging
 
-For each batch, record UTC start and end timestamps per feature for these phases: claim and worktree setup; implementation; tests and builds; documentation and screenshot; formatting and review; commit and push; PR opening and completion metadata; CI wait. Workers should include phase timestamps in each progress/completion report; the coordinator records claim/worktree and PR/CI timestamps. Do not infer elapsed time from message order when timestamps are unavailable; mark it unknown or approximate and state why.
+Use `migration/scripts/batch_metrics.py` to record phase timestamps and generate the required timing matrices:
 
-The final report includes:
-- **Calendar batch duration**: earliest batch claim/setup start through the latest terminal CI result (or current time if checks remain pending), with pending CI clearly identified.
-- **Sum of feature elapsed durations**: sum of each feature's start-to-terminal time, including CI wait; this may exceed calendar duration when workers run in parallel.
-- **Agent active time**: sum of the seven non-CI phase durations across features, separately from CI waiting time.
-- One table per agent/feature with the eight requested phase durations, total elapsed duration, and any unknown/approximate values.
+```bash
+# Record phase transitions (start/end)
+python migration/scripts/batch_metrics.py --batch-id <batch_id> start-phase <feature_id> <phase>
+python migration/scripts/batch_metrics.py --batch-id <batch_id> end-phase <feature_id> <phase> [--notes "notes"]
+
+# Or record completed durations directly
+python migration/scripts/batch_metrics.py --batch-id <batch_id> record-phase <feature_id> <phase> <seconds>
+
+# Update feature status and PR URL
+python migration/scripts/batch_metrics.py --batch-id <batch_id> set-status <feature_id> completed --pr <pr_url> --title "<title>"
+
+# Generate formatted Markdown summary & phase tables
+python migration/scripts/batch_metrics.py --batch-id <batch_id> report
+```
+
+Standard phases tracked:
+- `claim_worktree_setup`
+- `implementation`
+- `tests_and_builds`
+- `documentation_and_screenshot`
+- `formatting_and_review`
+- `commit_and_push`
+- `pr_opening_and_metadata`
+- `ci_wait`
+
+The generated report includes:
+- **Calendar batch duration**: earliest batch claim/setup start through the latest terminal CI result.
+- **Sum of feature elapsed durations**: sum of each feature's start-to-terminal time (including CI wait).
+- **Agent active time**: sum of the seven non-CI phase durations across features.
+- Markdown feature matrix and detailed phase duration table per feature.
 
 Report the proposed and approved batch, each resulting feature ID and PR URL, verification outcomes, and every blocked or skipped feature with the reason and its current claim/lease state. Distinguish ready PRs from tasks that still need work. Leave all PRs open for the user; do not merge them.
