@@ -67,6 +67,7 @@ jobs:
             "tests/Components/Vek.UnitTests",
             "tests/Docs/Vek.UnitTests.Docs",
             "tests/Analyzers/Vek.UnitTests.Analyzers",
+            "tests/Architecture/Vek.ArchitectureTests",
           ]
 
     steps:
