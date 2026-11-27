@@ -93,19 +93,21 @@ If `inspect` or `claim` reports an active lease or open PR, skip the candidate a
 
 ## 4. Open and complete each PR
 
-For each successful worker result:
+For each successful worker result, finalize the PR deterministically:
 
-1. Review the worker's diff, test/build results, screenshot evidence, target branch, and claim state. Reject accidental scope changes or missing required evidence.
-2. Ensure implementation, tests, docs, and verified screenshots are committed and pushed to the feature branch before creating a PR.
-3. Follow the Git commit and pull request title conventions in `docs/governance/development-rules.md` for every commit subject and PR title. Use `<type>(<scope>): <imperative summary>`; for example, `feat(button): add loading state with auto-disable`. Put `Migration <feature_id>` and its context in the PR description, not as a `[Migration NNN]` title prefix. Reference related GitHub issues in the description with closing keywords.
-4. Open a draft PR targeting `master`, with a concise summary, verification results, and all screenshot embeds in reading order under `## UI screenshots`.
-   - **Attach to Milestone**: Always link the PR to the active GitHub Milestone via `gh pr create --milestone "<milestone_title>"` (e.g. `--milestone "v1.5.0"`).
-   - For committed screenshots, use the raw image URL form `https://raw.githubusercontent.com/<owner>/<repo>/<branch>/<path>` as the Markdown image source.
-   - Do not embed `https://github.com/<owner>/<repo>/blob/...` URLs. They serve an HTML file preview, so the link can open when clicked while the image remains broken inline.
-   - Check for an existing PR immediately before creation; update an existing open PR instead of creating a duplicate. Make sure any existing PR is also linked to the milestone.
-5. In that feature worktree, run `python migration/scripts/orchestrator.py --complete <feature_id> --pr <pr_url>`. This records `Completed` and the PR URL in the feature specification and backlog. Commit and push that status update to the same PR.
-6. After the PR is opened or updated, inspect its `format-check` result. If it fails, read the complete diagnostics, repair all cited changed `src/**` files, rerun the CI-equivalent verification across the full changed-file set, push the fix, and confirm the new format check passes before marking the PR ready.
-7. Verify the PR body, screenshots, base branch, title, and completion commit. Mark the PR ready for review only after the completion update is pushed and `format-check` passes. Then run `python migration/scripts/claim_ledger.py release <feature_id> --run-id <run_id>`.
+```bash
+python migration/scripts/finalize_pr.py <feature_id> --dir <worktree_dir> --run-id <run_id>
+```
+
+This automatically:
+1. **Title & Body Formatting**: Builds the `<type>(<scope>): <summary>` PR title and markdown body containing feature summary and verification points.
+2. **Screenshot Embeds**: Detects screenshots matching `<feature_id>-*.png` under `migration/artifacts/ui-screenshots/` and formats valid `raw.githubusercontent.com` URLs (never broken blob URLs).
+3. **Milestone Association**: Queries the active GitHub Milestone and links the PR via `--milestone "<milestone_title>"`.
+4. **Draft PR Creation**: Opens or updates the draft PR on GitHub via `gh pr create`.
+5. **Orchestrator Completion**: Runs `orchestrator.py --complete <feature_id> --pr <pr_url>` inside the worktree, commits the backlog/spec metadata, and pushes the update to the PR branch.
+6. **Claim Release**: Automatically releases the claim lease in `claim_ledger.py`.
+
+After the PR is opened or updated, inspect its `format-check` result on CI. If it passes, mark the PR ready for review. Leave all PRs open for the user; do not merge them.
 
 For an already-open PR, do not create a duplicate; report or update that PR as appropriate. For a merged PR, reconcile status if needed and skip it. Do not wait for prior batches' PRs to merge before starting a new batch; exclude their features because their PRs are already open.
 
