@@ -1,8 +1,8 @@
 {
   "claimed_at": "2026-11-27T22:57:02Z",
   "feature_id": "018",
-  "last_heartbeat": "2026-11-27T23:20:19Z",
-  "lease_expires_at": "2026-11-29T23:20:19Z",
+  "last_heartbeat": "2026-11-27T23:26:22Z",
+  "lease_expires_at": "2026-11-29T23:26:22Z",
   "owner": "codex",
   "run_id": "batch-20261128-vek-018-01",
   "state": "claimed"
