@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Vek.State;
 using Vek.Utilities;
 
 namespace Vek
@@ -16,10 +17,18 @@ namespace Vek
     public partial class VekFocusTrap : IDisposable
     {
         private bool _shiftDown;
-        private bool _disabled;
         private bool _disposed;
         private bool _initialized;
         private bool _shouldRender = true;
+        private readonly ParameterState<bool> _disabledState;
+
+        public VekFocusTrap()
+        {
+            using var registerScope = CreateRegisterScope();
+            _disabledState = registerScope.RegisterParameter<bool>(nameof(Disabled))
+                .WithParameter(() => Disabled)
+                .WithChangeHandler(OnDisabledChanged);
+        }
 
         protected string Classname =>
             new CssBuilder("vek-focus-trap")
@@ -45,20 +54,9 @@ namespace Vek
         /// <remarks>
         /// Defaults to <c>false</c>.
         /// </remarks>
-        [Parameter]
+        [Parameter, ParameterState]
         [Category(CategoryTypes.FocusTrap.Behavior)]
-        public bool Disabled
-        {
-            get => _disabled;
-            set
-            {
-                if (_disabled != value)
-                {
-                    _disabled = value;
-                    _initialized = false;
-                }
-            }
-        }
+        public bool Disabled { get; set; }
 
         /// <summary>
         /// The element which receives focus when this focus trap is created or enabled.
@@ -70,7 +68,12 @@ namespace Vek
         [Category(CategoryTypes.FocusTrap.Behavior)]
         public DefaultFocus DefaultFocus { get; set; } = DefaultFocus.FirstChild;
 
-        private string TrapTabIndex => Disabled ? "-1" : "0";
+        private string TrapTabIndex => _disabledState.Value ? "-1" : "0";
+
+        private void OnDisabledChanged(ParameterChangedEventArgs<bool> args)
+        {
+            _initialized = false;
+        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -126,7 +129,7 @@ namespace Vek
         {
             _initialized = true;
 
-            if (!_disabled)
+            if (!_disabledState.Value)
             {
                 switch (DefaultFocus)
                 {
@@ -156,7 +159,7 @@ namespace Vek
         private void HandleKeyEvent(KeyboardEventArgs args)
         {
             _shouldRender = false;
-            if (args.Key == "Tab")
+            if (args.Key is "Tab" or "Shift")
             {
                 _shiftDown = args.ShiftKey;
             }
@@ -190,7 +193,7 @@ namespace Vek
         public void Dispose()
         {
             _disposed = true;
-            if (!_disabled)
+            if (!_disabledState.Value)
             {
                 RestoreFocusAsync().CatchAndLog(ignoreExceptions: true);
             }

@@ -29,6 +29,8 @@ namespace Vek
         private readonly ParameterState<bool> _maximizedState;
         private readonly ParameterState<DialogAnimation?> _animationState;
         private readonly ParameterState<bool?> _bottomSheetOnMobileState;
+        private readonly ParameterState<bool?> _closeOnEscapeKeyState;
+        private readonly ParameterState<bool?> _closeOnBackdropClickState;
         private readonly SemaphoreSlim _showLock = new SemaphoreSlim(1, 1);
 
         /// <summary>
@@ -51,6 +53,12 @@ namespace Vek
                 .WithParameter(() => Animation);
             _bottomSheetOnMobileState = registerScope.RegisterParameter<bool?>(nameof(BottomSheetOnMobile))
                 .WithParameter(() => BottomSheetOnMobile);
+            _closeOnEscapeKeyState = registerScope.RegisterParameter<bool?>(nameof(CloseOnEscapeKey))
+                .WithParameter(() => CloseOnEscapeKey)
+                .WithChangeHandler(OnCloseOnEscapeKeyChangedAsync);
+            _closeOnBackdropClickState = registerScope.RegisterParameter<bool?>(nameof(CloseOnBackdropClick))
+                .WithParameter(() => CloseOnBackdropClick)
+                .WithChangeHandler(OnCloseOnBackdropClickChangedAsync);
         }
 
         protected string ContentClassname => new CssBuilder("vek-dialog-content")
@@ -238,6 +246,26 @@ namespace Vek
         public bool? BottomSheetOnMobile { get; set; }
 
         /// <summary>
+        /// Allows closing this dialog by pressing the Escape key.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>, which falls back to <see cref="DialogOptions.CloseOnEscapeKey"/> or <see cref="VekDialogProvider.CloseOnEscapeKey"/> (defaulting to <c>false</c>).
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.Dialog.Behavior)]
+        public bool? CloseOnEscapeKey { get; set; }
+
+        /// <summary>
+        /// Allows closing this dialog by clicking the backdrop outside the dialog.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>, which falls back to <see cref="DialogOptions.BackdropClick"/> or <see cref="VekDialogProvider.BackdropClick"/> (defaulting to <c>true</c>).
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.Dialog.Behavior)]
+        public bool? CloseOnBackdropClick { get; set; }
+
+        /// <summary>
         /// Occurs when <see cref="Maximized"/> has changed.
         /// </summary>
         [Parameter]
@@ -251,6 +279,10 @@ namespace Vek
 
         internal bool? BottomSheetOnMobileValue => _bottomSheetOnMobileState.Value;
 
+        internal bool? CloseOnEscapeKeyValue => _closeOnEscapeKeyState.Value;
+
+        internal bool? CloseOnBackdropClickValue => _closeOnBackdropClickState.Value;
+
         internal Task UpdateMaximizedAsync(bool maximized) => _maximizedState.SetValueAsync(maximized);
 
         internal Task UpdateShowMaximizeButtonFromParentAsync(bool? showMaximizeButton)
@@ -260,11 +292,47 @@ namespace Vek
             return result;
         }
 
+        internal Task UpdateCloseOnEscapeKeyFromParentAsync(bool? closeOnEscapeKey)
+        {
+            var result = _closeOnEscapeKeyState.SetValueAsync(closeOnEscapeKey);
+            DialogInstance?.StateHasChanged();
+            return result;
+        }
+
+        internal Task UpdateCloseOnBackdropClickFromParentAsync(bool? closeOnBackdropClick)
+        {
+            var result = _closeOnBackdropClickState.SetValueAsync(closeOnBackdropClick);
+            DialogInstance?.StateHasChanged();
+            return result;
+        }
+
         private Task OnShowMaximizeButtonChangedAsync(ParameterChangedEventArgs<bool?> args)
         {
             if (IsInline && _reference?.Dialog is VekDialog innerDialog)
             {
                 return innerDialog.UpdateShowMaximizeButtonFromParentAsync(args.Value);
+            }
+
+            DialogInstance?.StateHasChanged();
+            return Task.CompletedTask;
+        }
+
+        private Task OnCloseOnEscapeKeyChangedAsync(ParameterChangedEventArgs<bool?> args)
+        {
+            if (IsInline && _reference?.Dialog is VekDialog innerDialog)
+            {
+                return innerDialog.UpdateCloseOnEscapeKeyFromParentAsync(args.Value);
+            }
+
+            DialogInstance?.StateHasChanged();
+            return Task.CompletedTask;
+        }
+
+        private Task OnCloseOnBackdropClickChangedAsync(ParameterChangedEventArgs<bool?> args)
+        {
+            if (IsInline && _reference?.Dialog is VekDialog innerDialog)
+            {
+                return innerDialog.UpdateCloseOnBackdropClickFromParentAsync(args.Value);
             }
 
             DialogInstance?.StateHasChanged();
@@ -356,6 +424,8 @@ namespace Vek
                     [nameof(MaximizedChanged)] = EventCallback.Factory.Create<bool>(this, value => _maximizedState.SetValueAsync(value)),
                     [nameof(Animation)] = _animationState.Value,
                     [nameof(BottomSheetOnMobile)] = _bottomSheetOnMobileState.Value,
+                    [nameof(CloseOnEscapeKey)] = _closeOnEscapeKeyState.Value,
+                    [nameof(CloseOnBackdropClick)] = _closeOnBackdropClickState.Value,
                 };
 #pragma warning restore CS0618 // Type or member is obsolete
 

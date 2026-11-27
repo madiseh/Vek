@@ -1,0 +1,81 @@
+@namespace Vek.Docs.Examples
+
+<VekStack Spacing="3">
+    <VekStack Row="true" Spacing="4" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+        <VekSwitch @bind-Value="_closeOnEscapeKey" Label="CloseOnEscapeKey" Color="Color.Primary" />
+        <VekSwitch @bind-Value="_closeOnBackdropClick" Label="CloseOnBackdropClick" Color="Color.Primary" />
+        <VekSelect T="DefaultFocus" @bind-Value="_defaultFocus" Label="DefaultFocus" Dense="true" Style="min-width: 180px;">
+            <VekSelectItem Value="DefaultFocus.Element">Element</VekSelectItem>
+            <VekSelectItem Value="DefaultFocus.FirstChild">FirstChild</VekSelectItem>
+            <VekSelectItem Value="DefaultFocus.LastChild">LastChild</VekSelectItem>
+        </VekSelect>
+    </VekStack>
+
+    <VekStack Row="true" Spacing="3" AlignItems="AlignItems.Center">
+        <VekButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenModal">
+            Open Accessible Modal
+        </VekButton>
+        <VekChip T="string" Variant="Variant.Outlined">@_statusMessage</VekChip>
+    </VekStack>
+</VekStack>
+
+<VekDialog Visible="@_open"
+           VisibleChanged="OnVisibleChanged"
+           CloseOnEscapeKey="@_closeOnEscapeKey"
+           CloseOnBackdropClick="@_closeOnBackdropClick"
+           DefaultFocus="@_defaultFocus"
+           AriaLabel="W3C Modal Accessibility Settings">
+    <TitleContent>
+        <VekText Typo="Typo.h6">W3C Modal Focus Trap</VekText>
+    </TitleContent>
+    <DialogContent>
+        <VekStack Spacing="3">
+            <VekText Typo="Typo.body2">
+                Use <CodeInline>Tab</CodeInline> and <CodeInline>Shift+Tab</CodeInline> to cycle focus strictly within this modal. Closing restores focus to the trigger button.
+            </VekText>
+            <VekTextField @bind-Value="_displayName" Label="Display Name" Variant="Variant.Outlined" />
+            <VekCheckBox @bind-Value="_requireConfirmation" Label="Require confirmation before leaving" />
+        </VekStack>
+    </DialogContent>
+    <DialogActions>
+        <VekButton OnClick="Cancel">Cancel</VekButton>
+        <VekButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">Save Settings</VekButton>
+    </DialogActions>
+</VekDialog>
+
+@code {
+    private bool _open;
+    private bool _closeOnEscapeKey = true;
+    private bool _closeOnBackdropClick = true;
+    private DefaultFocus _defaultFocus = DefaultFocus.FirstChild;
+    private string _displayName = "Accessible Workspace";
+    private bool _requireConfirmation = true;
+    private string _statusMessage = "Modal ready";
+
+    private void OpenModal()
+    {
+        _open = true;
+        _statusMessage = "Modal open (focus trapped)";
+    }
+
+    private void OnVisibleChanged(bool visible)
+    {
+        _open = visible;
+        if (!visible && _statusMessage == "Modal open (focus trapped)")
+        {
+            _statusMessage = "Dismissed via Escape or Backdrop";
+        }
+    }
+
+    private void Cancel()
+    {
+        _open = false;
+        _statusMessage = "Closed without saving";
+    }
+
+    private void Save()
+    {
+        _open = false;
+        _statusMessage = $"Saved settings for '{_displayName}'";
+    }
+}

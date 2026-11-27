@@ -1,0 +1,33 @@
+@namespace Vek.UnitTests.TestComponents.Dialog
+@using Vek
+
+<VekButton Class="open-inline-modal-btn" OnClick="Open">Open Modal</VekButton>
+
+<VekDialog @bind-Visible="_visible"
+           CloseOnEscapeKey="@CloseOnEscapeKey"
+           CloseOnBackdropClick="@CloseOnBackdropClick"
+           DefaultFocus="@DefaultFocus">
+    <DialogContent>
+        <VekTextField T="string" Label="Name" />
+    </DialogContent>
+    <DialogActions>
+        <VekButton Class="close-inline-modal-btn" OnClick="Close">Close</VekButton>
+    </DialogActions>
+</VekDialog>
+
+@code {
+    private bool _visible;
+
+    [Parameter]
+    public bool? CloseOnEscapeKey { get; set; }
+
+    [Parameter]
+    public bool? CloseOnBackdropClick { get; set; }
+
+    [Parameter]
+    public DefaultFocus? DefaultFocus { get; set; }
+
+    private void Open() => _visible = true;
+
+    private void Close() => _visible = false;
+}
