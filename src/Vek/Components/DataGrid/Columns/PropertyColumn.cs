@@ -9,8 +9,8 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
-using Collections = System.Collections;
 using Vek.Utilities.Expressions;
+using Collections = System.Collections;
 
 namespace Vek
 {

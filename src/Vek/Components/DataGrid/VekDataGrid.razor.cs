@@ -12,12 +12,12 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.JSInterop;
-using Collections = System.Collections;
 using Vek.Components.DataGrid.Export;
 using Vek.Components.Highlighter;
 using Vek.State;
 using Vek.Utilities;
 using Vek.Utilities.Clone;
+using Collections = System.Collections;
 
 namespace Vek
 {
