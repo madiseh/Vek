@@ -1259,9 +1259,10 @@
       "title": "Hotkey Global and Scoped Shortcut Binding Manager with Chord Key Sequences",
       "module": "Hotkey",
       "priority": 100,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/100-hotkey-global-and-scoped-keyboard-shortcuts.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-27T22:10:17Z"
     }
   ]
 }

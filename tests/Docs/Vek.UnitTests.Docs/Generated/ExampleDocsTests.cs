@@ -24,6 +24,7 @@ namespace Vek.UnitTests.Docs.Generated
             _ctx.Services.AddSingleton<NavigationManager>(new BunitNavigationManager(_ctx));
             _ctx.Services.AddSingleton<IDialogService>(new DialogService());
             _ctx.Services.AddSingleton<ISnackbar, SnackbarService>();
+            _ctx.Services.AddVekHotkey();
             _ctx.Services.AddSingleton<IBrowserViewportService>(new MockBrowserViewportService());
             _ctx.Services.AddTransient<IScrollManager, MockScrollManager>();
             _ctx.Services.AddTransient<IScrollListenerFactory, MockScrollListenerFactory>();

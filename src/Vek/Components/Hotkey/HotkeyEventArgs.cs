@@ -2,13 +2,13 @@
 // Vek licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
+using Microsoft.AspNetCore.Components.Web;
 using Vek.Utilities;
 
 namespace Vek;
 
 /// <summary>
-/// The information passed when a <see cref="VekHotkey"/> is pressed.
+/// The information passed when a <see cref="VekHotkey"/> is triggered.
 /// </summary>
 public class HotkeyEventArgs : EventArgs
 {
@@ -28,15 +28,45 @@ public class HotkeyEventArgs : EventArgs
     public VekHotkey Sender { get; }
 
     /// <summary>
-    /// Creates a new instance.
+    /// The normalized key combination or chord sequence string associated with the hotkey.
     /// </summary>
-    /// <param name="key">The key which triggered the hotkey.</param>
-    /// <param name="keyModifiers">The modifiers which were pressed together with <paramref name="key"/>.</param>
-    /// <param name="sender">The <see cref="VekHotkey"/> which raised the event.</param>
+    public string? KeyCombination { get; }
+
+    /// <summary>
+    /// The container scope identifier if the hotkey was scoped, or <c>null</c> for global hotkeys.
+    /// </summary>
+    public string? ScopeId { get; }
+
+    /// <summary>
+    /// Indicates whether the triggered hotkey was a multi-step chord sequence.
+    /// </summary>
+    public bool IsChord { get; }
+
+    /// <summary>
+    /// The keyboard event arguments associated with the trigger, when available.
+    /// </summary>
+    public KeyboardEventArgs? KeyboardEventArgs { get; }
+
     public HotkeyEventArgs(JsKey key, IReadOnlyCollection<JsKeyModifier> keyModifiers, VekHotkey sender)
+        : this(key, keyModifiers, sender, keyCombination: null, scopeId: null, isChord: false, keyboardEventArgs: null)
+    {
+    }
+
+    public HotkeyEventArgs(
+        JsKey key,
+        IReadOnlyCollection<JsKeyModifier> keyModifiers,
+        VekHotkey sender,
+        string? keyCombination,
+        string? scopeId = null,
+        bool isChord = false,
+        KeyboardEventArgs? keyboardEventArgs = null)
     {
         Key = key;
         KeyModifiers = keyModifiers;
         Sender = sender;
+        KeyCombination = keyCombination;
+        ScopeId = scopeId;
+        IsChord = isChord;
+        KeyboardEventArgs = keyboardEventArgs;
     }
 }

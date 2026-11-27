@@ -4,9 +4,10 @@
 - **Feature ID**: 100
 - **Feature Slug**: hotkey-global-and-scoped-keyboard-shortcuts
 - **Module**: Hotkey
-- **Status**: Ready
+- **Status**: In Progress
 - **Priority**: 100
 - **Dependencies**: []
+- **Started At**: 2026-11-27T22:10:17Z
 
 ---
 

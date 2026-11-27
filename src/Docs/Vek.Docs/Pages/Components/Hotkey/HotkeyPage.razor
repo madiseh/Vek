@@ -6,8 +6,8 @@
         <SectionHeader Title="Usage">
             <Description>
                 There are 2 general usages: Render child components and/or use the
-                <CodeInline>OnHotkeyPressed</CodeInline>
-                event.
+                <CodeInline>OnHotkeyPressed</CodeInline> or <CodeInline>OnHotkeyDown</CodeInline>
+                events.
                 <br/>
                 <VekAlert Severity="Severity.Info">If you want a global hotkey, add the
                     <CodeInline>VekHotkey</CodeInline>
@@ -39,5 +39,19 @@
                 </SectionContent>
             </DocsPageSection>
         </SectionSubGroups>
+    </DocsPageSection>
+
+    <DocsPageSection>
+        <SectionHeader Title="Global, Scoped, Chord Sequences &amp; Input Suppression">
+            <Description>
+                Use <CodeInline>KeyCombination</CodeInline> for declarative shortcuts (such as <CodeInline>Ctrl+S</CodeInline>,
+                <CodeInline>Alt+Shift+F</CodeInline>, or chord sequences like <CodeInline>g then d</CodeInline>),
+                set <CodeInline>Scope="HotkeyScope.Scoped"</CodeInline> to confine shortcuts to a specific container,
+                and control editable field suppression via <CodeInline>IgnoreInInputs</CodeInline>.
+            </Description>
+        </SectionHeader>
+        <SectionContent Code="@nameof(HotkeyExampleManagerAndChords)">
+            <HotkeyExampleManagerAndChords/>
+        </SectionContent>
     </DocsPageSection>
 </DocsPage>

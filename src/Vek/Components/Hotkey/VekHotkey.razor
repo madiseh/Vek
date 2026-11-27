@@ -1,7 +1,20 @@
 ﻿@namespace Vek
 @inherits VekComponentBase
 
-@if (_childContentIsVisible)
+@if (IsScopedContainer)
+{
+    <div role="@ScopeRole"
+         aria-label="@AriaLabel"
+         tabindex="@ScopeTabIndex"
+         @attributes="UserAttributes"
+         id="@EffectiveScopeId"
+         class="@Classname"
+         style="@Style"
+         @onkeydown="OnScopedKeyDownAsync">
+        @ChildContent
+    </div>
+}
+else if (_childContentIsVisible)
 {
     @ChildContent
 }

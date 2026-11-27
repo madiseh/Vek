@@ -1,0 +1,181 @@
+@namespace Vek.Docs.Examples
+
+@implements IDisposable
+@inject HotkeyManager HotkeyManager
+
+<VekStack Spacing="4">
+    <VekStack Row="true" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center" Spacing="3">
+        <VekSwitch @bind-Value="_ignoreInInputs" Label="Ignore in Inputs" Color="Color.Primary" />
+        <VekSwitch @bind-Value="_preventDefault" Label="Prevent Browser Default" Color="Color.Secondary" />
+        @if (!string.IsNullOrEmpty(_pendingChord))
+        {
+            <VekChip T="string" Color="Color.Warning" Variant="Variant.Filled" Size="Size.Small">
+                Chord pending: @_pendingChord ...
+            </VekChip>
+        }
+        else
+        {
+            <VekChip T="string" Color="Color.Default" Variant="Variant.Outlined" Size="Size.Small">
+                Chord idle
+            </VekChip>
+        }
+        <VekButton Variant="Variant.Outlined" Size="Size.Small" OnClick="ClearLog">Clear Log</VekButton>
+    </VekStack>
+
+    <VekHotkey KeyCombination="Ctrl+S"
+               PreventDefault="@_preventDefault"
+               IgnoreInInputs="@_ignoreInInputs"
+               OnHotkeyDown="@(args => RecordEvent("Global", "Save document", args))" />
+
+    <VekHotkey KeyCombination="g then d"
+               PreventDefault="@_preventDefault"
+               IgnoreInInputs="@_ignoreInInputs"
+               OnHotkeyDown="@(args => RecordEvent("Global Chord", "Navigate to Dashboard", args))" />
+
+    <VekHotkey KeyCombination="Alt+Shift+F"
+               PreventDefault="@_preventDefault"
+               IgnoreInInputs="@_ignoreInInputs"
+               OnHotkeyDown="@(args => RecordEvent("Global", "Format workspace", args))" />
+
+    <VekHotkey KeyCombination="Escape"
+               IgnoreInInputs="false"
+               OnHotkeyDown="@(args => HandleEscape(args))" />
+
+    <VekGrid>
+        <VekItem xs="12" md="6">
+            <VekPaper Outlined="true" Class="pa-4" Style="height: 100%;">
+                <VekStack Spacing="3">
+                    <VekText Typo="Typo.subtitle1">Global &amp; Input Suppression</VekText>
+                    <VekText Typo="Typo.body2" Color="Color.Secondary">
+                        Try pressing <CodeInline>Ctrl+S</CodeInline>, <CodeInline>Alt+Shift+F</CodeInline>, or the chord <CodeInline>g then d</CodeInline>.
+                        Focus the input below to verify input suppression (<CodeInline>Escape</CodeInline> stays active via <CodeInline>IgnoreInInputs="false"</CodeInline>).
+                    </VekText>
+                    <VekTextField @bind-Value="_notes"
+                                  Label="Notes (focus here to test IgnoreInInputs)"
+                                  Placeholder="Type g then d or Ctrl+S while focused..."
+                                  Variant="Variant.Outlined" />
+                    <VekStack Row="true" Wrap="Wrap.Wrap" Spacing="1">
+                        <VekChip T="string" Size="Size.Small" Variant="Variant.Outlined">Ctrl+S</VekChip>
+                        <VekChip T="string" Size="Size.Small" Variant="Variant.Outlined">g then d</VekChip>
+                        <VekChip T="string" Size="Size.Small" Variant="Variant.Outlined">Alt+Shift+F</VekChip>
+                        <VekChip T="string" Size="Size.Small" Variant="Variant.Outlined">Escape</VekChip>
+                    </VekStack>
+                </VekStack>
+            </VekPaper>
+        </VekItem>
+
+        <VekItem xs="12" md="6">
+            <VekHotkey Scope="HotkeyScope.Scoped"
+                       KeyCombination="Ctrl+S"
+                       PreventDefault="@_preventDefault"
+                       StopPropagation="true"
+                       IgnoreInInputs="@_ignoreInInputs"
+                       AriaLabel="Scoped editor workspace"
+                       OnHotkeyDown="@(args => RecordEvent("Scoped", "Save editor draft", args))">
+                <VekPaper Outlined="true" Class="pa-4" Style="height: 100%; border-color: var(--vek-palette-primary);">
+                    <VekStack Spacing="3">
+                        <VekStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                            <VekText Typo="Typo.subtitle1">Scoped Shortcut Container</VekText>
+                            <VekChip T="string" Color="Color.Primary" Size="Size.Small" Variant="Variant.Text">Scoped</VekChip>
+                        </VekStack>
+                        <VekText Typo="Typo.body2" Color="Color.Secondary">
+                            Click the button below to focus inside this scoped region, then press <CodeInline>Ctrl+S</CodeInline>.
+                            The scoped handler overrides the global <CodeInline>Ctrl+S</CodeInline> shortcut.
+                        </VekText>
+                        <VekStack Row="true" Spacing="2">
+                            <VekButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small">
+                                Focus Scoped Container
+                            </VekButton>
+                            <VekButton Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Small" OnClick="SimulateScopedTrigger">
+                                Simulate Scoped Ctrl+S
+                            </VekButton>
+                        </VekStack>
+                    </VekStack>
+                </VekPaper>
+            </VekHotkey>
+        </VekItem>
+    </VekGrid>
+
+    <VekPaper Outlined="true" Class="pa-3">
+        <VekStack Spacing="2">
+            <VekText Typo="Typo.subtitle2">Triggered Shortcut Events (@_events.Count)</VekText>
+            @if (_events.Count == 0)
+            {
+                <VekText Typo="Typo.body2" Color="Color.Secondary">
+                    No shortcuts triggered yet. Press any registered combination or click Simulate Scoped Ctrl+S.
+                </VekText>
+            }
+            else
+            {
+                @foreach (var entry in _events)
+                {
+                    <VekAlert Severity="@(entry.Scope.StartsWith("Scoped") ? Severity.Success : Severity.Info)" Dense="true">
+                        <strong>@entry.Scope:</strong> @entry.Action (<CodeInline>@entry.Combination</CodeInline>)
+                        @if (entry.IsChord)
+                        {
+                            <span> — Chord sequence completed</span>
+                        }
+                    </VekAlert>
+                }
+            }
+        </VekStack>
+    </VekPaper>
+</VekStack>
+
+@code {
+    private sealed record TriggeredShortcutLog(string Scope, string Action, string Combination, bool IsChord);
+
+    private bool _ignoreInInputs = true;
+    private bool _preventDefault = true;
+    private string _notes = string.Empty;
+    private string _pendingChord = string.Empty;
+    private readonly List<TriggeredShortcutLog> _events = [];
+
+    protected override void OnInitialized()
+    {
+        HotkeyManager.StateChanged += OnHotkeyManagerStateChanged;
+    }
+
+    private void OnHotkeyManagerStateChanged()
+    {
+        _pendingChord = HotkeyManager.GetPendingChordDisplay() ?? string.Empty;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void RecordEvent(string scope, string action, HotkeyEventArgs args)
+    {
+        _events.Insert(0, new TriggeredShortcutLog(scope, action, args.KeyCombination ?? args.Key.ToString(), args.IsChord));
+        if (_events.Count > 5)
+        {
+            _events.RemoveAt(_events.Count - 1);
+        }
+    }
+
+    private void HandleEscape(HotkeyEventArgs args)
+    {
+        _notes = string.Empty;
+        RecordEvent("Global (Always Active)", "Clear notes", args);
+    }
+
+    private async Task SimulateScopedTrigger()
+    {
+        var scopedRegistration = HotkeyManager.GetRegistrations()
+            .FirstOrDefault(r => r.ScopeId is not null);
+        if (scopedRegistration is not null)
+        {
+            await HotkeyManager.HandleKeyDownAsync(
+                new KeyboardEventArgs { Key = "s", Code = "KeyS", CtrlKey = true },
+                scopeId: scopedRegistration.ScopeId);
+        }
+    }
+
+    private void ClearLog()
+    {
+        _events.Clear();
+    }
+
+    public void Dispose()
+    {
+        HotkeyManager.StateChanged -= OnHotkeyManagerStateChanged;
+    }
+}
