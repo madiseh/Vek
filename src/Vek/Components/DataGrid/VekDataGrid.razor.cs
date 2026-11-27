@@ -465,6 +465,14 @@ namespace Vek
 
         internal T? _editingSourceItem;
 
+        private T? _newRowItem;
+        private bool _isCreatingNewRow;
+
+        internal bool HasNewRow => _isCreatingNewRow;
+        internal T? NewRowItem => _newRowItem;
+        internal bool IsNewRowAtTop => NewRowPosition == global::Vek.NewRowPosition.Top;
+        internal bool IsNewRowAtBottom => NewRowPosition == global::Vek.NewRowPosition.Bottom;
+
         internal T? _previousEditingItem;
         internal bool _isEditFormOpen;
 
@@ -568,6 +576,20 @@ namespace Vek
         /// </remarks>
         [Parameter]
         public EventCallback<T> CanceledEditingItem { get; set; }
+
+        /// <summary>
+        /// Occurs when a new row is started and its initial item is ready for editing.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public EventCallback<T> OnRowCreating { get; set; }
+
+        /// <summary>
+        /// Occurs after a new row has passed validation and is ready to be added to the data source.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public EventCallback<T> OnRowCreated { get; set; }
 
         /// <summary>
         /// Invoked when the user saves changes to an item, allowing validation, persistence, or other pre-commit work.
@@ -1256,6 +1278,24 @@ namespace Vek
         /// </remarks>
         [Parameter]
         public DataGridEditMode? EditMode { get; set; }
+
+        /// <summary>
+        /// Positions the active new row before or after the data rows.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="NewRowPosition.Top"/>.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public NewRowPosition NewRowPosition { get; set; }
+
+        /// <summary>
+        /// Creates the item used when <see cref="StartNewRowAsync"/> begins a new row.
+        /// </summary>
+        /// <remarks>This factory is required.</remarks>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public Func<T>? NewItemFactory { get; set; }
 
         /// <summary>
         /// The behavior which begins editing a cell when <see cref="EditMode"/> is <see cref="DataGridEditMode.Form"/>.
@@ -4022,6 +4062,70 @@ namespace Vek
             }
 
             return item;
+        }
+
+        /// <summary>
+        /// Starts a new row using <see cref="NewItemFactory"/>.
+        /// </summary>
+        /// <remarks>
+        /// The <see cref="OnRowCreating"/> callback runs after the new item is created and before the row is rendered.
+        /// </remarks>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        public async Task StartNewRowAsync()
+        {
+            if (ReadOnly || _isCreatingNewRow || HasActiveEdit)
+                return;
+
+            if (NewItemFactory is null)
+                throw new InvalidOperationException($"{nameof(NewItemFactory)} must be set before starting a new row.");
+
+            var item = NewItemFactory();
+
+            if (item is null)
+                throw new InvalidOperationException($"{nameof(NewItemFactory)} must return a non-null item.");
+
+            await OnRowCreating.InvokeAsync(item);
+            _newRowItem = item;
+            _isCreatingNewRow = true;
+            await InvokeAsync(StateHasChanged);
+        }
+
+        /// <summary>
+        /// Validates and completes the active new row.
+        /// </summary>
+        /// <remarks>
+        /// When validation succeeds, <see cref="OnRowCreated"/> receives the new item so the caller can add it to the data source.
+        /// The row remains open when validation fails or the callback throws.
+        /// </remarks>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        public async Task CommitNewRowAsync()
+        {
+            if (!_isCreatingNewRow)
+                return;
+
+            await _inlineEditValidator.ValidateAsync();
+            if (_inlineEditValidator.Errors.Length > 0)
+                return;
+
+            var item = _newRowItem!;
+            await OnRowCreated.InvokeAsync(item);
+            _newRowItem = default;
+            _isCreatingNewRow = false;
+            await InvokeAsync(StateHasChanged);
+        }
+
+        /// <summary>
+        /// Discards the active new row without invoking <see cref="OnRowCreated"/>.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        public async Task CancelNewRowAsync()
+        {
+            if (!_isCreatingNewRow)
+                return;
+
+            _newRowItem = default;
+            _isCreatingNewRow = false;
+            await InvokeAsync(StateHasChanged);
         }
 
         /// <summary>

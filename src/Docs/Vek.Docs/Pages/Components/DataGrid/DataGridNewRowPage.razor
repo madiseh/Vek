@@ -1,0 +1,25 @@
+@page "/components/datagrid/new-row"
+
+<DocsPage>
+    <DocsPageHeader Title="DataGrid - Inline New Row" Component="@nameof(VekDataGrid<T>)">
+        <Description>
+            Start an inline row, choose where it appears, and commit or discard it with the grid's validation and callback lifecycle.
+        </Description>
+    </DocsPageHeader>
+    <DocsPageContent>
+        <DocsPageSection>
+            <SectionHeader Title="Create a row inline">
+                <Description>
+                    Provide <CodeInline>NewItemFactory</CodeInline> so the grid can create an item without guessing how your model is initialized.
+                    Call <CodeInline>StartNewRowAsync</CodeInline> from a toolbar or another control. The new row uses editable columns and appears at the top by default.
+                    Set <CodeInline>NewRowPosition</CodeInline> to <CodeInline>NewRowPosition.Bottom</CodeInline> to place it after the data rows.
+                    The row's Create action validates its editors before invoking <CodeInline>OnRowCreated</CodeInline>; the callback can then add the item to your data source.
+                    Cancel discards the draft. <CodeInline>OnRowCreating</CodeInline> can initialize the factory item before it is shown.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridNewRowExample)" ShowCode="false" Block="true" FullWidth="true">
+                <DataGridNewRowExample />
+            </SectionContent>
+        </DocsPageSection>
+    </DocsPageContent>
+</DocsPage>

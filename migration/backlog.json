@@ -243,9 +243,10 @@
       "title": "DataGrid Inline Create Row and Top/Bottom Insertion Mode",
       "module": "DataGrid",
       "priority": 19,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/019-datagrid-inline-create-row.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-27T23:06:19Z"
     },
     {
       "id": "020",
