@@ -4,10 +4,12 @@
 - **Feature ID**: 071
 - **Feature Slug**: dialog-focus-trap-and-escape-key-handling
 - **Module**: Dialog
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 71
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/180
 - **Started At**: 2026-11-27T22:10:15Z
+- **Completed At**: 2026-11-27T22:43:08Z
 
 ---
 

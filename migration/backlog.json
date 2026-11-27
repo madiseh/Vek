@@ -895,10 +895,12 @@
       "title": "Dialog W3C Modal Focus Trap and Escape Key Interception",
       "module": "Dialog",
       "priority": 71,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/071-dialog-focus-trap-and-escape-key-handling.md",
       "dependencies": [],
-      "started_at": "2026-11-27T22:10:15Z"
+      "started_at": "2026-11-27T22:10:15Z",
+      "completed_at": "2026-11-27T22:43:08Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/180"
     },
     {
       "id": "072",
