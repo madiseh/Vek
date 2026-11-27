@@ -1,6 +1,6 @@
 import { afterEach, expect, mock, spyOn, test } from "bun:test";
 import type { DotNet } from "@microsoft/dotnet-js-interop";
-import VekHotkeyListener from "./vekHotkeyListener";
+import VekHotkeyListener, { type HotkeyStepSpec } from "./vekHotkeyListener";
 
 const listeners: VekHotkeyListener[] = [];
 
@@ -11,18 +11,32 @@ function createListener() {
 }
 
 function createDotNetReference() {
-    const invokeMethodAsync = mock(async (_method: string) => { });
+    const invokeMethodAsync = mock(async (_method: string, _payload?: unknown) => { });
     return { reference: { invokeMethodAsync } as unknown as DotNet.DotNetObject, invokeMethodAsync };
 }
 
-function press(init: KeyboardEventInit) {
+function press(init: KeyboardEventInit, target: EventTarget = document.body) {
     const event = new KeyboardEvent("keydown", { bubbles: true, cancelable: true, ...init });
-    document.body.dispatchEvent(event);
+    target.dispatchEvent(event);
     return event;
+}
+
+function step(key: string, code: string, mods: Partial<Pick<HotkeyStepSpec, "requireCtrl" | "requireShift" | "requireAlt" | "requireMeta">> = {}): HotkeyStepSpec {
+    return {
+        key,
+        code,
+        modifiers: [],
+        exactModifiers: false,
+        requireCtrl: mods.requireCtrl ?? false,
+        requireShift: mods.requireShift ?? false,
+        requireAlt: mods.requireAlt ?? false,
+        requireMeta: mods.requireMeta ?? false
+    };
 }
 
 afterEach(() => {
     for (const listener of listeners.splice(0)) listener.dispose();
+    document.body.replaceChildren();
     mock.restore();
 });
 
@@ -144,4 +158,88 @@ test("dispose stops listening to the document", () => {
     press({ code: "KeyS" });
 
     expect(invokeMethodAsync).not.toHaveBeenCalled();
+});
+
+test("suppresses hotkeys inside editable inputs when ignoreInInputs is true", () => {
+    const listener = createListener();
+    const { reference, invokeMethodAsync } = createDotNetReference();
+    listener.registerOrUpdateHotkey(reference, "OnJsHotkeyTriggeredAsync", "save", "KeyS", [], true, {
+        steps: [step("s", "KeyS", { requireCtrl: true })],
+        ignoreInInputs: true
+    });
+
+    const input = document.createElement("input");
+    input.type = "text";
+    document.body.appendChild(input);
+
+    const event = press({ code: "KeyS", key: "s", ctrlKey: true }, input);
+
+    expect(invokeMethodAsync).not.toHaveBeenCalled();
+    expect(event.defaultPrevented).toBe(false);
+});
+
+test("fires hotkeys inside editable inputs when ignoreInInputs is false", () => {
+    const listener = createListener();
+    const { reference, invokeMethodAsync } = createDotNetReference();
+    listener.registerOrUpdateHotkey(reference, "OnJsHotkeyTriggeredAsync", "save", "KeyS", [], true, {
+        steps: [step("s", "KeyS", { requireCtrl: true })],
+        ignoreInInputs: false,
+        stopPropagation: true
+    });
+
+    const input = document.createElement("input");
+    document.body.appendChild(input);
+
+    const event = press({ code: "KeyS", key: "s", ctrlKey: true }, input);
+
+    expect(invokeMethodAsync).toHaveBeenCalledTimes(1);
+    expect(event.defaultPrevented).toBe(true);
+});
+
+test("supports multi-step chord key sequences and ignores non-matching prefix breaks", () => {
+    const listener = createListener();
+    const { reference, invokeMethodAsync } = createDotNetReference();
+    listener.registerOrUpdateHotkey(reference, "OnJsHotkeyTriggeredAsync", "nav", "KeyD", [], true, {
+        steps: [step("g", "KeyG"), step("d", "KeyD")],
+        ignoreInInputs: true,
+        chordTimeoutMs: 1000
+    });
+
+    press({ code: "KeyG", key: "g" });
+    expect(invokeMethodAsync).not.toHaveBeenCalled();
+
+    press({ code: "KeyD", key: "d" });
+    expect(invokeMethodAsync).toHaveBeenCalledTimes(1);
+});
+
+test("scoped hotkey only triggers when event target is inside the scope container and overrides global", () => {
+    const listener = createListener();
+    const globalRef = createDotNetReference();
+    const scopedRef = createDotNetReference();
+
+    const scopeContainer = document.createElement("div");
+    scopeContainer.id = "editor-scope";
+    const childButton = document.createElement("button");
+    scopeContainer.appendChild(childButton);
+    document.body.appendChild(scopeContainer);
+
+    listener.registerOrUpdateHotkey(globalRef.reference, "OnJsHotkeyTriggeredAsync", "global-save", "KeyS", [], true, {
+        steps: [step("s", "KeyS", { requireCtrl: true })],
+        ignoreInInputs: true
+    });
+    listener.registerOrUpdateHotkey(scopedRef.reference, "OnJsHotkeyTriggeredAsync", "scoped-save", "KeyS", [], true, {
+        steps: [step("s", "KeyS", { requireCtrl: true })],
+        scopeElementId: "editor-scope",
+        ignoreInInputs: true
+    });
+
+    // Inside scoped container -> scoped wins, global does not fire.
+    press({ code: "KeyS", key: "s", ctrlKey: true }, childButton);
+    expect(scopedRef.invokeMethodAsync).toHaveBeenCalledTimes(1);
+    expect(globalRef.invokeMethodAsync).not.toHaveBeenCalled();
+
+    // Outside scoped container -> global fires.
+    press({ code: "KeyS", key: "s", ctrlKey: true }, document.body);
+    expect(scopedRef.invokeMethodAsync).toHaveBeenCalledTimes(1);
+    expect(globalRef.invokeMethodAsync).toHaveBeenCalledTimes(1);
 });

@@ -1259,9 +1259,12 @@
       "title": "Hotkey Global and Scoped Shortcut Binding Manager with Chord Key Sequences",
       "module": "Hotkey",
       "priority": 100,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/100-hotkey-global-and-scoped-keyboard-shortcuts.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-27T22:10:17Z",
+      "completed_at": "2026-11-27T22:43:56Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/182"
     }
   ]
 }

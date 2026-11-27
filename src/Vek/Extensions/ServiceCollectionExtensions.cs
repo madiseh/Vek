@@ -236,6 +236,18 @@ namespace Vek.Services
         }
 
         /// <summary>
+        /// Adds <see cref="HotkeyManager"/> as a scoped dependency.
+        /// </summary>
+        /// <param name="services">IServiceCollection</param>
+        /// <returns>Continues the IServiceCollection chain.</returns>
+        public static IServiceCollection AddVekHotkey(this IServiceCollection services)
+        {
+            services.TryAddScoped<HotkeyManager>();
+
+            return services;
+        }
+
+        /// <summary>
         /// Adds the services required for translations.
         /// </summary>
         /// <param name="services">IServiceCollection</param>
@@ -327,6 +339,7 @@ namespace Vek.Services
                 .AddVekScrollSpy()
                 .AddVekPopoverService()
                 .AddVekPointerEventsNoneService()
+                .AddVekHotkey()
                 .AddVekLocalization();
         }
 
@@ -407,6 +420,7 @@ namespace Vek.Services
                 })
                 .AddVekScrollSpy()
                 .AddVekPointerEventsNoneService()
+                .AddVekHotkey()
                 .AddVekLocalization();
         }
 
