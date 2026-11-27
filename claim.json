@@ -2,8 +2,9 @@
   "feature_id": "023",
   "worker_run_id": "batch-20261127T225943Z-023",
   "owner": "codex/vek-migration-batch-agent",
-  "state": "claimed",
+  "state": "blocked",
   "claimed_at": "2026-11-27T22:59:43Z",
-  "last_heartbeat": "2026-11-27T23:46:28Z",
-  "lease_expires_at": "2026-11-29T23:46:28Z"
+  "last_heartbeat": "2026-11-27T23:48:07Z",
+  "lease_expires_at": "2026-11-29T23:48:07Z",
+  "blocked_reason": "Waiting for paired browser reconnect to capture required UI screenshots."
 }
