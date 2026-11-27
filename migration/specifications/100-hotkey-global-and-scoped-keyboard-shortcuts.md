@@ -4,10 +4,12 @@
 - **Feature ID**: 100
 - **Feature Slug**: hotkey-global-and-scoped-keyboard-shortcuts
 - **Module**: Hotkey
-- **Status**: In Progress
+- **Status**: Completed
 - **Priority**: 100
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/182
 - **Started At**: 2026-11-27T22:10:17Z
+- **Completed At**: 2026-11-27T22:43:56Z
 
 ---
 
