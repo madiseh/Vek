@@ -13,18 +13,21 @@ This is an explicit batch-level exception to the repository's one-feature-per-ta
 
 Every feature in the migration pipeline must belong to an active GitHub Milestone before any work begins:
 
-1. **Active Milestone Required**: Inspect existing GitHub milestones using `gh api repos/:owner/:repo/milestones`. Ensure an open milestone exists for the upcoming release or phase (e.g. `v1.5.0`). If no open milestone exists, stop immediately: **do not proceed** until a milestone is created.
-2. **Milestone Scope Enforcement**: Only features explicitly listed in the description or scope of the upcoming active milestone may be selected for a batch. If a candidate feature in the backlog is not included in the milestone, **do not execute it** — it must first be added to an active milestone by the user or an authorized milestone definition before work can start.
+1. **Active Milestone Required**: Inspect existing GitHub milestones using `python migration/scripts/milestone_gate.py list` or `gh api repos/:owner/:repo/milestones`. Ensure an open milestone exists for the upcoming release or phase (e.g. `v1.5.0`). If no open milestone exists, stop immediately: **do not proceed** until a milestone is created.
+2. **Milestone Scope Enforcement**: Only features explicitly listed in the description or scope of the upcoming active milestone may be selected for a batch. Use `python migration/scripts/milestone_gate.py verify <feature_id>` to deterministically verify any candidate feature. If a candidate feature in the backlog is not included in the milestone, **do not execute it** — it must first be added to an active milestone by the user or an authorized milestone definition before work can start.
 3. **Link PRs to Milestone**: When opening a pull request, always attach it to the active milestone using `gh pr create --milestone "<milestone_title>"` (or update with `gh pr edit <pr_url> --milestone "<milestone_title>"`).
 
 ## 1. Build a read-only batch proposal
 
-1. Read the repository instructions, `migration/AGENTS.md`, and the relevant governance docs. Fetch the latest `origin/master` and inspect its backlog without running a command that claims or changes a feature.
-2. Query GitHub for the upcoming open milestone (`gh api repos/:owner/:repo/milestones`) and identify all features covered in its scope.
-3. Select only existing `READY` features whose dependencies are completed **AND that belong to the active milestone**. Do not run `orchestrator.py --discover`; backlog discovery belongs to a separate skill/agent.
-4. Exclude features with an open PR or an active unexpired claim. Inspect each candidate specification and likely code, test, documentation, and asset paths. Prefer candidates with disjoint files and components; keep the backlog priority order among similarly isolated candidates.
-5. Select up to three eligible candidates. If fewer than three low-conflict candidates belonging to the milestone are available, propose the available count; do not invent work or relax the isolation requirement to fill the batch.
-6. Derive each target branch from the current orchestrator convention and backlog pipeline settings without running `--pick`. Present each candidate's feature ID, title, module, specification, target branch, associated milestone, and likely touched paths. State the batch size and any priority items skipped due to open PRs, claims, dependencies, path overlap, or not being in the active milestone. Wait for the user's explicit approval before creating claims, worktrees, branches, or editing files.
+Use `python migration/scripts/milestone_gate.py propose --size 3` to build a deterministic read-only batch proposal adhering strictly to active milestone scope, claim status, open PRs, and disjoint path heuristics.
+
+1. Read the repository instructions, `migration/AGENTS.md`, and the relevant governance docs. Fetch the latest `origin/master`.
+2. Run `python migration/scripts/milestone_gate.py propose --size 3`. The script automatically:
+   - Queries GitHub for the upcoming open milestone and identifies all features covered in its scope.
+   - Selects only existing `READY` features whose dependencies are completed AND that belong to the active milestone.
+   - Excludes features with an open PR or an active unexpired claim via `claim_ledger.py`.
+   - Heuristically detects touched paths and enforces disjoint components/files across the batch.
+3. Present each candidate's feature ID, title, module, specification, target branch, associated milestone, and likely touched paths from the script output. State the batch size and skipped items summary. Wait for the user's explicit approval before creating claims, worktrees, branches, or editing files.
 
 Approval authorizes a batch of up to three next eligible features within the active milestone, not only a frozen set of IDs. If a candidate is claimed by another agent after approval, skip it and substitute the next eligible low-conflict candidate within the milestone without asking again. If the source backlog changes, do not add newly discovered work to the approved batch unless it is needed as such a substitution.
 
