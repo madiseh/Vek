@@ -290,9 +290,10 @@
       "title": "DataGrid Conditional Cell Display Template Selector",
       "module": "DataGrid",
       "priority": 23,
-      "status": "ready",
+      "status": "in_progress",
       "specification": "specifications/023-datagrid-cell-display-template-selector.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-27T23:01:21Z"
     },
     {
       "id": "024",

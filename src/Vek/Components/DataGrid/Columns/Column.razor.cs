@@ -111,6 +111,19 @@ namespace Vek
         public virtual RenderFragment<CellContext<T>>? GetCellTemplate() => CellTemplate;
 
         /// <summary>
+        /// Selects a display template for each row item in this column.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>. When the selector returns <c>null</c>, the cell uses its standard value display.
+        /// A <see cref="CellTemplate"/> takes precedence when both are set.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Appearance)]
+        public Func<T, RenderFragment<T>?>? CellDisplayTemplateSelector { get; set; }
+
+        internal RenderFragment<T>? GetCellDisplayTemplate(T item) => CellDisplayTemplateSelector?.Invoke(item);
+
+        /// <summary>
         /// The template used to display this column's footer.
         /// </summary>
         [Parameter]

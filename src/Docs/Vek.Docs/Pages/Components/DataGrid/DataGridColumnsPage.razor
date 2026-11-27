@@ -156,6 +156,19 @@
             </SectionContent>
         </DocsPageSection>
 
+          <DocsPageSection>
+              <SectionHeader Title="Conditional Cell Templates">
+                  <Description>
+                      Select a cell display template from each row item with <CodeInline>CellDisplayTemplateSelector</CodeInline>.
+                      Build ordered rules with <CodeInline>DataGridCellTemplateSelector&lt;T&gt;</CodeInline> to highlight positive, negative, or watch-list values.
+                      If no rule matches, the grid shows the column's normal value; an explicit <CodeInline>CellTemplate</CodeInline> takes precedence.
+                  </Description>
+              </SectionHeader>
+              <SectionContent DarkenBackground="true" Code="@nameof(DataGridCellTemplateSelectorExample)" Block="true" FullWidth="true">
+                  <DataGridCellTemplateSelectorExample />
+              </SectionContent>
+          </DocsPageSection>
+
         <DocsPageSection>
             <SectionHeader Title="Cell Context Menu">
                 <Description>

@@ -631,6 +631,9 @@
                  var showEditMode = column.Editable && !ReadOnly &&
                                     (EditMode == DataGridEditMode.Cell || isInlineEditing) &&
                                     hasEditableContent;
+                 var cellDisplayTemplate = cellTemplate is null && !showEditMode
+                     ? column.GetCellDisplayTemplate(cell.Context.Item)
+                     : null;
                  var cellClickCallback = GetCellClickCallback(item, rowIndex, colIndex, column);
                  var cellContextMenuClickCallback = GetCellContextMenuClickCallback(item, rowIndex, colIndex, column);
                  var cellSelected = IsCellSelected(rowIndex, colIndex);
@@ -675,6 +678,10 @@
                      if (cellTemplate is not null)
                      {
                          @cellTemplate(cell.Context)
+                     }
+                     else if (cellDisplayTemplate is not null)
+                     {
+                         @cellDisplayTemplate(cell.Context.Item)
                      }
                      else if (column.Culture is not null && column.isNumber)
                      {
