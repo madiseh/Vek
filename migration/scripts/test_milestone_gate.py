@@ -14,7 +14,6 @@ if str(SCRIPT_DIR) not in sys.path:
 
 from milestone_gate import (
     extract_feature_ids_from_text,
-    extract_likely_paths,
     verify_feature_milestone,
     propose_batch,
     MilestoneInfo,
@@ -40,11 +39,6 @@ class TestMilestoneGate(unittest.TestCase):
     def test_extract_feature_ids_from_text(self):
         ids = extract_feature_ids_from_text(SAMPLE_MILESTONE_DESC)
         self.assertEqual(ids, ["014", "017", "070", "099"])
-
-    def test_extract_likely_paths_fallback(self):
-        paths = extract_likely_paths("nonexistent.md", "Dialog")
-        self.assertIn("src/Vek/Components/Dialog", paths)
-        self.assertIn("tests/Components/Vek.UnitTests/Components/Dialog", paths)
 
     @patch("milestone_gate.get_primary_active_milestone")
     def test_verify_feature_milestone(self, mock_get_milestone):
@@ -84,7 +78,7 @@ class TestMilestoneGate(unittest.TestCase):
 
         mock_inspect.side_effect = mock_eligibility
 
-        result = propose_batch(max_batch_size=2, enforce_disjoint=True)
+        result = propose_batch(max_batch_size=2)
         self.assertEqual(result["milestone"]["title"], "v1.5.0")
         selected_ids = [c["id"] for c in result["selected_batch"]]
         self.assertTrue(len(selected_ids) <= 2)

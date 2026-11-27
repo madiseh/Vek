@@ -19,17 +19,16 @@ Every feature in the migration pipeline must belong to an active GitHub Mileston
 
 ## 1. Build a read-only batch proposal
 
-Use `python migration/scripts/milestone_gate.py propose --size 3` to build a deterministic read-only batch proposal adhering strictly to active milestone scope, claim status, open PRs, and disjoint path heuristics.
+Use `python migration/scripts/milestone_gate.py propose --size 3` to build a deterministic, read-only proposal from the active milestone, backlog, claims, and open PRs. Select at most one feature per backlog `module` (the module is the batch's domain), so a batch of three spans three distinct modules/domains. Skip additional eligible features from an already represented module and report that reason. Do not use guessed file paths or file-overlap heuristics to select candidates.
 
 1. Read the repository instructions, `migration/AGENTS.md`, and the relevant governance docs. Fetch the latest `origin/master`.
 2. Run `python migration/scripts/milestone_gate.py propose --size 3`. The script automatically:
    - Queries GitHub for the upcoming open milestone and identifies all features covered in its scope.
    - Selects only existing `READY` features whose dependencies are completed AND that belong to the active milestone.
    - Excludes features with an open PR or an active unexpired claim via `claim_ledger.py`.
-   - Heuristically detects touched paths and enforces disjoint components/files across the batch.
-3. Present each candidate's feature ID, title, module, specification, target branch, associated milestone, and likely touched paths from the script output. State the batch size and skipped items summary. Wait for the user's explicit approval before creating claims, worktrees, branches, or editing files.
+3. Present each candidate's feature ID, title, module/domain, specification, target branch, and associated milestone. State the batch size and skipped items summary, including candidates skipped because their module/domain is already represented. Wait for the user's explicit approval before creating claims, worktrees, branches, or editing files.
 
-Approval authorizes a batch of up to three next eligible features within the active milestone, not only a frozen set of IDs. If a candidate is claimed by another agent after approval, skip it and substitute the next eligible low-conflict candidate within the milestone without asking again. If the source backlog changes, do not add newly discovered work to the approved batch unless it is needed as such a substitution.
+Approval authorizes a batch of up to three next eligible features within the active milestone, with no repeated module/domain, not only a frozen set of IDs. If a candidate is claimed by another agent after approval, skip it and substitute the next eligible candidate from a module/domain not already represented in the approved batch without asking again. If the source backlog changes, do not add newly discovered work to the approved batch unless it is needed as such a substitution.
 
 ## 2. Claim each feature across agents
 
@@ -113,7 +112,7 @@ For an already-open PR, do not create a duplicate; report or update that PR as a
 
 ## 5. Batch completion and report
 
-Continue until three new PRs are ready for review or no more eligible, low-conflict READY features remain. A blocked feature does not stop other workers. If the queue runs out, finish with fewer than three PRs and report that clearly.
+Continue until three new PRs are ready for review or no more eligible READY features from unrepresented modules/domains remain. A blocked feature does not stop other workers. If the queue runs out, finish with fewer than three PRs and report that clearly.
 
 ### Deterministic Batch Timing and Report Logging
 

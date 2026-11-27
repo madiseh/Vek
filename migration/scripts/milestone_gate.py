@@ -13,7 +13,7 @@ of vek-migration-batch-agent:
    - Filters features by READY status, completed dependencies, and active milestone inclusion.
    - Checks claims via claim_ledger.
    - Checks open PRs via GitHub CLI.
-   - Proposes disjoint batches (avoiding file/module overlaps).
+   - Proposes batches with at most one feature per module/domain.
 """
 
 from __future__ import annotations
@@ -62,7 +62,6 @@ class CandidateFeature:
     target_branch: str
     milestone: str
     dependencies: list[str]
-    likely_paths: list[str]
     eligible: bool
     skip_reason: str | None = None
 
@@ -167,25 +166,6 @@ def get_primary_active_milestone(target_milestone: str | None = None) -> Milesto
     return milestones[0]
 
 
-def extract_likely_paths(spec_rel_path: str, module: str) -> list[str]:
-    """Heuristically determine touched files and components from specification or module."""
-    paths = []
-    spec_full_path = MIGRATION_DIR / spec_rel_path
-    if spec_full_path.exists():
-        content = spec_full_path.read_text(encoding="utf-8")
-        found_paths = set(re.findall(r"`((?:src|tests)/[a-zA-Z0-9_\-\./]+)`", content))
-        if found_paths:
-            paths.extend(sorted(found_paths))
-
-    if not paths:
-        mod_clean = module.strip()
-        paths.append(f"src/Vek/Components/{mod_clean}")
-        paths.append(f"tests/Components/Vek.UnitTests/Components/{mod_clean}")
-        paths.append(f"src/Docs/Vek.Docs/Pages/Components/{mod_clean}")
-
-    return paths
-
-
 def verify_feature_milestone(feature_id: str, milestone_title: str | None = None) -> dict[str, Any]:
     """
     Deterministic check: Verify if feature_id is part of the active milestone.
@@ -236,12 +216,11 @@ def inspect_candidate_eligibility(feature_id: str) -> tuple[bool, str | None, di
 def propose_batch(
     max_batch_size: int = 3,
     milestone_name: str | None = None,
-    enforce_disjoint: bool = True,
 ) -> dict[str, Any]:
     """
     Deterministic implementation of Section 0 & Section 1:
     Builds a read-only batch proposal adhering strictly to active milestone,
-    claim status, open PRs, and disjoint path heuristics.
+    claim status, open PRs, and at most one feature per module/domain.
     """
     milestone = get_primary_active_milestone(milestone_name)
     if not BACKLOG_PATH.exists():
@@ -301,10 +280,9 @@ def propose_batch(
 
         prefiltered.append((feat, target_branch, deps))
 
-    # Pass 2: Inspect candidate eligibility and disjoint paths until we have max_batch_size
+    # Pass 2: Inspect eligible candidates, taking at most one per module/domain.
     selected: list[CandidateFeature] = []
     seen_modules = set()
-    seen_paths = set()
 
     for feat, target_branch, deps in prefiltered:
         if len(selected) >= max_batch_size:
@@ -316,20 +294,23 @@ def propose_batch(
         module = feat.get("module", "")
         spec = feat.get("specification", "")
 
-        likely_paths = extract_likely_paths(spec, module)
+        module_key = module.strip().casefold()
+        if not module_key:
+            skipped.append({
+                "id": fid,
+                "title": title,
+                "reason": "Missing module/domain in backlog",
+            })
+            continue
 
-        # Pre-check disjoint constraints locally BEFORE running slow inspect
-        if enforce_disjoint:
-            cand_paths = set(likely_paths)
-            overlap = seen_paths.intersection(cand_paths)
-            if overlap or module in seen_modules:
-                overlap_desc = f"paths: {', '.join(overlap)}" if overlap else f"module: {module}"
-                skipped.append({
-                    "id": fid,
-                    "title": title,
-                    "reason": f"Skipped locally due to overlap with chosen batch items ({overlap_desc})",
-                })
-                continue
+        # Enforce domain diversity before the remote eligibility check.
+        if module_key in seen_modules:
+            skipped.append({
+                "id": fid,
+                "title": title,
+                "reason": f"Skipped because module/domain '{module}' is already represented in the batch",
+            })
+            continue
 
         # Now do the remote ledger inspect only for viable candidates
         eligible, reason, ledger_info = inspect_candidate_eligibility(fid)
@@ -343,7 +324,6 @@ def propose_batch(
             target_branch=target_branch,
             milestone=milestone.title,
             dependencies=deps,
-            likely_paths=likely_paths,
             eligible=eligible,
             skip_reason=reason,
         )
@@ -356,9 +336,7 @@ def propose_batch(
             })
             continue
 
-        if enforce_disjoint:
-            seen_modules.add(candidate.module)
-            seen_paths.update(set(candidate.likely_paths))
+        seen_modules.add(module_key)
 
         selected.append(candidate)
 
@@ -392,7 +370,6 @@ def main():
     propose_parser = subparsers.add_parser("propose", help="Propose a batch of eligible features")
     propose_parser.add_argument("--size", type=int, default=3, help="Max batch size (default: 3)")
     propose_parser.add_argument("--milestone", help="Target milestone title or number")
-    propose_parser.add_argument("--no-disjoint", action="store_true", help="Disable disjoint path enforcement")
 
     args = parser.parse_args()
 
@@ -421,7 +398,6 @@ def main():
             res = propose_batch(
                 max_batch_size=args.size,
                 milestone_name=args.milestone,
-                enforce_disjoint=not args.no_disjoint,
             )
             print(json.dumps(res, indent=2))
 
