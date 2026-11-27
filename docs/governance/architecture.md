@@ -97,6 +97,7 @@ graph TD
 - **`Vek.Docs.Showcases`** owns complete, interactive use cases such as the Expense Tracker. Add a route page and its reusable view components here; it may reuse the docs layout and Vek components.
 - **`Vek.Docs.Landing`** owns the `/` page and references shared docs content only. Keep it independent from Showcase content; users open examples through the `Showcases` navigation menu.
 - **`Vek.Docs.Server`** and **`Vek.Docs.Wasm`** host the same route assemblies. They reference Landing and Showcases, and their `App.razor` routers include both in `AdditionalAssemblies`, so new routes added to either project are available in both hosting modes.
+- `Vek.Docs.Server` and `Vek.Docs.WasmHost` permanently redirect mixed-case `/api/...` paths to lowercase, matching API links, canonical tags, and the sitemap.
 
 ### NuGet Packaging Architecture
 - **Shipped Analyzers**: `Vek.Analyzers.dll` and `Vek.Analyzers.CodeFixes.dll` are packed side-by-side into `analyzers/dotnet/cs` of the primary `Vek` NuGet package. They target Roslyn 4.7.0 (via `<VekRoslynShippedVersion>` in the root `Directory.Packages.props`) ensuring full compatibility with consuming consumer IDEs and build compilers. NuGet package versions are centrally managed in this file.

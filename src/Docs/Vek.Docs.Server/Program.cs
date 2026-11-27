@@ -1,6 +1,7 @@
 ﻿using Vek.Docs.Extensions;
 using Vek.Docs.Models;
 using Vek.Docs.Services;
+using Vek.Docs.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseStaticWebAssets();
@@ -32,6 +33,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseMiddleware<ApiCanonicalizationMiddleware>();
 
 app.UseStaticFiles();
 
@@ -39,6 +41,10 @@ app.UseRouting();
 
 app.MapControllers();
 app.MapBlazorHub();
+app.MapGet("/profile", () => Results.NotFound());
+app.MapGet("/archived-projects", () => Results.NotFound());
+app.MapGet("/permissions", () => Results.NotFound());
+app.MapGet("/features/break-points", () => Results.Redirect("/features/breakpoints", permanent: true));
 app.MapFallbackToPage("/_Host");
 
 using (var scope = app.Services.CreateScope())
