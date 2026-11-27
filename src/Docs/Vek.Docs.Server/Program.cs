@@ -1,7 +1,7 @@
 ﻿using Vek.Docs.Extensions;
 using Vek.Docs.Models;
-using Vek.Docs.Services;
 using Vek.Docs.Server;
+using Vek.Docs.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseStaticWebAssets();
