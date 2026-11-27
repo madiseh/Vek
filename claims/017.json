@@ -1,8 +1,8 @@
 {
   "claimed_at": "2026-11-27T22:24:21Z",
   "feature_id": "017",
-  "last_heartbeat": "2026-11-27T22:24:21Z",
-  "lease_expires_at": "2026-11-29T22:24:21Z",
+  "last_heartbeat": "2026-11-27T22:28:32Z",
+  "lease_expires_at": "2026-11-29T22:28:32Z",
   "owner": "codex",
   "run_id": "017-20261128-codex-batch1",
   "state": "claimed"
