@@ -30,6 +30,9 @@
     <Project Path="tests/Analyzers/Vek.Analyzers.TestComponents/Vek.Analyzers.TestComponents.csproj" />
     <Project Path="tests/Analyzers/Vek.UnitTests.Analyzers/Vek.UnitTests.Analyzers.csproj" />
   </Folder>
+  <Folder Name="/tests/Architecture/">
+    <Project Path="tests/Architecture/Vek.ArchitectureTests/Vek.ArchitectureTests.csproj" />
+  </Folder>
   <Folder Name="/tests/Components/">
     <Project Path="tests/Components/Vek.UnitTests/Vek.UnitTests.csproj" />
     <Project Path="tests/Components/Vek.UnitTests.Viewer/Vek.UnitTests.Viewer.csproj" />
