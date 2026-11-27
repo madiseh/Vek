@@ -315,6 +315,9 @@ namespace Vek
 
         private bool GetBackdropClick()
         {
+            if (_dialog?.CloseOnBackdropClickValue is { } closeOnBackdropClick)
+                return closeOnBackdropClick;
+
             if (GetDialogOptionsOrDefault.BackdropClick.HasValue)
                 return GetDialogOptionsOrDefault.BackdropClick.Value;
 
@@ -326,6 +329,9 @@ namespace Vek
 
         private bool GetCloseOnEscapeKey()
         {
+            if (_dialog?.CloseOnEscapeKeyValue is { } closeOnEscapeKey)
+                return closeOnEscapeKey;
+
             if (GetDialogOptionsOrDefault.CloseOnEscapeKey.HasValue)
                 return GetDialogOptionsOrDefault.CloseOnEscapeKey.Value;
 

@@ -1,0 +1,32 @@
+@namespace Vek.UnitTests.TestComponents.Dialog
+@using Vek
+
+<VekDialog CloseOnEscapeKey="@CloseOnEscapeKey"
+           CloseOnBackdropClick="@CloseOnBackdropClick"
+           DefaultFocus="@DefaultFocus">
+    <DialogContent>
+        <VekTextField T="string" Label="Dialog input" />
+    </DialogContent>
+    <DialogActions>
+        <VekButton Class="cancel-btn" OnClick="Cancel">Cancel</VekButton>
+        <VekButton Class="ok-btn" Color="Color.Primary" OnClick="Submit">OK</VekButton>
+    </DialogActions>
+</VekDialog>
+
+@code {
+    [CascadingParameter]
+    private IVekDialogInstance VekDialog { get; set; } = null!;
+
+    [Parameter]
+    public bool? CloseOnEscapeKey { get; set; }
+
+    [Parameter]
+    public bool? CloseOnBackdropClick { get; set; }
+
+    [Parameter]
+    public DefaultFocus? DefaultFocus { get; set; }
+
+    private void Submit() => VekDialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => VekDialog.Cancel();
+}
