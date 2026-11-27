@@ -4,9 +4,12 @@
 - **Feature ID**: 099
 - **Feature Slug**: colorpicker-rgba-hex-hsv-and-palette-presets
 - **Module**: ColorPicker
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 99
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/181
+- **Started At**: 2026-11-27T22:10:16Z
+- **Completed At**: 2026-11-27T22:43:32Z
 
 ---
 

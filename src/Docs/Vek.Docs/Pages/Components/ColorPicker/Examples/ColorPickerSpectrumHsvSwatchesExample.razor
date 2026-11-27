@@ -1,0 +1,67 @@
+@namespace Vek.Docs.Examples
+@using Vek.Utilities
+
+<VekStack Row="true" Spacing="4" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+    <VekColorPicker @bind-Value="_selectedColor"
+                    @bind-Text="_colorText"
+                    @bind-ColorPickerMode="_mode"
+                    OutputFormat="_outputFormat"
+                    ShowSwatches="true"
+                    Palette="_presetSwatches"
+                    PickerVariant="PickerVariant.Static" />
+
+    <VekPaper Class="pa-4" Outlined="true" Style="min-width: 280px;">
+        <VekStack Spacing="3">
+            <VekText Typo="Typo.subtitle1">Color Output &amp; Format</VekText>
+            <div class="d-flex align-center gap-3">
+                <div style="@($"width: 36px; height: 36px; border-radius: var(--vek-default-borderradius); background: {_selectedColor?.ToString(VekColorOutputFormats.RGBA)}; border: 1px solid var(--vek-palette-lines-default);")"></div>
+                <VekText Typo="Typo.body2"><code>@_colorText</code></VekText>
+            </div>
+            <VekSelect T="VekColorOutputFormats" Label="Text Output Format" Variant="Variant.Outlined" Dense="true" @bind-Value="_outputFormat" @bind-Value:after="SyncTextFormat">
+                <VekSelectItem T="VekColorOutputFormats" Value="VekColorOutputFormats.Hex">HEX (#RRGGBB)</VekSelectItem>
+                <VekSelectItem T="VekColorOutputFormats" Value="VekColorOutputFormats.HexA">HEXA (#RRGGBBAA)</VekSelectItem>
+                <VekSelectItem T="VekColorOutputFormats" Value="VekColorOutputFormats.RGBA">RGBA (rgba(...))</VekSelectItem>
+            </VekSelect>
+            <VekSelect T="ColorPickerMode" Label="Channel Mode" Variant="Variant.Outlined" Dense="true" @bind-Value="_mode">
+                <VekSelectItem T="ColorPickerMode" Value="ColorPickerMode.RGB">RGBA</VekSelectItem>
+                <VekSelectItem T="ColorPickerMode" Value="ColorPickerMode.HSL">HSLA</VekSelectItem>
+                <VekSelectItem T="ColorPickerMode" Value="ColorPickerMode.HEX">HEX</VekSelectItem>
+                <VekSelectItem T="ColorPickerMode" Value="ColorPickerMode.HSV">HSV</VekSelectItem>
+            </VekSelect>
+            @if (_selectedColor is not null)
+            {
+                var hsv = _selectedColor.ToHsv();
+                <VekText Typo="Typo.caption">
+                    HSV: @($"{hsv.H:0}°, {hsv.S:0.00}, {hsv.V:0.00}") | Alpha: @($"{_selectedColor.APercentage:0.00}")
+                </VekText>
+            }
+        </VekStack>
+    </VekPaper>
+</VekStack>
+
+@code {
+    private VekColor _selectedColor = new("rgba(37, 99, 235, 0.85)");
+    private string _colorText = "rgba(37,99,235,0.8509803921568627)";
+    private ColorPickerMode _mode = ColorPickerMode.HSV;
+    private VekColorOutputFormats _outputFormat = VekColorOutputFormats.RGBA;
+
+    private readonly IEnumerable<VekColor> _presetSwatches =
+    [
+        "#2563EB",
+        "#0EA5E9",
+        "#10B981",
+        "#F59E0B",
+        "#EF4444",
+        "#8B5CF6",
+        "#EC4899",
+        "#0F172A"
+    ];
+
+    private void SyncTextFormat()
+    {
+        if (_selectedColor is not null)
+        {
+            _colorText = _selectedColor.ToString(_outputFormat);
+        }
+    }
+}

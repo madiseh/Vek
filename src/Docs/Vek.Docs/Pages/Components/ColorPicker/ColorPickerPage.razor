@@ -33,10 +33,19 @@
 
         <DocsPageSection>
             <SectionHeader Title="Color Picker Mode">
-                <Description>You can set the default mode of the color picker with the <CodeInline>ColorPickerMode</CodeInline> property. Combine this with <CodeInline>ShowModeSwitch="false"</CodeInline> to force a specific color mode.</Description>
+                <Description>You can set the default mode of the color picker with the <CodeInline>ColorPickerMode</CodeInline> property (<CodeInline>RGB</CodeInline>, <CodeInline>HSL</CodeInline>, <CodeInline>HEX</CodeInline>, or <CodeInline>HSV</CodeInline>). Combine this with <CodeInline>ShowModeSwitch="false"</CodeInline> to force a specific color mode.</Description>
             </SectionHeader>
             <SectionContent Code="@nameof(ColorPickerColorModeExample)">
                 <ColorPickerColorModeExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
+            <SectionHeader Title="Spectrum, HSV, and Preset Swatches">
+                <Description>Combine the 2D saturation/brightness spectrum canvas, alpha slider, <CodeInline>HSV</CodeInline> channel mode, <CodeInline>OutputFormat</CodeInline> string binding (<CodeInline>#RRGGBB</CodeInline> or <CodeInline>rgba(...)</CodeInline>), and inline <CodeInline>ShowSwatches</CodeInline> presets.</Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(ColorPickerSpectrumHsvSwatchesExample)">
+                <ColorPickerSpectrumHsvSwatchesExample />
             </SectionContent>
         </DocsPageSection>
 

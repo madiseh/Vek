@@ -7,11 +7,11 @@ using AwesomeAssertions;
 using Bunit;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using Vek.Extensions;
 using Vek.Resources;
 using Vek.UnitTests.TestComponents.ColorPicker;
 using Vek.Utilities;
-using NUnit.Framework;
 
 namespace Vek.UnitTests.Components
 {
@@ -156,7 +156,7 @@ namespace Vek.UnitTests.Components
         /// </summary>
         private static void AssertDisplayedChannelValuesCore(IHtmlInputElement[] castedInputs, VekColor expectedColor, ColorPickerMode mode)
         {
-            if (mode is ColorPickerMode.RGB or ColorPickerMode.HSL)
+            if (mode is ColorPickerMode.RGB or ColorPickerMode.HSL or ColorPickerMode.HSV)
             {
                 if (mode == ColorPickerMode.RGB)
                 {
@@ -165,11 +165,19 @@ namespace Vek.UnitTests.Components
                     castedInputs[2].Value.Should().Be(expectedColor.B.ToString());
                     castedInputs[3].Value.Should().Be(expectedColor.APercentage.ToString(CultureInfo.CurrentUICulture));
                 }
-                else
+                else if (mode == ColorPickerMode.HSL)
                 {
                     castedInputs[0].Value.Should().Be(expectedColor.H.ToString(CultureInfo.CurrentUICulture));
                     castedInputs[1].Value.Should().Be(expectedColor.S.ToString(CultureInfo.CurrentUICulture));
                     castedInputs[2].Value.Should().Be(expectedColor.L.ToString(CultureInfo.CurrentUICulture));
+                    castedInputs[3].Value.Should().Match(x => double.Parse(x, CultureInfo.CurrentUICulture) == Math.Round(expectedColor.A / 255.0, 2));
+                }
+                else
+                {
+                    var (hsvH, hsvS, hsvV) = expectedColor.ToHsv();
+                    castedInputs[0].Value.Should().Be(hsvH.ToString(CultureInfo.CurrentUICulture));
+                    castedInputs[1].Value.Should().Be(hsvS.ToString(CultureInfo.CurrentUICulture));
+                    castedInputs[2].Value.Should().Be(hsvV.ToString(CultureInfo.CurrentUICulture));
                     castedInputs[3].Value.Should().Match(x => double.Parse(x, CultureInfo.CurrentUICulture) == Math.Round(expectedColor.A / 255.0, 2));
                 }
 
@@ -791,6 +799,10 @@ namespace Vek.UnitTests.Components
             //click again to switch to hex
             await modeButton.ClickAsync();
             await CheckColorRelatedValues(comp, _defaultXForColorPanel, _defaultYForColorPanel, color, ColorPickerMode.HEX);
+
+            //click again to switch to HSV
+            await modeButton.ClickAsync();
+            await CheckColorRelatedValues(comp, _defaultXForColorPanel, _defaultYForColorPanel, color, ColorPickerMode.HSV);
 
             //click last time to reset to RGB
             await modeButton.ClickAsync();

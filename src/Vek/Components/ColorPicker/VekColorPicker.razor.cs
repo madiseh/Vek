@@ -38,6 +38,7 @@ namespace Vek
         private readonly ParameterState<VekColor?> _valueState;
         private readonly ParameterState<int> _throttleIntervalState;
         private readonly ParameterState<ColorPickerView> _colorPickerViewState;
+        private readonly ParameterState<ColorPickerMode> _colorPickerModeState;
         private int _inputResetKey = 0; // Used to force TextField re-render on invalid input
 
         private readonly IReadOnlyList<VekColor> _gridList = new VekColor[]
@@ -72,9 +73,13 @@ namespace Vek
                 .WithComparer(VekColor.VekColorComparer.RgbaAndHsl);
             _textState = registerScope.RegisterParameter<string?>(nameof(Text))
                 .WithParameter(() => Text)
-                .WithEventCallback(() => TextChanged);
+                .WithEventCallback(() => TextChanged)
+                .WithChangeHandler(OnTextChangeHandlerAsync);
             _colorPickerViewState = registerScope.RegisterParameter<ColorPickerView>(nameof(ColorPickerView))
                 .WithParameter(() => ColorPickerView);
+            _colorPickerModeState = registerScope.RegisterParameter<ColorPickerMode>(nameof(ColorPickerMode))
+                .WithParameter(() => ColorPickerMode)
+                .WithEventCallback(() => ColorPickerModeChanged);
             _alphaState = registerScope.RegisterParameter<bool>(nameof(ShowAlpha))
                 .WithParameter(() => ShowAlpha)
                 .WithChangeHandler(OnAlphaChangeHandlerAsync);
@@ -87,11 +92,44 @@ namespace Vek
         {
             await base.OnInitializedAsync();
 
-            var workingColor = _lastColor = ValueOrDefault; // initialize color picker with Value or default
+            var workingColor = ValueOrDefault;
+            if (_valueState.Value is null && !string.IsNullOrEmpty(_textState.Value) && VekColor.TryParse(_textState.Value, out var textColor))
+            {
+                workingColor = textColor;
+            }
+
+            _lastColor = workingColor; // initialize color picker with Value, parsed Text, or default
             _baseColor = UpdateBaseColor(workingColor);
             var (x, y) = UpdateColorSelectorBasedOnRgb(workingColor);
             _selectorX = x;
             _selectorY = y;
+        }
+
+        private Task OnTextChangeHandlerAsync(ParameterChangedEventArgs<string?> args)
+        {
+            if (_valueState.Value is not null)
+            {
+                return Task.CompletedTask;
+            }
+
+            if (VekColor.TryParse(args.Value, out var parsedColor))
+            {
+                _lastColor = parsedColor;
+                _baseColor = UpdateBaseColor(parsedColor);
+                var (x, y) = UpdateColorSelectorBasedOnRgb(parsedColor);
+                _selectorX = x;
+                _selectorY = y;
+            }
+            else if (string.IsNullOrEmpty(args.Value))
+            {
+                _lastColor = null;
+                _baseColor = UpdateBaseColor(_defaultColor);
+                var (x, y) = UpdateColorSelectorBasedOnRgb(_defaultColor);
+                _selectorX = x;
+                _selectorY = y;
+            }
+
+            return Task.CompletedTask;
         }
 
         private Task OnValueChangeHandlerAsync(ParameterChangedEventArgs<VekColor?> args)
@@ -203,11 +241,37 @@ namespace Vek
         /// The initial color channels shown.
         /// </summary>
         /// <remarks>
-        /// Defaults to <see cref="ColorPickerMode.RGB"/>.  Other values are <see cref="ColorPickerMode.HEX"/> for hexadecimal values and <see cref="ColorPickerMode.HSL"/> for hue/saturation/lightness mode.
+        /// Defaults to <see cref="ColorPickerMode.RGB"/>.  Other values are <see cref="ColorPickerMode.HEX"/> for hexadecimal values, <see cref="ColorPickerMode.HSL"/> for hue/saturation/lightness mode, and <see cref="ColorPickerMode.HSV"/> for hue/saturation/value mode.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.FormComponent.PickerBehavior)]
+        public ColorPickerMode ColorPickerMode { get; set; } = ColorPickerMode.RGB;
+
+        /// <summary>
+        /// Occurs when the <see cref="ColorPickerMode"/> property has changed.
+        /// </summary>
+        [Parameter]
+        public EventCallback<ColorPickerMode> ColorPickerModeChanged { get; set; }
+
+        /// <summary>
+        /// Displays preset color swatches from <see cref="Palette"/> inline below the controls.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>.
         /// </remarks>
         [Parameter]
         [Category(CategoryTypes.FormComponent.PickerBehavior)]
-        public ColorPickerMode ColorPickerMode { get; set; } = ColorPickerMode.RGB;
+        public bool ShowSwatches { get; set; }
+
+        /// <summary>
+        /// Overrides the string format used for <see cref="Text"/>.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>null</c>, which uses <see cref="VekColorOutputFormats.HexA"/> when <see cref="ShowAlpha"/> is <c>true</c> in spectrum or grid views and <see cref="VekColorOutputFormats.Hex"/> otherwise.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Data)]
+        public VekColorOutputFormats? OutputFormat { get; set; }
 
         /// <summary>
         /// The initial view.
@@ -379,18 +443,26 @@ namespace Vek
         }
 
         /// <summary>
-        /// Refreshes the current color change mode.
+        /// Cycles to the next color channel input mode.
         /// </summary>
-        public void ChangeMode()
+        public Task ChangeModeAsync()
         {
-            ColorPickerMode = ColorPickerMode switch
+            var nextMode = _colorPickerModeState.Value switch
             {
                 ColorPickerMode.RGB => ColorPickerMode.HSL,
                 ColorPickerMode.HSL => ColorPickerMode.HEX,
-                ColorPickerMode.HEX => ColorPickerMode.RGB,
+                ColorPickerMode.HEX => ColorPickerMode.HSV,
+                ColorPickerMode.HSV => ColorPickerMode.RGB,
                 _ => ColorPickerMode.RGB,
             };
+
+            return _colorPickerModeState.SetValueAsync(nextMode);
         }
+
+        /// <summary>
+        /// Refreshes the current color change mode.
+        /// </summary>
+        public void ChangeMode() => ChangeModeAsync().CatchAndLog();
 
         /// <summary>
         /// Changes to the specified color selection view.
@@ -674,11 +746,21 @@ namespace Vek
 
         private double ReadLightness => ValueOrDefault.L;
 
+        private double ReadHsvSaturation => ValueOrDefault.ToHsv().S;
+
+        private double ReadHsvValue => ValueOrDefault.ToHsv().V;
+
         private Task SetHueAsync(double value) => SetColorAsync(ValueOrDefault.SetH(value));
 
         private Task SetSaturationAsync(double value) => SetColorAsync(ValueOrDefault.SetS(value));
 
         private Task SetLightnessAsync(double value) => SetColorAsync(ValueOrDefault.SetL(value));
+
+        private Task SetHsvHueAsync(double value) => SetColorAsync(VekColor.FromHsv(value, ReadHsvSaturation, ReadHsvValue, ValueOrDefault.A));
+
+        private Task SetHsvSaturationAsync(double value) => SetColorAsync(ValueOrDefault.SetHsvS(value));
+
+        private Task SetHsvValueAsync(double value) => SetColorAsync(ValueOrDefault.SetHsvV(value));
 
         /// <summary>
         /// Sets the selected color to the specified value.
@@ -708,9 +790,22 @@ namespace Vek
 
         private string GetSelectorLocation() => $"translate({Math.Round(_selectorX, 2).ToString(CultureInfo.InvariantCulture)}px, {Math.Round(_selectorY, 2).ToString(CultureInfo.InvariantCulture)}px);";
 
-        private string? GetColorTextValue(VekColor? color) => !_alphaState.Value || _colorPickerViewState.Value is ColorPickerView.Palette or ColorPickerView.GridCompact
-            ? color?.ToString(VekColorOutputFormats.Hex)
-            : color?.ToString(VekColorOutputFormats.HexA);
+        private string? GetColorTextValue(VekColor? color)
+        {
+            if (color is null)
+            {
+                return null;
+            }
+
+            if (OutputFormat is { } outputFormat)
+            {
+                return color.ToString(outputFormat);
+            }
+
+            return !_alphaState.Value || _colorPickerViewState.Value is ColorPickerView.Palette or ColorPickerView.GridCompact
+                ? color.ToString(VekColorOutputFormats.Hex)
+                : color.ToString(VekColorOutputFormats.HexA);
+        }
 
         private int GetHexColorInputMaxLength() => !_alphaState.Value ? 7 : 9;
 
@@ -719,6 +814,66 @@ namespace Vek
         private bool IsAnyControlVisible() => ShowPreview || ShowSliders || ShowInputs;
 
         private EventCallback<MouseEventArgs> GetSelectPaletteColorCallback(VekColor color) => new EventCallbackFactory().Create(this, (MouseEventArgs _) => SelectPaletteColorAsync(color));
+
+        private EventCallback<KeyboardEventArgs> GetSelectPaletteColorKeyDownCallback(VekColor color)
+            => EventCallback.Factory.Create<KeyboardEventArgs>(this, e => IsActivationKey(e) ? SelectPaletteColorAsync(color) : Task.CompletedTask);
+
+        private void OnToggleCollectionKeyDown(KeyboardEventArgs e)
+        {
+            if (IsActivationKey(e))
+            {
+                ToggleCollection();
+            }
+        }
+
+        private static bool IsActivationKey(KeyboardEventArgs e) => e.Key is "Enter" or " " or "Spacebar";
+
+        private bool IsSelectedColor(VekColor color) => color == _valueState.Value;
+
+        private int GetSpectrumBrightnessPercent() => (int)Math.Round((1.0 - (_selectorY / MaxY)) * 100.0);
+
+        private string GetSpectrumAriaValueText()
+        {
+            var saturationPercent = (int)Math.Round(_selectorX / MaxX * 100.0);
+            var brightnessPercent = GetSpectrumBrightnessPercent();
+            return string.Create(CultureInfo.InvariantCulture, $"Saturation {saturationPercent}%, Brightness {brightnessPercent}%, {ValueOrDefault.ToString(VekColorOutputFormats.HexA)}");
+        }
+
+        private async Task OnSpectrumKeyDownAsync(KeyboardEventArgs e)
+        {
+            var step = e.ShiftKey ? 0.1 : 0.01;
+            var handled = true;
+
+            switch (e.Key)
+            {
+                case "ArrowRight":
+                    _selectorX = (_selectorX + (MaxX * step)).EnsureRange(MaxX);
+                    break;
+                case "ArrowLeft":
+                    _selectorX = (_selectorX - (MaxX * step)).EnsureRange(MaxX);
+                    break;
+                case "ArrowUp":
+                    _selectorY = (_selectorY - (MaxY * step)).EnsureRange(MaxY);
+                    break;
+                case "ArrowDown":
+                    _selectorY = (_selectorY + (MaxY * step)).EnsureRange(MaxY);
+                    break;
+                case "Home":
+                    _selectorX = 0;
+                    break;
+                case "End":
+                    _selectorX = MaxX;
+                    break;
+                default:
+                    handled = false;
+                    break;
+            }
+
+            if (handled)
+            {
+                await UpdateColorBaseOnSelectionAsync();
+            }
+        }
 
         private Color GetButtonColor(ColorPickerView view) => _colorPickerViewState.Value == view ? Color.Primary : Color.Inherit;
 

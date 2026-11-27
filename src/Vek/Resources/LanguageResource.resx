@@ -303,6 +303,12 @@
   <data name="VekColorPicker_ModeSwitch" xml:space="preserve">
     <value>Switch mode</value>
   </data>
+  <data name="VekColorPicker_SpectrumCanvas" xml:space="preserve">
+    <value>Color spectrum</value>
+  </data>
+  <data name="VekColorPicker_Swatches" xml:space="preserve">
+    <value>Preset color swatches</value>
+  </data>
   <data name="VekBaseDatePicker_PrevYear" xml:space="preserve">
     <value>Previous year {0}</value>
   </data>

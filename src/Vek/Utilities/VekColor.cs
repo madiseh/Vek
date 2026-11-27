@@ -302,6 +302,95 @@ namespace Vek.Utilities
         public VekColor SetAlpha(double a) => new(R, G, B, a);
 
         /// <summary>
+        /// Converts this color to Hue, Saturation, and Value (HSV) components.
+        /// </summary>
+        /// <returns>A tuple containing Hue (<c>0</c> to <c>360</c>), HSV Saturation (<c>0.0</c> to <c>1.0</c>), and Value/Brightness (<c>0.0</c> to <c>1.0</c>).</returns>
+        public (double H, double S, double V) ToHsv()
+        {
+            var r = R / 255.0;
+            var g = G / 255.0;
+            var b = B / 255.0;
+            var max = Math.Max(r, Math.Max(g, b));
+            var min = Math.Min(r, Math.Min(g, b));
+            var delta = max - min;
+            var s = max < Epsilon ? 0.0 : delta / max;
+            var h = delta < Epsilon ? _hsl.H : H;
+
+            return (Math.Round(h.EnsureRange(360), 0), Math.Round(s.EnsureRange(1), 2), Math.Round(max.EnsureRange(1), 2));
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="VekColor"/> from Hue, Saturation, Value (HSV), and alpha byte components.
+        /// </summary>
+        /// <param name="h">The hue component value (<c>0</c> to <c>360</c>).</param>
+        /// <param name="s">The HSV saturation component value (<c>0.0</c> to <c>1.0</c>).</param>
+        /// <param name="v">The HSV value/brightness component value (<c>0.0</c> to <c>1.0</c>).</param>
+        /// <param name="a">The alpha component value (<c>0</c> to <c>255</c>).</param>
+        /// <returns>A new <see cref="VekColor"/> instance representing the HSV color.</returns>
+        public static VekColor FromHsv(double h, double s, double v, byte a = 255)
+        {
+            var clampedH = Math.Round(h.EnsureRange(360), 0);
+            var clampedS = s.EnsureRange(1);
+            var clampedV = v.EnsureRange(1);
+
+            var normalizedH = clampedH >= 360 ? 0 : clampedH;
+            var c = clampedV * clampedS;
+            var x = c * (1.0 - Math.Abs((normalizedH / 60.0 % 2.0) - 1.0));
+            var m = clampedV - c;
+
+            var (rPrime, gPrime, bPrime) = normalizedH switch
+            {
+                < 60 => (c, x, 0.0),
+                < 120 => (x, c, 0.0),
+                < 180 => (0.0, c, x),
+                < 240 => (0.0, x, c),
+                < 300 => (x, 0.0, c),
+                _ => (c, 0.0, x)
+            };
+
+            var r = ((int)Math.Round((rPrime + m) * 255.0)).EnsureRangeToByte();
+            var g = ((int)Math.Round((gPrime + m) * 255.0)).EnsureRangeToByte();
+            var b = ((int)Math.Round((bPrime + m) * 255.0)).EnsureRangeToByte();
+
+            // Preserve the requested hue when saturation or value collapses the RGB channels to grayscale.
+            var hueCarrier = new VekColor(clampedH, 1.0, 0.5, a);
+            return new VekColor(r, g, b, hueCarrier);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="VekColor"/> from Hue, Saturation, Value (HSV), and alpha percentage components.
+        /// </summary>
+        /// <param name="h">The hue component value (<c>0</c> to <c>360</c>).</param>
+        /// <param name="s">The HSV saturation component value (<c>0.0</c> to <c>1.0</c>).</param>
+        /// <param name="v">The HSV value/brightness component value (<c>0.0</c> to <c>1.0</c>).</param>
+        /// <param name="alpha">The alpha component value (<c>0.0</c> to <c>1.0</c>).</param>
+        /// <returns>A new <see cref="VekColor"/> instance representing the HSV color.</returns>
+        public static VekColor FromHsv(double h, double s, double v, double alpha)
+            => FromHsv(h, s, v, (byte)(alpha * 255.0).EnsureRange(255));
+
+        /// <summary>
+        /// Creates a new <see cref="VekColor"/> instance with the specified HSV saturation value while keeping hue, HSV value, and alpha unchanged.
+        /// </summary>
+        /// <param name="s">The HSV saturation component value (<c>0.0</c> to <c>1.0</c>).</param>
+        /// <returns>A new <see cref="VekColor"/> instance with the adjusted HSV saturation.</returns>
+        public VekColor SetHsvS(double s)
+        {
+            var (_, _, v) = ToHsv();
+            return FromHsv(H, s, v, A);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="VekColor"/> instance with the specified HSV value/brightness while keeping hue, HSV saturation, and alpha unchanged.
+        /// </summary>
+        /// <param name="v">The HSV value/brightness component value (<c>0.0</c> to <c>1.0</c>).</param>
+        /// <returns>A new <see cref="VekColor"/> instance with the adjusted HSV value.</returns>
+        public VekColor SetHsvV(double v)
+        {
+            var (_, s, _) = ToHsv();
+            return FromHsv(H, s, v, A);
+        }
+
+        /// <summary>
         /// Creates a new <see cref="VekColor"/> instance by adjusting the lightness component value by the specified amount.
         /// </summary>
         /// <param name="amount">The amount to adjust the lightness by (-1.0 to 1.0).</param>
@@ -669,8 +758,40 @@ namespace Vek.Utilities
             {
                 _ when value.StartsWith("rgba") => ParseStringRgbaToRgba(value),
                 _ when value.StartsWith("rgb") => ParseStringRgbToRgba(value),
+                _ when value.StartsWith("hsva") => ParseStringHsvToRgba(value, hasAlpha: true),
+                _ when value.StartsWith("hsv") => ParseStringHsvToRgba(value, hasAlpha: false),
                 _ => ParseStringHexToRgba(value),
             };
+        }
+
+        private static RGBA ParseStringHsvToRgba(string value, bool hasAlpha)
+        {
+            var parts = SplitInputIntoParts(value);
+            var expectedParts = hasAlpha ? 4 : 3;
+            if (parts.Length != expectedParts)
+            {
+                throw new ArgumentException("Invalid color format.");
+            }
+
+            var h = double.Parse(parts[0], CultureInfo.InvariantCulture);
+            var s = ParseNormalizedFractionOrPercent(parts[1]);
+            var v = ParseNormalizedFractionOrPercent(parts[2]);
+            var a = hasAlpha
+                ? (byte)Math.Max(0, Math.Min(255, 255 * double.Parse(parts[3], CultureInfo.InvariantCulture)))
+                : byte.MaxValue;
+
+            var color = FromHsv(h, s, v, a);
+            return new RGBA(color.R, color.G, color.B, color.A);
+        }
+
+        private static double ParseNormalizedFractionOrPercent(string raw)
+        {
+            if (raw.EndsWith('%'))
+            {
+                return double.Parse(raw[..^1], CultureInfo.InvariantCulture) / 100.0;
+            }
+
+            return double.Parse(raw, CultureInfo.InvariantCulture);
         }
 
         private static RGBA ParseStringRgbaToRgba(string value)
