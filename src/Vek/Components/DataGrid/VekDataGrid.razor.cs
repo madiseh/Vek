@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.JSInterop;
+using Collections = System.Collections;
 using Vek.Components.DataGrid.Export;
 using Vek.Components.Highlighter;
 using Vek.State;
@@ -5386,7 +5387,7 @@ namespace Vek
 
             public IEnumerator<TElement> GetEnumerator() => Enumerable.Empty<TElement>().GetEnumerator();
 
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+            Collections.IEnumerator Collections.IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
         internal record GroupKey(string? Title, object? ItemsKey);

@@ -2,6 +2,7 @@
 // Vek licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -470,7 +471,7 @@ namespace Vek
             }
 
             // A collection value (e.g. a multi-file VekFileUpload bound to an empty list) only counts as a value when it holds at least one element.
-            if (value is System.Collections.IEnumerable enumerable)
+            if (value is IEnumerable enumerable)
             {
                 return enumerable.Cast<object?>().Any();
             }

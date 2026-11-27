@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Diagnostics;
+using System.Text;
 using System.Text.RegularExpressions;
 using Vek.Utilities;
 
@@ -308,7 +309,7 @@ public class PatternMask : BaseMask
         if (string.IsNullOrEmpty(Mask) || PromptChar is null)
             return string.Empty;
 
-        var result = new System.Text.StringBuilder(Mask.Length);
+        var result = new StringBuilder(Mask.Length);
         foreach (var c in Mask)
         {
             if (IsDelimiter(c))

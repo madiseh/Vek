@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using Collections = System.Collections;
 using Vek.Utilities.Expressions;
 
 namespace Vek
@@ -144,7 +145,7 @@ namespace Vek
 
         private Task ApplyHeaderFilterAsync(IFilterDefinition<T> definition)
         {
-            if (definition.Value is not System.Collections.IEnumerable selected || definition.Value is string)
+            if (definition.Value is not Collections.IEnumerable selected || definition.Value is string)
             {
                 definition.Value = null;
                 if (definition is FilterDefinition<T> emptyDefinition)

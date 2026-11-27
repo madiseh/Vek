@@ -37,6 +37,7 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="5.9.0" Condition="('$(MSBuildProjectName)' == 'Vek.UnitTests.Analyzers')" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(VekRoslynShippedVersion)" Condition="('$(MSBuildProjectName)' == 'Vek.Analyzers')" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" Condition="('$(MSBuildProjectName)' == 'Vek.Analyzers.TestComponents')" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" Condition="('$(MSBuildProjectName)' == 'Vek.ArchitectureTests')" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.4" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="1.1.4" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(VekRoslynShippedVersion)" Condition="('$(MSBuildProjectName)' == 'Vek.Analyzers.CodeFixes')" />
