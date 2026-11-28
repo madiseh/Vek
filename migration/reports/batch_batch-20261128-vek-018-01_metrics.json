@@ -2,13 +2,13 @@
   "batch_id": "batch-20261128-vek-018-01",
   "milestone": "",
   "created_at": "2026-11-27T23:09:29Z",
-  "updated_at": "2026-11-28T06:59:16Z",
+  "updated_at": "2026-11-28T07:01:38Z",
   "features": {
     "018": {
       "feature_id": "018",
-      "title": "",
-      "pr_url": null,
-      "status": "in_progress",
+      "title": "feat(datagrid): horizontal Column Virtualization for Ultra-Wide Grids",
+      "pr_url": "https://github.com/madiseh/Vek/pull/186",
+      "status": "completed",
       "phases": {
         "implementation": {
           "start_time": "2026-11-27T23:09:29Z",
@@ -39,6 +39,15 @@
           "end_time": "2026-11-27T23:55:32Z",
           "duration_seconds": 29.0,
           "notes": "Pushed feature branch origin/feature/migration-018-datagrid-column-virtualization"
+        },
+        "pr_opening_and_metadata": {
+          "start_time": "2026-11-28T07:01:15Z",
+          "end_time": "2026-11-28T07:01:38Z",
+          "duration_seconds": 23.0,
+          "notes": null
+        },
+        "ci_wait": {
+          "start_time": "2026-11-28T07:01:38Z"
         }
       }
     }
