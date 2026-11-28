@@ -1,0 +1,64 @@
+{
+  "batch_id": "migration-2026-11-28-017",
+  "milestone": "v1.5.0",
+  "created_at": "2026-11-27T22:25:50Z",
+  "updated_at": "2026-11-27T23:23:45Z",
+  "features": {
+    "017": {
+      "feature_id": "017",
+      "title": "feat(datagrid): add detail row auto-collapse controls",
+      "pr_url": "https://github.com/madiseh/Vek/pull/183",
+      "status": "completed",
+      "phases": {
+        "implementation": {
+          "start_time": "2026-11-27T22:25:50Z",
+          "end_time": "2026-11-27T22:33:27Z",
+          "duration_seconds": 457.0,
+          "notes": "Core manager, public API, and interactive docs example drafted"
+        },
+        "tests_and_builds": {
+          "start_time": "2026-11-27T22:33:28Z",
+          "end_time": "2026-11-27T22:55:42Z",
+          "duration_seconds": 1334.0,
+          "notes": "563 DataGrid tests passed after scoped restore"
+        },
+        "documentation_and_screenshot": {
+          "start_time": "2026-11-27T22:33:28Z",
+          "end_time": "2026-11-27T22:55:43Z",
+          "duration_seconds": 1335.0,
+          "notes": "Docs host built; 1440x900 default and auto-collapse states captured and inspected"
+        },
+        "formatting_and_review": {
+          "start_time": "2026-11-27T22:55:43Z",
+          "end_time": "2026-11-27T23:23:40Z",
+          "duration_seconds": 1677.0,
+          "notes": "Review-finalize clean; rebased branch gate passed"
+        },
+        "claim_worktree_setup": {
+          "start_time": "2026-11-27T22:24:21Z",
+          "end_time": "2026-11-27T22:25:50Z",
+          "duration_seconds": 89.0,
+          "notes": "Claim created and deterministic worktree setup completed before implementation"
+        },
+        "commit_and_push": {
+          "start_time": "2026-11-27T23:22:56Z",
+          "end_time": "2026-11-27T23:23:41Z",
+          "duration_seconds": 45.0,
+          "notes": "Feature commit rebased onto origin/master and pushed by PR finalizer"
+        },
+        "pr_opening_and_metadata": {
+          "start_time": "2026-11-27T23:23:14Z",
+          "end_time": "2026-11-27T23:23:42Z",
+          "duration_seconds": 28.0,
+          "notes": "PR 183 opened, milestone v1.5.0 attached, title corrected"
+        },
+        "ci_wait": {
+          "start_time": "2026-11-27T23:19:10Z",
+          "end_time": "2026-11-27T23:29:45Z",
+          "duration_seconds": 635.0,
+          "notes": "CI format-check and all build/test jobs passed after metadata push; PR remained ready"
+        }
+      }
+    }
+  }
+}
