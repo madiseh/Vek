@@ -91,7 +91,7 @@
                                role="@(IsAriaGrid ? "grid" : null)"
                                aria-multiselectable="@(_selectionModeState.Value == DataGridSelectionMode.CellRange || (_keyboardNavigationEnabledState.Value && MultiSelection) ? "true" : null)"
                                aria-activedescendant="@ActiveCellId"
-                               tabindex="@(!_keyboardNavigationEnabledState.Value && (_focusedRowEnabledState.Value || _selectionModeState.Value == DataGridSelectionMode.CellRange) ? 0 : null)"
+                               tabindex="@(!_keyboardNavigationEnabledState.Value && (_focusedRowEnabledState.Value || _selectionModeState.Value == DataGridSelectionMode.CellRange || _clipboardCopyEnabledState.Value) ? 0 : null)"
                                @onkeydown="this.AsNonRenderingEventHandler<KeyboardEventArgs>(OnKeyDownAsync)">
                             @if (ColGroup != null)
                             {

@@ -1,0 +1,72 @@
+@namespace Vek.Docs.Examples
+
+<div class="d-flex flex-column gap-3">
+    <div class="d-flex align-center gap-2">
+        <VekSwitch @bind-Value="_includeHeaders" Color="Color.Primary" Label="Include Headers" />
+        <VekSelect T="DataGridClipboardFormat" @bind-Value="_format" Label="Format" Dense="true" Margin="Margin.Dense" Style="width: 140px;">
+            <VekSelectItem Value="DataGridClipboardFormat.Tsv">TSV (Excel/Sheets)</VekSelectItem>
+            <VekSelectItem Value="DataGridClipboardFormat.Csv">CSV</VekSelectItem>
+        </VekSelect>
+        <VekButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ContentCopy" OnClick="CopyManuallyAsync">
+            Copy Selection
+        </VekButton>
+    </div>
+
+    <VekDataGrid @ref="_grid" T="QuarterlySales" Items="Sales" SelectionMode="DataGridSelectionMode.CellRange"
+                 @bind-SelectedCellRange="_selectedCellRange"
+                 ClipboardCopyEnabled="true"
+                 ClipboardOptions="_clipboardOptions">
+        <Columns>
+            <PropertyColumn Property="item => item.Team" Title="Team" />
+            <PropertyColumn Property="item => item.January" Title="January" />
+            <PropertyColumn Property="item => item.February" Title="February" />
+            <PropertyColumn Property="item => item.March" Title="March" />
+        </Columns>
+    </VekDataGrid>
+
+    @if (!string.IsNullOrEmpty(_lastCopiedPreview))
+    {
+        <VekAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mt-2">
+            <div><strong>Copied to clipboard:</strong></div>
+            <pre class="mt-1" style="font-size: 0.85rem; max-height: 120px; overflow-y: auto;">@_lastCopiedPreview</pre>
+        </VekAlert>
+    }
+
+    <VekText Typo="Typo.body2" Class="mt-1">
+        Select cells with click-drag or <CodeInline>Shift</CodeInline> + arrow keys, then press <CodeInline>Ctrl+C</CodeInline> (<CodeInline>Cmd+C</CodeInline> on Mac) to copy in TSV format directly into spreadsheet applications.
+    </VekText>
+</div>
+
+@code {
+#nullable enable
+    private VekDataGrid<QuarterlySales>? _grid;
+    private bool _includeHeaders = true;
+    private DataGridClipboardFormat _format = DataGridClipboardFormat.Tsv;
+    private string? _lastCopiedPreview;
+    private DataGridCellRange? _selectedCellRange;
+
+    private DataGridClipboardOptions _clipboardOptions => new()
+    {
+        IncludeHeaders = _includeHeaders,
+        Format = _format
+    };
+
+    private async Task CopyManuallyAsync()
+    {
+        if (_grid is not null)
+        {
+            _lastCopiedPreview = await _grid.CopyToClipboardAsync(_clipboardOptions);
+        }
+    }
+
+    private readonly List<QuarterlySales> Sales =
+    [
+        new("North", 1250, 1480, 1375),
+        new("Central", 980, 1120, 1260),
+        new("South", 1540, 1390, 1610),
+        new("West", 1180, 1325, 1450)
+    ];
+
+    private sealed record QuarterlySales(string Team, int January, int February, int March);
+#nullable restore
+}
