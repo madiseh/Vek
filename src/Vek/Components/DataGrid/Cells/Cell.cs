@@ -14,6 +14,7 @@ namespace Vek
         private readonly VekDataGrid<T> _dataGrid;
         private readonly Column<T> _column;
         private readonly T _sourceItem;
+        private readonly bool _isNewRow;
         private CellContext<T>? _cellContext;
         private object? _computedValue;
         private bool _hasComputedValue;
@@ -97,12 +98,13 @@ namespace Vek
 
         #endregion
 
-        public Cell(VekDataGrid<T> dataGrid, Column<T> column, T item, T sourceItem)
+        public Cell(VekDataGrid<T> dataGrid, Column<T> column, T item, T sourceItem, bool isNewRow = false)
         {
             _dataGrid = dataGrid;
             _column = column;
             _item = item;
             _sourceItem = sourceItem;
+            _isNewRow = isNewRow;
 
             OnStartedEditingItem();
         }
@@ -110,26 +112,26 @@ namespace Vek
         public async Task StringValueChangedAsync(string? value)
         {
             // In cell edit mode, raise StartedEditingItem before the value is written so consumers can snapshot the pre-edit item, then commit the change immediately.
-            if (_dataGrid.EditMode == DataGridEditMode.Cell)
+            if (!_isNewRow && _dataGrid.EditMode == DataGridEditMode.Cell)
                 await _dataGrid.BeginCellEditAsync(_item);
 
             _column.SetProperty(_item, value);
             _hasComputedValue = false;
 
-            if (_dataGrid.EditMode == DataGridEditMode.Cell)
+            if (!_isNewRow && _dataGrid.EditMode == DataGridEditMode.Cell)
                 await _dataGrid.CommitItemChangesAsync(_item);
         }
 
         public async Task NumberValueChangedAsync(double? value)
         {
             // In cell edit mode, raise StartedEditingItem before the value is written so consumers can snapshot the pre-edit item, then commit the change immediately.
-            if (_dataGrid.EditMode == DataGridEditMode.Cell)
+            if (!_isNewRow && _dataGrid.EditMode == DataGridEditMode.Cell)
                 await _dataGrid.BeginCellEditAsync(_item);
 
             _column.SetProperty(_item, value);
             _hasComputedValue = false;
 
-            if (_dataGrid.EditMode == DataGridEditMode.Cell)
+            if (!_isNewRow && _dataGrid.EditMode == DataGridEditMode.Cell)
                 await _dataGrid.CommitItemChangesAsync(_item);
         }
 

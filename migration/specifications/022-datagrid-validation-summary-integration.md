@@ -4,7 +4,7 @@
 - **Feature ID**: 022
 - **Feature Slug**: datagrid-validation-summary-integration
 - **Module**: DataGrid
-- **Status**: Backlog
+- **Status**: Ready
 - **Priority**: 22
 - **Dependencies**: ["019"]
 

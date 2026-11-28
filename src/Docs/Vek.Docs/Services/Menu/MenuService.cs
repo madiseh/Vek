@@ -83,6 +83,7 @@ namespace Vek.Docs.Services
                 .AddItem("Filtering", typeof(VekDataGrid<T>), "datagrid/filtering")
                 .AddItem("Grouping", typeof(VekDataGrid<T>), "datagrid/grouping")
                 .AddItem("Editing", typeof(VekDataGrid<T>), "datagrid/editing")
+                .AddItem("Inline New Row", typeof(VekDataGrid<T>), "datagrid/new-row")
                 .AddItem("Selection", typeof(VekDataGrid<T>), "datagrid/selection")
                 .AddItem("Detail Row", typeof(VekDataGrid<T>), "datagrid/detail-row")
                 .AddItem("Columns & Layout", typeof(VekDataGrid<T>), "datagrid/columns")

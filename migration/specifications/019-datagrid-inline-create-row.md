@@ -4,9 +4,12 @@
 - **Feature ID**: 019
 - **Feature Slug**: datagrid-inline-create-row
 - **Module**: DataGrid
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 19
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/184
+- **Started At**: 2026-11-27T23:06:19Z
+- **Completed At**: 2026-11-28T06:48:52Z
 
 ---
 

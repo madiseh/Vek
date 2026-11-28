@@ -1,0 +1,69 @@
+@namespace Vek.Docs.Examples
+
+<VekStack Spacing="3">
+    <VekStack Row Spacing="2">
+        <VekButton OnClick="@(() => StartNewRowAsync(NewRowPosition.Top))">Add at top</VekButton>
+        <VekButton OnClick="@(() => StartNewRowAsync(NewRowPosition.Bottom))">Add at bottom</VekButton>
+    </VekStack>
+    <VekDataGrid @ref="_grid"
+                 T="Person"
+                 Items="@_people"
+                 ReadOnly="false"
+                 NewRowPosition="@_position"
+                 NewItemFactory="@CreatePerson"
+                 OnRowCreating="@PreparePerson"
+                 OnRowCreated="@AddPerson"
+                 Bordered="true"
+                 Hover="true">
+        <Columns>
+            <PropertyColumn Property="person => person.Name" Title="Name" />
+            <PropertyColumn Property="person => person.Role" Title="Role" />
+        </Columns>
+    </VekDataGrid>
+    @if (_message is not null)
+    {
+        <VekText Typo="Typo.body2">@_message</VekText>
+    }
+</VekStack>
+
+@code {
+#nullable enable
+
+    private VekDataGrid<Person> _grid = default!;
+    private readonly List<Person> _people =
+    [
+        new() { Name = "Avery Chen", Role = "Designer" },
+        new() { Name = "Sam Rivera", Role = "Engineer" },
+    ];
+    private NewRowPosition _position = NewRowPosition.Top;
+    private string? _message;
+
+    private async Task StartNewRowAsync(NewRowPosition position)
+    {
+        _position = position;
+        await InvokeAsync(StateHasChanged);
+        await _grid.StartNewRowAsync();
+    }
+
+    private static Person CreatePerson() => new();
+
+    private Task PreparePerson(Person person)
+    {
+        person.Role = "New teammate";
+        _message = "Complete the new row, then choose Create or Cancel.";
+        return Task.CompletedTask;
+    }
+
+    private Task AddPerson(Person person)
+    {
+        _people.Add(person);
+        _message = $"Added {person.Name}.";
+        return Task.CompletedTask;
+    }
+
+    private sealed class Person
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
+    }
+}
