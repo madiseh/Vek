@@ -243,10 +243,12 @@
       "title": "DataGrid Inline Create Row and Top/Bottom Insertion Mode",
       "module": "DataGrid",
       "priority": 19,
-      "status": "in_progress",
+      "status": "completed",
       "specification": "specifications/019-datagrid-inline-create-row.md",
       "dependencies": [],
-      "started_at": "2026-11-27T23:06:19Z"
+      "started_at": "2026-11-27T23:06:19Z",
+      "completed_at": "2026-11-28T06:48:52Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/184"
     },
     {
       "id": "020",
@@ -279,7 +281,7 @@
       "title": "DataGrid Built-in Edit Row Validation Summary Integration",
       "module": "DataGrid",
       "priority": 22,
-      "status": "backlog",
+      "status": "ready",
       "specification": "specifications/022-datagrid-validation-summary-integration.md",
       "dependencies": [
         "019"
