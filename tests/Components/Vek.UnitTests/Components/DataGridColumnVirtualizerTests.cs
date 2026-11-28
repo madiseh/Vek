@@ -33,6 +33,9 @@ public sealed class DataGridColumnVirtualizerTests : BunitTest
                 .Should().Contain(style => style!.Contains("500px", StringComparison.Ordinal));
         });
 
+        listenerFactory.CreatedSelector.Should().Be($"#{grid.Find(".vek-table-container").GetAttribute("id")}");
+        listenerFactory.CreatedReportRateMs.Should().Be(16);
+
         listenerFactory.Listener.RaiseScroll(new ScrollEventArgs { ClientWidth = 250, ScrollLeft = 300 });
 
         await grid.WaitForAssertionAsync(() =>
@@ -153,9 +156,22 @@ public sealed class DataGridColumnVirtualizerTests : BunitTest
     {
         public TestScrollListener Listener { get; } = new(currentScrollData);
 
-        public IScrollListener Create(string? selector) => Listener;
+        public string? CreatedSelector { get; private set; }
 
-        public IScrollListener Create(string? selector, int reportRateMs) => Listener;
+        public int? CreatedReportRateMs { get; private set; }
+
+        public IScrollListener Create(string? selector)
+        {
+            CreatedSelector = selector;
+            return Listener;
+        }
+
+        public IScrollListener Create(string? selector, int reportRateMs)
+        {
+            CreatedSelector = selector;
+            CreatedReportRateMs = reportRateMs;
+            return Listener;
+        }
     }
 
     private sealed class TestScrollListener(ScrollEventArgs currentScrollData) : IScrollListener
