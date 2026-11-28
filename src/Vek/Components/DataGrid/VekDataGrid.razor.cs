@@ -86,6 +86,8 @@ namespace Vek
         private readonly ParameterState<int> _focusedColumnIndexState;
         private readonly ParameterState<DataGridSelectionMode> _selectionModeState;
         private readonly ParameterState<DataGridCellRange?> _selectedCellRangeState;
+        private readonly ParameterState<bool> _clipboardCopyEnabledState;
+        private readonly ParameterState<DataGridClipboardOptions?> _clipboardOptionsState;
         private readonly ParameterState<bool> _contextMenuEnabledState;
         private readonly ParameterState<bool> _allowRowReorderState;
         private readonly DataGridRowDragManager<T> _rowDragManager = new();
@@ -101,6 +103,11 @@ namespace Vek
         /// Gets the manager responsible for focused row tracking and keyboard navigation.
         /// </summary>
         public DataGridFocusManager<T> FocusManager { get; }
+
+        /// <summary>
+        /// Gets the service responsible for data grid clipboard copy operations.
+        /// </summary>
+        public DataGridClipboardService<T> ClipboardService { get; }
 
         /// <summary>
         /// Gets the handler responsible for WAI-ARIA Grid keyboard navigation, roving tabindex, and keyboard edit/selection lifecycles.
@@ -149,6 +156,7 @@ namespace Vek
             _initialExpansions = new HashSet<T>(Comparer);
             FocusManager = new DataGridFocusManager<T>(this);
             KeyboardHandler = new DataGridAriaKeyboardHandler<T>(this);
+            ClipboardService = new DataGridClipboardService<T>(this);
             using var registerScope = CreateRegisterScope();
             registerScope.RegisterParameter<IEnumerable<T>?>(nameof(Items))
                 .WithParameter(() => Items)
@@ -230,6 +238,12 @@ namespace Vek
                 .WithParameter(() => SelectedCellRange)
                 .WithEventCallback(() => SelectedCellRangeChanged)
                 .WithChangeHandler(OnSelectedCellRangeChangedAsync);
+
+            _clipboardCopyEnabledState = registerScope.RegisterParameter<bool>(nameof(ClipboardCopyEnabled))
+                .WithParameter(() => ClipboardCopyEnabled);
+
+            _clipboardOptionsState = registerScope.RegisterParameter<DataGridClipboardOptions?>(nameof(ClipboardOptions))
+                .WithParameter(() => ClipboardOptions);
 
             _contextMenuEnabledState = registerScope.RegisterParameter<bool>(nameof(ContextMenuEnabled))
                 .WithParameter(() => ContextMenuEnabled);
@@ -1772,6 +1786,26 @@ namespace Vek
         public EventCallback<DataGridCellRange?> SelectedCellRangeChanged { get; set; }
 
         /// <summary>
+        /// Enables native clipboard copy via keyboard shortcuts (Ctrl+C / Cmd+C) and programmatic copy methods.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. When enabled, pressing Ctrl+C or Cmd+C copies selected cells or rows in TSV format.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Selecting)]
+        public bool ClipboardCopyEnabled { get; set; }
+
+        /// <summary>
+        /// Options controlling clipboard copy formatting, delimiters, scope, and header inclusion.
+        /// </summary>
+        /// <remarks>
+        /// When omitted, defaults to TSV format with headers included and automatic scope.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Selecting)]
+        public DataGridClipboardOptions? ClipboardOptions { get; set; }
+
+        /// <summary>
         /// Enables dedicated row focus tracking and keyboard navigation.
         /// </summary>
         /// <remarks>
@@ -2882,6 +2916,12 @@ namespace Vek
 
         internal async Task OnKeyDownAsync(KeyboardEventArgs args)
         {
+            if (_clipboardCopyEnabledState.Value && (args.CtrlKey || args.MetaKey) && string.Equals(args.Key, "c", StringComparison.OrdinalIgnoreCase))
+            {
+                await CopyToClipboardAsync();
+                return;
+            }
+
             if (_selectionModeState.Value == DataGridSelectionMode.CellRange && args.ShiftKey)
             {
                 var rowDelta = args.Key switch
@@ -4306,6 +4346,16 @@ namespace Vek
                 _currentContextMenuArgs = null;
             }
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Copies the currently selected rows or cells to the system clipboard asynchronously.
+        /// </summary>
+        /// <param name="options">Optional options controlling copy scope, headers, and delimiter.</param>
+        /// <returns>The copied text, or <see langword="null"/> if nothing was copied.</returns>
+        public Task<string?> CopyToClipboardAsync(DataGridClipboardOptions? options = null)
+        {
+            return ClipboardService.CopyToClipboardAsync(options);
         }
 
         internal async Task CopyTextToClipboardAsync(string text)

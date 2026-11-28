@@ -320,11 +320,14 @@
       "title": "DataGrid Native Clipboard Copy (Selected Rows/Cells to TSV/CSV)",
       "module": "DataGrid",
       "priority": 26,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/026-datagrid-copy-to-clipboard.md",
       "dependencies": [
         "008"
-      ]
+      ],
+      "started_at": "2026-11-28T06:52:22Z",
+      "completed_at": "2026-11-28T07:13:59Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/187"
     },
     {
       "id": "027",

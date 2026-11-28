@@ -69,6 +69,19 @@
         </DocsPageSection>
 
         <DocsPageSection>
+            <SectionHeader Title="Native Clipboard Copy">
+                <Description>
+                    Set <CodeInline>ClipboardCopyEnabled="true"</CodeInline> to enable native keyboard copy shortcuts (<CodeInline>Ctrl+C</CodeInline> / <CodeInline>Cmd+C</CodeInline>) and programmatic clipboard operations via <CodeInline>CopyToClipboardAsync</CodeInline>.
+                    Copied tabular data is serialized in TSV (Tab-Separated Values) format by default, allowing seamless paste into external spreadsheet applications such as Microsoft Excel and Google Sheets.
+                    Configure <CodeInline>ClipboardOptions</CodeInline> to include or exclude column headers, switch between TSV and CSV formats, or provide custom value formatters.
+                </Description>
+            </SectionHeader>
+            <SectionContent DarkenBackground="true" Code="@nameof(DataGridClipboardCopyExample)" ShowCode="true" Block="true" FullWidth="true">
+                <DataGridClipboardCopyExample />
+            </SectionContent>
+        </DocsPageSection>
+
+        <DocsPageSection>
             <SectionHeader Title="ARIA Grid Keyboard Navigation">
                 <Description>
                     Set <CodeInline>KeyboardNavigationEnabled="true"</CodeInline> to enable full W3C WAI-ARIA Grid keyboard navigation with roving <CodeInline>tabindex</CodeInline> across table cells.
