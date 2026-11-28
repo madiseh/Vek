@@ -233,9 +233,12 @@
       "title": "DataGrid Horizontal Column Virtualization for Ultra-Wide Grids",
       "module": "DataGrid",
       "priority": 18,
-      "status": "ready",
+      "status": "completed",
       "specification": "specifications/018-datagrid-column-virtualization.md",
-      "dependencies": []
+      "dependencies": [],
+      "started_at": "2026-11-27T22:57:19Z",
+      "completed_at": "2026-11-28T07:00:18Z",
+      "pr_url": "https://github.com/madiseh/Vek/pull/186"
     },
     {
       "id": "019",

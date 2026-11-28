@@ -32,13 +32,16 @@ namespace Vek
     /// <seealso cref="VekDataGridPager{T}" />
     /// <seealso cref="VekTable{T}" />
     [CascadingTypeParameter(nameof(T))]
-    public partial class VekDataGrid<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T> : VekComponentBase, IDisposable
+    public partial class VekDataGrid<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T> : VekComponentBase, IDisposable, IAsyncDisposable
     {
         [Inject]
         private IJSRuntime JSRuntime { get; set; } = null!;
 
         [Inject]
         private IScrollManager ScrollManager { get; set; } = null!;
+
+        [Inject]
+        private IScrollListenerFactory ScrollListenerFactory { get; set; } = null!;
 
         private VekForm? _editForm;
         internal int? _rowsPerPage;
@@ -88,6 +91,10 @@ namespace Vek
         private readonly ParameterState<DataGridCellRange?> _selectedCellRangeState;
         private readonly ParameterState<bool> _contextMenuEnabledState;
         private readonly ParameterState<bool> _allowRowReorderState;
+        private readonly ParameterState<bool> _virtualizeColumnsState;
+        private readonly ParameterState<int> _columnOverscanCountState;
+        private readonly DataGridColumnVirtualizer<T> _columnVirtualizer = new();
+        private IScrollListener? _columnScrollListener;
         private readonly DataGridRowDragManager<T> _rowDragManager = new();
         private VekMenu? _contextMenu;
         private bool _contextMenuOpen;
@@ -116,6 +123,19 @@ namespace Vek
         internal int CurrentFocusedColumnIndex => _focusedColumnIndexState.Value;
         internal T? CurrentFocusedItem => _focusedItemState.Value;
         internal bool HasActiveEdit => !EqualityComparer<T?>.Default.Equals(_editingSourceItem, default) || _isEditFormOpen;
+        internal IReadOnlyList<DataGridColumnVirtualizationEntry<T>> ColumnVirtualizationEntries
+        {
+            get
+            {
+                _columnVirtualizer.SetOptions(IsColumnVirtualizationActive, _columnOverscanCountState.Value);
+                _columnVirtualizer.Update(RenderedColumns);
+                return _columnVirtualizer.Entries;
+            }
+        }
+        internal bool IsColumnVirtualizationActive =>
+            _virtualizeColumnsState.Value &&
+            ColGroup is null &&
+            !RenderedColumns.Any(column => column.HeaderColSpan > 1 || column.FooterColSpan > 1);
 
         private const string PrePrefix = "__vek_dg_pre__:";
         private const string PostPrefix = "__vek_dg_post__:";
@@ -236,6 +256,14 @@ namespace Vek
 
             _allowRowReorderState = registerScope.RegisterParameter<bool>(nameof(AllowRowReorder))
                 .WithParameter(() => AllowRowReorder);
+
+            _virtualizeColumnsState = registerScope.RegisterParameter<bool>(nameof(VirtualizeColumns))
+                .WithParameter(() => VirtualizeColumns)
+                .WithChangeHandler(OnColumnVirtualizationParametersChangedAsync);
+
+            _columnOverscanCountState = registerScope.RegisterParameter<int>(nameof(ColumnOverscanCount))
+                .WithParameter(() => ColumnOverscanCount)
+                .WithChangeHandler(OnColumnVirtualizationParametersChangedAsync);
         }
 
         protected string Classname =>
@@ -260,7 +288,7 @@ namespace Vek
 
         protected string Stylename =>
             new StyleBuilder()
-                .AddStyle("overflow-x", "auto", when: HorizontalScrollbar || ColumnResizeMode == ResizeMode.Container)
+                .AddStyle("overflow-x", "auto", when: HorizontalScrollbar || _virtualizeColumnsState.Value || ColumnResizeMode == ResizeMode.Container)
                 .AddStyle("position", "relative", when: HasStickyColumns)
                 .AddStyle(Style)
                 .Build();
@@ -268,13 +296,13 @@ namespace Vek
         protected string TableStyle =>
             new StyleBuilder()
                 .AddStyle("height", Height, !string.IsNullOrWhiteSpace(Height))
-                .AddStyle("display", "block", when: HorizontalScrollbar)
+                  .AddStyle("display", "block", when: HorizontalScrollbar || _virtualizeColumnsState.Value)
                 .Build();
 
         protected string TableRootStyle =>
             new StyleBuilder()
-                .AddStyle("width", "max-content", when: HorizontalScrollbar || ColumnResizeMode == ResizeMode.Container)
-                .AddStyle("min-width", "100%", when: HorizontalScrollbar || ColumnResizeMode == ResizeMode.Container)
+                .AddStyle("width", "max-content", when: HorizontalScrollbar || _virtualizeColumnsState.Value || ColumnResizeMode == ResizeMode.Container)
+                .AddStyle("min-width", "100%", when: HorizontalScrollbar || _virtualizeColumnsState.Value || ColumnResizeMode == ResizeMode.Container)
                 .Build();
 
         protected string TableClass =>
@@ -1160,6 +1188,26 @@ namespace Vek
         /// </remarks>
         [Parameter]
         public bool Virtualize { get; set; }
+
+        /// <summary>
+        /// Renders only the columns near the horizontal scroll viewport.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>false</c>. Pinned columns remain rendered while the visible column window changes.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public bool VirtualizeColumns { get; set; }
+
+        /// <summary>
+        /// The number of columns rendered before and after the horizontal viewport when <see cref="VirtualizeColumns"/> is enabled.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>3</c>.
+        /// </remarks>
+        [Parameter, ParameterState]
+        [Category(CategoryTypes.DataGrid.Behavior)]
+        public int ColumnOverscanCount { get; set; } = 3;
 
         /// <summary>
         /// A RenderFragment that will be used as a placeholder when the Virtualize component is asynchronously loading data.
@@ -2262,7 +2310,44 @@ namespace Vek
                 PagerStateHasChangedEvent?.Invoke();
             }
 
+            if (IsColumnVirtualizationActive)
+            {
+                if (_columnScrollListener is null)
+                {
+                    _columnScrollListener = ScrollListenerFactory.Create($"#{_gridId}", 16);
+                    _columnScrollListener.OnScroll += OnColumnScroll;
+                }
+
+                var scrollData = await _columnScrollListener.GetCurrentScrollDataAsync();
+                if (_columnVirtualizer.SetViewport(scrollData.ScrollLeft, scrollData.ClientWidth, RightToLeft) &&
+                    _columnVirtualizer.Update(RenderedColumns))
+                {
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+            else if (_columnScrollListener is not null)
+            {
+                _columnScrollListener.OnScroll -= OnColumnScroll;
+                await _columnScrollListener.DisposeAsync();
+                _columnScrollListener = null;
+            }
+
             await base.OnAfterRenderAsync(firstRender);
+        }
+
+        private Task OnColumnVirtualizationParametersChangedAsync()
+        {
+            _columnVirtualizer.SetOptions(_virtualizeColumnsState.Value, _columnOverscanCountState.Value);
+            return Task.CompletedTask;
+        }
+
+        private void OnColumnScroll(object? sender, ScrollEventArgs args)
+        {
+            if (_columnVirtualizer.SetViewport(args.ScrollLeft, args.ClientWidth, RightToLeft) &&
+                _columnVirtualizer.Update(RenderedColumns))
+            {
+                _ = InvokeAsync(StateHasChanged);
+            }
         }
 
         public override async Task SetParametersAsync(ParameterView parameters)
@@ -5355,6 +5440,20 @@ namespace Vek
         public void Dispose()
         {
             Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <inheritdoc />
+        public async ValueTask DisposeAsync()
+        {
+            Dispose(disposing: true);
+            if (_columnScrollListener is not null)
+            {
+                _columnScrollListener.OnScroll -= OnColumnScroll;
+                await _columnScrollListener.DisposeAsync();
+                _columnScrollListener = null;
+            }
+
             GC.SuppressFinalize(this);
         }
 

@@ -1,0 +1,36 @@
+@namespace Vek.Docs.Examples
+
+<div class="d-flex flex-column gap-2">
+    <VekText Typo="Typo.body2">
+        Scroll horizontally to move the rendered window across 60 metric columns. The Store column remains pinned, and two columns on either side of the viewport are kept in the DOM as overscan.
+    </VekText>
+    <VekSwitch T="bool" @bind-Value="_virtualizeColumns" Label="Virtualize columns" Color="Color.Primary" />
+    <VekDataGrid T="WarehouseMetrics" Items="@_rows" VirtualizeColumns="@_virtualizeColumns" ColumnOverscanCount="2" HorizontalScrollbar="true" Style="height: 330px">
+        <Columns>
+            <PropertyColumn Property="row => row.Store" Title="Store" Width="180px" FixedStyle="DataGridFixedStyle.Left" />
+            @foreach (var metric in _metrics)
+            {
+                <TemplateColumn T="WarehouseMetrics" Title="@($"Metric {metric:D2}")" Width="160px">
+                    <CellTemplate>
+                        @context.Item.Values[metric - 1]
+                    </CellTemplate>
+                </TemplateColumn>
+            }
+        </Columns>
+    </VekDataGrid>
+</div>
+
+@code {
+    private readonly int[] _metrics = Enumerable.Range(1, 60).ToArray();
+    private bool _virtualizeColumns = true;
+    private readonly WarehouseMetrics[] _rows =
+    [
+        new("North Distribution", Enumerable.Range(1, 60).Select(metric => 1240 + metric * 17).ToArray()),
+        new("West Distribution", Enumerable.Range(1, 60).Select(metric => 980 + metric * 13).ToArray()),
+        new("Central Distribution", Enumerable.Range(1, 60).Select(metric => 1110 + metric * 11).ToArray()),
+        new("East Distribution", Enumerable.Range(1, 60).Select(metric => 870 + metric * 19).ToArray()),
+        new("South Distribution", Enumerable.Range(1, 60).Select(metric => 1030 + metric * 7).ToArray())
+    ];
+
+    private sealed record WarehouseMetrics(string Store, int[] Values);
+}
