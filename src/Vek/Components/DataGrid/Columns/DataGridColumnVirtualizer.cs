@@ -1,6 +1,8 @@
 ﻿namespace Vek;
 
-internal sealed class DataGridColumnVirtualizer<T>
+using System.Diagnostics.CodeAnalysis;
+
+internal sealed class DataGridColumnVirtualizer<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>
 {
     private readonly List<DataGridColumnVirtualizationEntry<T>> _entries = [];
     private double _scrollLeft;
@@ -238,7 +240,7 @@ internal sealed class DataGridColumnVirtualizer<T>
     }
 }
 
-internal readonly struct DataGridColumnVirtualizationEntry<T>
+internal readonly struct DataGridColumnVirtualizationEntry<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>
 {
     private DataGridColumnVirtualizationEntry(Column<T>? column, double spacerWidth, int visibleIndex)
     {
