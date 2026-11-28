@@ -4,9 +4,12 @@
 - **Feature ID**: 023
 - **Feature Slug**: datagrid-cell-display-template-selector
 - **Module**: DataGrid
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 23
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/185
+- **Started At**: 2026-11-27T23:01:21Z
+- **Completed At**: 2026-11-28T06:49:17Z
 
 ---
 

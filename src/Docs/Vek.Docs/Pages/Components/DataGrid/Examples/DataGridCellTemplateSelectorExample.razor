@@ -1,0 +1,32 @@
+@namespace Vek.Docs.Examples
+
+<VekDataGrid Items="@_positions" Dense="true">
+    <Columns>
+        <PropertyColumn Property="position => position.Symbol" Title="Symbol" />
+        <PropertyColumn Property="position => position.Change" Title="Daily change" CellDisplayTemplateSelector="@_changeTemplateSelector" />
+    </Columns>
+</VekDataGrid>
+
+@code {
+#nullable enable
+    private readonly IReadOnlyList<Position> _positions =
+    [
+        new("ALP", 0.18m),
+        new("BRT", 0.04m),
+        new("CRN", -0.07m),
+    ];
+
+    private readonly Func<Position, RenderFragment<Position>?> _changeTemplateSelector = new DataGridCellTemplateSelector<Position>()
+        .When(position => position.Change >= 0.1m, PositiveChangeTemplate)
+        .When(position => position.Change < 0m, NegativeChangeTemplate)
+        .Otherwise(WatchChangeTemplate)
+        .Build();
+
+    private static RenderFragment<Position> PositiveChangeTemplate => position => @<VekChip T="string" Color="Color.Success" Size="Size.Small">+@position.Change.ToString("P0")</VekChip>;
+
+    private static RenderFragment<Position> NegativeChangeTemplate => position => @<VekChip T="string" Color="Color.Error" Size="Size.Small">@position.Change.ToString("P0")</VekChip>;
+
+    private static RenderFragment<Position> WatchChangeTemplate => position => @<VekChip T="string" Color="Color.Warning" Size="Size.Small">@position.Change.ToString("P0")</VekChip>;
+
+    private sealed record Position(string Symbol, decimal Change);
+}
