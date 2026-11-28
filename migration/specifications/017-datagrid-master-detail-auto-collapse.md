@@ -4,9 +4,12 @@
 - **Feature ID**: 017
 - **Feature Slug**: datagrid-master-detail-auto-collapse
 - **Module**: DataGrid
-- **Status**: Ready
+- **Status**: Completed
 - **Priority**: 17
 - **Dependencies**: []
+- **Pull Request**: https://github.com/madiseh/Vek/pull/183
+- **Started At**: 2026-11-27T22:24:53Z
+- **Completed At**: 2026-11-27T23:19:07Z
 
 ---
 

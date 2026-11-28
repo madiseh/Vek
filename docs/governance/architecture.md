@@ -142,6 +142,7 @@ Vek components are engineered to avoid unnecessary allocations, redundant abstra
 - **`Filtering/`**: Filtering engines, token evaluation, and filter parameters (`DataGridSearchEngine.cs`, `DataGridSearchTextParseMode.cs`, `Filter.cs`, `FilterDefinition.cs`, `FilterExpressionGenerator.cs`, `DataGridFilterMode.cs`).
 - **`Grouping/`**: Row grouping structures, grouping definitions, and footer aggregates (`DataGridGroupRow.razor`, `GroupDefinition.cs`, `AggregateDefinition.cs`).
 - **`Models/`**: Event arguments, contexts, validation state, and grid state snapshots (`DataGridSearchBoxContext.cs`, `DataGridCellClickEventArgs.cs`, `GridState.cs`, `IndexBag.cs`).
+- **`Rows/`**: Row-level behavior managers, including detail expansion state and row reordering (`DataGridDetailViewManager<T>`, `DataGridRowDragManager<T>`).
 - **Root Directory**: Reserved exclusively for top-level component orchestrators (`VekDataGrid.razor`, `VekDataGridPager.razor`).
 
 #### Search & Highlighting Pipeline
